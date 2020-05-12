@@ -264,3 +264,7 @@ textarea {
   }
 }
 
+
+[v-cloak] {
+  display: none;
+}
