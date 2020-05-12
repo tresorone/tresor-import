@@ -3,6 +3,7 @@ export const buySamples = [
     require('./buy2_etf.json'),
     require('./buy3.json'),
     require('./buy4.json'),
+    require('./buy5.json'),
 ];
 
 export const dividendsSamples  = [

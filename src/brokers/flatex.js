@@ -18,7 +18,7 @@ const getHeaderValueByKey = (textArr, key) => {
     return result ? result.match(new RegExp(key + '\\s\\s+(.+)'))[1] : null;
 };
 
-const findTableIndex = textArr => textArr.findIndex(t => t.includes('Nr.'));
+const findTableIndex = textArr => textArr.findIndex(t => /Nr.\d+(\/\d)?/.test(t));
 
 const findISIN = textArr => {
     const isinStr = textArr[findTableIndex(textArr)].trim();

@@ -7,6 +7,7 @@ describe('Flatex broker', () => {
 
     test('should accept Buy, Sell, Div Flatex PDFs only', () => {
         expect(canParseData(['flatex Bank AG', 'Kauf'])).toEqual(true);
+        expect(canParseData(['FinTech Group Bank AG', 'Kauf'])).toEqual(true); // old bank name
         expect(canParseData(['flatex Bank AG', 'Verkauf'])).toEqual(true);
         expect(canParseData(['flatex Bank AG', 'Dividendengutschrift'])).toEqual(true);
     });
@@ -81,6 +82,23 @@ describe('Flatex broker', () => {
                 price: 125.5,
                 amount: 1506,
                 fee: 5.9 + 0.85,
+            });
+        });
+
+        test('should map pdf data of sample 5 correctly', () => {
+
+            const activity = parseData(buySamples[4]);
+
+            expect(activity).toEqual({
+                broker: 'flatex',
+                type: 'Buy',
+                date: '2018-04-03',
+                isin: 'US88160R1014',
+                company: 'TESLA INC.',
+                shares: 1,
+                price: 207.83,
+                amount: 207.83,
+                fee: 5.9 + 0.71,
             });
         });
     });
