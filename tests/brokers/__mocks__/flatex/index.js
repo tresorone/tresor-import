@@ -7,4 +7,5 @@ export const buySamples = [
 
 export const dividendsSamples  = [
     require('./dividend1.json'),
+    require('./dividend2.json'),
 ];

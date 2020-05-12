@@ -2,6 +2,7 @@ import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 import every from 'lodash/every';
 import values from 'lodash/values';
+import {Big} from "big.js";
 
 const parseGermanNum = n =>
     parseFloat(n.replace(/[-+]$/, '').replace(/\./g, '').replace(',', '.'));
@@ -28,7 +29,7 @@ const findISIN = textArr => {
 const findCompany = textArr => {
     const companyStr = textArr[findTableIndex(textArr)].trim();
     const companyMatch = companyStr.match(/Nr.\d+(\/\d)?\s+(Kauf|Verkauf)?\s+((\S+\s?\S*)+)\s+(\(|DL)/);
-    return companyMatch ? companyMatch[3] : null;
+    return companyMatch ? companyMatch[3].trim() : null;
 };
 
 const findDateBuySell = textArr =>
@@ -51,14 +52,31 @@ const findPrice = textArr =>
 const findAmount = textArr =>
     parseGermanNum(getTableValueByKey(textArr, 'Kurswert').split(' ')[0]);
 
-const findFee = textArr =>
-    getTableValueByKey(textArr, 'Provision') ? parseGermanNum(getTableValueByKey(textArr, 'Provision').split(' ')[0]) : 0;
+const findFee = textArr => {
+    const provision = getTableValueByKey(textArr, 'Provision') ? parseGermanNum(getTableValueByKey(textArr, 'Provision').split(' ')[0]) : 0;
+    const ownExpenses = getTableValueByKey(textArr, 'Eigene Spesen') ? parseGermanNum(getTableValueByKey(textArr, 'Eigene Spesen').split(' ')[0]) : 0;
+    const foreignExpenses = getTableValueByKey(textArr, 'Fremde Spesen') ? parseGermanNum(getTableValueByKey(textArr, 'Fremde Spesen').split(' ')[0]) : 0;
+
+    return provision + ownExpenses + foreignExpenses;
+};
+
+const findDividendFee = textArr => {
+    const assessmentBasis = getTableValueByKey(textArr, 'grundlage') ? parseGermanNum(getTableValueByKey(textArr, 'grundlage').split(' ')[0]) : 0; // Bemessungsgrundlage
+    const netDividend = getTableValueByKey(textArr, 'Endbetrag') ? parseGermanNum(getTableValueByKey(textArr, 'Endbetrag').split(' ')[0]) : 0;
+
+    return assessmentBasis > 0 ? +Big(assessmentBasis).minus(Big(netDividend)) : 0;
+};
+
 
 const findDateDividend = textArr =>
     getTableValueByKey(textArr, 'Zahlungstag');
 
-const findPayout = textArr =>
-    parseGermanNum(getTableValueByKey(textArr, 'Endbetrag')); // incl. Tax
+const findPayout = textArr => {
+    const assessmentBasis = getTableValueByKey(textArr, 'grundlage') ? parseGermanNum(getTableValueByKey(textArr, 'grundlage').split(' ')[0]) : 0; // Bemessungsgrundlage
+    const netDividend = getTableValueByKey(textArr, 'Endbetrag') ? parseGermanNum(getTableValueByKey(textArr, 'Endbetrag').split(' ')[0]) : 0;
+
+    return assessmentBasis > 0 ? assessmentBasis : netDividend;
+};
 
 const isBuy = textArr =>
     textArr.some(t => t.includes('Kauf'));
@@ -104,7 +122,7 @@ export const parseData = textArr => {
         shares = findShares(textArr);
         amount = findPayout(textArr);
         price = amount / shares;
-        fee = 0;
+        fee = findDividendFee(textArr);
     } else {
         console.error('Type could not be determined!');
         return undefined;
