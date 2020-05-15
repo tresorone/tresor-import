@@ -11,4 +11,5 @@ export const sellSamples  = [
 export const dividendsSamples  = [
     require('./div-1.json'),
     require('./div-2.json'),
+    require('./div-3.json'),
 ];

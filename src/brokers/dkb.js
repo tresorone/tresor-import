@@ -65,7 +65,7 @@ const isSell = textArr =>
   textArr.some(t => t.includes('Wertpapier Abrechnung Verkauf'));
 
 const isDividend = textArr =>
-  textArr.some(t => t.includes('Dividendengutschrift'));
+  textArr.some(t => t.includes('Dividendengutschrift') || t.includes('Ausschüttung Investmentfonds'));
 
 export const canParseData = textArr =>
   textArr.some(t => t.includes('BIC BYLADEM1001')) &&

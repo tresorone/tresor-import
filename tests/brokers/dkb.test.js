@@ -130,6 +130,21 @@ describe('DKB broker', () => {
         fee: 0,
       });
     });
+    test('should map pdf data of sample 3 correctly', () => {
+      const activity = parseData(dividendsSamples[2]);
+
+      expect(activity).toEqual({
+        broker: 'dkb',
+        type: 'Dividend',
+        date: '2020-04-08',
+        isin: 'IE00B3RBWM25',
+        company: 'VANGUARD FTSE ALL-WORLD U.ETF',
+        shares: 12,
+        price: 0.375,
+        amount: 4.5,
+        fee: 0,
+      });
+    });
   });
 
   beforeEach(() => {
