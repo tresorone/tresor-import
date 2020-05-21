@@ -24,7 +24,7 @@ const isDividend = textArr =>
   );
 
 export const canParseData = textArr =>
-  textArr.some(t => t.includes('INGDDEFFXXX')) &&
+  textArr.some(t => t.includes('BIC: INGDDEFFXX')) &&
   (isBuy(textArr) || isSell(textArr) || isDividend(textArr));
 
 const findShares = textArr =>
