@@ -2,6 +2,7 @@ import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 import every from 'lodash/every';
 import values from 'lodash/values';
+import Big from 'big.js';
 
 const parseGermanNum = n =>
   parseFloat(n.replace(/[-+]$/, '').replace(/\./g, '').replace(',', '.'));
@@ -24,9 +25,12 @@ export const canParseData = textArr =>
   textArr.some(t => t.includes('INGDDEFFXXX')) &&
   (isBuy(textArr) || isSell(textArr) || isDividend(textArr));
 
-const findShares = textArr => (isBuy(textArr) || isSell(textArr))
-  ? parseGermanNum(getValueByPreviousElement(textArr, 'Stück', 1))
-  : parseGermanNum(getValueByPreviousElement(textArr, 'Nominale', 1).split(' ')[0]);
+const findShares = textArr =>
+  isBuy(textArr) || isSell(textArr)
+    ? parseGermanNum(getValueByPreviousElement(textArr, 'Stück', 1))
+    : parseGermanNum(
+        getValueByPreviousElement(textArr, 'Nominale', 1).split(' ')[0]
+      );
 
 const findISIN = textArr => {
   const isin = getValueByPreviousElement(textArr, 'ISIN', 1).split(' ')[0];
@@ -36,13 +40,19 @@ const findISIN = textArr => {
 const findCompany = textArr =>
   getValueByPreviousElement(textArr, 'Wertpapierbezeichnung', 1).split(' -')[0];
 
-const findDate = textArr => (isBuy(textArr) || isSell(textArr))
-  ? getValueByPreviousElement(textArr, 'Ausführungstag', 2).split(' ')[0]
-  : getValueByPreviousElement(textArr, 'Zahltag', 1);
+const findDate = textArr =>
+  isBuy(textArr) || isSell(textArr)
+    ? getValueByPreviousElement(textArr, 'Ausführungstag', 2).split(' ')[0]
+    : getValueByPreviousElement(textArr, 'Zahltag', 1);
 
-const findPrice = textArr => (isBuy(textArr) || isSell(textArr))
-  ? parseGermanNum(getValueByPreviousElement(textArr, 'Kurs', 2))
-  : parseGermanNum(getValueByPreviousElement(textArr, 'Zins-/Dividendensatz', 1).split(' ')[0]);
+const findPrice = textArr =>
+  isBuy(textArr) || isSell(textArr)
+    ? parseGermanNum(getValueByPreviousElement(textArr, 'Kurs', 2))
+    : parseGermanNum(
+        getValueByPreviousElement(textArr, 'Zins-/Dividendensatz', 1).split(
+          ' '
+        )[0]
+      );
 
 const findAmount = textArr =>
   parseGermanNum(getValueByPreviousElement(textArr, 'Kurswert', 2));
@@ -83,7 +93,7 @@ export const parseData = textArr => {
     date = findDate(textArr);
     shares = findShares(textArr);
     amount = findPayout(textArr);
-    price = amount / shares;
+    price = +Big(amount).div(shares);
     fee = 0;
   } else {
     console.error('Type could not be determined!');
