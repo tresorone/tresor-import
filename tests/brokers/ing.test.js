@@ -140,5 +140,53 @@ describe('Test Ing', () => {
         fee: 0,
       });
     });
+
+    test('Test if dividend3 is mapped correctly', () => {
+      const activity = ing.parseData(dividendsSamples[2]);
+
+      expect(activity).toEqual({
+        broker: 'ing',
+        type: 'Dividend',
+        date: '2020-05-04',
+        isin: 'IE00BZ163G84',
+        company: 'Vanguard EUR Corp.Bond U.ETF',
+        shares: 29,
+        price: 0.02,
+        amount: 0.58,
+        fee: 0,
+      });
+    });
+
+    test('Test if dividend4 is mapped correctly', () => {
+      const activity = ing.parseData(dividendsSamples[3]);
+
+      expect(activity).toEqual({
+        broker: 'ing',
+        type: 'Dividend',
+        date: '2020-04-15',
+        isin: 'DE000A0F5UH1',
+        company: 'iSh.ST.Gl.Sel.Div.100 U.ETF DE',
+        shares: 34,
+        price: 0.17705882352941177,
+        amount: 6.02,
+        fee: 0,
+      });
+    });
+
+    test('Test if dividend5 is mapped correctly', () => {
+      const activity = ing.parseData(dividendsSamples[4]);
+
+      expect(activity).toEqual({
+        broker: 'ing',
+        type: 'Dividend',
+        date: '2020-04-08',
+        isin: 'IE00B3RBWM25',
+        company: 'Vanguard FTSE All-World U.ETF',
+        shares: 270,
+        price: 0.30596296296296294,
+        amount: 82.61,
+        fee: 0,
+      });
+    });
   });
 });

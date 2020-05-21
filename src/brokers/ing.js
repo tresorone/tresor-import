@@ -19,7 +19,9 @@ const isSell = textArr =>
   textArr.some(t => t.includes('Verkauf'));
 
 const isDividend = textArr =>
-  textArr.some(t => t.includes('Dividendengutschrift'));
+  textArr.some(
+    t => t.includes('Dividendengutschrift') || t.includes('Ertragsgutschrift')
+  );
 
 export const canParseData = textArr =>
   textArr.some(t => t.includes('INGDDEFFXXX')) &&
