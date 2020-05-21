@@ -12,6 +12,7 @@ export const dividendsSamples = [
   require('./dividend3.json'),
   require('./dividend4.json'),
   require('./dividend5.json'),
+  require('./dividend_etf.json'),
 ];
 
 export const invalidSamples = [require('./invalid_buy.json')];

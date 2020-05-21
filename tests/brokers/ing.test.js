@@ -188,5 +188,21 @@ describe('Test Ing', () => {
         fee: 0,
       });
     });
+
+    test('Test if dividend_etf is mapped correctly', () => {
+      const activity = ing.parseData(dividendsSamples[5]);
+
+      expect(activity).toEqual({
+        broker: 'ing',
+        type: 'Dividend',
+        date: '2018-08-23',
+        isin: 'LU0392494562',
+        company: 'ComStage-MSCI World TRN U.ETF',
+        shares: 12,
+        price: 0.9408333333333333,
+        amount: 11.29,
+        fee: 0,
+      });
+    });
   });
 });
