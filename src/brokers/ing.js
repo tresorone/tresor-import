@@ -59,8 +59,12 @@ const findPrice = textArr =>
 const findAmount = textArr =>
   parseGermanNum(getValueByPreviousElement(textArr, 'Kurswert', 2));
 
-const findFee = textArr =>
-  parseGermanNum(getValueByPreviousElement(textArr, 'Provision', 2));
+const findFee = textArr => {
+  const fee = parseGermanNum(
+    getValueByPreviousElement(textArr, 'Provision', 2)
+  );
+  return fee && /([0-9]*)/.test(fee) ? fee : 0;
+};
 
 const findPayout = textArr =>
   parseGermanNum(
