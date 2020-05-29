@@ -11,7 +11,7 @@ const parseGermanNum = n => {
 const findISIN = (text, span) => {
   const isinLine =
     text[text.findIndex(t => t.includes('Auftragsnummer')) + span];
-  // get first 12 characters
+  // the order number is always 12 charactes long
   const isin = isinLine.substring(0, 12);
   return isin;
 };
@@ -20,7 +20,7 @@ const findCompany = (text, span) => {
   const companyLine =
     text[text.findIndex(t => t.includes('Auftragsnummer')) + span];
   // company starts right after the order number which is 12 characters followed by 17 spaces
-  const company = companyLine.slice((12+17));
+  const company = companyLine.slice(12 + 17);
 
   return company;
 };
@@ -76,20 +76,27 @@ const findFee = textArr => {
     textArr[textArr.findIndex(t => t.includes('Zu Ihren')) + 1];
   const totalCost = totalCostLine.split('EUR').pop().trim();
 
-  const diff = +(Big(parseGermanNum(totalCost)).minus(Big(amount)));
+  const diff = +Big(parseGermanNum(totalCost)).minus(Big(amount));
   return Math.abs(diff);
 };
 
 const isBuy = textArr => {
-  return textArr.some(t => t.includes('Kauf aus Wertpapierliste')) || textArr.some(t => t.includes('uf Marktplatz'));
-}
+  return (
+    textArr.some(t => t.includes('Kauf aus Wertpapierliste')) ||
+    textArr.some(t => t.includes('uf Marktplatz'))
+  );
+};
 const isSell = textArr => textArr.some(t => t.includes('*'));
 
-const isDividend = textArr => textArr.some(t => t.includes('Ausschüttung'))
+const isDividend = textArr => textArr.some(t => t.includes('Ausschüttung'));
 
 export const canParseData = textArr => {
-  return textArr.some(t => t.includes('ERSTE')) && (isBuy(textArr) || isSell(textArr) || isDividend(textArr));
-}
+  return (
+    textArr.some(t => t.includes('ERSTE')) &&
+    textArr.some(t => t.includes('SPARKASSEN')) &&
+    (isBuy(textArr) || isSell(textArr) || isDividend(textArr))
+  );
+};
 export const parseData = textArr => {
   let type, date, isin, company, shares, price, amount, fee;
 
@@ -100,7 +107,7 @@ export const parseData = textArr => {
     date = findDateBuySell(textArr);
     shares = findShares(textArr);
     amount = findAmount(textArr);
-    price = +(Big(amount).div(Big(shares)));
+    price = +Big(amount).div(Big(shares));
     fee = findFee(textArr);
   } else if (isSell(textArr)) {
     type = 'Sell';
@@ -109,7 +116,7 @@ export const parseData = textArr => {
     date = findDateBuySell(textArr);
     shares = findShares(textArr);
     amount = findAmount(textArr);
-    price = +(Big(amount).div(Big(shares)));
+    price = +Big(amount).div(Big(shares));
     fee = findFee(textArr);
   } else if (isDividend(textArr)) {
     type = 'Dividend';
@@ -118,7 +125,7 @@ export const parseData = textArr => {
     date = findDateDividend(textArr);
     shares = findDividendShares(textArr);
     amount = findPayout(textArr);
-    price = +(Big(amount).div(Big(shares)));
+    price = +Big(amount).div(Big(shares));
     fee = 0;
   }
 
@@ -151,5 +158,7 @@ export const parsePages = contents => {
 };
 
 export const testables = {
-  isBuy:isBuy
-}
+  isBuy: isBuy,
+  findISIN: findISIN,
+  findCompany: findCompany,
+};
