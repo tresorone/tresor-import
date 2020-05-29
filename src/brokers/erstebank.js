@@ -9,18 +9,18 @@ const parseGermanNum = n => {
 };
 
 const findISIN = (text, span) => {
-  const isinLine = text[text.findIndex(t => t.includes('Auftragsnummer')) + span];
-  const isin = isinLine.substr(isinLine.length - 12);
+  const isinLine =
+    text[text.findIndex(t => t.includes('Auftragsnummer')) + span];
+  // get first 12 characters
+  const isin = isinLine.substring(0, 12);
   return isin;
 };
 
 const findCompany = (text, span) => {
-  const companyLine = text[text.findIndex(t => t.includes('/ISIN')) + span];
-  // span = 2 means its a dividend PDF - dividends dont have the WKN in the same line
-  const company =
-    span === 2
-      ? companyLine.trim()
-      : companyLine.substr(0, companyLine.length - 6).trim();
+  const companyLine =
+    text[text.findIndex(t => t.includes('Auftragsnummer')) + span];
+  // company starts right after the order number which is 12 characters followed by 17 spaces
+  const company = companyLine.slice((12+17));
 
   return company;
 };
