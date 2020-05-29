@@ -21,7 +21,23 @@ describe('Test internal functions for Erste Bank Parser', () => {
     }
   );
 
+  const isin_testcases = [
+    [samples[0], 'AT0000A05HR3'],
+    [samples[1], 'AT0000A08SH5'],
+    [samples[2], 'AT0000660600'],
+    [samples[3], 'AT0000707674'],
+    [samples[4], 'AT0000A11F86'],
+    [samples[5], 'AT0000753504'],
+    [samples[6], 'AT0000705678'],
+    [samples[7], 'AT0000680970'],
+    [samples[8], 'AT0000A296E8'],
+  ];
+  test.each(isin_testcases)(
+    'should be able to findISIN in Sample %#',
+    (sample, expected) => {
+      expect(findISIN(sample, 1)).toBe(expected);
     }
+  );
 
 describe('Test public functions for Erste Bank Parser', () => {
   test.each(samples.map(samples => [samples, true]))(
