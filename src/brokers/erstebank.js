@@ -4,8 +4,15 @@ import every from 'lodash/every';
 import values from 'lodash/values';
 import Big from 'big.js';
 
+// remove . (thousands separator) and replace , (decimal separator) with a dot
+// also remove anything that isn't a digit, decimal point or a minus sign
 const parseGermanNum = n => {
-  return parseFloat(n.replace(/\./g, '').replace(',', '.'));
+  return parseFloat(
+    n
+      .replace(/\./g, '')
+      .replace(',', '.')
+      .replace(/[^\d.-]/g, '')
+  );
 };
 
 const findISIN = (text, span) => {
