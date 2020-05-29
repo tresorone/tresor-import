@@ -52,11 +52,9 @@ const findDateSell = textArr => {
 };
 
 const findDateDividend = textArr => {
-  // Extract the date from a string like this: "Dividende mit dem Ex-Tag 13.02.2020."
-  const searchTerm = 'mit dem Ex-Tag ';
-  const dateLine = textArr[textArr.findIndex(t => t.includes(searchTerm))];
-  const datePart = dateLine.split(searchTerm)[1].trim().substring(0, 10);
-  const date = datePart;
+  const searchTerm = 'VALUTA';
+  const dateLine = textArr[textArr.indexOf(searchTerm) + 3];
+  const date = dateLine;
   return date;
 };
 
