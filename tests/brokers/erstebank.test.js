@@ -9,7 +9,7 @@ import {
 
 console.error = jest.fn();
 
-const {isBuy} = eb.testables
+const { isBuy, findISIN, findCompany } = eb.testables;
 
 const samples = buySamples.concat(sellSamples, dividendsSamples);
 
@@ -29,6 +29,7 @@ describe('Test internal functions for Erste Bank Parser', () => {
 
   test('Should identify Erste Bank as broker', () => {
     for (let sample of buySamples.concat(sellSamples, dividendsSamples)) {
+describe('Test public functions for Erste Bank Parser', () => {
       expect(getBroker(sample)).toEqual(eb);
     }
   });
