@@ -21,16 +21,20 @@ describe('Test internal functions for Erste Bank Parser', () => {
     }
   );
 
-  test('should be able to parseData', () => {
-    for (let sample of buySamples.concat(sellSamples, dividendsSamples)) {
-      expect(eb.canParseData(sample)).toEqual(true);
     }
-  });
 
-  test('Should identify Erste Bank as broker', () => {
-    for (let sample of buySamples.concat(sellSamples, dividendsSamples)) {
 describe('Test public functions for Erste Bank Parser', () => {
+  test.each(samples.map(samples => [samples, true]))(
+    'should be able to parseData from Sample %#',
+    (sample, expected) => {
+      expect(eb.canParseData(sample)).toEqual(expected);
+    }
+  );
+
+  test.each(samples.map(samples => [samples, true]))(
+    'Should identify Erste Bank as broker from Sample %#',
+    sample => {
       expect(getBroker(sample)).toEqual(eb);
     }
-  });
+  );
 });
