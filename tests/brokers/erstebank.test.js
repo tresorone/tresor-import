@@ -39,6 +39,25 @@ describe('Test internal functions for Erste Bank Parser', () => {
     }
   );
 
+  const company_testcases = [
+    [samples[0], 'ERSTE BOND EMERGING MARKETS CORPOR.'],
+    [samples[1], 'ERSTE IMMOBILIENFONDS'],
+    [samples[2], 'ESPA SELECT BOND (T)'],
+    [samples[3], 'ESPA BEST OF WORLD'],
+    [samples[4], 'YOU INVEST ACTIVE EUR R T'],
+    [samples[5], 'ERSTE STOCK TECHNO EUR R T'],
+    [samples[6], 'ERSTE WWF STOCK ENV EUR R T'],
+    [samples[7], 'ERSTE STOCK EM GLOBAL EUR R T'],
+    [samples[8], 'ERSTE FUTURE INVEST EUR R T'],
+  ];
+  test.each(company_testcases)(
+    'should be able to findCompany in Sample %#',
+    (sample, expected) => {
+      expect(findCompany(sample, 1)).toBe(expected);
+    }
+  );
+});
+
 describe('Test public functions for Erste Bank Parser', () => {
   test.each(samples.map(samples => [samples, true]))(
     'should be able to parseData from Sample %#',
