@@ -15,11 +15,14 @@ const parseGermanNum = n => {
   );
 };
 
+// parse line like:
+//   ISIN                           Company
+// "AT0000707674                 ESPA BEST OF WORLD",
 const findISIN = (text, span) => {
   const isinLine =
     text[text.findIndex(t => t.includes('Auftragsnummer')) + span];
   // the order number is always 12 charactes long
-  const isin = isinLine.substring(0, 12);
+  const isin = isinLine.substr(0, 12);
   return isin;
 };
 
