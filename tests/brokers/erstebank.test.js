@@ -86,6 +86,24 @@ describe('Test internal functions for Erste Bank Parser', () => {
       expect(parseGermanNum(sample)).toBe(expected);
     }
   );
+
+  const buyselldate_testcases = [
+    [samples[0], '02.03.2017'],
+    [samples[1], '01.03.2017'],
+    [samples[2], '02.03.2017'],
+    [samples[3], '02.03.2017'],
+    [samples[4], '12.05.2020'],
+    [samples[5], '11.05.2020'],
+    [samples[6], '11.05.2020'],
+    [samples[7], '12.05.2020'],
+    [samples[8], '12.05.2020'],
+  ];
+  test.each(buyselldate_testcases)(
+    'should be able to findDateBuySell in Sample %#',
+    (sample, expected) => {
+      expect(findDateBuySell(sample)).toBe(expected);
+    }
+  );
 });
 
 describe('Test public functions for Erste Bank Parser', () => {
