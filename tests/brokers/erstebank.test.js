@@ -11,13 +11,15 @@ console.error = jest.fn();
 
 const {isBuy} = eb.testables
 
-describe('Test Erste Bank', () => {
-  test('should identify Buy Statements', () => {
-    // const sample = buySamples[0];    
-    for (let sample of buySamples.concat(sellSamples, dividendsSamples)) {
-      expect(isBuy(sample)).toEqual(true);
+const samples = buySamples.concat(sellSamples, dividendsSamples);
+
+describe('Test internal functions for Erste Bank Parser', () => {
+  test.each(samples.map(samples => [samples, true]))(
+    'should identify Buy Statements in Sample %#',
+    (sample, expected) => {
+      expect(isBuy(sample)).toEqual(expected);
     }
-  });
+  );
 
   test('should be able to parseData', () => {
     for (let sample of buySamples.concat(sellSamples, dividendsSamples)) {
