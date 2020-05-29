@@ -62,6 +62,30 @@ describe('Test internal functions for Erste Bank Parser', () => {
       expect(findCompany(sample, 1)).toBe(expected);
     }
   );
+
+  const parseGermanNum_testcases = [
+    ['99.735,77', 99735.77],
+    ['99.833,64', 99833.64],
+    ['123456,50', 123456.5],
+    ['90783496', 90783496],
+    ['99,495,00', 99.495],
+    ['+123456,50', 123456.5],
+    ['-123456,50', -123456.5],
+    ['123456,50+', 123456.5],
+    ['123456,50-', 123456.5],
+    ['+ 123456,50', 123456.5],
+    ['- 123456,50', -123456.5],
+    ['123456,50 +', 123456.5],
+    ['123456,50 -', 123456.5],
+    ['hallo', NaN],
+    ['Tresor', NaN],
+  ];
+  test.each(parseGermanNum_testcases)(
+    'should be able to findDateBuySell in Sample %#',
+    (sample, expected) => {
+      expect(parseGermanNum(sample)).toBe(expected);
+    }
+  );
 });
 
 describe('Test public functions for Erste Bank Parser', () => {
