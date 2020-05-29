@@ -161,7 +161,9 @@ export const parsePages = contents => {
 };
 
 export const testables = {
+  parseGermanNum: parseGermanNum,
   isBuy: isBuy,
   findISIN: findISIN,
   findCompany: findCompany,
+  findDateBuySell: findDateBuySell,
 };
