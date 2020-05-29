@@ -35,20 +35,13 @@ const findCompany = (text, span) => {
   return company;
 };
 
+// parse line like:
+// "Ausführungszeit 15:43:02                Schlusstag: 02.03.2017",
 const findDateBuySell = textArr => {
   const dateLine = textArr[textArr.findIndex(t => t.includes('Schlusstag'))];
-  const date = dateLine.split(':')[1].trim().substr(0, 10);
+  const date = dateLine.split(':')[3].trim().substr(0, 10);
   return date;
 };
-
-const findDateDividend = textArr => {
-  const dateLine = textArr[textArr.findIndex(t => t.includes('Extag'))];
-  const datePart = dateLine.split('Extag')[1].trim().substr(0, 10);
-  const date = datePart;
-
-  return date;
-};
-
 const findShares = textArr => {
   const sharesLine =
     textArr[textArr.findIndex(t => t.includes('Nennwert')) + 1];
