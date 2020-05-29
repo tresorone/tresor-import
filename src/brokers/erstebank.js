@@ -25,7 +25,9 @@ const findISIN = (text, span) => {
   const isin = isinLine.substr(0, 12);
   return isin;
 };
-
+// parse line like:
+//   ISIN                           Company
+// "AT0000707674                 ESPA BEST OF WORLD",
 const findCompany = (text, span) => {
   const companyLine =
     text[text.findIndex(t => t.includes('Auftragsnummer')) + span];
@@ -42,6 +44,9 @@ const findDateBuySell = textArr => {
   const date = dateLine.split(':')[3].trim().substr(0, 10);
   return date;
 };
+// parse line like:
+// "Währung/STK   Nennwert/Stückzahl              Kurs             Handelsart                  Kurswert",
+// "STK                      999,000     EUR     108,870000         NETTO Inland                99.024,06  EUR",
 const findShares = textArr => {
   const sharesLine =
     textArr[textArr.findIndex(t => t.includes('Nennwert')) + 1];
@@ -49,6 +54,9 @@ const findShares = textArr => {
   return parseGermanNum(shares);
 };
 
+// parse lines like:
+// "Währung/STK   Nennwert/Stückzahl              Kurs             Handelsart                  Kurswert",
+// "STK                      999,000     EUR     108,870000         NETTO Inland                99.024,06  EUR",
 const findDividendShares = textArr => {
   const sharesLine = textArr[textArr.findIndex(t => t.includes('STK'))];
   const shares = sharesLine.split('  ').filter(i => i.length > 0)[1];
