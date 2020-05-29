@@ -9,7 +9,13 @@ import {
 
 console.error = jest.fn();
 
-const { isBuy, findISIN, findCompany } = eb.testables;
+const {
+  isBuy,
+  findISIN,
+  findCompany,
+  findDateBuySell,
+  parseGermanNum,
+} = eb.testables;
 
 const samples = buySamples.concat(sellSamples, dividendsSamples);
 
