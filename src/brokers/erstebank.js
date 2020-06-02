@@ -15,7 +15,7 @@ const parseGermanNum = n => {
   );
 };
 
-// parse line like:
+// parse lines for ISIN. example:
 //   ISIN                           Company
 // "AT0000707674                 ESPA BEST OF WORLD",
 const findISIN = (text, span) => {
@@ -25,7 +25,7 @@ const findISIN = (text, span) => {
   const isin = isinLine.substr(0, 12);
   return isin;
 };
-// parse line like:
+// parse lines for company/share name. example:
 //   ISIN                           Company
 // "AT0000707674                 ESPA BEST OF WORLD",
 const findCompany = (text, span) => {
@@ -37,14 +37,14 @@ const findCompany = (text, span) => {
   return company;
 };
 
-// parse line like:
+// parse lines for Buy/Sell date. example:
 // "Ausführungszeit 15:43:02                Schlusstag: 02.03.2017",
 const findDateBuySell = textArr => {
   const dateLine = textArr[textArr.findIndex(t => t.includes('Schlusstag'))];
   const date = dateLine.split(':')[3].trim().substr(0, 10);
   return date;
 };
-// parse line like:
+// parse lines for amount of shares. example:
 // "Währung/STK   Nennwert/Stückzahl              Kurs             Handelsart                  Kurswert",
 // "STK                      999,000     EUR     108,870000         NETTO Inland                99.024,06  EUR",
 const findShares = textArr => {
@@ -54,7 +54,7 @@ const findShares = textArr => {
   return parseGermanNum(shares);
 };
 
-// parse lines like:
+// parse lines for value of shares. example:
 // "Währung/STK   Nennwert/Stückzahl              Kurs             Handelsart                  Kurswert",
 // "STK                      999,000     EUR     108,870000         NETTO Inland                99.024,06  EUR",
 const findDividendShares = textArr => {
