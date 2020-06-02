@@ -15,6 +15,7 @@ const {
   findCompany,
   findDateBuySell,
   parseGermanNum,
+  findAmount,
 } = eb.testables;
 
 const samples = buySamples.concat(sellSamples, dividendsSamples);
@@ -102,6 +103,24 @@ describe('Test internal functions for Erste Bank Parser', () => {
     'should be able to findDateBuySell in Sample %#',
     (sample, expected) => {
       expect(findDateBuySell(sample)).toBe(expected);
+    }
+  );
+
+  const amount_testcases = [
+    [samples[0], 99735.77],
+    [samples[1], 99833.64],
+    [samples[2], 99637.50],
+    [samples[3], 99024.06],
+    [samples[4], 99495.00],
+    [samples[5], 99001.88],
+    [samples[6], 99086.64],
+    [samples[7], 9505.90],
+    [samples[8], 99289.02],
+  ];
+  test.each(amount_testcases)(
+    'should be able to findAmount in Sample %#',
+    (sample, expected) => {
+      expect(findAmount(sample)).toBe(expected);
     }
   );
 });

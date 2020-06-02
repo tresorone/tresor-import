@@ -57,20 +57,18 @@ const findShares = textArr => {
 // parse lines for value of shares. example:
 // "Währung/STK   Nennwert/Stückzahl              Kurs             Handelsart                  Kurswert",
 // "STK                      999,000     EUR     108,870000         NETTO Inland                99.024,06  EUR",
+const findAmount = textArr => {
+  const priceLine = textArr[textArr.findIndex(t => t.includes('Kurswert')) + 1];
+  const re = /^STK\s+\d+,\d+\s+EUR\s+\d+,\d+(\s+NETTO Inland)?\s+(\d+\.\d+,\d+)\s+EUR/;
+  const amount = priceLine.match(re)[2];
+  return parseGermanNum(amount);
+};
+
 const findDividendShares = textArr => {
   const sharesLine = textArr[textArr.findIndex(t => t.includes('STK'))];
   const shares = sharesLine.split('  ').filter(i => i.length > 0)[1];
   // console.log(shares)
   return parseGermanNum(shares);
-};
-
-const findAmount = textArr => {
-  const priceArea = textArr.slice(
-    textArr.findIndex(t => t.includes('Kurswert'))
-  );
-  const priceLine = priceArea[priceArea.findIndex(t => t.includes('EUR'))];
-  const amount = priceLine.split('EUR')[1].trim();
-  return parseGermanNum(amount);
 };
 
 const findPayout = textArr => {
@@ -174,4 +172,5 @@ export const testables = {
   findISIN: findISIN,
   findCompany: findCompany,
   findDateBuySell: findDateBuySell,
+  findAmount: findAmount,
 };
