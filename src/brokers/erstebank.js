@@ -98,9 +98,9 @@ const findDividendShares = textArr => {
   return parseGermanNum(shares);
 };
 // parse line to get payout from dividends. example:
-//     "Gutschrift                                                                         205,11",
+// "Brutto EUR                                                                         276,00",
 const findDividendPayout = textArr => {
-  const payoutLine = textArr[textArr.findIndex(t => t.includes('Gutschrift'))];
+  const payoutLine = textArr[textArr.findIndex(t => t.includes('Brutto EUR'))];
   const re = /\d+,?\d+/;
   const payout = payoutLine.match(re)[0];
   return parseGermanNum(payout);
