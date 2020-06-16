@@ -240,4 +240,139 @@ describe('Test public functions for Erste Bank Parser', () => {
       expect(getBroker(sample)).toEqual(eb);
     }
   );
+
+  const TTparseBuy = [
+    [
+      buySamples[0],
+      {
+        broker: 'erstebank',
+        type: 'Buy',
+        date: '2017-03-02',
+        isin: 'AT0000A05HR3',
+        company: 'ERSTE BOND EMERGING MARKETS CORPOR.',
+        shares: 999,
+        price: 171.37,
+        amount: 171198.63,
+        fee: 0,
+      },
+    ],
+    [
+      buySamples[1],
+      {
+        broker: 'erstebank',
+        type: 'Buy',
+        date: '2017-03-01',
+        isin: 'AT0000A08SH5',
+        company: 'ERSTE IMMOBILIENFONDS',
+        shares: 999,
+        price: 128.12,
+        amount: 127991.88,
+        fee: 0,
+      },
+    ],
+    [
+      buySamples[2],
+      {
+        broker: 'erstebank',
+        type: 'Buy',
+        date: '2017-03-02',
+        isin: 'AT0000660600',
+        company: 'ESPA SELECT BOND (T)',
+        shares: 999,
+        price: 162.5,
+        amount: 162337.5,
+        fee: 0,
+      },
+    ],
+    [
+      buySamples[3],
+      {
+        broker: 'erstebank',
+        type: 'Buy',
+        date: '2017-03-02',
+        isin: 'AT0000707674',
+        company: 'ESPA BEST OF WORLD',
+        shares: 999,
+        price: 108.87,
+        amount: 108761.13,
+        fee: 0,
+      },
+    ],
+    [
+      buySamples[4],
+      {
+        broker: 'erstebank',
+        type: 'Buy',
+        date: '2020-05-12',
+        isin: 'AT0000A11F86',
+        company: 'YOU INVEST ACTIVE EUR R T',
+        shares: 999,
+        price: 107.4,
+        amount: 107292.6,
+        fee: 2029.86,
+      },
+    ],
+    [
+      buySamples[5],
+      {
+        broker: 'erstebank',
+        type: 'Buy',
+        date: '2020-05-11',
+        isin: 'AT0000753504',
+        company: 'ERSTE STOCK TECHNO EUR R T',
+        shares: 999,
+        price: 102.06,
+        amount: 101957.94,
+        fee: 360.07,
+      },
+    ],
+    [
+      buySamples[6],
+      {
+        broker: 'erstebank',
+        type: 'Buy',
+        date: '2020-05-11',
+        isin: 'AT0000705678',
+        company: 'ERSTE WWF STOCK ENV EUR R T',
+        shares: 999,
+        price: 167.87,
+        amount: 167702.13,
+        fee: 435.12,
+      },
+    ],
+    [
+      buySamples[7],
+      {
+        broker: 'erstebank',
+        type: 'Buy',
+        date: '2020-05-12',
+        isin: 'AT0000680970',
+        company: 'ERSTE STOCK EM GLOBAL EUR R T',
+        shares: 999,
+        price: 191.35,
+        amount: 191158.65,
+        fee: 234.21,
+      },
+    ],
+    [
+      buySamples[8],
+      {
+        broker: 'erstebank',
+        type: 'Buy',
+        date: '2020-05-12',
+        isin: 'AT0000A296E8',
+        company: 'ERSTE FUTURE INVEST EUR R T',
+        shares: 999,
+        price: 110.79,
+        amount: 110679.21,
+        fee: 550.4,
+      },
+    ],
+  ];
+  test.each(TTparseBuy)(
+    'should map Buys from Sample %# correctly',
+    (activity, expected) => {
+      expect(eb.parseData(activity)).toEqual(expected);
+    }
+  );
 });
