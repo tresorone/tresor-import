@@ -115,6 +115,14 @@ const findDividendCompany = textArr => {
 
   return company;
 };
+
+// parse lines for ISIN. example:
+// "ISIN:                         ESPA BEST OF WORLD",
+// "AT0000707674",
+const findDividendISIN = textArr => {
+  const isin = textArr[textArr.findIndex(t => t.includes('ISIN:')) + 1];
+  return isin;
+};
 // determine what kind of document we are dealing with
 // Buying
 const isBuy = textArr => {
@@ -160,7 +168,7 @@ export const parseData = textArr => {
     fee = findFee(textArr);
   } else if (isDividend(textArr)) {
     type = 'Dividend';
-    isin = findISIN(textArr, 1);
+    isin = findDividendISIN(textArr);
     company = findDividendCompany(textArr);
     date = findDividendDate(textArr);
     shares = findDividendShares(textArr);
@@ -168,7 +176,6 @@ export const parseData = textArr => {
     price = +Big(amount).div(Big(shares));
     fee = 0;
   }
-
   const activity = {
     broker: 'erstebank',
     type,
