@@ -18,6 +18,7 @@ const {
   findAmount,
   findShares,
   findFee,
+  findDividendPayout,
 } = eb.testables;
 
 const samples = buySamples.concat(sellSamples, dividendsSamples);
@@ -148,6 +149,17 @@ describe('Test internal functions for Erste Bank Parser', () => {
     'should find fees in Sample %#',
     (sample, expected) => {
       expect(findFee(sample)).toEqual(expected);
+    }
+  );
+  const divpayout_testcases = [
+    [samples[9], 205.11],
+    [samples[10], 203.3],
+    [samples[11], 202.58],
+  ];
+  test.each(divpayout_testcases)(
+    'should be able to findDividendPayout in Sample %#',
+    (sample, expected) => {
+      expect(findDividendPayout(sample)).toBe(expected);
     }
   );
 });

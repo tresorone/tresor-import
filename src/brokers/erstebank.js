@@ -202,4 +202,5 @@ export const testables = {
   findFee: findFee,
   findDividendDate: findDividendDate,
   findDividendShares: findDividendShares,
+  findDividendPayout: findDividendPayout,
 };
