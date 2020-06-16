@@ -63,7 +63,22 @@ const findAmount = textArr => {
   const amount = priceLine.match(re)[2];
   return parseGermanNum(amount);
 };
+// parse lines for value of fee. example:
+// "Gesamtkosten und -geb",
+// "ü",
+// "hren                 2.029,86+ EUR",
+const findFee = textArr => {
+  if (textArr.findIndex(t => t.includes('Gesamtkosten und -geb')) == -1) {
+    return 0;
+  }
+  const totalCostLine =
+    textArr[textArr.findIndex(t => t.includes('Gesamtkosten und -geb')) + 3];
+  const amount = findAmount(textArr);
+  const totalCost = parseGermanNum(totalCostLine.split(' ')[0].trim());
+  const fee = Math.abs(+Big(totalCost).minus(Big(amount)));
 
+  return fee;
+};
 const findDividendShares = textArr => {
   const sharesLine = textArr[textArr.findIndex(t => t.includes('STK'))];
   const shares = sharesLine.split('  ').filter(i => i.length > 0)[1];
