@@ -17,6 +17,7 @@ const {
   parseGermanNum,
   findAmount,
   findShares,
+  findFee,
 } = eb.testables;
 
 const samples = buySamples.concat(sellSamples, dividendsSamples);
@@ -129,6 +130,24 @@ describe('Test internal functions for Erste Bank Parser', () => {
     'should find Shares Count in Sample %#',
     (sample, expected) => {
       expect(findShares(sample)).toEqual(expected);
+    }
+  );
+
+  const fee_testcases = [
+    [samples[0], 0],
+    [samples[1], 0],
+    [samples[2], 0],
+    [samples[3], 0],
+    [samples[4], 2029.86],
+    [samples[5], 360.07],
+    [samples[6], 435.12],
+    [samples[7], 234.21],
+    [samples[8], 550.4],
+  ];
+  test.each(fee_testcases)(
+    'should find fees in Sample %#',
+    (sample, expected) => {
+      expect(findFee(sample)).toEqual(expected);
     }
   );
 });

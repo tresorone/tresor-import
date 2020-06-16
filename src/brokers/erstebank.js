@@ -188,4 +188,6 @@ export const testables = {
   findCompany: findCompany,
   findDateBuySell: findDateBuySell,
   findAmount: findAmount,
+  findShares: findShares,
+  findFee: findFee,
 };
