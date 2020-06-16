@@ -19,6 +19,7 @@ const {
   findAmount,
   findShares,
   findFee,
+  findDividendDate,
   findDividendPayout,
 } = eb.testables;
 
@@ -173,6 +174,19 @@ describe('Test internal functions for Erste Bank Parser', () => {
       expect(findFee(sample)).toEqual(expected);
     }
   );
+
+  const divdate_testcases = [
+    [samples[9], '03.07.2017'],
+    [samples[10], '02.07.2018'],
+    [samples[11], '01.07.2019'],
+  ];
+  test.each(divdate_testcases)(
+    'should be able to findDividendDate in Sample %#',
+    (sample, expected) => {
+      expect(findDividendDate(sample)).toBe(expected);
+    }
+  );
+
   const divpayout_testcases = [
     [samples[9], 205.11],
     [samples[10], 203.3],
