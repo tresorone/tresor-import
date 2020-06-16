@@ -49,7 +49,8 @@ const findDateBuySell = textArr => {
 // "Währung/STK   Nennwert/Stückzahl              Kurs             Handelsart                  Kurswert",
 // "STK                      999,000     EUR     108,870000         NETTO Inland                99.024,06  EUR",
 const findShares = textArr => {
-  const sharesLine = textArr[textArr.findIndex(t => t.includes('Kurswert')) + 1];
+  const sharesLine =
+    textArr[textArr.findIndex(t => t.includes('Kurswert')) + 1];
   const re = /^STK\s+(\d+,\d+)\s+EUR\s+\d+,\d+(\s+NETTO Inland)?\s+\d+\.\d+,\d+\s+EUR/;
   const shares = sharesLine.match(re)[1];
   return parseGermanNum(shares);
@@ -96,15 +97,6 @@ const findDividendShares = textArr => {
   const shares = sharesLine.match(re)[0];
   return parseGermanNum(shares);
 };
-
-const findFee = textArr => {
-  const amount = findAmount(textArr);
-  const totalCostLine =
-    textArr[textArr.findIndex(t => t.includes('Zu Ihren')) + 1];
-  const totalCost = totalCostLine.split('EUR').pop().trim();
-
-  const diff = +Big(parseGermanNum(totalCost)).minus(Big(amount));
-  return Math.abs(diff);
 // parse line to get payout from dividends. example:
 //     "Gutschrift                                                                         205,11",
 const findDividendPayout = textArr => {
@@ -114,12 +106,16 @@ const findDividendPayout = textArr => {
   return parseGermanNum(payout);
 };
 
+// determine what kind of document we are dealing with
+// Buying
 const isBuy = textArr => {
   return (
     textArr.some(t => t.includes('Kauf aus Wertpapierliste')) ||
     textArr.some(t => t.includes('uf Marktplatz'))
   );
 };
+// TODO: isSell
+// Selling
 const isSell = textArr => textArr.some(t => t.includes('*'));
 
 // Payout / Dividends

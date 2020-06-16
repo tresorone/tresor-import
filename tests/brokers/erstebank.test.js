@@ -26,6 +26,7 @@ const {
 
 const samples = buySamples.concat(sellSamples, dividendsSamples);
 
+// INTERNAL FUNCTIONS
 describe('Test internal functions for Erste Bank Parser', () => {
   const isBuy_testcases = [
     [samples[0], true],
@@ -123,7 +124,7 @@ describe('Test internal functions for Erste Bank Parser', () => {
     ['Tresor', NaN],
   ];
   test.each(parseGermanNum_testcases)(
-    'should be able to findDateBuySell in Sample %#',
+    'should be able to parseGermanNum in Sample %#',
     (sample, expected) => {
       expect(parseGermanNum(sample)).toBe(expected);
     }
@@ -227,6 +228,7 @@ describe('Test internal functions for Erste Bank Parser', () => {
   );
 });
 
+// PUBLIC FUNCTIONS
 describe('Test public functions for Erste Bank Parser', () => {
   test.each(samples.map(samples => [samples, true]))(
     'should be able to parseData from Sample %#',
