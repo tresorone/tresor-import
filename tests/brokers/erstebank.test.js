@@ -111,12 +111,12 @@ describe('Test internal functions for Erste Bank Parser', () => {
   const amount_testcases = [
     [samples[0], 99735.77],
     [samples[1], 99833.64],
-    [samples[2], 99637.50],
+    [samples[2], 99637.5],
     [samples[3], 99024.06],
-    [samples[4], 99495.00],
+    [samples[4], 97495.0],
     [samples[5], 99001.88],
     [samples[6], 99086.64],
-    [samples[7], 9505.90],
+    [samples[7], 9505.9],
     [samples[8], 99289.02],
   ];
   test.each(amount_testcases)(
