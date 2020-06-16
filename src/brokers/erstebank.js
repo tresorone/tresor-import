@@ -96,14 +96,6 @@ const findDividendShares = textArr => {
   return parseGermanNum(shares);
 };
 
-const findPayout = textArr => {
-  const amountLine = textArr[textArr.findIndex(t => t.includes('Gunsten')) + 1];
-  const amountPart = amountLine.split('EUR');
-  const amount = amountPart[amountPart.length - 1].trim();
-  // console.log('payout', amount)
-  return parseGermanNum(amount);
-};
-
 const findFee = textArr => {
   const amount = findAmount(textArr);
   const totalCostLine =
@@ -112,6 +104,13 @@ const findFee = textArr => {
 
   const diff = +Big(parseGermanNum(totalCost)).minus(Big(amount));
   return Math.abs(diff);
+// parse line to get payout from dividends. example:
+//     "Gutschrift                                                                         205,11",
+const findDividendPayout = textArr => {
+  const payoutLine = textArr[textArr.findIndex(t => t.includes('Gutschrift'))];
+  const re = /\d+,?\d+/;
+  const payout = payoutLine.match(re)[0];
+  return parseGermanNum(payout);
 };
 
 const isBuy = textArr => {
@@ -158,7 +157,7 @@ export const parseData = textArr => {
     company = findCompany(textArr, 2);
     date = findDividendDate(textArr);
     shares = findDividendShares(textArr);
-    amount = findPayout(textArr);
+    amount = findDividendPayout(textArr);
     price = +Big(amount).div(Big(shares));
     fee = 0;
   }
