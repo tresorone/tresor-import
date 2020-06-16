@@ -79,6 +79,14 @@ const findFee = textArr => {
 
   return fee;
 };
+// parse lines for date of dividend valuta. example:
+// "Wir haben oben genannten Betrag auf Ihrem Konto 999-999-999/00 mit Valuta 03.07.2017",
+const findDividendDate = textArr => {
+  const dateLine = textArr[textArr.findIndex(t => t.includes('Valuta'))];
+  // date always consists of 10 characters
+  const date = dateLine.substring(dateLine.length - 10);
+  return date;
+};
 const findDividendShares = textArr => {
   const sharesLine = textArr[textArr.findIndex(t => t.includes('STK'))];
   const shares = sharesLine.split('  ').filter(i => i.length > 0)[1];
@@ -146,7 +154,7 @@ export const parseData = textArr => {
     type = 'Dividend';
     isin = findISIN(textArr, 1);
     company = findCompany(textArr, 2);
-    date = findDateDividend(textArr);
+    date = findDividendDate(textArr);
     shares = findDividendShares(textArr);
     amount = findPayout(textArr);
     price = +Big(amount).div(Big(shares));
@@ -190,4 +198,5 @@ export const testables = {
   findAmount: findAmount,
   findShares: findShares,
   findFee: findFee,
+  findDividendDate: findDividendDate,
 };
