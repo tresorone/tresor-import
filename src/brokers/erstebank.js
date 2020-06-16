@@ -48,9 +48,9 @@ const findDateBuySell = textArr => {
 // "Währung/STK   Nennwert/Stückzahl              Kurs             Handelsart                  Kurswert",
 // "STK                      999,000     EUR     108,870000         NETTO Inland                99.024,06  EUR",
 const findShares = textArr => {
-  const sharesLine =
-    textArr[textArr.findIndex(t => t.includes('Nennwert')) + 1];
-  const shares = sharesLine.split('  ')[1];
+  const sharesLine = textArr[textArr.findIndex(t => t.includes('Kurswert')) + 1];
+  const re = /^STK\s+(\d+,\d+)\s+EUR\s+\d+,\d+(\s+NETTO Inland)?\s+\d+\.\d+,\d+\s+EUR/;
+  const shares = sharesLine.match(re)[1];
   return parseGermanNum(shares);
 };
 
