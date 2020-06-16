@@ -148,16 +148,16 @@ describe('Test internal functions for Erste Bank Parser', () => {
     }
   );
 
-    [samples[0], 99735.77],
-    [samples[1], 99833.64],
-    [samples[2], 99637.5],
-    [samples[3], 99024.06],
-    [samples[4], 97495.0],
-    [samples[5], 99001.88],
-    [samples[6], 99086.64],
-    [samples[7], 9505.9],
-    [samples[8], 99289.02],
   const TTfindAmount = [
+    [samples[0], 171198.63],
+    [samples[1], 127991.88],
+    [samples[2], 162337.5],
+    [samples[3], 108761.13],
+    [samples[4], 107292.6],
+    [samples[5], 101957.94],
+    [samples[6], 167702.13],
+    [samples[7], 191158.65],
+    [samples[8], 110679.21],
   ];
   test.each(TTfindAmount)(
     'should be able to findAmount in Sample %#',
@@ -212,10 +212,10 @@ describe('Test internal functions for Erste Bank Parser', () => {
     }
   );
 
-    [samples[9], 205.11],
-    [samples[10], 203.3],
-    [samples[11], 202.58],
   const TTfindDividendPayout = [
+    [samples[9], 276.0],
+    [samples[10], 345.0],
+    [samples[11], 345.0],
   ];
   test.each(TTfindDividendPayout)(
     'should be able to findDividendPayout in Sample %#',
