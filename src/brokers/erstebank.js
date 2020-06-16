@@ -105,7 +105,16 @@ const findDividendPayout = textArr => {
   const payout = payoutLine.match(re)[0];
   return parseGermanNum(payout);
 };
+// parse lines for company/share name. example:
+// "ISIN:                         ESPA BEST OF WORLD",
+//  "AT0000707674",
+const findDividendCompany = textArr => {
+  const companyLine = textArr[textArr.findIndex(t => t.includes('ISIN:'))];
+  // company starts right after the order number which is 12 characters followed by 17 spaces
+  const company = companyLine.substring('ISIN:'.length).trim();
 
+  return company;
+};
 // determine what kind of document we are dealing with
 // Buying
 const isBuy = textArr => {
@@ -152,7 +161,7 @@ export const parseData = textArr => {
   } else if (isDividend(textArr)) {
     type = 'Dividend';
     isin = findISIN(textArr, 1);
-    company = findCompany(textArr, 2);
+    company = findDividendCompany(textArr);
     date = findDividendDate(textArr);
     shares = findDividendShares(textArr);
     amount = findDividendPayout(textArr);
