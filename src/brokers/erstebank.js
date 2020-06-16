@@ -87,10 +87,12 @@ const findDividendDate = textArr => {
   const date = dateLine.substring(dateLine.length - 10);
   return date;
 };
+// parse line for count of shares in dividend. example:
+// "Menge/Währung:                138 STK",
 const findDividendShares = textArr => {
   const sharesLine = textArr[textArr.findIndex(t => t.includes('STK'))];
-  const shares = sharesLine.split('  ').filter(i => i.length > 0)[1];
-  // console.log(shares)
+  const re = /\d+/;
+  const shares = sharesLine.match(re)[0];
   return parseGermanNum(shares);
 };
 
@@ -199,4 +201,5 @@ export const testables = {
   findShares: findShares,
   findFee: findFee,
   findDividendDate: findDividendDate,
+  findDividendShares: findDividendShares,
 };
