@@ -375,4 +375,55 @@ describe('Test public functions for Erste Bank Parser', () => {
       expect(eb.parseData(activity)).toEqual(expected);
     }
   );
+
+  const TTparseDividend = [
+    [
+      dividendsSamples[0],
+      {
+        broker: 'erstebank',
+        type: 'Dividend',
+        date: '2017-07-03',
+        isin: 'AT0000707674',
+        company: 'ESPA BEST OF WORLD',
+        shares: 138,
+        price: 2,
+        amount: 276.0,
+        fee: 0,
+      },
+    ],
+    [
+      dividendsSamples[1],
+      {
+        broker: 'erstebank',
+        type: 'Dividend',
+        date: '2018-07-02',
+        isin: 'AT0000707674',
+        company: 'ESPA BEST OF WORLD',
+        shares: 138,
+        price: 2.5,
+        amount: 345.0,
+        fee: 0,
+      },
+    ],
+    [
+      dividendsSamples[2],
+      {
+        broker: 'erstebank',
+        type: 'Dividend',
+        date: '2019-07-01',
+        isin: 'AT0000707674',
+        company: 'ESPA BEST OF WORLD EUR R A',
+        shares: 138,
+        price: 2.5,
+        amount: 345.0,
+        fee: 0,
+      },
+    ],
+  ];
+  test.each(TTparseDividend)(
+    'should map Dividends from Sample %# correctly',
+    (activity, expected) => {
+      expect(eb.parseData(activity)).toEqual(expected);
+    }
+  );
 });
