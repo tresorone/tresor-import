@@ -18,9 +18,9 @@ const parseGermanNum = n => {
 // parse lines for ISIN. example:
 //   ISIN                           Company
 // "AT0000707674                 ESPA BEST OF WORLD",
-const findISIN = (text, span) => {
+const findISIN = textArr => {
   const isinLine =
-    text[text.findIndex(t => t.includes('Auftragsnummer')) + span];
+    textArr[textArr.findIndex(t => t.includes('Auftragsnummer')) + 1];
   // the order number is always 12 charactes long
   const isin = isinLine.substring(0, 12);
   return isin;
@@ -28,11 +28,11 @@ const findISIN = (text, span) => {
 // parse lines for company/share name. example:
 //   ISIN                           Company
 // "AT0000707674                 ESPA BEST OF WORLD",
-const findCompany = (text, span) => {
+const findCompany = textArr => {
   const companyLine =
-    text[text.findIndex(t => t.includes('Auftragsnummer')) + span];
   // company starts right after the order number which is 12 characters followed by 17 spaces
   const company = companyLine.slice(12 + 17);
+    textArr[textArr.findIndex(t => t.includes('Auftragsnummer')) + 1];
 
   return company;
 };
@@ -133,8 +133,8 @@ export const parseData = textArr => {
 
   if (isBuy(textArr)) {
     type = 'Buy';
-    isin = findISIN(textArr, 1);
-    company = findCompany(textArr, 1);
+    isin = findISIN(textArr);
+    company = findCompany(textArr);
     date = findDateBuySell(textArr);
     shares = findShares(textArr);
     amount = findAmount(textArr);
@@ -142,8 +142,8 @@ export const parseData = textArr => {
     fee = findFee(textArr);
   } else if (isSell(textArr)) {
     type = 'Sell';
-    isin = findISIN(textArr, 2);
-    company = findCompany(textArr, 1);
+    isin = findISIN(textArr);
+    company = findCompany(textArr);
     date = findDateBuySell(textArr);
     shares = findShares(textArr);
     amount = findAmount(textArr);
