@@ -165,7 +165,7 @@ describe('Test internal functions for Erste Bank Parser', () => {
     }
   );
 
-  test.each(samples.map(samples => [samples, 999.0]))(
+  test.each(buySamples.map(buySamples => [buySamples, 999.0]))(
     'should find Shares Count in Sample %#',
     (sample, expected) => {
       expect(findShares(sample)).toEqual(expected);
