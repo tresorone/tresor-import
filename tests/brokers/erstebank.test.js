@@ -11,6 +11,7 @@ console.error = jest.fn();
 
 const {
   isBuy,
+  isDividend,
   findISIN,
   findCompany,
   findDateBuySell,
@@ -28,6 +29,27 @@ describe('Test internal functions for Erste Bank Parser', () => {
     'should identify Buy Statements in Sample %#',
     (sample, expected) => {
       expect(isBuy(sample)).toEqual(expected);
+    }
+  );
+
+  const isDividend_testcases = [
+    [samples[0], false],
+    [samples[1], false],
+    [samples[2], false],
+    [samples[3], false],
+    [samples[4], false],
+    [samples[5], false],
+    [samples[6], false],
+    [samples[7], false],
+    [samples[8], false],
+    [samples[9], true],
+    [samples[10], true],
+    [samples[11], true],
+  ];
+  test.each(isDividend_testcases)(
+    'should identify Dividend Statements in Sample %#',
+    (sample, expected) => {
+      expect(isDividend(sample)).toEqual(expected);
     }
   );
 

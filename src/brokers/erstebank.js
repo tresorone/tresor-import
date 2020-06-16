@@ -122,6 +122,7 @@ const isBuy = textArr => {
 };
 const isSell = textArr => textArr.some(t => t.includes('*'));
 
+// Payout / Dividends
 const isDividend = textArr => textArr.some(t => t.includes('Ausschüttung'));
 
 export const canParseData = textArr => {
@@ -194,6 +195,7 @@ export const parsePages = contents => {
 export const testables = {
   parseGermanNum: parseGermanNum,
   isBuy: isBuy,
+  isDividend: isDividend,
   findISIN: findISIN,
   findCompany: findCompany,
   findDateBuySell: findDateBuySell,
