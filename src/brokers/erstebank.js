@@ -30,9 +30,9 @@ const findISIN = textArr => {
 // "AT0000707674                 ESPA BEST OF WORLD",
 const findCompany = textArr => {
   const companyLine =
-  // company starts right after the order number which is 12 characters followed by 17 spaces
-  const company = companyLine.slice(12 + 17);
     textArr[textArr.findIndex(t => t.includes('Auftragsnummer')) + 1];
+  // company starts right after the order number which is 12 characters
+  const company = companyLine.substring(12).trim();
 
   return company;
 };
