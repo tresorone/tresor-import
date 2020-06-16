@@ -22,7 +22,7 @@ const findISIN = (text, span) => {
   const isinLine =
     text[text.findIndex(t => t.includes('Auftragsnummer')) + span];
   // the order number is always 12 charactes long
-  const isin = isinLine.substr(0, 12);
+  const isin = isinLine.substring(0, 12);
   return isin;
 };
 // parse lines for company/share name. example:
@@ -41,7 +41,8 @@ const findCompany = (text, span) => {
 // "Ausführungszeit 15:43:02                Schlusstag: 02.03.2017",
 const findDateBuySell = textArr => {
   const dateLine = textArr[textArr.findIndex(t => t.includes('Schlusstag'))];
-  const date = dateLine.split(':')[3].trim().substr(0, 10);
+  // date always consists of 10 characters
+  const date = dateLine.split(':')[3].trim().substring(0, 10);
   return date;
 };
 // parse lines for amount of shares. example:
