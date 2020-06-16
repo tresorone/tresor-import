@@ -27,7 +27,21 @@ const {
 const samples = buySamples.concat(sellSamples, dividendsSamples);
 
 describe('Test internal functions for Erste Bank Parser', () => {
-  test.each(samples.map(samples => [samples, true]))(
+  const isBuy_testcases = [
+    [samples[0], true],
+    [samples[1], true],
+    [samples[2], true],
+    [samples[3], true],
+    [samples[4], true],
+    [samples[5], true],
+    [samples[6], true],
+    [samples[7], true],
+    [samples[8], true],
+    [samples[9], false],
+    [samples[10], false],
+    [samples[11], false],
+  ];
+  test.each(isBuy_testcases)(
     'should identify Buy Statements in Sample %#',
     (sample, expected) => {
       expect(isBuy(sample)).toEqual(expected);
