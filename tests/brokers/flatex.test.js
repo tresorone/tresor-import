@@ -1,6 +1,6 @@
-import { parseData, canParseData } from '../../src/brokers/flatex';
-import { buySamples, dividendsSamples } from './__mocks__/flatex';
-import Big from "big.js";
+import {parseData, canParseData} from '../../src/brokers/flatex';
+import {buySamples, sellSamples, dividendsSamples} from './__mocks__/flatex';
+import Big from 'big.js';
 
 describe('Flatex broker', () => {
     let consoleErrorSpy;
@@ -9,31 +9,14 @@ describe('Flatex broker', () => {
         expect(canParseData(['flatex Bank AG', 'Kauf'])).toEqual(true);
         expect(canParseData(['FinTech Group Bank AG', 'Kauf'])).toEqual(true); // old bank name
         expect(canParseData(['flatex Bank AG', 'Verkauf'])).toEqual(true);
-        expect(canParseData(['flatex Bank AG', 'Dividendengutschrift'])).toEqual(true);
+        expect(canParseData(['flatex Bank AG', 'Dividendengutschrift'])).toEqual(
+            true
+        );
     });
 
     test('should not accept any PDFs', () => {
         expect(canParseData(['42'])).toEqual(false);
     });
-
-    // No clue what this does yet, copied from the dkb test
-    // test('should validate the result', () => {
-    //     const invalidSample = buySamples[0].filter(item => item !== 'Stück 36');
-    //     const activity = parseData(invalidSample);
-    //
-    //     expect(activity).toEqual(undefined);
-    //     expect(console.error).toHaveBeenLastCalledWith('Error while parsing PDF', {
-    //         amount: 4428,
-    //         broker: 'dkb',
-    //         company: 'Kurswert',
-    //         date: '2019-01-25',
-    //         fee: 10,
-    //         isin: null,
-    //         price: 123,
-    //         shares: NaN,
-    //         type: 'Buy',
-    //     });
-    // });
 
     describe('Buy', () => {
         test('should map pdf data of sample 1 correctly', () => {
@@ -48,7 +31,8 @@ describe('Flatex broker', () => {
                 shares: 4,
                 price: 170,
                 amount: 680,
-                fee: 5.9 + 0.85,
+                fee: +Big(5.9).plus(Big(0.85)),
+                tax: 0,
             });
         });
 
@@ -65,8 +49,8 @@ describe('Flatex broker', () => {
                 price: 82.4959,
                 amount: 1649.92,
                 fee: 5.9,
+                tax: 0,
             });
-
         });
 
         test('should map pdf data of sample 3 correctly', () => {
@@ -81,12 +65,12 @@ describe('Flatex broker', () => {
                 shares: 12,
                 price: 125.5,
                 amount: 1506,
-                fee: 5.9 + 0.85,
+                fee: +Big(5.9).plus(Big(0.85)),
+                tax: 0,
             });
         });
 
         test('should map pdf data of sample 5 correctly', () => {
-
             const activity = parseData(buySamples[4]);
 
             expect(activity).toEqual({
@@ -98,37 +82,53 @@ describe('Flatex broker', () => {
                 shares: 1,
                 price: 207.83,
                 amount: 207.83,
-                fee: 5.9 + 0.71,
+                fee: +Big(5.9).plus(Big(0.71)),
+                tax: 0,
             });
         });
     });
 
-    /*
-    TODO: test sell orders
     describe('Sell', () => {
-      test('should map pdf data of sample 1 correctly', () => {
-        const activity = parseData(sellSamples[0]);
+        test('should map pdf data of sample 1 correctly', () => {
+            const activity = parseData(sellSamples[0]);
 
-        expect(activity).toEqual({
-          broker: 'dkb',
-          type: 'Sell',
-          date: '2020-01-27',
-          isin: 'LU1861132840',
-          company: 'AIS - AMUNDI STOXX GL.ART.INT.',
-          shares: 36,
-          price: 123,
-          amount: 4428,
-          fee: 10,
+            expect(activity).toEqual({
+                broker: 'flatex',
+                type: 'Sell',
+                date: '2019-05-20',
+                isin: 'US30303M1027',
+                company: 'FACEBOOK INC.A',
+                shares: 4,
+                price: 164.5,
+                amount: 658,
+                fee: +Big(3.8).plus(Big(0.85)),
+                tax: 28.33,
+            });
         });
-      });
+
+        test('should map pdf data of sample 2 correctly', () => {
+            const activity = parseData(sellSamples[1]);
+
+            expect(activity).toEqual({
+                broker: 'flatex',
+                type: 'Sell',
+                date: '2019-05-20',
+                isin: 'DE000A1C9KL8',
+                company: 'HSBC MSCI WORLD UC.ETF DZ',
+                shares: 36,
+                price: 18.95,
+                amount: 682.2,
+                fee: +Big(3.8).plus(Big(0.85)),
+                tax: 17.17,
+            });
+        });
     });
-    */
 
     describe('Dividend', () => {
         test('should map pdf data of sample 1 correctly', () => {
             const activity = parseData(dividendsSamples[0]);
 
-            // Can add tax here
+            // stock
             expect(activity).toEqual({
                 broker: 'flatex',
                 type: 'Dividend',
@@ -138,14 +138,15 @@ describe('Flatex broker', () => {
                 shares: 7,
                 amount: 4.96,
                 price: 4.96 / 7,
-                fee: +Big(4.96).minus(Big(3.60)) // calculate from Bemessungsgrundlage - Endbetrag
+                fee: 0,
+                tax: +Big(4.96).minus(Big(3.6)), // calculate from Bemessungsgrundlage - Endbetrag#
             });
         });
 
         test('should map pdf data of sample 2 correctly', () => {
             const activity = parseData(dividendsSamples[1]);
 
-            // Can add tax here
+            // stock
             expect(activity).toEqual({
                 broker: 'flatex',
                 type: 'Dividend',
@@ -155,7 +156,26 @@ describe('Flatex broker', () => {
                 shares: 16,
                 amount: 6.23, // only available in USD, thus using net dividend in EUR
                 price: 6.23 / 16,
-                fee: 0, // skip bc only available in USD
+                fee: 0,
+                tax: 0, // skip bc only available in USD
+            });
+        });
+
+        test('should map pdf data of sample 3 correctly', () => {
+            const activity = parseData(dividendsSamples[2]);
+
+            // index fund
+            expect(activity).toEqual({
+                broker: 'flatex',
+                type: 'Dividend',
+                date: '2018-11-09',
+                isin: 'DE000A1C9KL8',
+                company: 'HSBC MSCI WORLD UC.ETF DZ',
+                shares: 36,
+                amount: 3.02,
+                price: 3.02 / 36,
+                fee: 0,
+                tax: +Big(3.02).minus(Big(2.18)), // calculate from Bemessungsgrundlage - Endbetrag (note: diff in pdf is wrong by 0,01)
             });
         });
     });

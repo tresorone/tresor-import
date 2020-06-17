@@ -8,8 +8,8 @@ const parseGermanNum = n =>
     parseFloat(n.replace(/[-+]$/, '').replace(/\./g, '').replace(',', '.'));
 
 const getTableValueByKey = (textArr, key) => {
-    const finding = textArr.find(t => t.includes(key + " "));
-    const result = finding ? finding.match(new RegExp(key + '\\s+:\\s+((\\s?\\S+\\s?\\S*)+)\\s*')) : null;
+    const finding = textArr.find(t => t.match(new RegExp(key + '\\s*:\\s+')));
+    const result = finding ? finding.match(new RegExp(key + '\\s*:\\s+((\\s?\\S+\\s?\\S*)+)\\s*')) : null;
     return result ? result[1] : null;
 };
 
@@ -57,10 +57,16 @@ const findFee = textArr => {
     const ownExpenses = getTableValueByKey(textArr, 'Eigene Spesen') ? parseGermanNum(getTableValueByKey(textArr, 'Eigene Spesen').split(' ')[0]) : 0;
     const foreignExpenses = getTableValueByKey(textArr, 'Fremde Spesen') ? parseGermanNum(getTableValueByKey(textArr, 'Fremde Spesen').split(' ')[0]) : 0;
 
-    return provision + ownExpenses + foreignExpenses;
+    return +(Big(provision).plus(Big(ownExpenses)).plus(Big(foreignExpenses)));
 };
 
-const findDividendFee = textArr => {
+const findTax = textArr => getTableValueByKey(textArr, 'Einbeh. Steuer')
+    ? parseGermanNum(getTableValueByKey(textArr, 'Einbeh. Steuer').split(' ')[0])
+    : getTableValueByKey(textArr, 'Einbeh. KESt')
+        ? parseGermanNum(getTableValueByKey(textArr, 'Einbeh. KESt').split(' ')[0])
+        : 0;
+
+const findDividendTax = textArr => {
     const assessmentBasis = getTableValueByKey(textArr, 'grundlage') ? parseGermanNum(getTableValueByKey(textArr, 'grundlage').split(' ')[0]) : 0; // Bemessungsgrundlage
     const netDividend = getTableValueByKey(textArr, 'Endbetrag') ? parseGermanNum(getTableValueByKey(textArr, 'Endbetrag').split(' ')[0]) : 0;
 
@@ -69,7 +75,7 @@ const findDividendFee = textArr => {
 
 
 const findDateDividend = textArr =>
-    getTableValueByKey(textArr, 'Zahlungstag');
+    getTableValueByKey(textArr, 'Valuta');
 
 const findPayout = textArr => {
     const assessmentBasis = getTableValueByKey(textArr, 'grundlage') ? parseGermanNum(getTableValueByKey(textArr, 'grundlage').split(' ')[0]) : 0; // Bemessungsgrundlage
@@ -85,7 +91,7 @@ const isSell = textArr =>
     textArr.some(t => t.includes('Verkauf'));
 
 const isDividend = textArr =>
-    textArr.some(t => t.includes('Dividendengutschrift'));
+    textArr.some(t => t.includes('Dividendengutschrift') || t.includes('Ertragsmitteilung'));
 
 export const canParseData = textArr =>
     textArr.some(t => t.includes('flatex Bank AG') || t.includes('FinTech Group Bank AG')) &&
@@ -94,7 +100,7 @@ export const canParseData = textArr =>
         isDividend(textArr));
 
 export const parseData = textArr => {
-    let type, date, isin, company, shares, price, amount, fee;
+    let type, date, isin, company, shares, price, amount, fee, tax;
 
     if (isBuy(textArr)) {
         type = 'Buy';
@@ -105,7 +111,8 @@ export const parseData = textArr => {
         amount = findAmount(textArr);
         price = findPrice(textArr);
         fee = findFee(textArr);
-    } else if (isSell(textArr)) { // TODO: testing needed
+        tax = 0;
+    } else if (isSell(textArr)) {
         type = 'Sell';
         isin = findISIN(textArr);
         company = findCompany(textArr);
@@ -114,6 +121,7 @@ export const parseData = textArr => {
         amount = findAmount(textArr);
         price = findPrice(textArr);
         fee = findFee(textArr);
+        tax = findTax(textArr);
     } else if (isDividend(textArr)) {
         type = 'Dividend';
         isin = findISIN(textArr);
@@ -122,7 +130,8 @@ export const parseData = textArr => {
         shares = findShares(textArr);
         amount = findPayout(textArr);
         price = amount / shares;
-        fee = findDividendFee(textArr);
+        fee = 0;
+        tax = findDividendTax(textArr);
     } else {
         console.error('Type could not be determined!');
         return undefined;
@@ -138,6 +147,7 @@ export const parseData = textArr => {
         price,
         amount,
         fee,
+        tax,
     };
 
     const valid = every(values(activity), a => !!a || a === 0);

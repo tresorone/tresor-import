@@ -6,7 +6,13 @@ export const buySamples = [
     require('./buy5.json'),
 ];
 
+export const sellSamples = [
+    require('./sell1.json'),
+    require('./sell2.json'),
+]
+
 export const dividendsSamples  = [
     require('./dividend1.json'),
     require('./dividend2.json'),
+    require('./dividend3.json'),
 ];
