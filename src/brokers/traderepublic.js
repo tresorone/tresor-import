@@ -102,28 +102,49 @@ const findFee = textArr => {
 const findTax = textArr => {
   var totalTax = Big(0);
 
-  if (textArr.lastIndexOf('Kapitalertragssteuer') != -1) {
-    const taxPositionLine =
-      textArr[textArr.lastIndexOf('Kapitalertragssteuer') + 1];
-    const taxPositionString = taxPositionLine.split(' EUR')[0];
-    const taxPositionAmount = Math.abs(parseGermanNum(taxPositionString));
-    totalTax = totalTax.plus(Big(taxPositionAmount));
+  // There are three `BETRAG` values in each document. After the second, there are the taxes located.
+  const searchTerm = 'BETRAG';
+  let startTaxLineNumber = textArr.indexOf(
+    searchTerm,
+    textArr.indexOf(searchTerm) + 1
+  );
+
+  // The taxes end with the second `GESAMT` value, after which the total amount is displayed.
+  const searchTermEnd = 'GESAMT';
+  const endTaxLineNumber = textArr.lastIndexOf(searchTermEnd);
+
+  // Skip the field `Fremdkostenzuschlag` after `BETRAG` to get the first tax.
+  let skipLineCounter = 4;
+
+  if (isDividend(textArr)) {
+    // The dividend documents needs quite other logic...
+    // Search the last field `Zwischensumme` and skip all lines which contains `EUR` to find the first tax field.
+    const searchTermSubtotal = 'Zwischensumme';
+    const subtotalLineNumber = textArr.lastIndexOf(searchTermSubtotal);
+    if (subtotalLineNumber > -1) {
+      skipLineCounter = 0;
+      while (
+        textArr[subtotalLineNumber + skipLineCounter + 1].includes('EUR')
+      ) {
+        skipLineCounter++;
+      }
+
+      startTaxLineNumber = subtotalLineNumber + 2;
+    }
   }
 
-  if (textArr.lastIndexOf('Solidaritätszuschlag') != -1) {
-    const taxPositionLine =
-      textArr[textArr.lastIndexOf('Solidaritätszuschlag') + 1];
-    const taxPositionString = taxPositionLine.split(' EUR')[0];
-    const taxPositionAmount = Math.abs(parseGermanNum(taxPositionString));
-    totalTax = totalTax.plus(Big(taxPositionAmount));
+  // Parse all taxes in the range of relevant line numbers
+  for (
+    let lineNumber = startTaxLineNumber + skipLineCounter;
+    lineNumber < endTaxLineNumber;
+    lineNumber += 2
+  ) {
+    const lineContent = textArr[lineNumber].split(' EUR')[0];
+    const lineParsedAmount = Math.abs(parseGermanNum(lineContent));
+
+    totalTax = totalTax.plus(Big(lineParsedAmount));
   }
 
-  if (textArr.lastIndexOf('Kirchensteuer') != -1) {
-    const taxPositionLine = textArr[textArr.lastIndexOf('Kirchensteuer') + 1];
-    const taxPositionString = taxPositionLine.split(' EUR')[0];
-    const taxPositionAmount = Math.abs(parseGermanNum(taxPositionString));
-    totalTax = totalTax.plus(Big(taxPositionAmount));
-  }
   return +totalTax;
 };
 
@@ -157,7 +178,7 @@ export const parseData = textArr => {
     amount = findAmountBuy(textArr);
     price = +Big(amount).div(Big(shares));
     fee = findFee(textArr);
-    tax = 0;
+    tax = findTax(textArr);
   } else if (isSell(textArr)) {
     type = 'Sell';
     isin = findISIN(textArr);
@@ -176,7 +197,7 @@ export const parseData = textArr => {
     shares = findShares(textArr);
     amount = findPayout(textArr);
     price = +Big(amount).div(Big(shares));
-    fee = 0;
+    fee = findFee(textArr);
     tax = findTax(textArr);
   } else {
     console.error('unable to detect order');

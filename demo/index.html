@@ -35,7 +35,7 @@
             </label>
           </div>
           <br>
-          <ul v-show="activities.length > 0" class="list">
+          <ul v-cloak v-show="activities.length > 0" class="list">
             <li class="list-item" v-for="(activity, i) in activities" :key="i">
               <div v-if="!activity.parserError">
                 <div>
