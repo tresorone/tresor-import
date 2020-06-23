@@ -14,13 +14,24 @@ const findISIN = text => {
 };
 
 const findCompany = text => {
-  const company = text[text.findIndex(t => t.includes('ISIN')) - 1];
+  let company = text[text.findIndex(t => t.includes('ISIN')) - 1];
+  if (company === 'Gattungsbezeichnung') {
+    company = text[text.findIndex(t => t.includes('ISIN')) - 2];
+  }
+
   return company;
 };
 
 const findDateBuySell = text => {
-  const date = text[text.findIndex(t => t.includes('Handelstag')) + 1];
-  return date;
+  const lineNumber = text.findIndex(t => t.includes('Handelstag'));
+
+  if (text[lineNumber + 1].split('.').length === 3) {
+    return text[lineNumber + 1];
+  } else if (text[lineNumber - 1].split('.').length === 3) {
+    return text[lineNumber - 1];
+  }
+
+  throw { text: 'Unknown date' };
 };
 
 const findDateDividend = text => {
@@ -55,9 +66,16 @@ const findFee = text => {
   let totalTraded = parseGermanNum(
     text[text.findIndex(t => t.includes('Kurswert')) + 2]
   );
-  let totalPrice = parseGermanNum(
-    text[text.findIndex(t => t.includes('Betrag zu Ihren ')) + 2]
-  );
+
+  let skipLineCounter = 1;
+  const amountLineNumber = text.findIndex(t => t.includes('Betrag zu Ihren '));
+
+  // Search the debited amount which is in a line after `EUR`
+  while (!text[amountLineNumber + skipLineCounter].includes('EUR')) {
+    skipLineCounter++;
+  }
+
+  let totalPrice = parseGermanNum(text[amountLineNumber + skipLineCounter + 1]);
   return +Big(totalPrice).minus(totalTraded).abs();
 };
 
@@ -92,7 +110,6 @@ export const parseData = text => {
   if (isBuy) {
     type = 'Buy';
     date = findDateBuySell(text);
-    shares = findShares(text);
     amount = findAmount(text);
     fee = findFee(text);
     shares = findShares(text);

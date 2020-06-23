@@ -38,7 +38,7 @@
     "jest-cli": "^25.4.0",
     "prettier": "2.0.5",
     "pretty-quick": "^2.0.1",
-    "serve": "^11.3.0",
+    "serve": "^11.3.2",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11"
   },

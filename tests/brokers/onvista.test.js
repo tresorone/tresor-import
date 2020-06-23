@@ -83,6 +83,25 @@ describe('Onvista Bank broker', () => {
       ]);
     });
 
+    test('should map pdf data of sample 4 correctly', () => {
+      const activity = onvista.parsePages(buySamples[3]);
+
+      expect(activity).toEqual([
+        {
+          broker: 'onvista',
+          type: 'Buy',
+          date: '2010-02-18',
+          isin: 'DE0008430026',
+          company: 'Münchener Rückvers.-Ges. AG vink.Namens-Aktien o.N.',
+          shares: 13,
+          price: 110.399,
+          amount: 1435.19,
+          fee: 1.3,
+          tax: 0,
+        },
+      ]);
+    });
+
     test('should map pdf data of multi-page sample 1 correctly', () => {
       const activity = multiPageActivities[0];
 
