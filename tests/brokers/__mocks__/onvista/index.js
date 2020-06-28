@@ -3,8 +3,9 @@ export const buySamples = [
   require('./buy-2.json'),
   require('./buy-3.json'),
   require('./buy-4.json'),
-  require('./buy-5.json'),
 ];
+
+export const sellSamples = [require('./sell-large.json')];
 
 export const multiPageSample = require('./multi-page.json');
 
