@@ -10,7 +10,9 @@ console.error = jest.fn();
 
 describe('Onvista Bank broker', () => {
   test('Our samples should be detected by Onvista Bank handler only', () => {
-    for (let sample of buySamples.concat(dividendsSamples)) {
+    for (let sample of buySamples
+      .concat(dividendsSamples)
+      .concat(multiPageSample)) {
       expect(getBroker(sample)).toEqual(onvista);
     }
   });
@@ -155,6 +157,44 @@ describe('Onvista Bank broker', () => {
           amount: 83.8,
           fee: 0,
           tax: 0,
+        },
+      ]);
+    });
+
+    test('should map pdf data of sample 2 correctly', () => {
+      const activity = onvista.parsePages(dividendsSamples[1]);
+
+      expect(activity).toEqual([
+        {
+          broker: 'onvista',
+          type: 'Dividend',
+          date: '2019-09-16',
+          isin: 'DE000A0F5UF5',
+          company: 'iShare.NASDAQ-100 UCITS ETF DE Inhaber-Anteile',
+          shares: 4.9438,
+          price: 0.02225009102309964,
+          amount: 0.11,
+          fee: 0,
+          tax: 0.03,
+        },
+      ]);
+    });
+
+    test('should map pdf data of sample 2 correctly', () => {
+      const activity = onvista.parsePages(dividendsSamples[2]);
+
+      expect(activity).toEqual([
+        {
+          broker: 'onvista',
+          type: 'Dividend',
+          date: '2019-08-22',
+          isin: 'LU0635178014',
+          company: 'ComSta.-MSCI Em.Mkts.TRN U.ETF Inhaber-Anteile I o.N.',
+          shares: 55.7157,
+          price: 0.8071333573840048,
+          amount: 44.97,
+          fee: 0,
+          tax: 4.14,
         },
       ]);
     });
