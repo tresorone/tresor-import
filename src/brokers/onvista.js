@@ -80,19 +80,26 @@ const findFee = text => {
 };
 
 const findTax = text => {
-  const amount1 =
-    text[
-      text.findIndex(t =>
-        t.includes('im laufenden Jahr einbehaltene Kapitalertragsteuer')
-      ) + 2
-    ];
-  const amount2 =
-    text[
-      text.findIndex(t =>
-        t.includes('im laufenden Jahr einbehaltener Solidaritätszuschlag')
-      ) + 2
-    ];
-  return parseGermanNum(amount1) + parseGermanNum(amount2);
+  let totalTax = Big(0);
+  let lastTaxIndex = Math.min(
+    text.findIndex(t => t.startsWith('einbehaltene ')),
+    text.findIndex(t => t.startsWith('einbehaltene '))
+  );
+
+  while (lastTaxIndex > 0) {
+    const lineParsedAmount = Math.abs(parseGermanNum(text[lastTaxIndex + 2]));
+    totalTax = totalTax.plus(Big(lineParsedAmount));
+    lastTaxIndex += 3;
+
+    if (
+      !text[lastTaxIndex].startsWith('einbehaltene ') &&
+      !text[lastTaxIndex].startsWith('einbehaltener ')
+    ) {
+      break;
+    }
+  }
+
+  return +totalTax;
 };
 
 export const canParseData = textArr =>
