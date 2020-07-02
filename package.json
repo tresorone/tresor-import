@@ -9,7 +9,7 @@
     "start": "npm run build && serve & npm run watch",
     "test": "jest --verbose",
     "lint": "eslint .",
-    "precommit": "pretty-quick --staged --no-restage && npm run lint && npm t"
+    "precommit": "pretty-quick --staged --no-restage && npm run lint && npm t && npm audit --audit-level=moderate"
   },
   "keywords": [
     "tresor",
