@@ -33,6 +33,7 @@
     "eslint-plugin-jest": "^23.8.2",
     "eslint-plugin-vue": "^6.2.2",
     "file-loader": "^6.0.0",
+    "glob": "^7.1.6",
     "husky": "^4.2.5",
     "jest": "^25.4.0",
     "jest-cli": "^25.4.0",
