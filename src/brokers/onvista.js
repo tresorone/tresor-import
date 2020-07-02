@@ -61,30 +61,75 @@ const findPayout = text => {
 };
 
 const findFee = text => {
-  let totalTraded = parseGermanNum(
-    text[text.findIndex(t => t.includes('Kurswert')) + 2]
-  );
+  const totalTradedLineNumber = text.findIndex(t => t.includes('Kurswert')) + 2;
+  const totalTraded = parseGermanNum(text[totalTradedLineNumber]);
 
   let skipLineCounter = 1;
   const amountLineNumber = text.findIndex(t => t.includes('Betrag zu Ihren '));
+  const fristTaxLineNumber = text.findIndex(
+    t =>
+      (t.toLowerCase().includes('steuer') ||
+        t.toLowerCase().includes('zuschlag')) &&
+      !t.toLowerCase().startsWith('steuer')
+  );
 
   // Search the debited amount which is in a line after `EUR`
   while (!text[amountLineNumber + skipLineCounter].includes('EUR')) {
     skipLineCounter++;
   }
 
-  let totalPrice = parseGermanNum(text[amountLineNumber + skipLineCounter + 1]);
-  return +Big(totalPrice).minus(totalTraded).abs();
+  let totalPrice = Big(
+    parseGermanNum(text[amountLineNumber + skipLineCounter + 1])
+  );
+
+  if (fristTaxLineNumber < amountLineNumber) {
+    // This is an old document. Old documents has an amount with deducted taxes.
+    totalPrice = totalPrice.plus(findTax(text));
+  }
+
+  return +totalPrice.minus(totalTraded).abs();
 };
 
 const findTax = text => {
   let totalTax = Big(0);
-  let lastTaxIndex = Math.min(
-    text.findIndex(t => t.startsWith('einbehaltene ')),
-    text.findIndex(t => t.startsWith('einbehaltene '))
-  );
 
-  while (lastTaxIndex > 0) {
+  let lastTaxIndex = undefined;
+  let taxLineNumber = text.findIndex(t => t.startsWith('einbehaltene '));
+  if (taxLineNumber > 0) {
+    lastTaxIndex = taxLineNumber;
+  } else {
+    let taxLineNumber = text.findIndex(t => t.startsWith('einbehaltener '));
+    if (taxLineNumber > 0) {
+      lastTaxIndex = taxLineNumber;
+    }
+  }
+
+  const dayOfTradeLineNumber = text.findIndex(t => t.includes('Handelstag'));
+  if (lastTaxIndex === undefined && dayOfTradeLineNumber > 0) {
+    // This document hasn't any taxes or is an old document.
+    // Search the taxes between Kurswert und Handelstag.
+
+    let nameOfPositionLineNumber =
+      text.findIndex(t => t.includes('Kurswert')) + 3;
+    while (nameOfPositionLineNumber < dayOfTradeLineNumber) {
+      let nameOfPosition = text[nameOfPositionLineNumber];
+
+      if (
+        nameOfPosition.toLowerCase().includes('steuer') ||
+        nameOfPosition.toLowerCase().includes('zuschlag')
+      ) {
+        totalTax = totalTax.plus(
+          Big(parseGermanNum(text[nameOfPositionLineNumber + 2]))
+        );
+      }
+
+      nameOfPositionLineNumber += 4;
+    }
+
+    return +totalTax;
+  }
+
+  while (lastTaxIndex !== undefined) {
     const lineParsedAmount = Math.abs(parseGermanNum(text[lastTaxIndex + 2]));
     totalTax = totalTax.plus(Big(lineParsedAmount));
     lastTaxIndex += 3;
