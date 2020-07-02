@@ -142,7 +142,7 @@ describe('Onvista Bank broker', () => {
       });
     });
 
-    test('should map pdf data of sample 4 correctly', () => {
+    test('should map pdf data of sample 1 correctly', () => {
       const activity = onvista.parsePages(sellSamples[0]);
 
       expect(activity).toEqual([
@@ -220,6 +220,57 @@ describe('Onvista Bank broker', () => {
         },
       ]);
     });
+
+    test('should map pdf data of sample 2 correctly', () => {
+      expect(onvista.parsePages(sellSamples[1])).toEqual([
+        {
+          broker: 'onvista',
+          type: 'Sell',
+          date: '2018-08-08',
+          isin: 'DE000A1TNUT7',
+          company: 'Deutsche Beteiligungs AG Namens-Aktien o.N.',
+          shares: 72,
+          price: 38.05,
+          amount: 2739.6,
+          fee: 6.5,
+          tax: 39.01,
+        },
+      ]);
+    });
+
+    test('should map pdf data of sample 3 correctly', () => {
+      expect(onvista.parsePages(sellSamples[2])).toEqual([
+        {
+          broker: 'onvista',
+          type: 'Sell',
+          date: '2018-09-27',
+          isin: 'IE00B2NPKV68',
+          company: 'iShsII-J.P.M.$ EM Bond U.ETF Registered Shares o.N.',
+          shares: 57,
+          price: 91.024,
+          amount: 5188.37,
+          fee: 6.5,
+          tax: 34.52,
+        },
+      ]);
+    });
+  });
+
+  test('should map pdf data of sample 4 correctly', () => {
+    expect(onvista.parsePages(sellSamples[3])).toEqual([
+      {
+        broker: 'onvista',
+        type: 'Sell',
+        date: '2018-11-27',
+        isin: 'DE0007480204',
+        company: 'Deutsche EuroShop AG Namens-Aktien o.N.',
+        shares: 84,
+        price: 28.16,
+        amount: 2365.44,
+        fee: 6.5,
+        tax: 0,
+      },
+    ]);
   });
 
   describe('Dividend', () => {
@@ -261,7 +312,7 @@ describe('Onvista Bank broker', () => {
       ]);
     });
 
-    test('should map pdf data of sample 2 correctly', () => {
+    test('should map pdf data of sample 3 correctly', () => {
       const activity = onvista.parsePages(dividendsSamples[2]);
 
       expect(activity).toEqual([
@@ -276,6 +327,35 @@ describe('Onvista Bank broker', () => {
           amount: 44.97,
           fee: 0,
           tax: 4.14,
+        },
+      ]);
+    });
+
+    test('should map pdf data of sample 4 correctly', () => {
+      expect(onvista.parsePages(dividendsSamples[3])).toEqual([
+        {
+          broker: 'onvista',
+          type: 'Dividend',
+          date: '2019-10-15',
+          isin: 'DE0002635281',
+          company: 'iSh.EO ST.Sel.Div.30 U.ETF DE Inhaber-Anteile',
+          shares: 245.3939,
+          price: 0.12188567034469887,
+          amount: 29.91,
+          fee: 0,
+          tax: 6.77,
+        },
+        {
+          broker: 'onvista',
+          type: 'Dividend',
+          date: '2019-10-15',
+          isin: 'DE0002635299',
+          company: 'iSh.ST.Eur.Sel.Div.30 U.ETF DE Inhaber-Anteile',
+          shares: 270.787,
+          price: 0.10306994058060394,
+          amount: 27.91,
+          fee: 0,
+          tax: 6.32,
         },
       ]);
     });
