@@ -6,10 +6,9 @@ import Big from 'big.js';
 
 import { parseGermanNum } from '@/helper';
 
-const findISIN = (text, span) => text[text.findIndex(t => t === 'ISIN') + span];
+const findISIN = text => text[text.findIndex(t => t === 'ISIN') + 3];
 
-const findCompany = (text, span) =>
-  text[text.findIndex(t => t === 'ISIN') + span];
+const findCompany = text => text[text.findIndex(t => t === 'ISIN') + 1];
 
 const findDateBuySell = textArr => {
   const idx = textArr.findIndex(t => t.toLowerCase() === 'orderabrechnung');
@@ -119,8 +118,8 @@ export const parseData = textArr => {
 
   if (isBuy(textArr)) {
     type = 'Buy';
-    isin = findISIN(textArr, 3);
-    company = findCompany(textArr, 1);
+    isin = findISIN(textArr);
+    company = findCompany(textArr);
     date = findDateBuySell(textArr);
     shares = findShares(textArr);
     amount = findAmount(textArr);
@@ -129,8 +128,8 @@ export const parseData = textArr => {
     tax = 0;
   } else if (isSell(textArr)) {
     type = 'Sell';
-    isin = findISIN(textArr, 3);
-    company = findCompany(textArr, 1);
+    isin = findISIN(textArr);
+    company = findCompany(textArr);
     date = findDateBuySell(textArr);
     shares = findShares(textArr);
     amount = findAmount(textArr);
@@ -139,8 +138,8 @@ export const parseData = textArr => {
     tax = findTax(textArr);
   } else if (isDividend(textArr)) {
     type = 'Dividend';
-    isin = findISIN(textArr, 3);
-    company = findCompany(textArr, 1);
+    isin = findISIN(textArr);
+    company = findCompany(textArr);
     date = findDateDividend(textArr);
     shares = findDividendShares(textArr);
     amount = findPayout(textArr);
