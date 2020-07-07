@@ -58,11 +58,10 @@ const findPayout = textArr => {
 };
 
 const findFee = textArr => {
-  const brokerage =
-    textArr[textArr.findIndex(t => t.toLowerCase() === 'provision') + 2];
-
-  const baseFee =
-    textArr[textArr.findIndex(t => t.toLowerCase() === 'grundgebühr') + 2];
+  const brokerageIdx = textArr.findIndex(t => t.toLowerCase() === 'provision');
+  const brokerage = brokerageIdx >= 0 ? textArr[brokerageIdx + 2] : null;
+  const baseFeeIdx = textArr.findIndex(t => t.toLowerCase() === 'grundgebühr');
+  const baseFee = baseFeeIdx >= 0 ? textArr[baseFeeIdx + 2] : null;
 
   const sum = +Big(parseGermanNum(brokerage)).plus(
     Big(parseGermanNum(baseFee))
