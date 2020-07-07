@@ -111,7 +111,7 @@ const isDividend = textArr =>
   textArr.some(t => t.toLowerCase() === 'ertragsgutschrift');
 
 export const canParseData = textArr =>
-  textArr.some(t => t.toLowerCase().includes('consorsbank')) &&
+  textArr.some(t => t.toLowerCase && t.toLowerCase().includes('consorsbank')) &&
   (isBuy(textArr) || isSell(textArr) || isDividend(textArr));
 
 export const parseData = textArr => {
