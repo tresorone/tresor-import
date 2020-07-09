@@ -12,4 +12,5 @@ export const dividendsSamples = [
   require('./div2.json'),
   require('./div3.json'),
   require('./div4.json'),
+  require('./div5.json'),
 ];
