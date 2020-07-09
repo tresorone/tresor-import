@@ -3,7 +3,7 @@ import { csvJSON } from '@/helper';
 import pdfjs from 'pdfjs-dist/build/pdf';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 import * as brokers from './brokers';
-import { parsePortfolio } from './apps/pp';
+import { parsePortfolioPerformanceExport } from './apps';
 
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -85,5 +85,5 @@ export const extractActivities = async e => {
 export const extractCSVActivities = async e => {
   const csv = e.currentTarget.result;
 
-  return parsePortfolio(JSON.parse(csvJSON(csv)));
+  return parsePortfolioPerformanceExport(JSON.parse(csvJSON(csv)));
 };

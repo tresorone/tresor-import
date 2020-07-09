@@ -1,5 +1,5 @@
 export function csvJSON(csv) {
-  var lines = csv.split('\n');
+  var lines = csv.trim().split('\n');
 
   var result = [];
 
