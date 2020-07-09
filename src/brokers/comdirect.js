@@ -4,9 +4,7 @@ import every from 'lodash/every';
 import values from 'lodash/values';
 import Big from 'big.js';
 
-const parseGermanNum = n => {
-  return parseFloat(n.replace(/\./g, '').replace(',', '.'));
-};
+import { parseGermanNum } from '@/helper';
 
 const findISIN = (text, span) => {
   const isinLine = text[text.findIndex(t => t.includes('/ISIN')) + span];
@@ -76,7 +74,7 @@ const findFee = textArr => {
     textArr[textArr.findIndex(t => t.includes('Zu Ihren')) + 1];
   const totalCost = totalCostLine.split('EUR').pop().trim();
 
-  const diff = +(Big(parseGermanNum(totalCost)).minus(Big(amount)));
+  const diff = +Big(parseGermanNum(totalCost)).minus(Big(amount));
   return Math.abs(diff);
 };
 
@@ -101,7 +99,7 @@ export const parseData = textArr => {
     date = findDateBuySell(textArr);
     shares = findShares(textArr);
     amount = findAmount(textArr);
-    price = +(Big(amount).div(Big(shares)));
+    price = +Big(amount).div(Big(shares));
     fee = findFee(textArr);
   } else if (isSell(textArr)) {
     type = 'Sell';
@@ -110,7 +108,7 @@ export const parseData = textArr => {
     date = findDateBuySell(textArr);
     shares = findShares(textArr);
     amount = findAmount(textArr);
-    price = +(Big(amount).div(Big(shares)));
+    price = +Big(amount).div(Big(shares));
     fee = findFee(textArr);
   } else if (isDividend(textArr)) {
     type = 'Dividend';
@@ -119,7 +117,7 @@ export const parseData = textArr => {
     date = findDateDividend(textArr);
     shares = findDividendShares(textArr);
     amount = findPayout(textArr);
-    price = +(Big(amount).div(Big(shares)));
+    price = +Big(amount).div(Big(shares));
     fee = 0;
   }
 

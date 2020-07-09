@@ -4,8 +4,7 @@ import every from 'lodash/every';
 import values from 'lodash/values';
 import Big from 'big.js';
 
-const parseGermanNum = n =>
-  parseFloat(n.replace(/[-+]$/, '').replace(/\./g, '').replace(',', '.'));
+import { parseGermanNum } from '@/helper';
 
 const getValueByPreviousElement = (textArr, prev, range) =>
   textArr[textArr.findIndex(t => t.includes(prev)) + range];
@@ -59,8 +58,12 @@ const findPrice = textArr =>
 const findAmount = textArr =>
   parseGermanNum(getValueByPreviousElement(textArr, 'Kurswert', 2));
 
-const findFee = textArr =>
-  parseGermanNum(getValueByPreviousElement(textArr, 'Provision', 2));
+const findFee = textArr => {
+  const fee = parseGermanNum(
+    getValueByPreviousElement(textArr, 'Provision', 2)
+  );
+  return fee && /([0-9]*)/.test(fee) ? fee : 0;
+};
 
 const findPayout = textArr =>
   parseGermanNum(

@@ -9,8 +9,7 @@ const offsets = {
   isin: 3,
 };
 
-const parseGermanNum = n =>
-  parseFloat(n.replace(/[-+]$/, '').replace(/\./g, '').replace(',', '.'));
+import { parseGermanNum } from '@/helper';
 
 const getValueByPreviousElement = (textArr, prev) =>
   textArr[textArr.findIndex(t => t.includes(prev)) + 1];
@@ -65,7 +64,11 @@ const isSell = textArr =>
   textArr.some(t => t.includes('Wertpapier Abrechnung Verkauf'));
 
 const isDividend = textArr =>
-  textArr.some(t => t.includes('Dividendengutschrift') || t.includes('Ausschüttung Investmentfonds'));
+  textArr.some(
+    t =>
+      t.includes('Dividendengutschrift') ||
+      t.includes('Ausschüttung Investmentfonds')
+  );
 
 export const canParseData = textArr =>
   textArr.some(t => t.includes('BIC BYLADEM1001')) &&

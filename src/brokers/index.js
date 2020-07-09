@@ -4,5 +4,8 @@ import * as traderepublic from './traderepublic';
 import * as onvista from './onvista';
 import * as ing from './ing';
 import * as eb from './erstebank';
+import * as flatex from './flatex';
+import * as pb from './pb';
+import * as consorsbank from './consorsbank';
 
-export { comdirect, dkb, traderepublic, onvista, ing, eb };
+export { comdirect, dkb, traderepublic, onvista, ing, pb, flatex, consorsbank, eb };

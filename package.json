@@ -9,7 +9,7 @@
     "start": "npm run build && serve & npm run watch",
     "test": "jest --verbose",
     "lint": "eslint .",
-    "precommit": "pretty-quick --staged --no-restage && npm run lint && npm t && npm audit"
+    "precommit": "pretty-quick --staged --no-restage && npm run lint && npm t && npm audit --audit-level=moderate"
   },
   "keywords": [
     "tresor",
@@ -33,6 +33,7 @@
     "eslint-plugin-jest": "^23.8.2",
     "eslint-plugin-vue": "^6.2.2",
     "file-loader": "^6.0.0",
+    "glob": "^7.1.6",
     "husky": "^4.2.5",
     "jest": "^25.4.0",
     "jest-cli": "^25.4.0",
@@ -45,6 +46,18 @@
   "husky": {
     "hooks": {
       "pre-commit": "npm run precommit"
+    }
+  },
+  "jest": {
+    "modulePaths": [
+      "<rootDir>"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "<rootDir>"
+    ],
+    "moduleNameMapper": {
+      "@/(.*)$": "<rootDir>/src/$1"
     }
   }
 }

@@ -1,6 +1,6 @@
-# Tresor-Import - der PDF Import von Tresor One
+# Tresor-Import - The File Import of Tresor One
 
-This is the PDF Import on [tresor.one](https://tresor.one)
+This is the PDF and PP-CSV Import used on [tresor.one](https://tresor.one)
 
 ### Contribute
 

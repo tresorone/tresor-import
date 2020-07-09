@@ -1,6 +1,7 @@
 export const buySamples = [
   require('./buy1.json'),
   require('./buy2.json'),
+  require('./buy_provision_free.json'),
   require('./buy_plan.json'),
 ];
 

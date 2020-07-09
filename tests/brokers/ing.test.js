@@ -57,8 +57,24 @@ describe('Test Ing', () => {
       });
     });
 
-    test('Test if investment plan is mapped correctly', () => {
+    test('Test if provision-free buy is mapped correctly', () => {
       const activity = ing.parseData(buySamples[2]);
+
+      expect(activity).toEqual({
+        broker: 'ing',
+        type: 'Buy',
+        date: '2016-01-22',
+        isin: 'US64110L1061',
+        company: 'Netflix Inc.',
+        shares: 11,
+        price: 92.09,
+        amount: 1012.99,
+        fee: 0,
+      });
+    });
+
+    test('Test if investment plan is mapped correctly', () => {
+      const activity = ing.parseData(buySamples[3]);
 
       expect(activity).toEqual({
         broker: 'ing',

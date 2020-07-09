@@ -1,0 +1,37 @@
+Date;Type;Value;Transaction Currency;Gross Amount;Currency Gross Amount;Exchange Rate;Fees;Taxes;Shares;ISIN;WKN;Ticker Symbol;Security Name;Note
+2019-01-25T00:00;Delivery (Inbound);4.979,80;EUR;;;;10,00;0,00;36;US0378331005;865985;APC.DE;APPLE INC.;Kauf_-_WKN_865985_-_Wertpapierabrechnung.pdf
+2019-01-28T00:00;Delivery (Inbound);4.404,97;EUR;;;;10,00;0,00;3;US0231351067;906866;AMZ.DE;AMAZON.COM INC.;Kauf_-_WKN_906866_-_Wertpapierabrechnung.pdf
+2019-01-28T00:00;Delivery (Inbound);2.489,56;EUR;;;;10,86;0,00;95;DE000A0F5UH1;A0F5UH;ISPA.DE;STOXX Global Select Dividend 100 UCITS;Kauf_-_WKN_A0F5UH_-_Wertpapierabrechnung.pdf
+2019-01-28T00:00;Delivery (Inbound);4.970,94;EUR;;;;10,88;0,00;119;IE00BTJRMP35;A12GVR;XMME.DE;MSCI Emerging Markets UCITS;Kauf_-_WKN_A12GVR_-_Wertpapierabrechnung.pdf
+2019-01-28T00:00;Delivery (Inbound);4.831,50;EUR;;;;10,00;0,00;5;US02079K3059;A14Y6F;ABEA.DE;ALPHABET INC.;Kauf_-_WKN_A14Y6F_-_Wertpapierabrechnung.pdf
+2019-01-28T00:00;Delivery (Inbound);4.940,76;EUR;;;;10,88;0,00;80;LU0392495700;ETF120;X020.F;MSCI USA UCITS;Kauf_-_WKN_ETF120_-_Wertpapierabrechnung.pdf
+2019-02-04T00:00;Delivery (Inbound);1.839,85;EUR;;;;10,00;0,00;5;US09247X1019;928193;BLQA.DE;BLACKROCK INC.;Kauf_-_WKN_928193_-_Wertpapierabrechnung.pdf
+2019-02-04T00:00;Delivery (Inbound);1.926,20;EUR;;;;10,00;0,00;13;US01609W1027;A117ME;AHLA.DE;ALIBABA GROUP HOLDING LTD.;Kauf_-_WKN_A117ME_-_Wertpapierabrechnung.pdf
+2019-04-08T00:00;Delivery (Inbound);2.084,45;EUR;;;;10,85;0,00;40;LU1861132840;A2JSC9;GOAI.DE;STOXX Global Artificial Intelligence UCITS;Kauf_-_WKN_A2JSC9_-_Wertpapierabrechnung.pdf
+2019-12-19T20:48;Delivery (Inbound);65,71;EUR;;;;9,30;0,00;1;IE00B4L5Y983;A0RPWH;EUNL.DE;MSCI World UCITS ETF USD;Wertpapierabrechnung_Kauf_1_St._WKN_A0RPWH(ISHSIII-CORE_MSCI_WLD_DLA)_C53FEE.pdf
+2019-12-20T09:46;Delivery (Inbound);4.660,44;EUR;;;;3,90;0,00;200;IE00BGHQ0G80;A1W8SB;XMAW.DE;MSCI ACWI UCITS;Wertpapierabrechnung_Kauf_200_St._WKN_A1W8SB(X(IE)-MSCI_AC_WORLD_1C)_B9623.pdf
+2019-12-30T00:00;Delivery (Inbound);3.777,60;EUR;;;;10,00;0,00;200;LU1841731745;LYX0YW;L4K3.DE;MSCI China UCITS;Kauf_-_WKN_LYX0YW_-_Wertpapierabrechnung.pdf
+2020-01-06T00:00;Delivery (Inbound);500,49;EUR;;;;0,49;0,00;9,6283;IE00B8GKDB10;A1T8FV;VGWD.DE;FTSE All-World High Dividend Yield UCITS;Kauf_-_WKN_A1T8FV_-_Wertpapierabrechnung.pdf
+2020-01-27T00:00;Delivery (Outbound);-2.372,00;EUR;;;;10,00;0,00;40;LU1861132840;A2JSC9;GOAI.DE;STOXX Global Artificial Intelligence UCITS;Verkauf_-_WKN_A2JSC9_-_Wertpapierabrechnung.pdf
+2020-02-05T00:00;Delivery (Inbound);500,49;EUR;;;;0,49;0,00;9,6321;IE00B8GKDB10;A1T8FV;VGWD.DE;FTSE All-World High Dividend Yield UCITS;Kauf_-_WKN_A1T8FV_-_Wertpapierabrechnung.pdf
+2020-03-03T00:00;Delivery (Inbound);3.104,80;EUR;;;;10,00;0,00;12;US0378331005;865985;APC.DE;APPLE INC.;Kauf_-_WKN_865985_-_Wertpapierabrechnung.pdf
+2020-03-04T00:00;Delivery (Inbound);5.468,20;EUR;;;;10,00;0,00;550;LU1781541179;LYX0YD;LCUW.DE;MSCI World (DR) UCITS;Kauf_-_WKN_LYX0YD_-_Wertpapierabrechnung.pdf
+2020-03-05T00:00;Delivery (Inbound);500,49;EUR;;;;0,49;0,00;10,6168;IE00B8GKDB10;A1T8FV;VGWD.DE;FTSE All-World High Dividend Yield UCITS;Kauf_-_WKN_A1T8FV_-_Wertpapierabrechnung.pdf
+2020-03-26T00:00;Delivery (Inbound);1.172,25;EUR;;;;10,00;0,00;5;US0378331005;865985;APC.DE;APPLE INC.;Kauf_-_WKN_865985_-_Wertpapierabrechnung.pdf
+2020-03-26T00:00;Delivery (Inbound);1.023,16;EUR;;;;10,00;0,00;120;LU1781541179;LYX0YD;LCUW.DE;MSCI World (DR) UCITS;Kauf_-_WKN_LYX0YD_-_Wertpapierabrechnung.pdf
+2020-04-06T00:00;Delivery (Inbound);500,49;EUR;;;;0,49;0,00;12,7162;IE00B8GKDB10;A1T8FV;VGWD.DE;FTSE All-World High Dividend Yield UCITS;Kauf_-_WKN_A1T8FV_-_Wertpapierabrechnung.pdf
+2020-04-28T11:41;Delivery (Inbound);1.005,52;EUR;;;;1,00;0,00;33;IE00BKM4H312;;QDVD.DE;MSCI USA Dividend IQ UCITS;Abrechnung MSCI USA Q.D.U.ETF.pdf
+2020-04-28T11:52;Delivery (Inbound);872,00;EUR;;;;1,00;0,00;5;US0846707026;;BRYN.F;Berkshire Hathaway Inc.;Abrechnung Berkshire Hathaway Inc. Reg.Shares B.pdf
+2020-04-30T13:54;Delivery (Inbound);170,50;EUR;;;;1,00;0,00;3;US9182041080;;VFP.DE;V.F. Corp.;Abrechnung V.F. Corp..pdf
+2020-04-30T14:01;Delivery (Inbound);28,27;EUR;;;;1,00;0,00;1;DE0005552004;;DPW.DE;Deutsche Post AG;Abrechnung Deutsche Post AG.pdf
+2020-05-05T00:00;Delivery (Inbound);500,49;EUR;;;;0,49;0,00;12,0934;IE00B8GKDB10;A1T8FV;VGWD.DE;FTSE All-World High Dividend Yield UCITS;Kauf_-_WKN_A1T8FV_-_Wertpapierabrechnung.pdf
+2020-05-07T19:52;Delivery (Inbound);1.012,50;EUR;;;;1,00;0,00;34;IE00BKM4H312;;QDVD.DE;MSCI USA Dividend IQ UCITS;Abrechnung.pdf
+2020-05-11T11:24;Delivery (Inbound);893,37;EUR;;;;1,00;0,00;41;DE000A0F5UH1;A0F5UH;ISPA.DE;STOXX Global Select Dividend 100 UCITS;Abrechnung.pdf
+2020-05-11T11:26;Delivery (Inbound);96,35;EUR;;;;1,00;0,00;18;IE00BJ5JNY98;;;MSCI World Information Technology;Abrechnung 2.pdf
+2020-05-14T14:44;Delivery (Inbound);11,20;EUR;;;;1,00;0,00;2;IE00BJ5JNY98;;;MSCI World Information Technology;Abrechnung iShs V-MSCI W.Inf.T.Sec.U.ETF 2.pdf
+2020-06-04T10:46;Delivery (Inbound);2.012,97;EUR;;;;1,00;0,00;86;DE000A0F5UH1;A0F5UH;ISPA.DE;STOXX Global Select Dividend 100 UCITS;Abrechnung 2.pdf
+2020-06-04T13:57;Delivery (Inbound);17,20;EUR;;;;1,00;0,00;3;IE00BJ5JNY98;;;MSCI World Information Technology;Abrechnung.pdf
+2020-06-05T00:00;Delivery (Inbound);500,49;EUR;;;;0,49;0,00;11,2829;IE00B8GKDB10;A1T8FV;VGWD.DE;FTSE All-World High Dividend Yield UCITS;Kauf_-_WKN_A1T8FV_-_Wertpapierabrechnung.pdf
+2020-06-24T16:34;Delivery (Inbound);580,80;EUR;;;;1,00;0,00;20;IE00BKM4H312;;QDVD.DE;MSCI USA Dividend IQ UCITS;Abrechnung.pdf
+2020-06-26T14:42;Delivery (Inbound);563,50;EUR;;;;1,00;0,00;25;DE000A0F5UH1;A0F5UH;ISPA.DE;STOXX Global Select Dividend 100 UCITS;Abrec2hnung.pdf
+2020-06-30T15:40;Delivery (Inbound);872,64;EUR;;;;1,00;0,00;57;IE00B652H904;A1JNZ9;EUNY.DE;EM Dividend;3Abrechnung.pdf

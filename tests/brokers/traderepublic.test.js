@@ -2,6 +2,7 @@ import { parseData } from '../../src/brokers/traderepublic';
 
 const stockSingleBuy = require('./__mocks__/traderepublic/stock_single_buy.json');
 const stockSingleLimitBuy = require('./__mocks__/traderepublic/stock_single_limit_buy.json');
+const stockSingleLimitBuyFinancialTransactionTax = require('./__mocks__/traderepublic/stock_single_limit_buy_financial_transaction_tax.json');
 const stockSingleLimitBuyWithoutExplicitISIN = require('./__mocks__/traderepublic/stock_single_limit_buy_without_explicit_ISIN.json');
 const etfSavingsPlanBuy = require('./__mocks__/traderepublic/etf_savings_plan_buy.json');
 const stockSell = require('./__mocks__/traderepublic/stock_sell.json');
@@ -45,6 +46,23 @@ describe('TradeRepublic broker', () => {
         amount: 9985.48,
         fee: 1,
         tax: 0,
+      });
+    });
+  });
+
+  describe('Stock Single Buy with financial transaction tax', () => {
+    test('should map the pdf data correctly', () => {
+      expect(parseData(stockSingleLimitBuyFinancialTransactionTax)).toEqual({
+        broker: 'traderepublic',
+        type: 'Buy',
+        date: '2020-06-09',
+        isin: 'FR0000031122',
+        company: 'Air France-KLM S.A.',
+        shares: 100,
+        price: 5.632,
+        amount: 563.2,
+        fee: 1,
+        tax: 1.69,
       });
     });
   });
@@ -114,7 +132,7 @@ describe('TradeRepublic broker', () => {
         amount: 118.21,
         broker: 'traderepublic',
         company: 'Royal Dutch Shell',
-        date: '2020-02-13',
+        date: '2020-03-23',
         fee: 0,
         isin: 'GB00B03MLX29',
         price: 0.3094502617801047,
@@ -133,7 +151,7 @@ describe('TradeRepublic broker', () => {
         amount: 17.52,
         broker: 'traderepublic',
         company: 'iShsII-Dev.Mkts Prop.Yld U.ETF',
-        date: '2020-02-13',
+        date: '2020-02-26',
         fee: 0,
         isin: 'IE00B1FZS350',
         price: 0.12425531914893617,

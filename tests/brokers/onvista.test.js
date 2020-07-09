@@ -2,6 +2,7 @@ import { getBroker } from '../../src/';
 import * as onvista from '../../src/brokers/onvista';
 import {
   buySamples,
+  sellSamples,
   dividendsSamples,
   multiPageSample,
 } from './__mocks__/onvista';
@@ -10,7 +11,10 @@ console.error = jest.fn();
 
 describe('Onvista Bank broker', () => {
   test('Our samples should be detected by Onvista Bank handler only', () => {
-    for (let sample of buySamples.concat(dividendsSamples)) {
+    for (let sample of buySamples
+      .concat(dividendsSamples)
+      .concat(multiPageSample)
+      .concat(sellSamples)) {
       expect(getBroker(sample)).toEqual(onvista);
     }
   });
@@ -83,6 +87,25 @@ describe('Onvista Bank broker', () => {
       ]);
     });
 
+    test('should map pdf data of sample 4 correctly', () => {
+      const activity = onvista.parsePages(buySamples[3]);
+
+      expect(activity).toEqual([
+        {
+          broker: 'onvista',
+          type: 'Buy',
+          date: '2010-02-18',
+          isin: 'DE0008430026',
+          company: 'Münchener Rückvers.-Ges. AG vink.Namens-Aktien o.N.',
+          shares: 13,
+          price: 110.399,
+          amount: 1435.19,
+          fee: 1.3,
+          tax: 0,
+        },
+      ]);
+    });
+
     test('should map pdf data of multi-page sample 1 correctly', () => {
       const activity = multiPageActivities[0];
 
@@ -118,6 +141,136 @@ describe('Onvista Bank broker', () => {
         tax: 0,
       });
     });
+
+    test('should map pdf data of sample 1 correctly', () => {
+      const activity = onvista.parsePages(sellSamples[0]);
+
+      expect(activity).toEqual([
+        {
+          broker: 'onvista',
+          type: 'Sell',
+          date: '2020-02-27',
+          isin: 'CA0585861085',
+          company: 'Ballard Power Systems Inc. Registered Shares o.N.',
+          shares: 60,
+          price: 9.254,
+          amount: 555.24,
+          fee: 7,
+          tax: 0,
+        },
+        {
+          broker: 'onvista',
+          type: 'Sell',
+          date: '2020-02-27',
+          isin: 'DE000A0F5UF5',
+          company: 'iShare.NASDAQ-100 UCITS ETF DE Inhaber-Anteile',
+          shares: 7,
+          price: 78.272,
+          amount: 547.9,
+          fee: 7,
+          tax: 0,
+        },
+        {
+          broker: 'onvista',
+          type: 'Sell',
+          date: '2020-02-27',
+          isin: 'IE00B52VJ196',
+          company: 'iShsII-MSCI Europe SRI U.ETF Registered Shs EUR (Acc) o.N.',
+          shares: 10,
+          price: 47.518,
+          amount: 475.18,
+          fee: 7,
+          tax: 0,
+        },
+        {
+          broker: 'onvista',
+          type: 'Sell',
+          date: '2020-02-27',
+          isin: 'NO0010081235',
+          company: 'NEL ASA Navne-Aksjer NK -,20',
+          shares: 500,
+          price: 0.9855,
+          amount: 492.75,
+          fee: 7,
+          tax: 0,
+        },
+        {
+          broker: 'onvista',
+          type: 'Sell',
+          date: '2020-02-27',
+          isin: 'SE0006425815',
+          company: 'PowerCell Sweden AB (publ) Namn-Aktier SK-,022',
+          shares: 95,
+          price: 20.35,
+          amount: 1933.25,
+          fee: 7,
+          tax: 0,
+        },
+        {
+          broker: 'onvista',
+          type: 'Sell',
+          date: '2020-02-27',
+          isin: 'US55087P1049',
+          company: 'Lyft Inc. Registered Shares Cl.A o.N.',
+          shares: 10,
+          price: 35.71,
+          amount: 357.1,
+          fee: 7,
+          tax: 0,
+        },
+      ]);
+    });
+
+    test('should map pdf data of sample 2 correctly', () => {
+      expect(onvista.parsePages(sellSamples[1])).toEqual([
+        {
+          broker: 'onvista',
+          type: 'Sell',
+          date: '2018-08-08',
+          isin: 'DE000A1TNUT7',
+          company: 'Deutsche Beteiligungs AG Namens-Aktien o.N.',
+          shares: 72,
+          price: 38.05,
+          amount: 2739.6,
+          fee: 6.5,
+          tax: 39.01,
+        },
+      ]);
+    });
+
+    test('should map pdf data of sample 3 correctly', () => {
+      expect(onvista.parsePages(sellSamples[2])).toEqual([
+        {
+          broker: 'onvista',
+          type: 'Sell',
+          date: '2018-09-27',
+          isin: 'IE00B2NPKV68',
+          company: 'iShsII-J.P.M.$ EM Bond U.ETF Registered Shares o.N.',
+          shares: 57,
+          price: 91.024,
+          amount: 5188.37,
+          fee: 6.5,
+          tax: 34.52,
+        },
+      ]);
+    });
+  });
+
+  test('should map pdf data of sample 4 correctly', () => {
+    expect(onvista.parsePages(sellSamples[3])).toEqual([
+      {
+        broker: 'onvista',
+        type: 'Sell',
+        date: '2018-11-27',
+        isin: 'DE0007480204',
+        company: 'Deutsche EuroShop AG Namens-Aktien o.N.',
+        shares: 84,
+        price: 28.16,
+        amount: 2365.44,
+        fee: 6.5,
+        tax: 0,
+      },
+    ]);
   });
 
   describe('Dividend', () => {
@@ -136,6 +289,73 @@ describe('Onvista Bank broker', () => {
           amount: 83.8,
           fee: 0,
           tax: 0,
+        },
+      ]);
+    });
+
+    test('should map pdf data of sample 2 correctly', () => {
+      const activity = onvista.parsePages(dividendsSamples[1]);
+
+      expect(activity).toEqual([
+        {
+          broker: 'onvista',
+          type: 'Dividend',
+          date: '2019-09-16',
+          isin: 'DE000A0F5UF5',
+          company: 'iShare.NASDAQ-100 UCITS ETF DE Inhaber-Anteile',
+          shares: 4.9438,
+          price: 0.02225009102309964,
+          amount: 0.11,
+          fee: 0,
+          tax: 0.03,
+        },
+      ]);
+    });
+
+    test('should map pdf data of sample 3 correctly', () => {
+      const activity = onvista.parsePages(dividendsSamples[2]);
+
+      expect(activity).toEqual([
+        {
+          broker: 'onvista',
+          type: 'Dividend',
+          date: '2019-08-22',
+          isin: 'LU0635178014',
+          company: 'ComSta.-MSCI Em.Mkts.TRN U.ETF Inhaber-Anteile I o.N.',
+          shares: 55.7157,
+          price: 0.8071333573840048,
+          amount: 44.97,
+          fee: 0,
+          tax: 4.14,
+        },
+      ]);
+    });
+
+    test('should map pdf data of sample 4 correctly', () => {
+      expect(onvista.parsePages(dividendsSamples[3])).toEqual([
+        {
+          broker: 'onvista',
+          type: 'Dividend',
+          date: '2019-10-15',
+          isin: 'DE0002635281',
+          company: 'iSh.EO ST.Sel.Div.30 U.ETF DE Inhaber-Anteile',
+          shares: 245.3939,
+          price: 0.12188567034469887,
+          amount: 29.91,
+          fee: 0,
+          tax: 6.77,
+        },
+        {
+          broker: 'onvista',
+          type: 'Dividend',
+          date: '2019-10-15',
+          isin: 'DE0002635299',
+          company: 'iSh.ST.Eur.Sel.Div.30 U.ETF DE Inhaber-Anteile',
+          shares: 270.787,
+          price: 0.10306994058060394,
+          amount: 27.91,
+          fee: 0,
+          tax: 6.32,
         },
       ]);
     });
