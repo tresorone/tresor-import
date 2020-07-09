@@ -207,5 +207,22 @@ describe('Consorsbank broker', () => {
         },
       ]);
     });
+
+    test('should map pdf data of sample 5 correctly', () => {
+      expect(consorsbank.parsePages(dividendsSamples[4])).toEqual([
+        {
+          amount: 67.2,
+          broker: 'consorsbank',
+          company: 'VOLKSWAGEN AG Inhaber-Stammaktien o.N.',
+          date: '2019-05-14',
+          fee: 0,
+          isin: 'DE0007664005',
+          price: 4.8,
+          shares: 14,
+          tax: 17.37,
+          type: 'Dividend',
+        },
+      ]);
+    });
   });
 });
