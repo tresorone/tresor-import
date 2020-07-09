@@ -48,8 +48,8 @@ const findAmount = textArr => {
 };
 
 const findPayout = textArr => {
-  const idx = textArr.findIndex(
-    t => t.toLowerCase() === 'zwischensumme in eur'
+  const idx = textArr.findIndex(t =>
+    ['brutto in eur', 'brutto'].includes(t.toLowerCase())
   );
   const amount = textArr[idx + 1].split(' ')[0];
 
@@ -81,19 +81,33 @@ const findTax = textArr => {
 };
 
 const findDividendTax = textArr => {
-  const kapstIdx = textArr.findIndex(t =>
-    t.toLowerCase().includes('kapitalertragsteuer')
-  );
+  const sum = textArr.reduce((acc, t, i) => {
+    // is addition (Zuschlag)
+    const isAddition = t.toLowerCase().includes('zuschlag');
 
-  const solzIdx = textArr.findIndex(t =>
-    t.toLowerCase().includes('solidaritätszuschlag')
-  );
+    // is withholding tax (Quellensteuer)
+    const isWithholdingTax = t.toLowerCase().includes('quellensteuer');
 
-  const kapst = kapstIdx >= 0 ? textArr[kapstIdx + 3].split(' ')[0] : null;
-  const solz = solzIdx >= 0 ? textArr[solzIdx + 3].split(' ')[0] : null;
-  const sum = +Big(parseGermanNum(kapst)).plus(Big(parseGermanNum(solz)));
+    // is tax, excl. irrelevant withholding tax lines
+    const isTax =
+      t.toLowerCase().includes('steuer') &&
+      !t.toLowerCase().includes('anrechenbare quellensteuer') &&
+      !t.toLowerCase().includes('abzgl. quellensteuer');
 
-  return Math.abs(sum);
+    if (isTax || isAddition) {
+      const offset = isWithholdingTax ? 1 : 3;
+      const [amount, currency] = textArr[i + offset].split(' ');
+
+      // ignore all USD taxes
+      if (currency !== 'USD') {
+        return acc.plus(Big(parseGermanNum(amount)));
+      }
+    }
+
+    return acc;
+  }, Big(0));
+
+  return Math.abs(+sum);
 };
 
 const isBuy = textArr => {
@@ -107,7 +121,9 @@ const isSell = textArr => {
 };
 
 const isDividend = textArr =>
-  textArr.some(t => t.toLowerCase() === 'ertragsgutschrift');
+  textArr.some(t =>
+    ['ertragsgutschrift', 'dividendengutschrift'].includes(t.toLowerCase())
+  );
 
 export const canParseData = textArr =>
   textArr.some(t => t.toLowerCase && t.toLowerCase().includes('consorsbank')) &&

@@ -139,15 +139,15 @@ describe('Consorsbank broker', () => {
 
       expect(activity).toEqual([
         {
-          amount: 158.77,
+          amount: 186.79,
           broker: 'consorsbank',
           company: 'Alerian MLP ETF Registered Shares o.N.',
           date: '2020-05-06',
           fee: 0,
           isin: 'US00162Q8666',
-          price: 0.11760740740740741,
+          price: 0.13836296296296297,
           shares: 1350,
-          tax: 19.7,
+          tax: 47.72,
           type: 'Dividend',
         },
       ]);
@@ -158,15 +158,15 @@ describe('Consorsbank broker', () => {
 
       expect(activity).toEqual([
         {
-          amount: 60.37,
+          amount: 71.02,
           broker: 'consorsbank',
           company: 'Global X SuperDividend ETF Registered Shares o.N.',
           date: '2020-03-03',
           fee: 0,
           isin: 'US37950E5490',
-          price: 0.09287692307692308,
+          price: 0.10926153846153847,
           shares: 650,
-          tax: 7.5,
+          tax: 18.15,
           type: 'Dividend',
         },
       ]);
@@ -194,15 +194,32 @@ describe('Consorsbank broker', () => {
     test('should map pdf data of sample 4 correctly', () => {
       expect(consorsbank.parsePages(dividendsSamples[3])).toEqual([
         {
-          amount: 201.22,
+          amount: 236.73,
           broker: 'consorsbank',
           company: 'Alerian MLP ETF Registered Shares o.N.',
           date: '2020-02-12',
           fee: 0,
           isin: 'US00162Q8666',
-          price: 0.14905185185185185,
+          price: 0.17535555555555554,
           shares: 1350,
-          tax: 24.97,
+          tax: 60.48,
+          type: 'Dividend',
+        },
+      ]);
+    });
+
+    test('should map pdf data of sample 5 correctly', () => {
+      expect(consorsbank.parsePages(dividendsSamples[4])).toEqual([
+        {
+          amount: 67.2,
+          broker: 'consorsbank',
+          company: 'VOLKSWAGEN AG Inhaber-Stammaktien o.N.',
+          date: '2019-05-14',
+          fee: 0,
+          isin: 'DE0007664005',
+          price: 4.8,
+          shares: 14,
+          tax: 18.68,
           type: 'Dividend',
         },
       ]);
