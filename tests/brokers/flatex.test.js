@@ -1,4 +1,8 @@
-import { parseData, canParseData, parsePages } from '../../src/brokers/flatex';
+import {
+  parseSinglePage,
+  canParseData,
+  parsePages,
+} from '../../src/brokers/flatex';
 import {
   buySamples,
   sellSamples,
@@ -25,7 +29,7 @@ describe('Flatex broker', () => {
 
   describe('Buy', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const activity = parseData(buySamples[0]);
+      const activity = parseSinglePage(buySamples[0]);
 
       expect(activity).toEqual({
         broker: 'flatex',
@@ -42,7 +46,7 @@ describe('Flatex broker', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const activity = parseData(buySamples[1]);
+      const activity = parseSinglePage(buySamples[1]);
 
       expect(activity).toEqual({
         broker: 'flatex',
@@ -59,7 +63,7 @@ describe('Flatex broker', () => {
     });
 
     test('should map pdf data of sample 3 correctly', () => {
-      const activity = parseData(buySamples[2]);
+      const activity = parseSinglePage(buySamples[2]);
 
       expect(activity).toEqual({
         broker: 'flatex',
@@ -76,7 +80,7 @@ describe('Flatex broker', () => {
     });
 
     test('should map pdf data of sample 5 correctly', () => {
-      const activity = parseData(buySamples[4]);
+      const activity = parseSinglePage(buySamples[4]);
 
       expect(activity).toEqual({
         broker: 'flatex',
@@ -95,7 +99,7 @@ describe('Flatex broker', () => {
 
   describe('Sell', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const activity = parseData(sellSamples[0]);
+      const activity = parseSinglePage(sellSamples[0]);
 
       expect(activity).toEqual({
         broker: 'flatex',
@@ -112,7 +116,7 @@ describe('Flatex broker', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const activity = parseData(sellSamples[1]);
+      const activity = parseSinglePage(sellSamples[1]);
 
       expect(activity).toEqual({
         broker: 'flatex',
@@ -131,7 +135,7 @@ describe('Flatex broker', () => {
 
   describe('Dividend', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const activity = parseData(dividendsSamples[0]);
+      const activity = parseSinglePage(dividendsSamples[0]);
 
       // stock
       expect(activity).toEqual({
@@ -149,7 +153,7 @@ describe('Flatex broker', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const activity = parseData(dividendsSamples[1]);
+      const activity = parseSinglePage(dividendsSamples[1]);
 
       // stock
       expect(activity).toEqual({
@@ -167,7 +171,7 @@ describe('Flatex broker', () => {
     });
 
     test('should map pdf data of sample 3 correctly', () => {
-      const activity = parseData(dividendsSamples[2]);
+      const activity = parseSinglePage(dividendsSamples[2]);
 
       // index fund
       expect(activity).toEqual({
@@ -219,7 +223,7 @@ describe('Flatex broker', () => {
         broker: 'flatex',
         company: 'WIRECARD AG',
         date: '2020-06-18',
-        fee: 6.17,
+        fee: 6.07,
         isin: 'DE0007472060',
         price: 32.915,
         shares: 10,
