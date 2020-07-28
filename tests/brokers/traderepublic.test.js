@@ -6,7 +6,11 @@ const stockSingleLimitBuyFinancialTransactionTax = require('./__mocks__/traderep
 const stockSingleLimitBuyWithoutExplicitISIN = require('./__mocks__/traderepublic/stock_single_limit_buy_without_explicit_ISIN.json');
 const etfSavingsPlanBuy = require('./__mocks__/traderepublic/etf_savings_plan_buy.json');
 const stockSell = require('./__mocks__/traderepublic/stock_sell.json');
-const stockDividend = require('./__mocks__/traderepublic/stock_dividend.json');
+const stockDividend = [
+  require('./__mocks__/traderepublic/stock_dividend_0.json'),
+  require('./__mocks__/traderepublic/stock_dividend_1.json'),
+  require('./__mocks__/traderepublic/stock_dividend_2.json'),
+];
 const etfDividend = require('./__mocks__/traderepublic/etf_dividend.json');
 
 describe('TradeRepublic broker', () => {
@@ -126,7 +130,7 @@ describe('TradeRepublic broker', () => {
 
   describe('Stock Dividend', () => {
     test('should map the pdf data correctly', () => {
-      const activity = parseData(stockDividend);
+      const activity = parseData(stockDividend[0]);
 
       expect(activity).toEqual({
         amount: 118.21,
@@ -138,6 +142,40 @@ describe('TradeRepublic broker', () => {
         price: 0.3094502617801047,
         shares: 382,
         tax: 17.94,
+        type: 'Dividend',
+      });
+    });
+
+    test('should map the pdf data correctly', () => {
+      const activity = parseData(stockDividend[1]);
+
+      expect(activity).toEqual({
+        amount: 9.67,
+        broker: 'traderepublic',
+        company: 'iSh.ST.Eur.Sel.Div.30 U.ETF DE',
+        date: '2020-07-15',
+        fee: 0,
+        isin: 'DE0002635299',
+        price: 0.21995569041520902,
+        shares: 43.9634,
+        tax: 2.2,
+        type: 'Dividend',
+      });
+    });
+
+    test('should map the pdf data correctly', () => {
+      const activity = parseData(stockDividend[2]);
+
+      expect(activity).toEqual({
+        amount: 8.34,
+        broker: 'traderepublic',
+        company: 'iSh.EO ST.Sel.Div.30 U.ETF DE',
+        date: '2020-07-15',
+        fee: 0,
+        isin: 'DE0002635281',
+        price: 0.19105128604546745,
+        shares: 43.6532,
+        tax: 1.89,
         type: 'Dividend',
       });
     });
