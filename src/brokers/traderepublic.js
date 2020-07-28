@@ -114,7 +114,7 @@ const findTax = textArr => {
 
   if (isDividend(textArr)) {
     // The dividend documents needs quite other logic...
-    // Search the last field `Zwischensumme` and skip all lines which contains `EUR` to find the first tax field.
+    // For dividends in other currencies we need to search the last field `Zwischensumme` and skip all lines which contains `EUR` to find the first tax field.
     const searchTermSubtotal = 'Zwischensumme';
     const subtotalLineNumber = textArr.lastIndexOf(searchTermSubtotal);
     if (subtotalLineNumber > -1) {
@@ -126,6 +126,9 @@ const findTax = textArr => {
       }
 
       startTaxLineNumber = subtotalLineNumber + 2;
+    } else {
+      // This dividend is payed in `EUR`. We don't need the fancy logic above and can set the `skipLineCounter` to zero, because there is no `Fremdkostenzuschlag` field for dividends.
+      skipLineCounter = 2;
     }
   }
 
