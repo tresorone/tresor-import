@@ -1,5 +1,10 @@
-import {parseData, canParseData} from '../../src/brokers/flatex';
-import {buySamples, sellSamples, dividendsSamples} from './__mocks__/flatex';
+import { parseData, canParseData, parsePages } from '../../src/brokers/flatex';
+import {
+  buySamples,
+  sellSamples,
+  dividendsSamples,
+  mixedPageSamples,
+} from './__mocks__/flatex';
 import Big from 'big.js';
 
 describe('Flatex broker', () => {
@@ -178,6 +183,50 @@ describe('Flatex broker', () => {
                 tax: +Big(3.02).minus(Big(2.18)), // calculate from Bemessungsgrundlage - Endbetrag (note: diff in pdf is wrong by 0,01)
             });
         });
+    });
+
+    describe('Mixed pages', () => {
+      test('should map the multi page documents correctly', () => {
+        const activities = parsePages(mixedPageSamples[0]);
+  
+        expect(activities.length).toEqual(3);
+        expect(activities[0]).toEqual({
+          amount: 481.4,
+          broker: 'flatex',
+          company: 'ADIDAS AG NA O.N.',
+          date: '2020-06-18',
+          fee: 4.65,
+          isin: 'DE000A1EWWW0',
+          price: 240.7,
+          shares: 2,
+          tax: 0,
+          type: 'Sell',
+        });
+        expect(activities[1]).toEqual({
+          amount: 484.4,
+          broker: 'flatex',
+          company: 'WIRECARD AG',
+          date: '2020-06-18',
+          fee: 4.84,
+          isin: 'DE0007472060',
+          price: 48.44,
+          shares: 10,
+          tax: 0,
+          type: 'Buy',
+        });
+        expect(activities[2]).toEqual({
+          amount: 329.15,
+          broker: 'flatex',
+          company: 'WIRECARD AG',
+          date: '2020-06-18',
+          fee: 6.17,
+          isin: 'DE0007472060',
+          price: 32.915,
+          shares: 10,
+          tax: 0,
+          type: 'Sell',
+        });
+      });
     });
 
     beforeEach(() => {
