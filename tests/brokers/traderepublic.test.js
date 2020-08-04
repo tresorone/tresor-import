@@ -6,6 +6,7 @@ const stockSingleLimitBuyFinancialTransactionTax = require('./__mocks__/traderep
 const stockSingleLimitBuyWithoutExplicitISIN = require('./__mocks__/traderepublic/stock_single_limit_buy_without_explicit_ISIN.json');
 const etfSavingsPlanBuy = require('./__mocks__/traderepublic/etf_savings_plan_buy.json');
 const stockSell = require('./__mocks__/traderepublic/stock_sell.json');
+const stockSell1 = require('./__mocks__/traderepublic/stock_sell2.json');
 const stockDividend = require('./__mocks__/traderepublic/stock_dividend.json');
 const etfDividend = require('./__mocks__/traderepublic/etf_dividend.json');
 
@@ -119,6 +120,23 @@ describe('TradeRepublic broker', () => {
         price: 850.0,
         shares: 3,
         tax: 36.47,
+        type: 'Sell',
+      });
+    });
+
+    test('should map the pdf data correctly', () => {
+      const activity = parseData(stockSell1);
+
+      expect(activity).toEqual({
+        amount: 16723.08,
+        broker: 'traderepublic',
+        company: 'Stryker Corp.',
+        date: '2020-07-21',
+        fee: 1,
+        isin: 'US8636671013',
+        price: 168.92,
+        shares: 99,
+        tax: 52.97,
         type: 'Sell',
       });
     });
