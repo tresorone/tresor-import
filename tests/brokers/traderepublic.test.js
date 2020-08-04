@@ -110,13 +110,13 @@ describe('TradeRepublic broker', () => {
       const activity = parseData(stockSell);
 
       expect(activity).toEqual({
-        amount: 2512.53,
+        amount: 2550,
         broker: 'traderepublic',
         company: 'Tesla Inc.',
         date: '2020-02-04',
         fee: 1,
         isin: 'US88160R1014',
-        price: 837.51,
+        price: 850.0,
         shares: 3,
         tax: 36.47,
         type: 'Sell',
