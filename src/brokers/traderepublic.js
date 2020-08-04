@@ -63,16 +63,9 @@ const findShares = textArr => {
   return parseGermanNum(shares);
 };
 
-const findAmountBuy = textArr => {
+const findAmount = textArr => {
   const searchTerm = 'GESAMT';
   const totalAmountLine = textArr[textArr.indexOf(searchTerm) + 1];
-  const totalAmount = totalAmountLine.split(' ')[0].trim();
-  return parseGermanNum(totalAmount);
-};
-
-const findAmountSell = textArr => {
-  const searchTerm = 'GESAMT';
-  const totalAmountLine = textArr[textArr.lastIndexOf(searchTerm) + 1];
   const totalAmount = totalAmountLine.split(' ')[0].trim();
   return parseGermanNum(totalAmount);
 };
@@ -171,7 +164,7 @@ export const parseData = textArr => {
       ? findDateBuySavingsPlan(textArr)
       : findDateSingleBuy(textArr);
     shares = findShares(textArr);
-    amount = findAmountBuy(textArr);
+    amount = findAmount(textArr);
     price = +Big(amount).div(Big(shares));
     fee = findFee(textArr);
     tax = findTax(textArr);
@@ -181,7 +174,7 @@ export const parseData = textArr => {
     company = findCompany(textArr);
     date = findDateSell(textArr);
     shares = findShares(textArr);
-    amount = findAmountSell(textArr);
+    amount = findAmount(textArr);
     price = +Big(amount).div(Big(shares));
     fee = findFee(textArr);
     tax = findTax(textArr);
