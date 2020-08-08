@@ -40,6 +40,23 @@ describe('Broker: comdirect', () => {
         fee: 0.37,
       });
     });
+
+    test('Can the order with purchase reduction parsed from the document', () => {
+      const activities = comdirect.parsePages(buySamples[1]);
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Buy',
+        date: '2020-04-01',
+        isin: 'LU0187079347',
+        company: 'Robeco Global Consumer Trends',
+        shares: 0.108,
+        price: 235.0769,
+        amount: 24.84,
+        fee: 0,
+      });
+    });
   });
 
   describe('Validate dividends', () => {

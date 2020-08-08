@@ -1,6 +1,7 @@
 export const allSamples = [
   // buys
   require('./buy/saving_plan.json'),
+  require('./buy/purchase_reduction.json'),
 
   // sells
   // require('./sell/something.json'),
@@ -10,7 +11,10 @@ export const allSamples = [
   require('./dividend/currency_eur.json'),
 ];
 
-export const buySamples = [require('./buy/saving_plan.json')];
+export const buySamples = [
+  require('./buy/saving_plan.json'),
+  require('./buy/purchase_reduction.json'),
+];
 
 export const sellSamples = [
   // require('./sell/something.json'),
