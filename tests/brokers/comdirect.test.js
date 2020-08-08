@@ -52,7 +52,7 @@ describe('Broker: comdirect', () => {
         isin: 'LU0187079347',
         company: 'Robeco Global Consumer Trends',
         shares: 0.108,
-        price: 235.0769,
+        price: 235.09259259259258,
         amount: 24.84,
         fee: 0,
       });

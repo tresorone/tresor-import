@@ -40,8 +40,27 @@ const findDateDividend = textArr => {
 const findShares = textArr => {
   const sharesLine =
     textArr[textArr.findIndex(t => t.includes('Nennwert')) + 1];
-  const shares = sharesLine.split('  ')[1];
-  return parseGermanNum(shares);
+
+  let shares = 0;
+  let hasPiece = false;
+  sharesLine.split(' ').forEach(element => {
+    if (shares > 0) {
+      return;
+    }
+
+    if (element.includes('St.')) {
+      hasPiece = true;
+      return;
+    }
+
+    if (!hasPiece || element.length == 0) {
+      return;
+    }
+
+    shares = parseGermanNum(element);
+  });
+
+  return shares;
 };
 
 const findDividendShares = textArr => {
@@ -76,6 +95,24 @@ const findFee = textArr => {
   return Math.abs(diff);
 };
 
+const findPurchaseReduction = textArr => {
+  let reduction = Big(0);
+  const lineWithReduction = textArr.findIndex(t =>
+    t.includes('Reduktion Kaufaufschlag')
+  );
+  if (lineWithReduction < 0) {
+    return +reduction;
+  }
+
+  const reductionLineContent = textArr[lineWithReduction];
+  let reductionValue = reductionLineContent.split('EUR').pop();
+  if (reductionValue.endsWith('-')) {
+    reductionValue = reductionValue.slice(0, -1);
+  }
+
+  return +reduction.minus(Big(parseGermanNum(reductionValue)));
+};
+
 const isBuy = textArr => textArr.some(t => t.includes('Wertpapierkauf'));
 const isSell = textArr => textArr.some(t => t.includes('Wertpapierverkauf'));
 
@@ -91,14 +128,20 @@ export const parseData = textArr => {
   let type, date, isin, company, shares, price, amount, fee;
 
   if (isBuy(textArr)) {
+    const reduction = findPurchaseReduction(textArr);
+    const foundAmount = Big(findAmount(textArr));
+    const totalAmount = foundAmount.plus(reduction);
+    const totalFee = Big(findFee(textArr)).plus(reduction); // Use plus instead of minus to prevent multiply with -1
+
     type = 'Buy';
     isin = findISIN(textArr, 2);
     company = findCompany(textArr, 1);
     date = findDateBuySell(textArr);
     shares = findShares(textArr);
-    amount = findAmount(textArr);
-    price = +Big(amount).div(Big(shares));
-    fee = findFee(textArr);
+    amount = +totalAmount;
+    price = 0;
+    price = +foundAmount.div(Big(shares));
+    fee = +totalFee;
   } else if (isSell(textArr)) {
     type = 'Sell';
     isin = findISIN(textArr, 2);
