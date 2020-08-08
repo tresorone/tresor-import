@@ -65,13 +65,40 @@ const findFee = textArr => {
   return fee && /([0-9]*)/.test(fee) ? fee : 0;
 };
 
+const findTaxes = textArr => {
+  let totalTax = Big(0);
+  const lineOfCommission = textArr.findIndex(t => t.includes('Provision'));
+
+  if (lineOfCommission <= 0 || lineOfCommission == undefined) {
+    return +totalTax;
+  }
+
+  let lineOfDescription = lineOfCommission;
+  while (lineOfDescription > 0) {
+    lineOfDescription -= 4;
+
+    let description = textArr[lineOfDescription].toLowerCase();
+    if (description.includes('steuer') || description.includes('zuschlag')) {
+      totalTax = totalTax.plus(
+        Big(parseGermanNum(textArr[lineOfDescription + 3]))
+      );
+
+      continue;
+    }
+
+    break;
+  }
+
+  return +totalTax;
+};
+
 const findPayout = textArr =>
   parseGermanNum(
     getValueByPreviousElement(textArr, 'Gesamtbetrag zu Ihren Gunsten', 2)
   );
 
 export const parseData = textArr => {
-  let type, date, isin, company, shares, price, amount, fee;
+  let type, date, isin, company, shares, price, amount, fee, tax;
 
   if (isBuy(textArr)) {
     type = 'Buy';
@@ -82,6 +109,7 @@ export const parseData = textArr => {
     amount = findAmount(textArr);
     price = findPrice(textArr);
     fee = findFee(textArr);
+    tax = 0;
   } else if (isSell(textArr)) {
     type = 'Sell';
     isin = findISIN(textArr);
@@ -91,6 +119,7 @@ export const parseData = textArr => {
     amount = findAmount(textArr);
     price = findPrice(textArr);
     fee = findFee(textArr);
+    tax = findTaxes(textArr);
   } else if (isDividend(textArr)) {
     type = 'Dividend';
     isin = findISIN(textArr);
@@ -100,6 +129,7 @@ export const parseData = textArr => {
     amount = findPayout(textArr);
     price = +Big(amount).div(shares);
     fee = 0;
+    tax = findTaxes(textArr);
   } else {
     console.error('Type could not be determined!');
     return undefined;
@@ -115,6 +145,7 @@ export const parseData = textArr => {
     price,
     amount,
     fee,
+    tax,
   };
 
   const valid = every(values(activity), a => !!a || a === 0);
