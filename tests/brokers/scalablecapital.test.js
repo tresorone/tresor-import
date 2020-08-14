@@ -1,5 +1,5 @@
 import { getBroker } from '../../src';
-import * as scalableCapital from '../../src/brokers/scalablecapital';
+import * as scalableCapital from '../../src/brokers/scalableCapital';
 import {
   allSamples,
   buySamples,
