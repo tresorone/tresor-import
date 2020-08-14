@@ -6,5 +6,16 @@ import * as ing from './ing';
 import * as flatex from './flatex';
 import * as pb from './pb';
 import * as consorsbank from './consorsbank';
+import * as scalableCapital from './scalableCapital';
 
-export { comdirect, dkb, traderepublic, onvista, ing, pb, flatex, consorsbank };
+export {
+  comdirect,
+  dkb,
+  traderepublic,
+  onvista,
+  ing,
+  pb,
+  flatex,
+  consorsbank,
+  scalableCapital,
+};
