@@ -47,7 +47,6 @@ const findShares = textArr => {
 const findDividendShares = textArr => {
   const sharesLine = textArr[textArr.findIndex(t => t.includes('STK'))];
   const shares = sharesLine.split('  ').filter(i => i.length > 0)[1];
-  // console.log(shares)
   return parseGermanNum(shares);
 };
 
@@ -64,7 +63,6 @@ const findPayout = textArr => {
   const amountLine = textArr[textArr.findIndex(t => t.includes('Gunsten')) + 1];
   const amountPart = amountLine.split('EUR');
   const amount = amountPart[amountPart.length - 1].trim();
-  // console.log('payout', amount)
   return parseGermanNum(amount);
 };
 
