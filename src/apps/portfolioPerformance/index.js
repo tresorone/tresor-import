@@ -108,6 +108,7 @@ export const parse = transactions => {
 
   const activities = transactions
     .map(normalizeKeys)
+    .filter(({ shares }) => shares !== undefined)
     .filter(({ type }) => Boolean(type))
     .map(normalizeActivity)
     .flatMap(validateActivity);

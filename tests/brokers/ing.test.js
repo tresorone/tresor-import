@@ -7,9 +7,9 @@ import {
   invalidSamples,
 } from './__mocks__/ing';
 
-console.error = jest.fn();
+describe('Broker: ING', () => {
+  let consoleErrorSpy;
 
-describe('Test Ing', () => {
   test('Should identify ing as broker', () => {
     for (let sample of buySamples.concat(sellSamples, dividendsSamples)) {
       expect(getBroker(sample)).toEqual(ing);
@@ -38,6 +38,7 @@ describe('Test Ing', () => {
         price: 151.72,
         amount: 1517.2,
         fee: 8.69,
+        tax: 0,
       });
     });
 
@@ -54,6 +55,7 @@ describe('Test Ing', () => {
         price: 153.48,
         amount: 767.4,
         fee: 9.9,
+        tax: 0,
       });
     });
 
@@ -70,6 +72,7 @@ describe('Test Ing', () => {
         price: 92.09,
         amount: 1012.99,
         fee: 0,
+        tax: 0,
       });
     });
 
@@ -86,6 +89,7 @@ describe('Test Ing', () => {
         price: 54.464,
         amount: 245.7,
         fee: 4.3,
+        tax: 0,
       });
     });
   });
@@ -104,6 +108,7 @@ describe('Test Ing', () => {
         price: 79.71,
         amount: 637.68,
         fee: 6.49,
+        tax: 0,
       });
     });
 
@@ -120,6 +125,24 @@ describe('Test Ing', () => {
         price: 20.09,
         amount: 401.8,
         fee: 5.9,
+        tax: 0,
+      });
+    });
+
+    test('Test if sell with taxes is mapped correctly', () => {
+      const activity = ing.parseData(sellSamples[2]);
+
+      expect(activity).toEqual({
+        broker: 'ing',
+        type: 'Sell',
+        date: '2020-07-21',
+        isin: 'US09075V1026',
+        company: 'BioNTech SE Nam.-Akt.(sp.ADRs)1/o.N.',
+        shares: 100,
+        price: 84,
+        amount: 8400,
+        fee: 2.9,
+        tax: 209.47,
       });
     });
   });
@@ -138,6 +161,7 @@ describe('Test Ing', () => {
         price: 0.385625,
         amount: 12.34,
         fee: 0,
+        tax: 0,
       });
     });
 
@@ -154,6 +178,7 @@ describe('Test Ing', () => {
         price: 0.34875,
         amount: 2.79,
         fee: 0,
+        tax: 0,
       });
     });
 
@@ -170,6 +195,7 @@ describe('Test Ing', () => {
         price: 0.02,
         amount: 0.58,
         fee: 0,
+        tax: 0,
       });
     });
 
@@ -186,6 +212,7 @@ describe('Test Ing', () => {
         price: 0.17705882352941177,
         amount: 6.02,
         fee: 0,
+        tax: 0,
       });
     });
 
@@ -202,6 +229,7 @@ describe('Test Ing', () => {
         price: 0.30596296296296294,
         amount: 82.61,
         fee: 0,
+        tax: 0,
       });
     });
 
@@ -218,7 +246,16 @@ describe('Test Ing', () => {
         price: 0.9408333333333333,
         amount: 11.29,
         fee: 0,
+        tax: 0,
       });
     });
+  });
+
+  beforeEach(() => {
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+  });
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
   });
 });
