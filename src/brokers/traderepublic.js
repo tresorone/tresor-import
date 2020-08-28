@@ -63,16 +63,9 @@ const findShares = textArr => {
   return parseGermanNum(shares);
 };
 
-const findAmountBuy = textArr => {
+const findAmount = textArr => {
   const searchTerm = 'GESAMT';
   const totalAmountLine = textArr[textArr.indexOf(searchTerm) + 1];
-  const totalAmount = totalAmountLine.split(' ')[0].trim();
-  return parseGermanNum(totalAmount);
-};
-
-const findAmountSell = textArr => {
-  const searchTerm = 'GESAMT';
-  const totalAmountLine = textArr[textArr.lastIndexOf(searchTerm) + 1];
   const totalAmount = totalAmountLine.split(' ')[0].trim();
   return parseGermanNum(totalAmount);
 };
@@ -114,7 +107,7 @@ const findTax = textArr => {
 
   if (isDividend(textArr)) {
     // The dividend documents needs quite other logic...
-    // Search the last field `Zwischensumme` and skip all lines which contains `EUR` to find the first tax field.
+    // For dividends in other currencies we need to search the last field `Zwischensumme` and skip all lines which contains `EUR` to find the first tax field.
     const searchTermSubtotal = 'Zwischensumme';
     const subtotalLineNumber = textArr.lastIndexOf(searchTermSubtotal);
     if (subtotalLineNumber > -1) {
@@ -126,6 +119,9 @@ const findTax = textArr => {
       }
 
       startTaxLineNumber = subtotalLineNumber + 2;
+    } else {
+      // This dividend is payed in `EUR`. We don't need the fancy logic above and can set the `skipLineCounter` to zero, because there is no `Fremdkostenzuschlag` field for dividends.
+      skipLineCounter = 2;
     }
   }
 
@@ -171,7 +167,7 @@ export const parseData = textArr => {
       ? findDateBuySavingsPlan(textArr)
       : findDateSingleBuy(textArr);
     shares = findShares(textArr);
-    amount = findAmountBuy(textArr);
+    amount = findAmount(textArr);
     price = +Big(amount).div(Big(shares));
     fee = findFee(textArr);
     tax = findTax(textArr);
@@ -181,7 +177,7 @@ export const parseData = textArr => {
     company = findCompany(textArr);
     date = findDateSell(textArr);
     shares = findShares(textArr);
-    amount = findAmountSell(textArr);
+    amount = findAmount(textArr);
     price = +Big(amount).div(Big(shares));
     fee = findFee(textArr);
     tax = findTax(textArr);
