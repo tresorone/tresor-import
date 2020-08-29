@@ -12,6 +12,8 @@ export const isPageTypeBuy = content =>
 export const isPageTypeSell = content =>
   content.some(line => line.includes('Wertpapierabrechnung: Verkauf'));
 
+export const isPageTypeDividend = content =>
+  content.some(line => line.includes('Fondsausschüttung'));
 
 export const findOrderDate = content => {
   let orderDate =
@@ -31,6 +33,9 @@ export const findOrderDate = content => {
   // For a saving plan, the order date is on another location
   return content[findLineNumberByContent(content, 'Handelsdatum') + 2];
 };
+
+export const findPayDate = content =>
+  content[findLineNumberByContent(content, 'Zahltag') + 1];
 
 export const findByStartingTerm = (content, term) =>
   content[content.findIndex(line => line.startsWith(term))].substring(
@@ -61,25 +66,38 @@ export const findLineNumberByContent = (content, term) =>
 
 export const findISIN = content => findByStartingTerm(content, 'ISIN: ');
 
-export const findCompany = content =>
-  content[findLineNumberByContent(content, 'Auftragszeit:') + 5];
+export const findCompany = (content, isDividend) =>
+  !isDividend
+    ? content[findLineNumberByContent(content, 'Auftragszeit:') + 5]
+    : content[findLineNumberByContent(content, 'Zahltag:') - 4];
 
-export const findShares = content => {
-  const line =
-    content[
-      findLineNumberByCurrentAndPreviousLineContent(content, 'Nominale', 'STK')
-    ];
+export const findShares = (content, isDividend) => {
+  const line = !isDividend
+    ? content[
+        findLineNumberByCurrentAndPreviousLineContent(
+          content,
+          'Nominale',
+          'STK'
+        )
+      ]
+    : content[findLineNumberByContent(content, 'Fondsausschüttung') + 1];
   return parseGermanNum(line.split(' ')[1]);
 };
 
-export const findAmount = (content, isCredit) =>
+export const findAmount = (content, isCredit, isDividend) =>
   parseGermanNum(
     content[
-      findLineNumberByCurrentAndPreviousLineContent(
-        content,
-        isCredit ? 'Zu Gunsten Konto' : 'Zu Lasten Konto',
-        'EUR'
-      ) + 1
+      !isDividend
+        ? findLineNumberByCurrentAndPreviousLineContent(
+            content,
+            isCredit ? 'Zu Gunsten Konto' : 'Zu Lasten Konto',
+            'EUR'
+          ) + 1
+        : findLineNumberByCurrentAndPreviousLineContent(
+            content,
+            'Bruttobetrag',
+            'EUR'
+          ) + 1
     ]
   );
 
@@ -87,7 +105,9 @@ export const canParseData = content =>
   content.some(line =>
     line.includes('Scalable Capital Vermögensverwaltung GmbH')
   ) &&
-  (isPageTypeBuy(content) || isPageTypeSell(content));
+  (isPageTypeBuy(content) ||
+    isPageTypeSell(content) ||
+    isPageTypeDividend(content));
 
 export const parseData = content => {
   let type, date, isin, company, shares, price, amount, fee, tax;
@@ -95,20 +115,30 @@ export const parseData = content => {
   if (isPageTypeBuy(content)) {
     type = 'Buy';
     isin = findISIN(content);
-    company = findCompany(content);
+    company = findCompany(content, false);
     date = findOrderDate(content);
-    shares = findShares(content);
-    amount = findAmount(content, false);
+    shares = findShares(content, false);
+    amount = findAmount(content, false, false);
     price = +Big(amount).div(Big(shares));
     fee = 0;
     tax = 0;
   } else if (isPageTypeSell(content)) {
     type = 'Sell';
     isin = findISIN(content);
-    company = findCompany(content);
+    company = findCompany(content, false);
     date = findOrderDate(content);
-    shares = findShares(content);
-    amount = findAmount(content, true);
+    shares = findShares(content, false);
+    amount = findAmount(content, true, false);
+    price = +Big(amount).div(Big(shares));
+    fee = 0;
+    tax = 0;
+  } else if (isPageTypeDividend(content)) {
+    type = 'Dividend';
+    isin = findISIN(content);
+    company = findCompany(content, true);
+    date = findPayDate(content);
+    shares = findShares(content, true);
+    amount = findAmount(content, false, true);
     price = +Big(amount).div(Big(shares));
     fee = 0;
     tax = 0;

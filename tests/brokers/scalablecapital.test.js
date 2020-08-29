@@ -4,6 +4,7 @@ import {
   allSamples,
   buySamples,
   sellSamples,
+  dividendSamples,
 } from './__mocks__/scalablecapital';
 
 describe('Broker: scalable.capital', () => {
@@ -86,7 +87,23 @@ describe('Broker: scalable.capital', () => {
   });
 
   describe('Validate dividends', () => {
-    //
+    test('Can the etf dividend be parsed from the document', () => {
+      const activities = scalableCapital.parsePages(dividendSamples[0]);
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'scalablecapital',
+        type: 'Dividend',
+        date: '2020-08-25',
+        isin: 'LU0392494562',
+        company: 'ComStage-MSCI World TRN U.ETF',
+        shares: 0.883,
+        price: 0.9173272933182333,
+        amount: 0.81,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   beforeEach(() => {

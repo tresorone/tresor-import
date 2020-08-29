@@ -7,6 +7,7 @@ export const allSamples = [
   require('./sell/market_order.json'),
 
   // dividends
+  require('./dividend/etf110_without_taxes.json'),
 ];
 
 export const buySamples = [
@@ -16,4 +17,6 @@ export const buySamples = [
 
 export const sellSamples = [require('./sell/market_order.json')];
 
-export const dividendSamples = [];
+export const dividendSamples = [
+  require('./dividend/etf110_without_taxes.json'),
+];
