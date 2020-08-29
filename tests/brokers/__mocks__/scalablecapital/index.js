@@ -1,7 +1,8 @@
 export const allSamples = [
   // buys
   require('./buy/market_order.json'),
-  require('./buy/saving_plan.json'),
+  require('./buy/saving_plan_vanguard.json'),
+  require('./buy/saving_plan_comstage.json'),
 
   // sells
   require('./sell/market_order.json'),
@@ -12,7 +13,8 @@ export const allSamples = [
 
 export const buySamples = [
   require('./buy/market_order.json'),
-  require('./buy/saving_plan.json'),
+  require('./buy/saving_plan_vanguard.json'),
+  require('./buy/saving_plan_comstage.json'),
 ];
 
 export const sellSamples = [require('./sell/market_order.json')];

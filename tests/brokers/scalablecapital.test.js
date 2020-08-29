@@ -47,7 +47,7 @@ describe('Broker: scalable.capital', () => {
       });
     });
 
-    test('Can the saving plan order parsed from the document', () => {
+    test('Can the saving plan order parsed from the document - vanguard', () => {
       const activities = scalableCapital.parsePages(buySamples[1]);
 
       expect(activities.length).toEqual(1);
@@ -60,6 +60,24 @@ describe('Broker: scalable.capital', () => {
         shares: 0.635,
         price: 78.67716535433071,
         amount: 49.96,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can the saving plan order parsed from the document - comstage', () => {
+      const activities = scalableCapital.parsePages(buySamples[2]);
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'scalablecapital',
+        type: 'Buy',
+        date: '2020-07-07',
+        isin: 'LU0392494562',
+        company: 'ComStage-MSCI World TRN U.ETF',
+        shares: 0.883,
+        price: 56.5911664779162,
+        amount: 49.97,
         fee: 0,
         tax: 0,
       });
