@@ -12,14 +12,25 @@ export const isPageTypeBuy = content =>
 export const isPageTypeSell = content =>
   content.some(line => line.includes('Wertpapierabrechnung: Verkauf'));
 
-export const findOrderDate = content =>
-  content[
-    findLineNumberByCurrentAndPreviousLineContent(
-      content,
-      'Handels-',
-      'datum'
-    ) + 5
-  ];
+
+export const findOrderDate = content => {
+  let orderDate =
+    content[
+      findLineNumberByCurrentAndPreviousLineContent(
+        content,
+        'Handels-',
+        'datum'
+      ) + 5
+    ];
+
+  if (orderDate !== undefined) {
+    // The document is a normal market order
+    return orderDate;
+  }
+
+  // For a saving plan, the order date is on another location
+  return content[findLineNumberByContent(content, 'Handelsdatum') + 2];
+};
 
 export const findByStartingTerm = (content, term) =>
   content[content.findIndex(line => line.startsWith(term))].substring(
@@ -58,7 +69,7 @@ export const findShares = content => {
     content[
       findLineNumberByCurrentAndPreviousLineContent(content, 'Nominale', 'STK')
     ];
-  return parseInt(line.split(' ')[1]);
+  return parseGermanNum(line.split(' ')[1]);
 };
 
 export const findAmount = (content, isCredit) =>

@@ -28,7 +28,7 @@ describe('Broker: scalable.capital', () => {
   });
 
   describe('Validate buys', () => {
-    test('Can the order parsed from the document', () => {
+    test('Can the market order parsed from the document', () => {
       const activities = scalableCapital.parsePages(buySamples[0]);
 
       expect(activities.length).toEqual(1);
@@ -41,6 +41,24 @@ describe('Broker: scalable.capital', () => {
         shares: 9,
         price: 55.56777777777778,
         amount: 500.11,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can the saving plan order parsed from the document', () => {
+      const activities = scalableCapital.parsePages(buySamples[1]);
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'scalablecapital',
+        type: 'Buy',
+        date: '2020-07-07',
+        isin: 'IE00B3RBWM25',
+        company: 'Vanguard FTSE All-World U.ETF',
+        shares: 0.635,
+        price: 78.67716535433071,
+        amount: 49.96,
         fee: 0,
         tax: 0,
       });
