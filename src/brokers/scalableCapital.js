@@ -67,35 +67,35 @@ export const findLineNumberByContent = (content, term) =>
 export const findISIN = content => findByStartingTerm(content, 'ISIN: ');
 
 export const findCompany = (content, isDividend) =>
-  !isDividend
-    ? content[findLineNumberByContent(content, 'Auftragszeit:') + 5]
-    : content[findLineNumberByContent(content, 'Zahltag:') - 4];
+  isDividend
+    ? content[findLineNumberByContent(content, 'Zahltag:') - 4]
+    : content[findLineNumberByContent(content, 'Auftragszeit:') + 5];
 
 export const findShares = (content, isDividend) => {
-  const line = !isDividend
-    ? content[
+  const line = isDividend
+    ? content[findLineNumberByContent(content, 'Fondsausschüttung') + 1]
+    : content[
         findLineNumberByCurrentAndPreviousLineContent(
           content,
           'Nominale',
           'STK'
         )
-      ]
-    : content[findLineNumberByContent(content, 'Fondsausschüttung') + 1];
+      ];
   return parseGermanNum(line.split(' ')[1]);
 };
 
 export const findAmount = (content, isCredit, isDividend) =>
   parseGermanNum(
     content[
-      !isDividend
+      isDividend
         ? findLineNumberByCurrentAndPreviousLineContent(
             content,
-            isCredit ? 'Zu Gunsten Konto' : 'Zu Lasten Konto',
+            'Bruttobetrag',
             'EUR'
           ) + 1
         : findLineNumberByCurrentAndPreviousLineContent(
             content,
-            'Bruttobetrag',
+            isCredit ? 'Zu Gunsten Konto' : 'Zu Lasten Konto',
             'EUR'
           ) + 1
     ]
