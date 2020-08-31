@@ -11,7 +11,7 @@ describe('Broker: scalable.capital', () => {
   let consoleErrorSpy;
 
   describe('Check all documents', () => {
-    test('Can one page parsed with scalable.capital', () => {
+    test('Can one page be parsed with scalable.capital', () => {
       allSamples.forEach(samples => {
         expect(
           samples.some(item => scalableCapital.canParseData(item))
@@ -29,7 +29,7 @@ describe('Broker: scalable.capital', () => {
   });
 
   describe('Validate buys', () => {
-    test('Can the market order parsed from the document', () => {
+    test('Can the market order be parsed from the document', () => {
       const activities = scalableCapital.parsePages(buySamples[0]);
 
       expect(activities.length).toEqual(1);
@@ -47,7 +47,7 @@ describe('Broker: scalable.capital', () => {
       });
     });
 
-    test('Can the saving plan order parsed from the document - vanguard', () => {
+    test('Can the saving plan order be parsed from the document - vanguard', () => {
       const activities = scalableCapital.parsePages(buySamples[1]);
 
       expect(activities.length).toEqual(1);
@@ -65,7 +65,7 @@ describe('Broker: scalable.capital', () => {
       });
     });
 
-    test('Can the saving plan order parsed from the document - comstage', () => {
+    test('Can the saving plan order be parsed from the document - comstage', () => {
       const activities = scalableCapital.parsePages(buySamples[2]);
 
       expect(activities.length).toEqual(1);
@@ -85,7 +85,7 @@ describe('Broker: scalable.capital', () => {
   });
 
   describe('Validate sells', () => {
-    test('Can the order parsed from the document', () => {
+    test('Can the order be parsed from the document', () => {
       const activities = scalableCapital.parsePages(sellSamples[0]);
 
       expect(activities.length).toEqual(1);
