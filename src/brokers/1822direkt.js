@@ -47,7 +47,7 @@ export const findAmount = (content, findTotalAmount) => {
     content[
       findLineNumberByContent(
         content,
-        !findTotalAmount ? 'Kurswert' : 'Ausmachender Betrag'
+        findTotalAmount ? 'Ausmachender Betrag' : 'Kurswert'
       ) + 1
     ]
   );
@@ -106,7 +106,7 @@ export const parseData = content => {
     fee = +Big(amountWithoutFees).minus(findAmount(content, true));
     tax = 0;
   } else if (isPageTypeDividend(content)) {
-    const amountWithoutTaxes = Big(findPayoutAmount(content, false));
+    const amountWithoutTaxes = Big(findPayoutAmount(content));
     type = 'Dividend';
     isin = findISIN(content);
     company = findCompany(content, true);
