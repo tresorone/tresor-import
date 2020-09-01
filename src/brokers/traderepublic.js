@@ -149,12 +149,60 @@ const isSell = textArr => textArr.some(t => t.includes('Verkauf am'));
 
 const isDividend = textArr => textArr.some(t => t.includes('mit dem Ex-Tag'));
 
+const isOverviewStatement = content =>
+  content.some(
+    line =>
+      line.includes('DEPOTAUSZUG') || line.includes('JAHRESDEPOTABSTIMMUNG')
+  );
+
 export const canParseData = textArr =>
   textArr.some(t => t.includes('TRADE REPUBLIC BANK GMBH')) &&
   (isBuySingle(textArr) ||
     isBuySavingsPlan(textArr) ||
     isSell(textArr) ||
-    isDividend(textArr));
+    isDividend(textArr) ||
+    isOverviewStatement(textArr));
+
+export const parsePositionAsActivity = (content, startLineNumber) => {
+  // Find the line with ISIN and the next line with the date
+  let lineNumberOfISIN;
+  let lineOfDate;
+  for (
+    let lineNumber = startLineNumber;
+    lineNumber < content.length;
+    lineNumber++
+  ) {
+    const line = content[lineNumber];
+    if (line.includes('ISIN:') && lineNumberOfISIN === undefined) {
+      lineNumberOfISIN = lineNumber;
+    }
+
+    if (lineNumberOfISIN !== undefined && /^\d{2}\.\d{2}\.\d{4}$/.test(line)) {
+      lineOfDate = lineNumber;
+      break;
+    }
+  }
+
+  const numberOfShares = parseGermanNum(content[startLineNumber].split(' ')[0]);
+  const toalAmount = parseGermanNum(content[lineOfDate + 1]);
+
+  return {
+    broker: 'traderepublic',
+    type: 'Buy',
+    date: format(
+      parse(content[lineOfDate], 'dd.MM.yyyy', new Date()),
+      'yyyy-MM-dd'
+    ),
+    isin: content[lineNumberOfISIN].split(' ')[1],
+    company: content[startLineNumber + 1],
+    shares: numberOfShares,
+    // We need to calculate the buy-price per share because in the overview is only the current price per share available.
+    price: +Big(toalAmount).div(Big(numberOfShares)),
+    amount: toalAmount,
+    fee: 0,
+    tax: 0,
+  };
+};
 
 export const parseOrderOrDividend = textArr => {
   let type, date, isin, company, shares, price, amount, fee, tax;
@@ -195,7 +243,7 @@ export const parseOrderOrDividend = textArr => {
     console.error('unable to detect order');
   }
 
-  const activity = {
+  return {
     broker: 'traderepublic',
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
@@ -207,8 +255,6 @@ export const parseOrderOrDividend = textArr => {
     fee,
     tax,
   };
-
-  return [activity];
 };
 
 export const isActivityValid = activity => {
@@ -220,16 +266,25 @@ export const isActivityValid = activity => {
   return false;
 };
 
-export const parsePage = textArr => {
+export const parsePage = content => {
   let foundActivities = [];
 
   if (
-    isBuySingle(textArr) ||
-    isBuySavingsPlan(textArr) ||
-    isSell(textArr) ||
-    isDividend(textArr)
+    isBuySingle(content) ||
+    isBuySavingsPlan(content) ||
+    isSell(content) ||
+    isDividend(content)
   ) {
-    foundActivities = parseOrderOrDividend(textArr);
+    foundActivities.push(parseOrderOrDividend(content));
+  } else if (isOverviewStatement(content)) {
+    for (let lineNumber = 0; lineNumber < content.length; lineNumber++) {
+      const line = content[lineNumber];
+      if (!line.includes(' Stk.')) {
+        continue;
+      }
+
+      foundActivities.push(parsePositionAsActivity(content, lineNumber));
+    }
   }
 
   let validatedActivities = [];
