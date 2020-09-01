@@ -156,7 +156,7 @@ export const canParseData = textArr =>
     isSell(textArr) ||
     isDividend(textArr));
 
-export const parseData = textArr => {
+export const parseOrderOrDividend = textArr => {
   let type, date, isin, company, shares, price, amount, fee, tax;
 
   if (isBuySingle(textArr) || isBuySavingsPlan(textArr)) {
@@ -208,18 +208,56 @@ export const parseData = textArr => {
     tax,
   };
 
-  const valid = every(values(activity), a => !!a || a === 0);
+  return [activity];
+};
 
-  if (!valid) {
-    console.error('Error while parsing PDF', activity);
-    return undefined;
-  } else {
-    return activity;
+export const isActivityValid = activity => {
+  if (every(values(activity), a => !!a || a === 0)) {
+    return true;
   }
+
+  console.error('The found activity is not valid.', activity);
+  return false;
+};
+
+export const parsePage = textArr => {
+  let foundActivities = [];
+
+  if (
+    isBuySingle(textArr) ||
+    isBuySavingsPlan(textArr) ||
+    isSell(textArr) ||
+    isDividend(textArr)
+  ) {
+    foundActivities = parseOrderOrDividend(textArr);
+  }
+
+  let validatedActivities = [];
+  foundActivities.forEach(activity => {
+    if (isActivityValid(activity)) {
+      validatedActivities.push(activity);
+    }
+  });
+
+  return validatedActivities;
 };
 
 export const parsePages = contents => {
-  // trade republic only has one-page PDFs
-  const activity = parseData(contents[0]);
-  return [activity];
+  let activities = [];
+
+  for (let content of contents) {
+    try {
+      parsePage(content).forEach(activity => {
+        activities.push(activity);
+      });
+    } catch (exception) {
+      console.error(
+        'Error while parsing page (trade republic)',
+        exception,
+        content
+      );
+    }
+  }
+
+  return activities;
 };

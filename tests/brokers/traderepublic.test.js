@@ -12,23 +12,28 @@ describe('Broker: Trade Republic', () => {
 
   describe('Check all documents', () => {
     test('Can the document parsed with Trade Republic', () => {
-      allSamples.forEach(sample => {
-        expect(traderepublic.canParseData(sample)).toEqual(true);
+      allSamples.forEach(samples => {
+        expect(samples.some(item => traderepublic.canParseData(item))).toEqual(
+          true
+        );
       });
     });
 
     test('Can identify a broker from the document as Trade Republic', () => {
-      allSamples.forEach(sample => {
-        expect(getBroker(sample)).toEqual(traderepublic);
+      allSamples.forEach(samples => {
+        expect(samples.some(item => getBroker(item) === traderepublic)).toEqual(
+          true
+        );
       });
     });
   });
 
   describe('Validate buys', () => {
     test('Map a limit order correctly', () => {
-      const activity = traderepublic.parseData(buySamples[0]);
+      const activities = traderepublic.parsePages(buySamples[0]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'traderepublic',
         type: 'Buy',
         date: '2020-02-24',
@@ -43,9 +48,10 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Map a market order correctly', () => {
-      const activity = traderepublic.parseData(buySamples[1]);
+      const activities = traderepublic.parsePages(buySamples[1]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'traderepublic',
         type: 'Buy',
         date: '2019-11-29',
@@ -60,9 +66,10 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Map a limit order with financial transaction tax correctly', () => {
-      const activity = traderepublic.parseData(buySamples[2]);
+      const activities = traderepublic.parsePages(buySamples[2]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'traderepublic',
         type: 'Buy',
         date: '2020-06-09',
@@ -77,9 +84,10 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Map a market order without explicit ISIN correctly', () => {
-      const activity = traderepublic.parseData(buySamples[3]);
+      const activities = traderepublic.parsePages(buySamples[3]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'traderepublic',
         type: 'Buy',
         date: '2019-07-19',
@@ -94,9 +102,10 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Map a saving plan order correctly', () => {
-      const activity = traderepublic.parseData(buySamples[4]);
+      const activities = traderepublic.parsePages(buySamples[4]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'traderepublic',
         type: 'Buy',
         date: '2020-01-16',
@@ -113,9 +122,10 @@ describe('Broker: Trade Republic', () => {
 
   describe('Validate sells', () => {
     test('Map a limit sell order correctly: Tesla', () => {
-      const activity = traderepublic.parseData(sellSamples[0]);
+      const activities = traderepublic.parsePages(sellSamples[0]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         amount: 2550,
         broker: 'traderepublic',
         company: 'Tesla Inc.',
@@ -130,9 +140,10 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Map a limit sell order correctly: Stryker', () => {
-      const activity = traderepublic.parseData(sellSamples[1]);
+      const activities = traderepublic.parsePages(sellSamples[1]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         amount: 16723.08,
         broker: 'traderepublic',
         company: 'Stryker Corp.',
@@ -149,9 +160,10 @@ describe('Broker: Trade Republic', () => {
 
   describe('Validate dividends', () => {
     test('Should map the pdf data correctly for: Royal Dutch Shell', () => {
-      const activity = traderepublic.parseData(dividendSamples[0]);
+      const activities = traderepublic.parsePages(dividendSamples[0]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         amount: 118.21,
         broker: 'traderepublic',
         company: 'Royal Dutch Shell',
@@ -166,9 +178,10 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Should map the pdf data correctly for: iSh.ST.Eur.Sel.Div.30 U.ETF DE', () => {
-      const activity = traderepublic.parseData(dividendSamples[1]);
+      const activities = traderepublic.parsePages(dividendSamples[1]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         amount: 9.67,
         broker: 'traderepublic',
         company: 'iSh.ST.Eur.Sel.Div.30 U.ETF DE',
@@ -183,9 +196,10 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Should map the pdf data correctly for: iSh.EO ST.Sel.Div.30 U.ETF DE', () => {
-      const activity = traderepublic.parseData(dividendSamples[2]);
+      const activities = traderepublic.parsePages(dividendSamples[2]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         amount: 8.34,
         broker: 'traderepublic',
         company: 'iSh.EO ST.Sel.Div.30 U.ETF DE',
@@ -200,9 +214,10 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Should map the pdf data correctly for: iShsII-Dev.Mkts Prop.Yld U.ETF', () => {
-      const activity = traderepublic.parseData(dividendSamples[3]);
+      const activities = traderepublic.parsePages(dividendSamples[3]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         amount: 17.52,
         broker: 'traderepublic',
         company: 'iShsII-Dev.Mkts Prop.Yld U.ETF',
