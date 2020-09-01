@@ -15,6 +15,10 @@ export const allSamples = [
   require('./dividend/ishares_stoxx_europe_select_dividend_30_etf.json'),
   require('./dividend/ishares_euro_stoxx_select_dividend_30.json'),
   require('./dividend/ishares_developed_markets_property_yield.json'),
+
+  // quarter statement
+  require('./quarter_statement/without_stocks.json'),
+  require('./quarter_statement/with_stocks.json'),
 ];
 
 export const buySamples = [
@@ -35,4 +39,9 @@ export const dividendSamples = [
   require('./dividend/ishares_stoxx_europe_select_dividend_30_etf.json'),
   require('./dividend/ishares_euro_stoxx_select_dividend_30.json'),
   require('./dividend/ishares_developed_markets_property_yield.json'),
+];
+
+export const quarterSamples = [
+  require('./quarter_statement/without_stocks.json'),
+  require('./quarter_statement/with_stocks.json'),
 ];

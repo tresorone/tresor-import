@@ -5,6 +5,7 @@ import {
   buySamples,
   sellSamples,
   dividendSamples,
+  quarterSamples,
 } from './__mocks__/traderepublic';
 
 describe('Broker: Trade Republic', () => {
@@ -228,6 +229,44 @@ describe('Broker: Trade Republic', () => {
         shares: 141,
         tax: 6.81,
         type: 'Dividend',
+      });
+    });
+  });
+
+  describe('Validate quarter statement', () => {
+    test('Map a empty quarter statement correctly', () => {
+      const activities = traderepublic.parsePages(quarterSamples[0]);
+
+      expect(activities.length).toEqual(0);
+    });
+
+    test('Map a quarter statement with two positions correctly', () => {
+      const activities = traderepublic.parsePages(quarterSamples[1]);
+
+      expect(activities.length).toEqual(2);
+      expect(activities[0]).toEqual({
+        amount: 132.96,
+        broker: 'traderepublic',
+        company: 'Royal Dutch Shell',
+        date: '2020-06-30',
+        fee: 0,
+        isin: 'GB00B03MLX29',
+        price: 13.296,
+        shares: 10,
+        tax: 0,
+        type: 'Buy',
+      });
+      expect(activities[1]).toEqual({
+        amount: 210.79,
+        broker: 'traderepublic',
+        company: 'Gazprom PJSC',
+        date: '2020-06-30',
+        fee: 0,
+        isin: 'US3682872078',
+        price: 4.684222222222222,
+        shares: 45,
+        tax: 0,
+        type: 'Buy',
       });
     });
   });
