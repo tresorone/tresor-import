@@ -1,15 +1,13 @@
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
-import every from 'lodash/every';
-import values from 'lodash/values';
+
+import { parseGermanNum, validateActivity } from '@/helper';
 
 const offsets = {
   shares: 0,
   companyName: 1,
   isin: 3,
 };
-
-import { parseGermanNum } from '@/helper';
 
 const getValueByPreviousElement = (textArr, prev) =>
   textArr[textArr.findIndex(t => t.includes(prev)) + 1];
@@ -75,7 +73,7 @@ export const canParseData = textArr =>
   (isBuy(textArr) || isSell(textArr) || isDividend(textArr));
 
 export const parseData = textArr => {
-  let type, date, isin, company, shares, price, amount, fee;
+  let type, date, isin, company, shares, price, amount, fee, tax;
 
   if (isBuy(textArr)) {
     type = 'Buy';
@@ -86,6 +84,7 @@ export const parseData = textArr => {
     amount = findAmount(textArr);
     price = findPrice(textArr);
     fee = findFee(textArr);
+    tax = 0;
   } else if (isSell(textArr)) {
     type = 'Sell';
     isin = findISIN(textArr);
@@ -95,6 +94,7 @@ export const parseData = textArr => {
     amount = findAmount(textArr);
     price = findPrice(textArr);
     fee = findFee(textArr);
+    tax = 0;
   } else if (isDividend(textArr)) {
     type = 'Dividend';
     isin = findISIN(textArr);
@@ -104,12 +104,10 @@ export const parseData = textArr => {
     amount = findPayout(textArr);
     price = amount / shares;
     fee = 0;
-  } else {
-    console.error('Type could not be determined!');
-    return undefined;
+    tax = 0;
   }
 
-  const activity = {
+  return validateActivity({
     broker: 'dkb',
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
@@ -119,16 +117,8 @@ export const parseData = textArr => {
     price,
     amount,
     fee,
-  };
-
-  const valid = every(values(activity), a => !!a || a === 0);
-
-  if (!valid) {
-    console.error('Error while parsing PDF', activity);
-    return undefined;
-  } else {
-    return activity;
-  }
+    tax,
+  });
 };
 
 export const parsePages = contents => {

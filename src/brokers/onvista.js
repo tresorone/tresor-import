@@ -1,10 +1,8 @@
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
-import every from 'lodash/every';
-import values from 'lodash/values';
 import Big from 'big.js';
 
-import { parseGermanNum } from '@/helper';
+import { parseGermanNum, validateActivity } from '@/helper';
 
 const findISIN = text => {
   const isin = text[text.findIndex(t => t.includes('ISIN')) + 1];
@@ -181,12 +179,12 @@ export const parseData = text => {
     tax = findTax(text);
     shares = findShares(text);
     price = +Big(amount).div(shares);
-  } else throw { text: 'Unknown document type' };
+  }
 
   isin = findISIN(text);
   company = findCompany(text);
 
-  const activity = {
+  return validateActivity({
     broker: 'onvista',
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
@@ -197,12 +195,7 @@ export const parseData = text => {
     amount,
     fee,
     tax,
-  };
-
-  const valid = every(values(activity), a => !!a || a === 0);
-
-  if (!valid) throw { text: 'Error while parsing PDF', activity };
-  return activity;
+  });
 };
 
 export const parsePages = contents => {
