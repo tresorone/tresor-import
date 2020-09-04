@@ -1,3 +1,6 @@
+import every from 'lodash/every';
+import values from 'lodash/values';
+
 export function csvJSON(csv) {
   var lines = csv.trim().split('\n');
 
@@ -29,4 +32,105 @@ export function parseGermanNum(n) {
     return 0;
   }
   return parseFloat(n.replace(/\./g, '').replace(',', '.'));
+}
+
+export function validateActivity(activity) {
+  // All fields must have a value unequal undefined
+  if (!every(values(activity), a => !!a || a === 0)) {
+    console.error(
+      'The activity for ' + activity.broker + ' has empty fields.',
+      activity
+    );
+    return undefined;
+  }
+
+  // The date must be in the past.
+  if (activity.date > new Date()) {
+    console.error(
+      'The activity for ' + activity.broker + ' has to be in the past.',
+      activity
+    );
+    return undefined;
+  }
+
+  // The date must be not older than 1990-01-01
+  if (activity.date < new Date(1990, 1, 1)) {
+    console.error(
+      'The activity for ' + activity.broker + ' is older than 1990-01-01.',
+      activity
+    );
+    return undefined;
+  }
+
+  if (Number(activity.shares) !== activity.shares || activity.shares <= 0) {
+    console.error(
+      'The shares in activity for ' +
+        activity.broker +
+        ' must be a number greater than 0.',
+      activity
+    );
+    return undefined;
+  }
+
+  if (Number(activity.price) !== activity.price || activity.price <= 0) {
+    console.error(
+      'The price in activity for ' +
+        activity.broker +
+        ' must be a number greater than 0.',
+      activity
+    );
+    return undefined;
+  }
+
+  if (Number(activity.amount) !== activity.amount || activity.amount <= 0) {
+    console.error(
+      'The amount in activity for ' +
+        activity.broker +
+        ' must be a number greater than 0.',
+      activity
+    );
+    return undefined;
+  }
+
+  if (Number(activity.fee) !== activity.fee || activity.fee < 0) {
+    console.error(
+      'The fee amount in activity for ' +
+        activity.broker +
+        ' must be a number greater than 0.',
+      activity
+    );
+    return undefined;
+  }
+
+  if (Number(activity.tax) !== activity.tax || activity.tax < 0) {
+    console.error(
+      'The tax amount in activity for ' +
+        activity.broker +
+        ' must be a number greater than 0.',
+      activity
+    );
+    return undefined;
+  }
+
+  if (!/^([A-Z]{2})([A-Z0-9]{9})([0-9]{1})$/.test(activity.isin)) {
+    console.error(
+      'The activity ISIN for ' +
+        activity.broker +
+        " can't be valid with an invalid scheme.",
+      activity
+    );
+    return undefined;
+  }
+
+  if (!['Buy', 'Sell', 'Dividend'].includes(activity.type)) {
+    console.error(
+      'The activity type for ' +
+        activity.broker +
+        " can't be valid with an unknown type.",
+      activity
+    );
+    return undefined;
+  }
+
+  return activity;
 }
