@@ -1,6 +1,7 @@
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 
+import { Big } from 'big.js';
 import { parseGermanNum, validateActivity } from '@/helper';
 
 const offsets = {
@@ -50,6 +51,22 @@ const findPayout = textArr =>
   parseGermanNum(
     getValueByPreviousElement(textArr, 'Ausmachender Betrag').split(' ')[0]
   );
+
+const findTax = textArr => {
+  const assessmentBasis = parseGermanNum(
+    getValueByPreviousElement(textArr, 'Berechnungsgrundlage für die Kapitalertragsteuer').split(' ')[0]
+  );
+  if (assessmentBasis === 0)
+    return 0;
+
+  const kap = parseGermanNum(
+    getValueByPreviousElement(textArr, 'Kapitalertragsteuer 25 %').split(' ')[0]
+  );
+  const soli = parseGermanNum(
+    getValueByPreviousElement(textArr, 'Solidaritätszuschlag').split(' ')[0]
+  );
+  return +Big(kap).plus(Big(soli));
+}
 
 const isBuy = textArr =>
   textArr.some(
@@ -104,7 +121,7 @@ export const parseData = textArr => {
     amount = findPayout(textArr);
     price = amount / shares;
     fee = 0;
-    tax = 0;
+    tax = findTax(textArr);
   }
 
   return validateActivity({
