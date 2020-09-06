@@ -68,7 +68,10 @@ const findTax = textArr => {
   const soli = parseGermanNum(
     getValueByPreviousElement(textArr, 'Solidaritätszuschlag').split(' ')[0]
   );
-  return +Big(kap).plus(Big(soli));
+  const churchTax = parseGermanNum(
+    getValueByPreviousElement(textArr, 'Kirchensteuer').split(' ')[0]
+  );
+  return +Big(kap).plus(Big(soli)).plus(Big(churchTax));
 }
 
 const isBuy = textArr =>
