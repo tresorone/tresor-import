@@ -50,17 +50,18 @@ const findFee = textArr =>
 const findDateDividend = textArr =>
   getValueByPreviousElement(textArr, 'Zahlbarkeitstag').split(' ')[0];
 
-const findPayout = textArr =>
-  parseGermanNum(
-    getValueByPreviousElement(textArr, 'Ausmachender Betrag').split(' ')[0]
-  );
+const findPayout = textArr => {
+  let index = textArr.indexOf("Ausschüttung");
+  if (index < 0)
+    index = textArr.lastIndexOf("Dividendengutschrift");
+  const currency = textArr[index + 2];
+  const eurAmount = (currency === "EUR") ? textArr[index + 1] : textArr[index + 3];
+  return parseGermanNum(eurAmount.split(' ')[0]);
+}
 
 const findTax = textArr => {
-  const assessmentBasis = parseGermanNum(
-    getValueByPreviousElement(textArr, 'Berechnungsgrundlage für die Kapitalertragsteuer').split(' ')[0]
-  );
-  if (assessmentBasis === 0)
-    return 0;
+  const withholdingTaxIndex = textArr.findIndex(t => t.startsWith("Anrechenbare Quellensteuer") && t.endsWith("EUR"))
+  const withholdingTax = (withholdingTaxIndex >= 0) ? parseGermanNum(textArr[withholdingTaxIndex+1]) : 0
 
   const kap = parseGermanNum(
     getValueByPreviousElement(textArr, 'Kapitalertragsteuer 25 %').split(' ')[0]
@@ -71,7 +72,7 @@ const findTax = textArr => {
   const churchTax = parseGermanNum(
     getValueByPreviousElement(textArr, 'Kirchensteuer').split(' ')[0]
   );
-  return +Big(kap).plus(Big(soli)).plus(Big(churchTax));
+  return +Big(kap).plus(Big(soli)).plus(Big(churchTax)).plus(Big(withholdingTax));
 }
 
 const isBuy = textArr =>
