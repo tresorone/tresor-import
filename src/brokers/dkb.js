@@ -10,8 +10,11 @@ const offsets = {
   isin: 3,
 };
 
-const getValueByPreviousElement = (textArr, prev) =>
-  textArr[textArr.findIndex(t => t.includes(prev)) + 1];
+const getValueByPreviousElement = (textArr, prev) => {
+  const index = textArr.findIndex(t => t.includes(prev));
+  if (index < 0) return "";
+  return textArr[index + 1];
+}
 
 const findTableIndex = textArr => textArr.findIndex(t => t.includes('Stück'));
 
@@ -111,7 +114,7 @@ export const parseData = textArr => {
     amount = findAmount(textArr);
     price = findPrice(textArr);
     fee = findFee(textArr);
-    tax = 0;
+    tax = findTax(textArr);
   } else if (isDividend(textArr)) {
     type = 'Dividend';
     isin = findISIN(textArr);
