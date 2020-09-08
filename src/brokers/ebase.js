@@ -102,7 +102,3 @@ export const parseData = pdfPages => {
 export const parsePages = contents => {
   return parseData(contents);
 };
-
-export const iAmEbase = test => {
-  return test;
-};
