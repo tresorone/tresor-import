@@ -8,15 +8,13 @@ describe('Broker: ebase', () => {
   let consoleErrorSpy;
 
   test('should only accept revenue-summary reports', () => {
-    expect(canParseData(['Fondsertrag / Vorabpauschale'])).toEqual(
-      true
-    );
+    expect(canParseData(['Fondsertrag / Vorabpauschale'])).toEqual(true);
   });
 
   test('should reject unknown PDF files', () => {
-    expect(canParseData(['This String should never occur in a legitimate document'])).toEqual(
-      false
-    );
+    expect(
+      canParseData(['This String should never occur in a legitimate document'])
+    ).toEqual(false);
   });
 
   test('should validate the result', () => {
