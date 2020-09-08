@@ -1,10 +1,8 @@
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
-import every from 'lodash/every';
-import values from 'lodash/values';
 import Big from 'big.js';
 
-import { parseGermanNum } from '@/helper';
+import { parseGermanNum, validateActivity } from '@/helper';
 
 export const isPageTypeBuy = content =>
   content.some(
@@ -120,7 +118,7 @@ export const parseData = content => {
     console.error('Unknown page type for 1822direkt');
   }
 
-  const activity = {
+  return validateActivity({
     broker: '1822direkt',
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
@@ -131,16 +129,7 @@ export const parseData = content => {
     amount,
     fee,
     tax,
-  };
-
-  const valid = every(values(activity), a => !!a || a === 0);
-
-  if (!valid) {
-    console.error('The parsed pages is invalid for 1822direkt', activity);
-    return undefined;
-  } else {
-    return activity;
-  }
+  });
 };
 
 export const parsePages = contents => {
