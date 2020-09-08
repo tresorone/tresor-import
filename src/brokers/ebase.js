@@ -52,8 +52,9 @@ function parseSellAction(pdfArray, i) {
   return verifyActivity(type, date, isin, company, shares, price, amount, fee);
 }
 
-export const canParseData = textArr =>  // textArr.flat(t => t.startsWith('ebase Depot flex standard'));
-  textArr.some(t => t.includes('Fondsertrag / Vorabpauschale'));
+export const canParseData = (
+  textArr // textArr.flat(t => t.startsWith('ebase Depot flex standard'));
+) => textArr.some(t => t.includes('Fondsertrag / Vorabpauschale'));
 
 export const parseData = pdfPages => {
   // Action can be: Fondsertrag (Ausschüttung), Ansparplan, Wiederanlage Fondsertrag, Entgelt Verkauf
@@ -63,19 +64,34 @@ export const parseData = pdfPages => {
 
     while (i <= pdfPage.length) {
       if (pdfPage[i] === 'Ansparplan') {
-        actions.push(parseBuyAction(pdfPage, i));
+        const action = parseBuyAction(pdfPage, i);
+        if (action === undefined) {
+          return undefined;
+        }
+        actions.push(action);
         // An 'Ansparplan'/'Wiederanlage Fondsertrag' entry occupies 7 array entries.
         i += 6;
       } else if (pdfPage[i] === 'Wiederanlage Fondsertrag') {
-        actions.push(parseBuyAction(pdfPage, i));
+        const action = parseBuyAction(pdfPage, i);
+        if (action === undefined) {
+          return undefined;
+        }
+        actions.push(action);
         // An 'Ansparplan'/'Wiederanlage Fondsertrag' entry occupies 7 array entries.
         i += 6;
       } else if (pdfPage[i] === 'Fondsertrag (Ausschüttung)') {
         // This was always blank in the example files I had -> So no parsing could be done.
         i += 3;
       } else if (pdfPage[i] === 'Entgelt Verkauf') {
-        actions.push(parseSellAction(pdfPage, i));
+        const action = parseSellAction(pdfPage, i);
+        if (action === undefined) {
+          return undefined;
+        }
+        actions.push(action);
         i += 6; // An 'Entgelt Verkauf' entry occupies 7 array entries.
+      } else if (pdfPage[i] === 'Vorabpauschale') {
+        // This was always blank in the example files I had -> So no parsing could be done.
+        i += 3;
       }
       i++;
     }
