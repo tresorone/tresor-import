@@ -1,10 +1,8 @@
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
-import every from 'lodash/every';
-import values from 'lodash/values';
 import Big from 'big.js';
 
-import { parseGermanNum } from '@/helper';
+import { parseGermanNum, validateActivity } from '@/helper';
 
 const findISIN = (text, span) => {
   const isinLine = text[text.findIndex(t => t.includes('/ISIN')) + span];
@@ -125,7 +123,7 @@ export const canParseData = textArr =>
   (isBuy(textArr) || isSell(textArr) || isDividend(textArr));
 
 export const parseData = textArr => {
-  let type, date, isin, company, shares, price, amount, fee;
+  let type, date, isin, company, shares, price, amount, fee, tax;
 
   if (isBuy(textArr)) {
     const reduction = findPurchaseReduction(textArr);
@@ -142,6 +140,7 @@ export const parseData = textArr => {
     price = 0;
     price = +foundAmount.div(Big(shares));
     fee = +totalFee;
+    tax = 0;
   } else if (isSell(textArr)) {
     type = 'Sell';
     isin = findISIN(textArr, 2);
@@ -151,6 +150,7 @@ export const parseData = textArr => {
     amount = findAmount(textArr);
     price = +Big(amount).div(Big(shares));
     fee = findFee(textArr);
+    tax = 0;
   } else if (isDividend(textArr)) {
     type = 'Dividend';
     isin = findISIN(textArr, 3);
@@ -160,9 +160,10 @@ export const parseData = textArr => {
     amount = findPayout(textArr);
     price = +Big(amount).div(Big(shares));
     fee = 0;
+    tax = 0;
   }
 
-  const activity = {
+  return validateActivity({
     broker: 'comdirect',
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
@@ -172,16 +173,8 @@ export const parseData = textArr => {
     price,
     amount,
     fee,
-  };
-
-  const valid = every(values(activity), a => !!a || a === 0);
-
-  if (!valid) {
-    console.error('Error while parsing PDF', activity);
-    return undefined;
-  } else {
-    return activity;
-  }
+    tax,
+  });
 };
 
 export const parsePages = contents => {

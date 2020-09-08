@@ -1,10 +1,8 @@
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
-import every from 'lodash/every';
-import values from 'lodash/values';
 import Big from 'big.js';
 
-import { parseGermanNum } from '@/helper';
+import { parseGermanNum, validateActivity } from '@/helper';
 
 const findISIN = text => {
   if (text.some(t => t.includes('ISIN:'))) {
@@ -191,11 +189,9 @@ export const parseData = textArr => {
     price = +Big(amount).div(Big(shares));
     fee = findFee(textArr);
     tax = findTax(textArr);
-  } else {
-    console.error('unable to detect order');
   }
 
-  const activity = {
+  return validateActivity({
     broker: 'traderepublic',
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
@@ -206,16 +202,7 @@ export const parseData = textArr => {
     amount,
     fee,
     tax,
-  };
-
-  const valid = every(values(activity), a => !!a || a === 0);
-
-  if (!valid) {
-    console.error('Error while parsing PDF', activity);
-    return undefined;
-  } else {
-    return activity;
-  }
+  });
 };
 
 export const parsePages = contents => {

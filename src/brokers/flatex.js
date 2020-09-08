@@ -1,10 +1,8 @@
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
-import every from 'lodash/every';
-import values from 'lodash/values';
-import { Big } from 'big.js';
+import Big from 'big.js';
 
-import { parseGermanNum } from '@/helper';
+import { parseGermanNum, validateActivity } from '@/helper';
 
 const getTableValueByKey = (textArr, startLineNumer, key) => {
   const finding = textArr.find(
@@ -220,12 +218,9 @@ export const parsePage = (textArr, startLineNumer) => {
     price = amount / shares;
     fee = 0;
     tax = findDividendTax(textArr, startLineNumer);
-  } else {
-    console.error('Type could not be determined!');
-    return undefined;
   }
 
-  const activity = {
+  return validateActivity({
     broker: 'flatex',
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
@@ -236,16 +231,7 @@ export const parsePage = (textArr, startLineNumer) => {
     amount,
     fee,
     tax,
-  };
-
-  const valid = every(values(activity), a => !!a || a === 0);
-
-  if (!valid) {
-    console.error('Error while parsing PDF', activity);
-    return undefined;
-  } else {
-    return activity;
-  }
+  });
 };
 
 export const parsePages = contents => {

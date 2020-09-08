@@ -1,10 +1,8 @@
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
-import every from 'lodash/every';
-import values from 'lodash/values';
 import Big from 'big.js';
 
-import { parseGermanNum } from '@/helper';
+import { parseGermanNum, validateActivity } from '@/helper';
 
 const getValueByPreviousElement = (textArr, prev, range) =>
   textArr[textArr.findIndex(t => t.includes(prev)) + range];
@@ -130,12 +128,9 @@ export const parseData = textArr => {
     price = +Big(amount).div(shares);
     fee = 0;
     tax = findTaxes(textArr);
-  } else {
-    console.error('Type could not be determined!');
-    return undefined;
   }
 
-  const activity = {
+  return validateActivity({
     broker: 'ing',
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
@@ -146,16 +141,7 @@ export const parseData = textArr => {
     amount,
     fee,
     tax,
-  };
-
-  const valid = every(values(activity), a => !!a || a === 0);
-
-  if (!valid) {
-    console.error('Error while parsing PDF', activity);
-    return undefined;
-  } else {
-    return activity;
-  }
+  });
 };
 
 export const parsePages = contents => {

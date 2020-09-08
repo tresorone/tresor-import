@@ -38,6 +38,7 @@ describe('Broker: comdirect', () => {
         price: 44.74545454545454,
         amount: 24.61,
         fee: 0.37,
+        tax: 0,
       });
     });
 
@@ -55,6 +56,7 @@ describe('Broker: comdirect', () => {
         price: 235.09259259259258,
         amount: 24.84,
         fee: 0,
+        tax: 0,
       });
     });
   });
@@ -74,6 +76,7 @@ describe('Broker: comdirect', () => {
         price: 0.007280978021605879,
         amount: 0.43,
         fee: 0,
+        tax: 0,
       });
     });
 
@@ -91,6 +94,7 @@ describe('Broker: comdirect', () => {
         price: 0.9696831200487508,
         amount: 12.73,
         fee: 0,
+        tax: 0,
       });
     });
   });
