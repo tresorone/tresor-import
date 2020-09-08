@@ -19,17 +19,21 @@ describe('DKB broker', () => {
     const activity = parseData(invalidSample);
 
     expect(activity).toEqual(undefined);
-    expect(console.error).toHaveBeenLastCalledWith('Error while parsing PDF', {
-      amount: 4428,
-      broker: 'dkb',
-      company: 'Kurswert',
-      date: '2019-01-25',
-      fee: 10,
-      isin: null,
-      price: 123,
-      shares: NaN,
-      type: 'Buy',
-    });
+    expect(console.error).toHaveBeenLastCalledWith(
+      'The activity for dkb has empty fields.',
+      {
+        amount: 4428,
+        broker: 'dkb',
+        company: 'Kurswert',
+        date: '2019-01-25',
+        fee: 10,
+        isin: null,
+        price: 123,
+        shares: NaN,
+        type: 'Buy',
+        tax: 0,
+      }
+    );
   });
 
   describe('Buy', () => {
@@ -46,6 +50,7 @@ describe('DKB broker', () => {
         price: 123,
         amount: 4428,
         fee: 10,
+        tax: 0,
       });
     });
 
@@ -62,8 +67,10 @@ describe('DKB broker', () => {
         price: 177.85,
         amount: 177.85,
         fee: 10,
+        tax: 0,
       });
     });
+
     test('should map pdf data of sample 3 correctly', () => {
       const activity = parseData(buySamples[2]);
 
@@ -77,6 +84,7 @@ describe('DKB broker', () => {
         price: 353.8346,
         amount: 262.5,
         fee: 1.5,
+        tax: 0,
       });
     });
   });
@@ -95,6 +103,7 @@ describe('DKB broker', () => {
         price: 123,
         amount: 4428,
         fee: 10,
+        tax: 0,
       });
     });
   });
@@ -113,8 +122,10 @@ describe('DKB broker', () => {
         price: 0.6019444444444445,
         amount: 21.67,
         fee: 0,
+        tax: 0,
       });
     });
+
     test('should map pdf data of sample 2 correctly', () => {
       const activity = parseData(dividendsSamples[1]);
 
@@ -128,6 +139,7 @@ describe('DKB broker', () => {
         price: 0.27799999999999997,
         amount: 1.39,
         fee: 0,
+        tax: 0,
       });
     });
     test('should map pdf data of sample 3 correctly', () => {
@@ -143,6 +155,7 @@ describe('DKB broker', () => {
         price: 0.375,
         amount: 4.5,
         fee: 0,
+        tax: 0,
       });
     });
   });

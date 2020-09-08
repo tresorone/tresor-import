@@ -1,15 +1,13 @@
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
-import every from 'lodash/every';
-import values from 'lodash/values';
+
+import { parseGermanNum, validateActivity } from '@/helper';
 
 const offsets = {
   shares: 0,
   companyName: 1,
   isin: 3,
 };
-
-import { parseGermanNum } from '@/helper';
 
 const getValueByPreviousElement = (textArr, prev) =>
   textArr[textArr.findIndex(t => t.includes(prev)) + 1];
@@ -104,13 +102,10 @@ export const parseData = textArr => {
     amount = findPayout(textArr);
     price = amount / shares;
     fee = 0;
-  } else {
-    console.error('Type could not be determined!');
-    return undefined;
   }
 
-  const activity = {
-    broker: 'pb',
+  return validateActivity({
+    broker: 'postbank',
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
     isin,
@@ -119,16 +114,7 @@ export const parseData = textArr => {
     price,
     amount,
     fee,
-  };
-
-  const valid = every(values(activity), a => !!a || a === 0);
-
-  if (!valid) {
-    console.error('Error while parsing PDF', activity);
-    return undefined;
-  } else {
-    return activity;
-  }
+  });
 };
 
 export const parsePages = contents => {

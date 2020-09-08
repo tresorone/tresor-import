@@ -1,10 +1,8 @@
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
-import every from 'lodash/every';
-import values from 'lodash/values';
 import Big from 'big.js';
 
-import { parseGermanNum } from '@/helper';
+import { parseGermanNum, validateActivity } from '@/helper';
 
 const findISIN = text => {
   if (text.some(t => t.includes('ISIN:'))) {
@@ -239,8 +237,6 @@ export const parseOrderOrDividend = textArr => {
     price = +Big(amount).div(Big(shares));
     fee = findFee(textArr);
     tax = findTax(textArr);
-  } else {
-    console.error('unable to detect order');
   }
 
   return {
@@ -255,15 +251,6 @@ export const parseOrderOrDividend = textArr => {
     fee,
     tax,
   };
-};
-
-export const isActivityValid = activity => {
-  if (every(values(activity), a => !!a || a === 0)) {
-    return true;
-  }
-
-  console.error('The found activity is not valid.', activity);
-  return false;
 };
 
 export const parsePage = content => {
@@ -289,7 +276,7 @@ export const parsePage = content => {
 
   let validatedActivities = [];
   foundActivities.forEach(activity => {
-    if (isActivityValid(activity)) {
+    if (validateActivity(activity)) {
       validatedActivities.push(activity);
     }
   });
