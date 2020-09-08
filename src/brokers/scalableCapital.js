@@ -1,10 +1,8 @@
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
-import every from 'lodash/every';
-import values from 'lodash/values';
 import Big from 'big.js';
 
-import { parseGermanNum } from '@/helper';
+import { parseGermanNum, validateActivity } from '@/helper';
 
 export const isPageTypeBuy = content =>
   content.some(line => line.includes('Wertpapierabrechnung: Kauf'));
@@ -146,7 +144,7 @@ export const parseData = content => {
     console.error('Unknown page type for scalable.capital');
   }
 
-  const activity = {
+  return validateActivity({
     broker: 'scalablecapital',
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
@@ -157,16 +155,7 @@ export const parseData = content => {
     amount,
     fee,
     tax,
-  };
-
-  const valid = every(values(activity), a => !!a || a === 0);
-
-  if (!valid) {
-    console.error('The parsed pages is invalid for scalable.capital', activity);
-    return undefined;
-  } else {
-    return activity;
-  }
+  });
 };
 
 export const parsePages = contents => {
