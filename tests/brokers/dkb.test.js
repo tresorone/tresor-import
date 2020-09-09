@@ -1,5 +1,5 @@
-import { parseData, canParseData } from '../../src/brokers/dkb';
-import { buySamples, sellSamples, dividendsSamples } from './__mocks__/dkb';
+import { canParseData, parseData } from '@/brokers/dkb';
+import { buySamples, dividendsSamples, sellSamples } from './mocks/dkb';
 
 describe('DKB broker', () => {
   let consoleErrorSpy;

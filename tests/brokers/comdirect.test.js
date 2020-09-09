@@ -1,6 +1,6 @@
-import { getBroker } from '../../src';
+import { getBroker } from '@/index';
 import * as comdirect from '../../src/brokers/comdirect';
-import { allSamples, buySamples, dividendSamples } from './__mocks__/comdirect';
+import { allSamples, buySamples, dividendSamples } from './mocks/comdirect';
 
 describe('Broker: comdirect', () => {
   let consoleErrorSpy;

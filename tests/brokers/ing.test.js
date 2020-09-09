@@ -1,11 +1,6 @@
-import { getBroker } from '../../src/';
+import { getBroker } from '@/index';
 import * as ing from '../../src/brokers/ing';
-import {
-  buySamples,
-  sellSamples,
-  dividendsSamples,
-  invalidSamples,
-} from './__mocks__/ing';
+import { buySamples, dividendsSamples, invalidSamples, sellSamples } from './mocks/ing';
 
 describe('Broker: ING', () => {
   let consoleErrorSpy;

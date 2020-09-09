@@ -1,20 +1,20 @@
-import { parseData } from '../../src/brokers/traderepublic';
+import { parseData } from '@/brokers/traderepublic';
 
-const stockSingleBuy = require('./__mocks__/traderepublic/stock_single_buy.json');
-const stockSingleLimitBuy = require('./__mocks__/traderepublic/stock_single_limit_buy.json');
-const stockSingleLimitBuyFinancialTransactionTax = require('./__mocks__/traderepublic/stock_single_limit_buy_financial_transaction_tax.json');
-const stockSingleLimitBuyWithoutExplicitISIN = require('./__mocks__/traderepublic/stock_single_limit_buy_without_explicit_ISIN.json');
-const etfSavingsPlanBuy = require('./__mocks__/traderepublic/etf_savings_plan_buy.json');
+const stockSingleBuy = require('./mocks/traderepublic/stock_single_buy.json');
+const stockSingleLimitBuy = require('./mocks/traderepublic/stock_single_limit_buy.json');
+const stockSingleLimitBuyFinancialTransactionTax = require('./mocks/traderepublic/stock_single_limit_buy_financial_transaction_tax.json');
+const stockSingleLimitBuyWithoutExplicitISIN = require('./mocks/traderepublic/stock_single_limit_buy_without_explicit_ISIN.json');
+const etfSavingsPlanBuy = require('./mocks/traderepublic/etf_savings_plan_buy.json');
 const stockSell = [
-  require('./__mocks__/traderepublic/stock_sell.json'),
-  require('./__mocks__/traderepublic/stock_sell2.json'),
+  require('./mocks/traderepublic/stock_sell.json'),
+  require('./mocks/traderepublic/stock_sell2.json')
 ];
 const stockDividend = [
-  require('./__mocks__/traderepublic/stock_dividend_0.json'),
-  require('./__mocks__/traderepublic/stock_dividend_1.json'),
-  require('./__mocks__/traderepublic/stock_dividend_2.json'),
+  require('./mocks/traderepublic/stock_dividend_0.json'),
+  require('./mocks/traderepublic/stock_dividend_1.json'),
+  require('./mocks/traderepublic/stock_dividend_2.json')
 ];
-const etfDividend = require('./__mocks__/traderepublic/etf_dividend.json');
+const etfDividend = require('./mocks/traderepublic/etf_dividend.json');
 
 describe('TradeRepublic broker', () => {
   let consoleErrorSpy;

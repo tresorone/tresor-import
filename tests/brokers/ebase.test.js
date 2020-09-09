@@ -1,6 +1,6 @@
 import { getBroker } from '@/index';
 import * as ebase from '../../src/brokers/ebase';
-import { buySamples, invalidSamples, mixedSamples, sellSamples } from './__mocks__/ebase';
+import { buySamples, invalidSamples, mixedSamples, sellSamples } from './mocks/ebase';
 import { canParseData, parseData } from '@/brokers/ebase';
 
 // David Holin: No dividend samples test yet, as no example document is available

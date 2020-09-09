@@ -1,14 +1,5 @@
-import {
-  parseSinglePage,
-  canParseData,
-  parsePages,
-} from '../../src/brokers/flatex';
-import {
-  buySamples,
-  sellSamples,
-  dividendsSamples,
-  mixedPageSamples,
-} from './__mocks__/flatex';
+import { canParseData, parsePages, parseSinglePage } from '@/brokers/flatex';
+import { buySamples, dividendsSamples, mixedPageSamples, sellSamples } from './mocks/flatex';
 import Big from 'big.js';
 
 describe('Flatex broker', () => {
