@@ -1,11 +1,6 @@
-import { getBroker } from '../../src';
+import { getBroker } from '@/index';
 import * as consorsbank from '../../src/brokers/consorsbank';
-import {
-  buySamples,
-  sellSamples,
-  dividendsSamples,
-  oldDividendsSamples,
-} from './__mocks__/consorsbank';
+import { buySamples, dividendsSamples, oldDividendsSamples, sellSamples } from './mocks/consorsbank';
 
 console.error = jest.fn();
 
