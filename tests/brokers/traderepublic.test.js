@@ -1,40 +1,29 @@
-import { getBroker } from '../../src';
-import * as traderepublic from '../../src/brokers/traderepublic';
-import {
-  allSamples,
-  buySamples,
-  sellSamples,
-  dividendSamples,
-  quarterSamples,
-} from './__mocks__/traderepublic';
+import { parseData } from '@/brokers/traderepublic';
 
-describe('Broker: Trade Republic', () => {
+const stockSingleBuy = require('./mocks/traderepublic/stock_single_buy.json');
+const stockSingleLimitBuy = require('./mocks/traderepublic/stock_single_limit_buy.json');
+const stockSingleLimitBuyFinancialTransactionTax = require('./mocks/traderepublic/stock_single_limit_buy_financial_transaction_tax.json');
+const stockSingleLimitBuyWithoutExplicitISIN = require('./mocks/traderepublic/stock_single_limit_buy_without_explicit_ISIN.json');
+const etfSavingsPlanBuy = require('./mocks/traderepublic/etf_savings_plan_buy.json');
+const stockSell = [
+  require('./mocks/traderepublic/stock_sell.json'),
+  require('./mocks/traderepublic/stock_sell2.json')
+];
+const stockDividend = [
+  require('./mocks/traderepublic/stock_dividend_0.json'),
+  require('./mocks/traderepublic/stock_dividend_1.json'),
+  require('./mocks/traderepublic/stock_dividend_2.json')
+];
+const etfDividend = require('./mocks/traderepublic/etf_dividend.json');
+
+describe('TradeRepublic broker', () => {
   let consoleErrorSpy;
 
-  describe('Check all documents', () => {
-    test('Can the document parsed with Trade Republic', () => {
-      allSamples.forEach(samples => {
-        expect(samples.some(item => traderepublic.canParseData(item))).toEqual(
-          true
-        );
-      });
-    });
+  describe('Stock Single Buy', () => {
+    test('should map the pdf data correctly', () => {
+      const activity = parseData(stockSingleLimitBuy);
 
-    test('Can identify a broker from the document as Trade Republic', () => {
-      allSamples.forEach(samples => {
-        expect(samples.some(item => getBroker(item) === traderepublic)).toEqual(
-          true
-        );
-      });
-    });
-  });
-
-  describe('Validate buys', () => {
-    test('Map a limit order correctly', () => {
-      const activities = traderepublic.parsePages(buySamples[0]);
-
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(activity).toEqual({
         broker: 'traderepublic',
         type: 'Buy',
         date: '2020-02-24',
@@ -47,12 +36,13 @@ describe('Broker: Trade Republic', () => {
         tax: 0,
       });
     });
+  });
 
-    test('Map a market order correctly', () => {
-      const activities = traderepublic.parsePages(buySamples[1]);
+  describe('Stock Single Limit Buy', () => {
+    test('should map the pdf data correctly', () => {
+      const activity = parseData(stockSingleBuy);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(activity).toEqual({
         broker: 'traderepublic',
         type: 'Buy',
         date: '2019-11-29',
@@ -65,12 +55,11 @@ describe('Broker: Trade Republic', () => {
         tax: 0,
       });
     });
+  });
 
-    test('Map a limit order with financial transaction tax correctly', () => {
-      const activities = traderepublic.parsePages(buySamples[2]);
-
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+  describe('Stock Single Buy with financial transaction tax', () => {
+    test('should map the pdf data correctly', () => {
+      expect(parseData(stockSingleLimitBuyFinancialTransactionTax)).toEqual({
         broker: 'traderepublic',
         type: 'Buy',
         date: '2020-06-09',
@@ -83,12 +72,13 @@ describe('Broker: Trade Republic', () => {
         tax: 1.69,
       });
     });
+  });
 
-    test('Map a market order without explicit ISIN correctly', () => {
-      const activities = traderepublic.parsePages(buySamples[3]);
+  describe('Stock Single Limit Buy without explicit ISIN', () => {
+    test('should map the pdf data correctly', () => {
+      const activity = parseData(stockSingleLimitBuyWithoutExplicitISIN);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(activity).toEqual({
         broker: 'traderepublic',
         type: 'Buy',
         date: '2019-07-19',
@@ -101,12 +91,13 @@ describe('Broker: Trade Republic', () => {
         tax: 0,
       });
     });
+  });
 
-    test('Map a saving plan order correctly', () => {
-      const activities = traderepublic.parsePages(buySamples[4]);
+  describe('ETF Savings Plan Buy', () => {
+    test('should map the pdf data correctly', () => {
+      const activity = parseData(etfSavingsPlanBuy);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(activity).toEqual({
         broker: 'traderepublic',
         type: 'Buy',
         date: '2020-01-16',
@@ -121,12 +112,11 @@ describe('Broker: Trade Republic', () => {
     });
   });
 
-  describe('Validate sells', () => {
-    test('Map a limit sell order correctly: Tesla', () => {
-      const activities = traderepublic.parsePages(sellSamples[0]);
+  describe('Stock Sell', () => {
+    test('should map the pdf data correctly', () => {
+      const activity = parseData(stockSell[0]);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(activity).toEqual({
         amount: 2550,
         broker: 'traderepublic',
         company: 'Tesla Inc.',
@@ -140,11 +130,10 @@ describe('Broker: Trade Republic', () => {
       });
     });
 
-    test('Map a limit sell order correctly: Stryker', () => {
-      const activities = traderepublic.parsePages(sellSamples[1]);
+    test('should map the pdf data correctly', () => {
+      const activity = parseData(stockSell[1]);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(activity).toEqual({
         amount: 16723.08,
         broker: 'traderepublic',
         company: 'Stryker Corp.',
@@ -159,12 +148,11 @@ describe('Broker: Trade Republic', () => {
     });
   });
 
-  describe('Validate dividends', () => {
-    test('Should map the pdf data correctly for: Royal Dutch Shell', () => {
-      const activities = traderepublic.parsePages(dividendSamples[0]);
+  describe('Stock Dividend', () => {
+    test('should map the pdf data correctly', () => {
+      const activity = parseData(stockDividend[0]);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(activity).toEqual({
         amount: 118.21,
         broker: 'traderepublic',
         company: 'Royal Dutch Shell',
@@ -178,11 +166,10 @@ describe('Broker: Trade Republic', () => {
       });
     });
 
-    test('Should map the pdf data correctly for: iSh.ST.Eur.Sel.Div.30 U.ETF DE', () => {
-      const activities = traderepublic.parsePages(dividendSamples[1]);
+    test('should map the pdf data correctly', () => {
+      const activity = parseData(stockDividend[1]);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(activity).toEqual({
         amount: 9.67,
         broker: 'traderepublic',
         company: 'iSh.ST.Eur.Sel.Div.30 U.ETF DE',
@@ -196,11 +183,10 @@ describe('Broker: Trade Republic', () => {
       });
     });
 
-    test('Should map the pdf data correctly for: iSh.EO ST.Sel.Div.30 U.ETF DE', () => {
-      const activities = traderepublic.parsePages(dividendSamples[2]);
+    test('should map the pdf data correctly', () => {
+      const activity = parseData(stockDividend[2]);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(activity).toEqual({
         amount: 8.34,
         broker: 'traderepublic',
         company: 'iSh.EO ST.Sel.Div.30 U.ETF DE',
@@ -213,12 +199,13 @@ describe('Broker: Trade Republic', () => {
         type: 'Dividend',
       });
     });
+  });
 
-    test('Should map the pdf data correctly for: iShsII-Dev.Mkts Prop.Yld U.ETF', () => {
-      const activities = traderepublic.parsePages(dividendSamples[3]);
+  describe('ETF Dividend', () => {
+    test('should map the pdf data correctly', () => {
+      const activity = parseData(etfDividend);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(activity).toEqual({
         amount: 17.52,
         broker: 'traderepublic',
         company: 'iShsII-Dev.Mkts Prop.Yld U.ETF',
@@ -247,44 +234,6 @@ describe('Broker: Trade Republic', () => {
         shares: 45,
         tax: 2.350661386805965,
         type: 'Dividend',
-      });
-    });
-  });
-
-  describe('Validate quarter statement', () => {
-    test('Map a empty quarter statement correctly', () => {
-      const activities = traderepublic.parsePages(quarterSamples[0]);
-
-      expect(activities.length).toEqual(0);
-    });
-
-    test('Map a quarter statement with two positions correctly', () => {
-      const activities = traderepublic.parsePages(quarterSamples[1]);
-
-      expect(activities.length).toEqual(2);
-      expect(activities[0]).toEqual({
-        amount: 132.96,
-        broker: 'traderepublic',
-        company: 'Royal Dutch Shell',
-        date: '2020-06-30',
-        fee: 0,
-        isin: 'GB00B03MLX29',
-        price: 13.296,
-        shares: 10,
-        tax: 0,
-        type: 'Buy',
-      });
-      expect(activities[1]).toEqual({
-        amount: 210.79,
-        broker: 'traderepublic',
-        company: 'Gazprom PJSC',
-        date: '2020-06-30',
-        fee: 0,
-        isin: 'US3682872078',
-        price: 4.684222222222222,
-        shares: 45,
-        tax: 0,
-        type: 'Buy',
       });
     });
   });

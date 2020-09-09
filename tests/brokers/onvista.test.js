@@ -1,11 +1,6 @@
-import { getBroker } from '../../src/';
+import { getBroker } from '@/index';
 import * as onvista from '../../src/brokers/onvista';
-import {
-  buySamples,
-  sellSamples,
-  dividendsSamples,
-  multiPageSample,
-} from './__mocks__/onvista';
+import { buySamples, dividendsSamples, multiPageSample, sellSamples } from './mocks/onvista';
 
 console.error = jest.fn();
 
