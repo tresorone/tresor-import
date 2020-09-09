@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import { parseData, canParseData } from '../../src/brokers/dkb';
 import { buySamples, sellSamples, dividendsSamples } from './mocks/dkb';
+=======
+import { canParseData, parseData } from '@/brokers/dkb';
+import { buySamples, dividendsSamples, sellSamples } from './mocks/dkb';
+>>>>>>> Improved Tests which is still wip
 
 describe('DKB broker', () => {
   let consoleErrorSpy;
