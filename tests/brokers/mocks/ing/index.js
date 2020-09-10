@@ -1,23 +1,23 @@
 export const buySamples = [
-  require('./buy1.json'),
-  require('./buy2.json'),
-  require('./buy_provision_free.json'),
-  require('./buy_plan.json'),
+  require('./buy/buy_stock_1.json'),
+  require('./buy/buy_stock_2.json'),
+  require('./buy/buy_stock_provision_free_1.json'),
+  require('./buy/buy_plan_etf_1.json')
 ];
 
 export const sellSamples = [
-  require('./sell1.json'),
-  require('./sell2.json'),
-  require('./sell3.json'),
+  require('./sell/sell1.json'),
+  require('./sell/sell2.json'),
+  require('./sell/sell3.json')
 ];
 
 export const dividendsSamples = [
-  require('./dividend1.json'),
-  require('./dividend2.json'),
-  require('./dividend3.json'),
-  require('./dividend4.json'),
-  require('./dividend5.json'),
-  require('./dividend_etf.json'),
+  require('./dividend/dividend_payout_1.json'),
+  require('./dividend/dividend_payout_2.json'),
+  require('./dividend/earnings_payout_1.json'),
+  require('./dividend/earnings_payout_2.json'),
+  require('./dividend/earnings_payout_3.json'),
+  require('./dividend/earnings_payout_4.json')
 ];
 
-export const invalidSamples = [require('./invalid_buy.json')];
+export const invalidSamples = [require('./invalid/invalid_buy_stock_1.json')];
