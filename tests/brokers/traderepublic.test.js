@@ -1,20 +1,20 @@
 import { parseData } from '@/brokers/traderepublic';
 
-const stockSingleBuy = require('./mocks/traderepublic/stock_single_buy.json');
-const stockSingleLimitBuy = require('./mocks/traderepublic/stock_single_limit_buy.json');
-const stockSingleLimitBuyFinancialTransactionTax = require('./mocks/traderepublic/stock_single_limit_buy_financial_transaction_tax.json');
-const stockSingleLimitBuyWithoutExplicitISIN = require('./mocks/traderepublic/stock_single_limit_buy_without_explicit_ISIN.json');
-const etfSavingsPlanBuy = require('./mocks/traderepublic/etf_savings_plan_buy.json');
+const stockSingleBuy = require('./mocks/traderepublic/buy/single_buy_stock_1.json');
+const stockSingleLimitBuy = require('./mocks/traderepublic/buy/single_limit_buy_stock_1.json');
+const stockSingleLimitBuyFinancialTransactionTax = require('./mocks/traderepublic/buy/single_limit_buy_stock_financial_transaction_tax_1.json');
+const stockSingleLimitBuyWithoutExplicitISIN = require('./mocks/traderepublic/buy/single_limit_buy_stock_no_explicit_isin_1.json');
+const etfSavingsPlanBuy = require('./mocks/traderepublic/buy/savings_plan_buy_etf_1.json');
 const stockSell = [
-  require('./mocks/traderepublic/stock_sell.json'),
-  require('./mocks/traderepublic/stock_sell2.json')
+  require('./mocks/traderepublic/sell/sell_stock_1.json'),
+  require('./mocks/traderepublic/sell/sell_stock_2.json')
 ];
 const stockDividend = [
-  require('./mocks/traderepublic/stock_dividend_0.json'),
-  require('./mocks/traderepublic/stock_dividend_1.json'),
-  require('./mocks/traderepublic/stock_dividend_2.json')
+  require('./mocks/traderepublic/dividend/dividend_1.json'),
+  require('./mocks/traderepublic/dividend/dividend_2.json'),
+  require('./mocks/traderepublic/dividend/dividend_3.json')
 ];
-const etfDividend = require('./mocks/traderepublic/etf_dividend.json');
+const etfDividend = require('./mocks/traderepublic/dividend/earnings_payout_1.json');
 
 describe('TradeRepublic broker', () => {
   let consoleErrorSpy;
