@@ -1,15 +1,11 @@
 import { getBroker } from '@/index';
 import * as ebase from '../../src/brokers/ebase';
-<<<<<<< HEAD
 import {
   buySamples,
   invalidSamples,
   mixedSamples,
   sellSamples,
 } from './mocks/ebase';
-=======
-import { buySamples, invalidSamples, mixedSamples, sellSamples } from './mocks/ebase';
->>>>>>> Improved Tests which is still wip
 import { canParseData, parseData } from '@/brokers/ebase';
 
 // David Holin: No dividend samples test yet, as no example document is available
@@ -59,6 +55,7 @@ describe('Broker: ebase', () => {
 
   describe('Validate buys', () => {
     test('Can parse multiple buy orders from a document', () => {
+
       const activities = ebase.parsePages(buySamples[0]);
       expect(activities.length).toEqual(11);
       expect(activities[0]).toEqual({
