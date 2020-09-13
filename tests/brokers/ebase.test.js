@@ -29,7 +29,7 @@ describe('Broker: ebase', () => {
       fee: 0,
       isin: 'DE0009848119',
       price: 130.93,
-      shares: NaN,
+      shares: undefined,
       type: 'Sell'
     });
   });
@@ -50,6 +50,7 @@ describe('Broker: ebase', () => {
 
   describe('Validate buys', () => {
     test('Can parse multiple buy orders from a document', () => {
+
       const activities = ebase.parsePages(buySamples[0]);
       expect(activities.length).toEqual(11);
       expect(activities[0]).toEqual({
