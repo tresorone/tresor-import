@@ -82,6 +82,24 @@ describe('Broker: scalable.capital', () => {
         tax: 0,
       });
     });
+
+    test('Can the limit order be parsed from the document', () => {
+      const activities = scalableCapital.parsePages(buySamples[3]);
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'scalablecapital',
+        type: 'Buy',
+        date: '2020-09-02',
+        isin: 'LU0392494562',
+        company: 'ComStage-MSCI World TRN U.ETF',
+        shares: 13,
+        price: 58.55769230769231,
+        amount: 761.25,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate sells', () => {
