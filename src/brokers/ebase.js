@@ -88,14 +88,6 @@ function parseBaseAction(pdfArray, i, actionType) {
   );
 }
 
-function parseBuyAction(pdfArray, i) {
-  return parseBaseAction(pdfArray, i, 'Buy');
-}
-
-function parseSellAction(pdfArray, i) {
-  return parseBaseAction(pdfArray, i, 'Sell');
-}
-
 export const canParseData = (
   textArr // textArr.flat(t => t.startsWith('ebase Depot flex standard'));
 ) => textArr.some(t => t.includes('Fondsertrag / Vorabpauschale'));
@@ -108,7 +100,7 @@ export const parseData = pdfPages => {
 
     while (i <= pdfPage.length) {
       if (pdfPage[i] === 'Ansparplan') {
-        const action = parseBuyAction(pdfPage, i);
+        const action = parseBaseAction(pdfPage, i, "Buy");
         if (action === undefined) {
           return undefined;
         }
@@ -116,7 +108,7 @@ export const parseData = pdfPages => {
         // An 'Ansparplan'/'Wiederanlage Fondsertrag' entry occupies 7 array entries.
         i += 6;
       } else if (pdfPage[i] === 'Wiederanlage Fondsertrag') {
-        const action = parseBuyAction(pdfPage, i);
+        const action = parseBaseAction(pdfPage, i, "Sell");
         if (action === undefined) {
           return undefined;
         }
@@ -127,7 +119,7 @@ export const parseData = pdfPages => {
         // This was always blank in the example files I had -> So no parsing could be done.
         i += 3;
       } else if (pdfPage[i] === 'Entgelt Verkauf') {
-        const action = parseSellAction(pdfPage, i);
+        const action = parseBaseAction(pdfPage, i, "Sell");
         if (action === undefined) {
           return undefined;
         }
