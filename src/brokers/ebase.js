@@ -1,9 +1,7 @@
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
-import every from 'lodash/every';
-import values from 'lodash/values';
 import Big from 'big.js';
-import { parseGermanNum } from '@/helper';
+import { parseGermanNum, validateActivity } from '@/helper';
 
 const parseShare = shareString => {
   try {
@@ -17,13 +15,41 @@ const parseShare = shareString => {
   }
 };
 
-const parsePrice = priceString =>
-  +Big(parseGermanNum(priceString.split(' ')[0])).abs();
+const parsePrice = priceString => {
+  try {
+    return +Big(parseGermanNum(priceString.split(' ')[0])).abs();
+  } catch (e) {
+    if (e.message === '[big.js] Invalid number') {
+      return undefined;
+    } else {
+      throw e; // re-throw the error unchanged
+    }
+  }
+};
 
-const parseAmount = priceString =>
-  +Big(parseGermanNum(priceString.split(' ')[0])).abs();
+const parseAmount = amountString => {
+  try {
+    return +Big(parseGermanNum(amountString.split(' ')[0])).abs();
+  } catch (e) {
+    if (e.message === '[big.js] Invalid number') {
+      return undefined;
+    } else {
+      throw e; // re-throw the error unchanged
+    }
+  }
+};
 
-function verifyActivity(type, date, isin, company, shares, price, amount, fee) {
+function verifyActivity(
+  type,
+  date,
+  isin,
+  company,
+  shares,
+  price,
+  amount,
+  tax,
+  fee
+) {
   const activity = {
     broker: 'ebase',
     type,
@@ -33,15 +59,10 @@ function verifyActivity(type, date, isin, company, shares, price, amount, fee) {
     shares,
     price,
     amount,
+    tax,
     fee,
   };
-  const valid = every(values(activity), a => !!a || a === 0);
-  if (!valid) {
-    console.error('Error while parsing PDF', activity);
-    return undefined;
-  } else {
-    return activity;
-  }
+  return validateActivity(activity);
 }
 
 function parseBaseAction(pdfArray, i, actionType) {
@@ -52,8 +73,19 @@ function parseBaseAction(pdfArray, i, actionType) {
   const price = parsePrice(pdfArray[i + 5]);
   const date = pdfArray[i + 6];
   const amount = parseAmount(pdfArray[i + 7]);
+  const tax = 0;
   const fee = 0;
-  return verifyActivity(type, date, isin, company, shares, price, amount, fee);
+  return verifyActivity(
+    type,
+    date,
+    isin,
+    company,
+    shares,
+    price,
+    amount,
+    tax,
+    fee
+  );
 }
 
 function parseBuyAction(pdfArray, i) {
