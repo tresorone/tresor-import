@@ -1,15 +1,11 @@
 import { getBroker } from '@/index';
 import * as consorsbank from '../../src/brokers/consorsbank';
-<<<<<<< HEAD
 import {
   buySamples,
   sellSamples,
   dividendsSamples,
   oldDividendsSamples,
 } from './mocks/consorsbank';
-=======
-import { buySamples, dividendsSamples, oldDividendsSamples, sellSamples } from './mocks/consorsbank';
->>>>>>> Improved Tests which is still wip
 
 console.error = jest.fn();
 
