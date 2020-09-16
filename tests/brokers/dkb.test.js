@@ -1,5 +1,5 @@
-import { canParseData, parseData } from '@/brokers/dkb';
-import { buySamples, dividendsSamples, sellSamples } from './mocks/dkb';
+import { parseData, canParseData } from '../../src/brokers/dkb';
+import { buySamples, sellSamples, dividendsSamples } from './mocks/dkb';
 
 describe('DKB broker', () => {
   let consoleErrorSpy;
@@ -156,22 +156,6 @@ describe('DKB broker', () => {
         amount: 4.5,
         fee: 0,
         tax: 0,
-      });
-    });
-    test('should map pdf data of sample 4 correctly', () => {
-      const activity = parseData(dividendsSamples[3]);
-
-      expect(activity).toEqual({
-        broker: 'dkb',
-        type: 'Dividend',
-        date: '2020-04-08',
-        isin: 'IE00B3RBWM25',
-        company: 'VANGUARD FTSE ALL-WORLD U.ETF',
-        shares: 12,
-        price: 0.375,
-        amount: 4.5,
-        fee: 0,
-        tax: 0.83,
       });
     });
   });
