@@ -26,16 +26,17 @@ describe('Broker: ebase', () => {
     const activity = parseData(invalidSamples[0]);
 
     expect(activity).toEqual(undefined);
-    expect(console.error).toHaveBeenLastCalledWith('Error while parsing PDF', {
+    expect(console.error).toHaveBeenLastCalledWith('The activity for ebase has empty fields.', {
+      type: 'Sell',
       amount: 45,
       broker: 'ebase',
       company: 'DWS Top Dividende LD',
       date: '2019-12-19',
-      fee: 0,
       isin: 'DE0009848119',
       price: 130.93,
       shares: undefined,
-      type: 'Sell',
+      tax: 0.0,
+      fee: 0,
     });
   });
 
@@ -66,6 +67,7 @@ describe('Broker: ebase', () => {
         shares: 0.054571,
         price: 311.52,
         amount: 17.0,
+        tax: 0.0,
         fee: 0.0,
       });
       expect(activities[10]).toEqual({
@@ -77,6 +79,7 @@ describe('Broker: ebase', () => {
         shares: 0.126761,
         price: 120.7,
         amount: 15.3,
+        tax: 0.0,
         fee: 0.0,
       });
     });
@@ -95,6 +98,7 @@ describe('Broker: ebase', () => {
         shares: 0.343695,
         price: 130.93,
         amount: 45.0,
+        tax: 0.0,
         fee: 0.0,
       });
       expect(activities[1]).toEqual({
@@ -106,6 +110,7 @@ describe('Broker: ebase', () => {
         shares: 0.394046,
         price: 114.2,
         amount: 45.0,
+        tax: 0.0,
         fee: 0.0,
       });
     });
@@ -124,6 +129,7 @@ describe('Broker: ebase', () => {
         shares: 0.054571,
         price: 311.52,
         amount: 17.0,
+        tax: 0.0,
         fee: 0.0,
       });
     });
