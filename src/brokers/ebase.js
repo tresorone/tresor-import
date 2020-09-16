@@ -5,22 +5,22 @@ import values from 'lodash/values';
 import Big from 'big.js';
 import { parseGermanNum } from '@/helper';
 
-const parseShare = (shareString) => {
+const parseShare = shareString => {
   try {
     return +Big(parseGermanNum(shareString)).abs();
   } catch (e) {
     if (e.message === '[big.js] Invalid number') {
       return undefined;
     } else {
-      throw e;  // re-throw the error unchanged
+      throw e; // re-throw the error unchanged
     }
   }
 };
 
-const parsePrice = (priceString) =>
+const parsePrice = priceString =>
   +Big(parseGermanNum(priceString.split(' ')[0])).abs();
 
-const parseAmount = (priceString) =>
+const parseAmount = priceString =>
   +Big(parseGermanNum(priceString.split(' ')[0])).abs();
 
 function verifyActivity(type, date, isin, company, shares, price, amount, fee) {
@@ -33,7 +33,7 @@ function verifyActivity(type, date, isin, company, shares, price, amount, fee) {
     shares,
     price,
     amount,
-    fee
+    fee,
   };
   const valid = every(values(activity), a => !!a || a === 0);
   if (!valid) {
