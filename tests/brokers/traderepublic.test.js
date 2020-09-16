@@ -6,7 +6,7 @@ import {
   sellSamples,
   dividendSamples,
   quarterSamples,
-} from './__mocks__/traderepublic';
+} from './mocks/traderepublic';
 
 describe('Broker: Trade Republic', () => {
   let consoleErrorSpy;
