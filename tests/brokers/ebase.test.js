@@ -1,6 +1,11 @@
 import { getBroker } from '@/index';
 import * as ebase from '../../src/brokers/ebase';
-import { buySamples, invalidSamples, mixedSamples, sellSamples } from './mocks/ebase';
+import {
+  buySamples,
+  invalidSamples,
+  mixedSamples,
+  sellSamples,
+} from './mocks/ebase';
 import { canParseData, parseData } from '@/brokers/ebase';
 
 // David Holin: No dividend samples test yet, as no example document is available
@@ -30,7 +35,7 @@ describe('Broker: ebase', () => {
       isin: 'DE0009848119',
       price: 130.93,
       shares: undefined,
-      type: 'Sell'
+      type: 'Sell',
     });
   });
 
@@ -50,7 +55,6 @@ describe('Broker: ebase', () => {
 
   describe('Validate buys', () => {
     test('Can parse multiple buy orders from a document', () => {
-
       const activities = ebase.parsePages(buySamples[0]);
       expect(activities.length).toEqual(11);
       expect(activities[0]).toEqual({
@@ -73,7 +77,7 @@ describe('Broker: ebase', () => {
         shares: 0.126761,
         price: 120.7,
         amount: 15.3,
-        fee: 0.0
+        fee: 0.0,
       });
     });
   });
@@ -91,7 +95,7 @@ describe('Broker: ebase', () => {
         shares: 0.343695,
         price: 130.93,
         amount: 45.0,
-        fee: 0.0
+        fee: 0.0,
       });
       expect(activities[1]).toEqual({
         broker: 'ebase',
@@ -102,7 +106,7 @@ describe('Broker: ebase', () => {
         shares: 0.394046,
         price: 114.2,
         amount: 45.0,
-        fee: 0.0
+        fee: 0.0,
       });
     });
   });
@@ -120,7 +124,7 @@ describe('Broker: ebase', () => {
         shares: 0.054571,
         price: 311.52,
         amount: 17.0,
-        fee: 0.0
+        fee: 0.0,
       });
     });
   });
