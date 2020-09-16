@@ -7,7 +7,6 @@ import {
   oldDividendsSamples,
 } from './mocks/consorsbank';
 
-
 console.error = jest.fn();
 
 describe('Consorsbank broker', () => {
