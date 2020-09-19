@@ -112,9 +112,32 @@ export function validateActivity(activity) {
     return undefined;
   }
 
-  if (!/^([A-Z]{2})([A-Z0-9]{9})([0-9]{1})$/.test(activity.isin)) {
+  if (activity.isin === undefined && activity.wkn === undefined) {
+    console.error(
+      'The activity for ' +
+        activity.broker +
+        ' must have at least an ISIN or WKN.',
+      activity
+    );
+    return undefined;
+  }
+
+  if (
+    activity.isin !== undefined &&
+    !/^([A-Z]{2})([A-Z0-9]{9})([0-9]{1})$/.test(activity.isin)
+  ) {
     console.error(
       'The activity ISIN for ' +
+        activity.broker +
+        " can't be valid with an invalid scheme.",
+      activity
+    );
+    return undefined;
+  }
+
+  if (activity.wkn !== undefined && !/^([A-Z0-9]{6})$/.test(activity.wkn)) {
+    console.error(
+      'The activity WKN for ' +
         activity.broker +
         " can't be valid with an invalid scheme.",
       activity
