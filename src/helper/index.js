@@ -3,7 +3,6 @@ import values from 'lodash/values';
 
 export function csvJSON(csv) {
   var lines = csv.trim().split('\n');
-
   var result = [];
 
   // NOTE: If your columns contain commas in their values, you'll need
@@ -17,14 +16,13 @@ export function csvJSON(csv) {
     var currentline = lines[i].split(';');
 
     for (var j = 0; j < headers.length; j++) {
-      obj[headers[j]] = currentline[j];
+      obj[headers[j]] = currentline[j].replace(/^"(.+)"$/, '$1').trim();
     }
 
     result.push(obj);
   }
 
-  //return result; //JavaScript object
-  return JSON.stringify(result); //JSON
+  return JSON.stringify(result);
 }
 
 export function parseGermanNum(n) {
