@@ -30,6 +30,8 @@ const activityNormalizer = typeKeyMap => activity => {
     date: format(new Date(activity.date), 'yyyy-MM-dd'),
   };
 
+  // The following fields can have empty or undefined values. All of these fields (with empty or undefined values) should
+  // be removed. The validation logic for activities will mark activities with empty or undefined values as invalid.
   ['isin', 'wkn', 'symbol', 'grossCurrency'].forEach(field => {
     if (activity[field] !== undefined) {
       const value = activity[field].trim();

@@ -16,6 +16,9 @@ export function csvJSON(csv) {
     var currentline = lines[i].split(';');
 
     for (var j = 0; j < headers.length; j++) {
+      // Some .csv files contains leading/trailing " and spaces. We need to replace the double quote at the beginning an
+      // the end to get the real value. E.g.: Value for a Starbucks WKN was in a .csv file "884437 ". T1 was unable to
+      // found the Holding by WKN because of the double quote. Also we need to trim spaces.
       obj[headers[j]] = currentline[j].replace(/^"(.+)"$/, '$1').trim();
     }
 
