@@ -61,6 +61,12 @@ const findShares = textArr => {
   return parseGermanNum(shares);
 };
 
+const findPriceOfShare = textArr => {
+  const lineWithValue =
+    textArr[textArr.findIndex(t => t.includes(' Stk.')) + 1];
+  return +findAndConvertNumber(lineWithValue, textArr);
+};
+
 const findAmount = textArr => {
   const searchTerm = 'GESAMT';
   const totalAmountLine = textArr[textArr.indexOf(searchTerm) + 1];
@@ -75,15 +81,46 @@ const findPayout = textArr => {
   return parseGermanNum(totalAmount);
 };
 
+const findExchangeRate = (textArr, currency) => {
+  // Find the value of "1,1869 EUR/USD" by searching for "EUR/USD"
+  const searchTerm = 'EUR/' + currency;
+  const totalExchangeRateLine =
+    textArr[textArr.findIndex(line => line.includes(searchTerm))];
+  const exchangeRateValue = totalExchangeRateLine.split(' ')[0].trim();
+  return Big(parseGermanNum(exchangeRateValue));
+};
+
+const findAndConvertNumber = (valueWithCurrency, textArr) => {
+  const lineElements = valueWithCurrency.split(' ');
+  const value = Big(Math.abs(parseGermanNum(lineElements[0])));
+  if (lineElements[1] === 'EUR') {
+    // No currency conversion is required.
+    return value;
+  }
+
+  // Convert the number with the exchange rate from document.
+  return value.div(findExchangeRate(textArr, lineElements[1]));
+};
+
 const findFee = textArr => {
+  var totalFee = Big(0);
+
   const searchTerm = 'Fremdkostenzuschlag';
   if (textArr.indexOf(searchTerm) > -1) {
     const feeLine = textArr[textArr.indexOf(searchTerm) + 1];
     const feeNumberString = feeLine.split(' EUR')[0];
-    return Math.abs(parseGermanNum(feeNumberString));
-  } else {
-    return 0;
+
+    totalFee = totalFee.plus(Big(Math.abs(parseGermanNum(feeNumberString))));
   }
+
+  const searchTermThirdPartyExpenses = 'Fremde Spesen';
+  if (textArr.indexOf(searchTermThirdPartyExpenses) > -1) {
+    const lineWithValue =
+      textArr[textArr.indexOf(searchTermThirdPartyExpenses) + 1];
+    totalFee = totalFee.plus(findAndConvertNumber(lineWithValue, textArr));
+  }
+
+  return totalFee;
 };
 
 const findTax = textArr => {
@@ -135,7 +172,14 @@ const findTax = textArr => {
     totalTax = totalTax.plus(Big(lineParsedAmount));
   }
 
-  return +totalTax;
+  const searchTermWithholdingTax = 'Quellensteuer';
+  if (textArr.indexOf(searchTermWithholdingTax) > -1) {
+    const lineWithValue =
+      textArr[textArr.indexOf(searchTermWithholdingTax) + 1];
+    totalTax = totalTax.plus(findAndConvertNumber(lineWithValue, textArr));
+  }
+
+  return totalTax;
 };
 
 const isBuySingle = textArr => textArr.some(t => t.includes('Kauf am'));
@@ -203,41 +247,30 @@ export const parsePositionAsActivity = (content, startLineNumber) => {
 };
 
 export const parseOrderOrDividend = textArr => {
-  let type, date, isin, company, shares, price, amount, fee, tax;
+  let type, date, isin, company, shares, price, amount;
 
   if (isBuySingle(textArr) || isBuySavingsPlan(textArr)) {
     type = 'Buy';
-    isin = findISIN(textArr);
     company = findCompany(textArr);
     date = isBuySavingsPlan(textArr)
       ? findDateBuySavingsPlan(textArr)
       : findDateSingleBuy(textArr);
-    shares = findShares(textArr);
     amount = findAmount(textArr);
-    price = +Big(amount).div(Big(shares));
-    fee = findFee(textArr);
-    tax = findTax(textArr);
   } else if (isSell(textArr)) {
     type = 'Sell';
-    isin = findISIN(textArr);
     company = findCompany(textArr);
     date = findDateSell(textArr);
-    shares = findShares(textArr);
     amount = findAmount(textArr);
-    price = +Big(amount).div(Big(shares));
-    fee = findFee(textArr);
-    tax = findTax(textArr);
   } else if (isDividend(textArr)) {
     type = 'Dividend';
-    isin = findISIN(textArr);
     company = findCompany(textArr);
     date = findDateDividend(textArr);
-    shares = findShares(textArr);
     amount = findPayout(textArr);
-    price = +Big(amount).div(Big(shares));
-    fee = findFee(textArr);
-    tax = findTax(textArr);
   }
+
+  isin = findISIN(textArr);
+  shares = findShares(textArr);
+  price = findPriceOfShare(textArr);
 
   return {
     broker: 'traderepublic',
@@ -248,8 +281,8 @@ export const parseOrderOrDividend = textArr => {
     shares,
     price,
     amount,
-    fee,
-    tax,
+    fee: +findFee(textArr),
+    tax: +findTax(textArr),
   };
 };
 
