@@ -336,7 +336,6 @@ describe('Heler functions', () => {
         broker: 'comdirect',
         type: 'Buy',
         date: new Date(),
-        company: 'Tresor 1 Inc.',
         shares: 42,
         price: 42,
         amount: 1764,
@@ -347,6 +346,25 @@ describe('Heler functions', () => {
       expect(helper.validateActivity(activity)).toEqual(undefined);
       expect(console.error).toHaveBeenLastCalledWith(
         'The activity for comdirect must have at least an ISIN or WKN.',
+        activity
+      );
+    });
+
+    test('Activity without an company, isin or wkn should be invalid', () => {
+      const activity = {
+        broker: 'comdirect',
+        type: 'Buy',
+        date: new Date(),
+        shares: 42,
+        price: 42,
+        amount: 1764,
+        fee: 1,
+        tax: 0,
+      };
+
+      expect(helper.validateActivity(activity, true)).toEqual(undefined);
+      expect(console.error).toHaveBeenLastCalledWith(
+        'The activity for comdirect must have at least a company, ISIN or WKN.',
         activity
       );
     });

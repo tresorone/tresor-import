@@ -46,5 +46,19 @@
     "currency": "EUR",
     "exchangeRate": 0,
     "price": 71.34
+  },
+  {
+    "type": "Buy",
+    "company": "STARBUCKS CORP.",
+    "symbol": "SRB.DE",
+    "date": "2020-10-01",
+    "shares": 13,
+    "amount": 927.42,
+    "grossAmount": 0,
+    "tax": 0,
+    "fee": 0,
+    "currency": "EUR",
+    "exchangeRate": 0,
+    "price": 71.34
   }
 ]

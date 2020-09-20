@@ -35,7 +35,7 @@ export function parseGermanNum(n) {
   return parseFloat(n.replace(/\./g, '').replace(',', '.'));
 }
 
-export function validateActivity(activity) {
+export function validateActivity(activity, findSecurityAlsoByCompany = false) {
   // All fields must have a value unequal undefined
   if (!every(values(activity), a => !!a || a === 0)) {
     console.error(
@@ -113,11 +113,20 @@ export function validateActivity(activity) {
     return undefined;
   }
 
-  if (activity.isin === undefined && activity.wkn === undefined) {
+  // Tresor One will search the security for PDF Documents with ISIN or WKN. For Imports of .csv File from Portfolio Performance
+  // T1 can search the security also by the Company.
+  if (
+    ((findSecurityAlsoByCompany && activity.company === undefined) ||
+      !findSecurityAlsoByCompany) &&
+    activity.isin === undefined &&
+    activity.wkn === undefined
+  ) {
     console.error(
       'The activity for ' +
         activity.broker +
-        ' must have at least an ISIN or WKN.',
+        ' must have at least a' +
+        (findSecurityAlsoByCompany ? ' company,' : 'n') +
+        ' ISIN or WKN.',
       activity
     );
     return undefined;
