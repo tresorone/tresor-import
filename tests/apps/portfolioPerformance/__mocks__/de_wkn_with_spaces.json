@@ -13,8 +13,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 37.425,
-    "parsed": true
+    "price": 37.425
   },
   {
     "isin": "US8552441094",
@@ -30,8 +29,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 71.34,
-    "parsed": true
+    "price": 71.34
   },
   {
     "isin": "US8552441094",
@@ -47,7 +45,6 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 71.34,
-    "parsed": true
+    "price": 71.34
   }
 ]
