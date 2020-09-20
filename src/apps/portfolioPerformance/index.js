@@ -90,8 +90,6 @@ const validateActivity = activity => {
 };
 
 export const parse = transactions => {
-  console.log(`processing ${transactions.length} transactions...`);
-
   const locale = detectLocale(transactions);
   if (!locale) {
     throw new Error('Locale could not be detected!');
@@ -113,7 +111,6 @@ export const parse = transactions => {
     .map(normalizeActivity)
     .flatMap(validateActivity);
 
-  console.log(`found ${activities.length} valid activities 🎉`);
   console.table(activities);
 
   return activities;
