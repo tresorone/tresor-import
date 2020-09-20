@@ -77,7 +77,7 @@ describe('Broker: Trade Republic', () => {
         isin: 'FR0000031122',
         company: 'Air France-KLM S.A.',
         shares: 100,
-        price: 5.632,
+        price: 5.63,
         amount: 563.2,
         fee: 1,
         tax: 1.69,
@@ -113,7 +113,7 @@ describe('Broker: Trade Republic', () => {
         isin: 'IE00B1YZSC51',
         company: 'iShsII-Core MSCI Europe U.ETF',
         shares: 1.3404,
-        price: 26.111608475082065,
+        price: 26.11,
         amount: 35.0,
         fee: 0,
         tax: 0,
@@ -171,9 +171,9 @@ describe('Broker: Trade Republic', () => {
         date: '2020-03-23',
         fee: 0,
         isin: 'GB00B03MLX29',
-        price: 0.3094502617801047,
+        price: 0.41929992970035224,
         shares: 382,
-        tax: 17.94,
+        tax: 41.96499384432018,
         type: 'Dividend',
       });
     });
@@ -189,7 +189,7 @@ describe('Broker: Trade Republic', () => {
         date: '2020-07-15',
         fee: 0,
         isin: 'DE0002635299',
-        price: 0.21995569041520902,
+        price: 0.27,
         shares: 43.9634,
         tax: 2.2,
         type: 'Dividend',
@@ -207,7 +207,7 @@ describe('Broker: Trade Republic', () => {
         date: '2020-07-15',
         fee: 0,
         isin: 'DE0002635281',
-        price: 0.19105128604546745,
+        price: 0.234,
         shares: 43.6532,
         tax: 1.89,
         type: 'Dividend',
@@ -225,9 +225,27 @@ describe('Broker: Trade Republic', () => {
         date: '2020-02-26',
         fee: 0,
         isin: 'IE00B1FZS350',
-        price: 0.12425531914893617,
+        price: 0.17252514069563613,
         shares: 141,
         tax: 6.81,
+        type: 'Dividend',
+      });
+    });
+
+    test('Should map the pdf data correctly for: Gazprom with third party expenses and withholding tax', () => {
+      const activities = traderepublic.parsePages(dividendSamples[4]);
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        amount: 12.54,
+        broker: 'traderepublic',
+        company: 'Gazprom PJSC',
+        date: '2020-08-18',
+        fee: 0.7582778667116017,
+        isin: 'US3682872078',
+        price: 0.3479652877243239,
+        shares: 45,
+        tax: 2.350661386805965,
         type: 'Dividend',
       });
     });
