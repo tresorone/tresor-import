@@ -1,89 +1,98 @@
-import { csvJSON } from '@/helper';
-
+import { csvLinesToJSON } from '@/helper';
 import pdfjs from 'pdfjs-dist/build/pdf';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 import * as brokers from './brokers';
-import { parsePortfolioPerformanceExport } from './apps';
+import * as apps from './apps';
 
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
-const getActivity = contents => {
-  // identify broker from first page
-  const broker = getBroker(contents[0]);
-
-  if (broker) {
-    // get activities from all pages
-    return broker.parsePages(contents);
-  } else {
-    // no supported broker found in PDF
-    return [];
-  }
-};
-
-export const getBroker = textArr => {
-  const supportedBrokers = Object.values(brokers).filter(broker =>
-    broker.canParseData(textArr)
+const parseActivitiesFromPages = (pages, extension) => {
+  // The broker or app will be selected by the content of the first page
+  const selectdBrokers = Object.values(brokers).filter(broker =>
+    broker.canParsePage(pages[0], extension)
   );
 
-  if (supportedBrokers.length > 1) {
-    console.error('Multiple supported brokers found!');
-    return false;
+  const selectedApps = Object.values(apps).filter(app =>
+    app.canParsePage(pages[0], extension)
+  );
+
+  let status;
+  const implementations = [...selectdBrokers, ...selectedApps];
+
+  if (implementations === undefined || implementations.length < 1) {
+    status = 1;
+  } else if (implementations.length === 1) {
+    if (extension === 'pdf') {
+      return implementations[0].parsePages(pages);
+    } else if (extension === 'csv') {
+      return implementations[0].parsePages(
+        JSON.parse(csvLinesToJSON(pages[0]))
+      );
+    } else {
+      status = 4;
+    }
+  } else if (implementations.length > 2) {
+    status = 2;
   }
 
-  if (supportedBrokers.length === 0) {
-    console.error('No supported broker found!');
-    return false;
-  }
-
-  return supportedBrokers[0];
+  return {
+    activities: undefined,
+    status,
+  };
 };
 
-const parsePage = async page => {
-  // extract content of page as an array of strings
-  let textArr;
+const parsePageToContent = async page => {
+  const parsedContent = [];
+  const content = await page.getTextContent();
 
-  const tc = await page.getTextContent();
-
-  var out = [];
-  for (let c of tc.items) {
-    out.push(c.str.trim());
+  for (const currentContent of content.items) {
+    parsedContent.push(currentContent.str.trim());
   }
-  textArr = out.filter(i => i.length > 0);
 
-  return textArr;
+  return parsedContent.filter(item => item.length > 0);
 };
 
-export const extractActivities = async e => {
-  const result = new Uint8Array(e.currentTarget.result);
-  const pdf = await pdfjs.getDocument(result).promise;
+export default file => {
+  return new Promise(resolve => {
+    try {
+      const extension = file.name.split('.').pop().toLowerCase();
+      const reader = new FileReader();
 
-  // get contents of all pages as array of textArrays
-  const contents = [];
-  const loopHelper = Array.from(Array(pdf.numPages)).entries();
+      reader.onload = async e => {
+        let fileContent, pdfDocument;
+        let pages = [];
 
-  for (const [i] of loopHelper) {
-    const pageNum = i + 1;
-    const page = await pdf.getPage(pageNum);
-    const textArr = await parsePage(page);
-    contents.push(textArr);
-  }
+        if (extension === 'pdf') {
+          fileContent = new Uint8Array(e.currentTarget.result);
+          pdfDocument = await pdfjs.getDocument(fileContent).promise;
 
-  console.log(contents);
+          const loopHelper = Array.from(Array(pdfDocument.numPages)).entries();
+          for (const [pageIndex] of loopHelper) {
+            pages.push(
+              await parsePageToContent(await pdfDocument.getPage(pageIndex + 1))
+            );
+          }
+        } else {
+          pages.push(e.currentTarget.result.trim().split('\n'));
+        }
 
-  // get activities out of entire PDF (all pages)
-  let activities = [];
+        const result = parseActivitiesFromPages(pages, extension);
 
-  try {
-    activities = getActivity(contents);
-  } catch (error) {
-    console.error(error);
-  }
+        resolve({
+          file: file.name,
+          activities: result.activities,
+          status: result.status,
+          successful: result.activities !== undefined && result.status === 0,
+        });
+      };
 
-  return activities;
-};
-
-export const extractCSVActivities = async e => {
-  const csv = e.currentTarget.result;
-
-  return parsePortfolioPerformanceExport(JSON.parse(csvJSON(csv)));
+      if (extension === 'pdf') {
+        reader.readAsArrayBuffer(file);
+      } else {
+        reader.readAsText(file);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  });
 };
