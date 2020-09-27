@@ -11,8 +11,6 @@
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css">
   <link rel="stylesheet" href="css/main.css">
-  <!-- Place favicon.ico in the root directory -->
-
 </head>
 
 <body>
@@ -45,7 +43,6 @@
                         <p v-if="activity.type">
                           <span class="tag is-success is-light"
                             :class="getTypeColor(activity.type)">{{activity.type}}</span>
-                          <!-- <span v-if="activity.holding" class="tag">{{holding(activity.holding).symbol}}</span> -->
                           <span class="tag is-light">{{activity.shares}}x</span>
                         </p>
                       </div>
