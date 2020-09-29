@@ -1,8 +1,13 @@
 import every from 'lodash/every';
 import values from 'lodash/values';
 
-export function csvLinesToJSON(lines) {
+export function csvLinesToJSON(content, trimAndSplit = false) {
   var result = [];
+
+  let lines = content;
+  if (trimAndSplit) {
+    lines = content.trim().split('\n');
+  }
 
   // NOTE: If your columns contain commas in their values, you'll need
   // to deal with those before doing the next step

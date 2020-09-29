@@ -107,8 +107,34 @@ const validate = activity => {
   return [activity];
 };
 
-export const parse = transactions => {
-  const locale = detectLocale(transactions);
+export const canParsePage = (content, extension) =>
+  extension === 'csv' &&
+  content.some(
+    line =>
+      (line.includes('Datum') &&
+        line.includes('Typ') &&
+        line.includes('Wert') &&
+        line.includes('Buchungswährung') &&
+        line.includes('Steuern') &&
+        line.includes('Stück') &&
+        line.includes('ISIN') &&
+        line.includes('WKN') &&
+        line.includes('Ticker-Symbol') &&
+        line.includes('Wertpapiername')) ||
+      (line.includes('Date') &&
+        line.includes('Type') &&
+        line.includes('Value') &&
+        line.includes('Transaction Currency') &&
+        line.includes('Taxes') &&
+        line.includes('Shares') &&
+        line.includes('ISIN') &&
+        line.includes('WKN') &&
+        line.includes('Ticker Symbol') &&
+        line.includes('Security Name'))
+  );
+
+export const parsePages = content => {
+  const locale = detectLocale(content);
   if (!locale) {
     throw new Error('Locale could not be detected!');
   }
@@ -122,14 +148,15 @@ export const parse = transactions => {
   const normalizeKeys = keyNormalizer(keyMap);
   const normalizeActivity = activityNormalizer(typeMap);
 
-  const activities = transactions
+  const activities = content
     .map(normalizeKeys)
     .filter(({ shares }) => shares !== undefined)
     .filter(({ type }) => Boolean(type))
     .map(normalizeActivity)
     .flatMap(validate);
 
-  console.table(activities);
-
-  return activities;
+  return {
+    activities,
+    status: 0,
+  };
 };

@@ -1,1 +1,3 @@
-export { parse as parsePortfolioPerformanceExport } from './portfolioPerformance';
+import * as portfolioPerformance from './portfolioPerformance';
+
+export { portfolioPerformance };
