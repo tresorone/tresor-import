@@ -197,13 +197,14 @@ const isOverviewStatement = content =>
       line.includes('DEPOTAUSZUG') || line.includes('JAHRESDEPOTABSTIMMUNG')
   );
 
-export const canParseData = textArr =>
-  textArr.some(t => t.includes('TRADE REPUBLIC BANK GMBH')) &&
-  (isBuySingle(textArr) ||
-    isBuySavingsPlan(textArr) ||
-    isSell(textArr) ||
-    isDividend(textArr) ||
-    isOverviewStatement(textArr));
+export const canParsePage = (content, extension) =>
+  extension === 'pdf' &&
+  content.some(line => line.includes('TRADE REPUBLIC BANK GMBH')) &&
+  (isBuySingle(content) ||
+    isBuySavingsPlan(content) ||
+    isSell(content) ||
+    isDividend(content) ||
+    isOverviewStatement(content));
 
 export const parsePositionAsActivity = (content, startLineNumber) => {
   // Find the line with ISIN and the next line with the date
@@ -334,5 +335,8 @@ export const parsePages = contents => {
     }
   }
 
-  return activities;
+  return {
+    activities,
+    status: 0,
+  };
 };

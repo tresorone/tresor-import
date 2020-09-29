@@ -1,4 +1,4 @@
-import { getBroker } from '../../src';
+import { findImplementation } from '../../src';
 import * as traderepublic from '../../src/brokers/traderepublic';
 import {
   allSamples,
@@ -14,24 +14,25 @@ describe('Broker: Trade Republic', () => {
   describe('Check all documents', () => {
     test('Can the document parsed with Trade Republic', () => {
       allSamples.forEach(samples => {
-        expect(samples.some(item => traderepublic.canParseData(item))).toEqual(
-          true
-        );
+        expect(
+          samples.some(item => traderepublic.canParsePage(item, 'pdf'))
+        ).toEqual(true);
       });
     });
 
-    test('Can identify a broker from the document as Trade Republic', () => {
+    test('Can identify a implementation from the document as Trade Republic', () => {
       allSamples.forEach(samples => {
-        expect(samples.some(item => getBroker(item) === traderepublic)).toEqual(
-          true
-        );
+        const implementations = findImplementation(samples, 'pdf');
+
+        expect(implementations.length).toEqual(1);
+        expect(implementations[0]).toEqual(traderepublic);
       });
     });
   });
 
   describe('Validate buys', () => {
     test('Map a limit order correctly', () => {
-      const activities = traderepublic.parsePages(buySamples[0]);
+      const activities = traderepublic.parsePages(buySamples[0]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -49,7 +50,7 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Map a market order correctly', () => {
-      const activities = traderepublic.parsePages(buySamples[1]);
+      const activities = traderepublic.parsePages(buySamples[1]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -67,7 +68,7 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Map a limit order with financial transaction tax correctly', () => {
-      const activities = traderepublic.parsePages(buySamples[2]);
+      const activities = traderepublic.parsePages(buySamples[2]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -85,7 +86,7 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Map a market order without explicit ISIN correctly', () => {
-      const activities = traderepublic.parsePages(buySamples[3]);
+      const activities = traderepublic.parsePages(buySamples[3]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -103,7 +104,7 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Map a saving plan order correctly', () => {
-      const activities = traderepublic.parsePages(buySamples[4]);
+      const activities = traderepublic.parsePages(buySamples[4]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -123,7 +124,7 @@ describe('Broker: Trade Republic', () => {
 
   describe('Validate sells', () => {
     test('Map a limit sell order correctly: Tesla', () => {
-      const activities = traderepublic.parsePages(sellSamples[0]);
+      const activities = traderepublic.parsePages(sellSamples[0]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -141,7 +142,7 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Map a limit sell order correctly: Stryker', () => {
-      const activities = traderepublic.parsePages(sellSamples[1]);
+      const activities = traderepublic.parsePages(sellSamples[1]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -161,7 +162,8 @@ describe('Broker: Trade Republic', () => {
 
   describe('Validate dividends', () => {
     test('Should map the pdf data correctly for: Royal Dutch Shell', () => {
-      const activities = traderepublic.parsePages(dividendSamples[0]);
+      const activities = traderepublic.parsePages(dividendSamples[0])
+        .activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -179,7 +181,8 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Should map the pdf data correctly for: iSh.ST.Eur.Sel.Div.30 U.ETF DE', () => {
-      const activities = traderepublic.parsePages(dividendSamples[1]);
+      const activities = traderepublic.parsePages(dividendSamples[1])
+        .activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -197,7 +200,8 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Should map the pdf data correctly for: iSh.EO ST.Sel.Div.30 U.ETF DE', () => {
-      const activities = traderepublic.parsePages(dividendSamples[2]);
+      const activities = traderepublic.parsePages(dividendSamples[2])
+        .activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -215,7 +219,8 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Should map the pdf data correctly for: iShsII-Dev.Mkts Prop.Yld U.ETF', () => {
-      const activities = traderepublic.parsePages(dividendSamples[3]);
+      const activities = traderepublic.parsePages(dividendSamples[3])
+        .activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -233,7 +238,8 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Should map the pdf data correctly for: Gazprom with third party expenses and withholding tax', () => {
-      const activities = traderepublic.parsePages(dividendSamples[4]);
+      const activities = traderepublic.parsePages(dividendSamples[4])
+        .activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -253,13 +259,13 @@ describe('Broker: Trade Republic', () => {
 
   describe('Validate quarter statement', () => {
     test('Map a empty quarter statement correctly', () => {
-      const activities = traderepublic.parsePages(quarterSamples[0]);
+      const activities = traderepublic.parsePages(quarterSamples[0]).activities;
 
       expect(activities.length).toEqual(0);
     });
 
     test('Map a quarter statement with two positions correctly', () => {
-      const activities = traderepublic.parsePages(quarterSamples[1]);
+      const activities = traderepublic.parsePages(quarterSamples[1]).activities;
 
       expect(activities.length).toEqual(2);
       expect(activities[0]).toEqual({
