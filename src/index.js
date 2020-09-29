@@ -6,7 +6,7 @@ import * as apps from './apps';
 
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
-const parseActivitiesFromPages = (pages, extension) => {
+export const findImplementation = (pages, extension) => {
   // The broker or app will be selected by the content of the first page
   const selectdBrokers = Object.values(brokers).filter(broker =>
     broker.canParsePage(pages[0], extension)
@@ -16,9 +16,11 @@ const parseActivitiesFromPages = (pages, extension) => {
     app.canParsePage(pages[0], extension)
   );
 
-  let status;
-  const implementations = [...selectdBrokers, ...selectedApps];
+  return [...selectdBrokers, ...selectedApps];
+};
 
+const parseActivitiesFromPages = (pages, extension) => {
+  const implementations = findImplementation(pages, extension);
   if (implementations === undefined || implementations.length < 1) {
     status = 1;
   } else if (implementations.length === 1) {
