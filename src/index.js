@@ -20,6 +20,7 @@ export const findImplementation = (pages, extension) => {
 };
 
 const parseActivitiesFromPages = (pages, extension) => {
+  let status;
   const implementations = findImplementation(pages, extension);
   if (implementations === undefined || implementations.length < 1) {
     status = 1;
