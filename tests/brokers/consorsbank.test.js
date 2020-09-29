@@ -1,4 +1,4 @@
-import { getBroker } from '../../src';
+import { findImplementation } from '../../src';
 import * as consorsbank from '../../src/brokers/consorsbank';
 import {
   buySamples,
@@ -9,22 +9,37 @@ import {
 
 console.error = jest.fn();
 
-describe('Consorsbank broker', () => {
-  test('Our samples should be detected by Consorsbank handler only', () => {
-    for (let sample of buySamples
-      .concat(dividendsSamples)
-      .concat(sellSamples)) {
-      expect(getBroker(sample[0])).toEqual(consorsbank);
-    }
+describe('Broker: Consorsbank', () => {
+  const allSamples = buySamples.concat(dividendsSamples).concat(sellSamples);
+
+  describe('Check all documents', () => {
+    test('Can the document parsed with Consorsbank', () => {
+      allSamples.forEach(samples => {
+        expect(
+          samples.some(item => consorsbank.canParsePage(item, 'pdf'))
+        ).toEqual(true);
+      });
+    });
+
+    test('Can identify a implementation from the document as Consorsbank', () => {
+      allSamples.forEach(samples => {
+        const implementations = findImplementation(samples, 'pdf');
+
+        expect(implementations.length).toEqual(1);
+        expect(implementations[0]).toEqual(consorsbank);
+      });
+    });
   });
 
   test('PDFs with the old Consorsbank format should not be accepted', () => {
-    expect(consorsbank.canParseData(oldDividendsSamples[0])).toEqual(false);
+    expect(consorsbank.canParsePage(oldDividendsSamples[0], 'pdf')).toEqual(
+      false
+    );
   });
 
   describe('Buy', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const activity = consorsbank.parsePages(buySamples[0]);
+      const activity = consorsbank.parsePages(buySamples[0]).activities;
 
       expect(activity).toEqual([
         {
@@ -43,7 +58,7 @@ describe('Consorsbank broker', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const activity = consorsbank.parsePages(buySamples[1]);
+      const activity = consorsbank.parsePages(buySamples[1]).activities;
 
       expect(activity).toEqual([
         {
@@ -62,7 +77,7 @@ describe('Consorsbank broker', () => {
     });
 
     test('should map pdf data of sample 3 correctly', () => {
-      const activity = consorsbank.parsePages(buySamples[2]);
+      const activity = consorsbank.parsePages(buySamples[2]).activities;
 
       expect(activity).toEqual([
         {
@@ -81,7 +96,7 @@ describe('Consorsbank broker', () => {
     });
 
     test('should map pdf data of sample 4 correctly', () => {
-      const activity = consorsbank.parsePages(buySamples[3]);
+      const activity = consorsbank.parsePages(buySamples[3]).activities;
 
       expect(activity).toEqual([
         {
@@ -102,7 +117,7 @@ describe('Consorsbank broker', () => {
 
   describe('Sell', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const activity = consorsbank.parsePages(sellSamples[0]);
+      const activity = consorsbank.parsePages(sellSamples[0]).activities;
 
       expect(activity).toEqual([
         {
@@ -121,7 +136,7 @@ describe('Consorsbank broker', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      expect(consorsbank.parsePages(sellSamples[1])).toEqual([
+      expect(consorsbank.parsePages(sellSamples[1]).activities).toEqual([
         {
           amount: 22.59,
           broker: 'consorsbank',
@@ -140,7 +155,7 @@ describe('Consorsbank broker', () => {
 
   describe('Dividend', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const activity = consorsbank.parsePages(dividendsSamples[0]);
+      const activity = consorsbank.parsePages(dividendsSamples[0]).activities;
 
       expect(activity).toEqual([
         {
@@ -159,7 +174,7 @@ describe('Consorsbank broker', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const activity = consorsbank.parsePages(dividendsSamples[1]);
+      const activity = consorsbank.parsePages(dividendsSamples[1]).activities;
 
       expect(activity).toEqual([
         {
@@ -178,7 +193,7 @@ describe('Consorsbank broker', () => {
     });
 
     test('should map pdf data of sample 3 correctly', () => {
-      const activity = consorsbank.parsePages(dividendsSamples[2]);
+      const activity = consorsbank.parsePages(dividendsSamples[2]).activities;
 
       expect(activity).toEqual([
         {
@@ -197,7 +212,7 @@ describe('Consorsbank broker', () => {
     });
 
     test('should map pdf data of sample 4 correctly', () => {
-      expect(consorsbank.parsePages(dividendsSamples[3])).toEqual([
+      expect(consorsbank.parsePages(dividendsSamples[3]).activities).toEqual([
         {
           amount: 236.73,
           broker: 'consorsbank',
@@ -214,7 +229,7 @@ describe('Consorsbank broker', () => {
     });
 
     test('should map pdf data of sample 5 correctly', () => {
-      expect(consorsbank.parsePages(dividendsSamples[4])).toEqual([
+      expect(consorsbank.parsePages(dividendsSamples[4]).activities).toEqual([
         {
           amount: 67.2,
           broker: 'consorsbank',
