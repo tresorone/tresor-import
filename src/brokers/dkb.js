@@ -12,9 +12,9 @@ const offsets = {
 
 const getValueByPreviousElement = (textArr, prev) => {
   const index = textArr.findIndex(t => t.includes(prev));
-  if (index < 0) return "";
+  if (index < 0) return '';
   return textArr[index + 1];
-}
+};
 
 const findTableIndex = textArr => textArr.findIndex(t => t.includes('Stück'));
 
@@ -51,17 +51,22 @@ const findDateDividend = textArr =>
   getValueByPreviousElement(textArr, 'Zahlbarkeitstag').split(' ')[0];
 
 const findPayout = textArr => {
-  let index = textArr.indexOf("Ausschüttung");
-  if (index < 0)
-    index = textArr.lastIndexOf("Dividendengutschrift");
+  let index = textArr.indexOf('Ausschüttung');
+  if (index < 0) index = textArr.lastIndexOf('Dividendengutschrift');
   const currency = textArr[index + 2];
-  const eurAmount = (currency === "EUR") ? textArr[index + 1] : textArr[index + 3];
+  const eurAmount =
+    currency === 'EUR' ? textArr[index + 1] : textArr[index + 3];
   return parseGermanNum(eurAmount.split(' ')[0]);
-}
+};
 
 const findTax = textArr => {
-  const withholdingTaxIndex = textArr.findIndex(t => t.startsWith("Anrechenbare Quellensteuer") && t.endsWith("EUR"))
-  const withholdingTax = (withholdingTaxIndex >= 0) ? parseGermanNum(textArr[withholdingTaxIndex+1]) : 0
+  const withholdingTaxIndex = textArr.findIndex(
+    t => t.startsWith('Anrechenbare Quellensteuer') && t.endsWith('EUR')
+  );
+  const withholdingTax =
+    withholdingTaxIndex >= 0
+      ? parseGermanNum(textArr[withholdingTaxIndex + 1])
+      : 0;
 
   const kap = parseGermanNum(
     getValueByPreviousElement(textArr, 'Kapitalertragsteuer 25 %').split(' ')[0]
@@ -72,8 +77,11 @@ const findTax = textArr => {
   const churchTax = parseGermanNum(
     getValueByPreviousElement(textArr, 'Kirchensteuer').split(' ')[0]
   );
-  return +Big(kap).plus(Big(soli)).plus(Big(churchTax)).plus(Big(withholdingTax));
-}
+  return +Big(kap)
+    .plus(Big(soli))
+    .plus(Big(churchTax))
+    .plus(Big(withholdingTax));
+};
 
 const isBuy = textArr =>
   textArr.some(
@@ -92,9 +100,10 @@ const isDividend = textArr =>
       t.includes('Ausschüttung Investmentfonds')
   );
 
-export const canParseData = textArr =>
-  textArr.some(t => t.includes('BIC BYLADEM1001')) &&
-  (isBuy(textArr) || isSell(textArr) || isDividend(textArr));
+export const canParsePage = (content, extension) =>
+  extension === 'pdf' &&
+  content.some(line => line.includes('BIC BYLADEM1001')) &&
+  (isBuy(content) || isSell(content) || isDividend(content));
 
 export const parseData = textArr => {
   let type, date, isin, company, shares, price, amount, fee, tax;
@@ -147,6 +156,10 @@ export const parseData = textArr => {
 
 export const parsePages = contents => {
   // parse first page has activity data
-  const activity = parseData(contents[0]);
-  return [activity];
+  const activities = [parseData(contents[0])];
+
+  return {
+    activities,
+    status: 0,
+  };
 };

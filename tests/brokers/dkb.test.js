@@ -1,46 +1,36 @@
-import { parseData, canParseData } from '../../src/brokers/dkb';
+import { findImplementation } from '../../src';
+import * as dkb from '../../src/brokers/dkb';
 import { buySamples, sellSamples, dividendsSamples } from './__mocks__/dkb';
 
 describe('DKB broker', () => {
   let consoleErrorSpy;
 
-  test('should accept Buy, Sell, Div DKB PDFs only', () => {
-    expect(canParseData(['BIC BYLADEM1001', 'Dividendengutschrift'])).toEqual(
-      true
-    );
-  });
+  const allSamples = buySamples.concat(sellSamples).concat(dividendsSamples);
 
-  test('should not accept any PDFs', () => {
-    expect(canParseData(['42'])).toEqual(false);
-  });
+  describe('Check all documents', () => {
+    test('Can the document parsed with DKB', () => {
+      allSamples.forEach(samples => {
+        expect(samples.some(item => dkb.canParsePage(item, 'pdf'))).toEqual(
+          true
+        );
+      });
+    });
 
-  test('should validate the result', () => {
-    const invalidSample = buySamples[0].filter(item => item !== 'Stück 36');
-    const activity = parseData(invalidSample);
+    test('Can identify a implementation from the document as DKB', () => {
+      allSamples.forEach(samples => {
+        const implementations = findImplementation(samples, 'pdf');
 
-    expect(activity).toEqual(undefined);
-    expect(console.error).toHaveBeenLastCalledWith(
-      'The activity for dkb has empty fields.',
-      {
-        amount: 4428,
-        broker: 'dkb',
-        company: 'Kurswert',
-        date: '2019-01-25',
-        fee: 10,
-        isin: null,
-        price: 123,
-        shares: NaN,
-        type: 'Buy',
-        tax: 0,
-      }
-    );
+        expect(implementations.length).toEqual(1);
+        expect(implementations[0]).toEqual(dkb);
+      });
+    });
   });
 
   describe('Buy', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const activity = parseData(buySamples[0]);
+      const result = dkb.parsePages(buySamples[0]);
 
-      expect(activity).toEqual({
+      expect(result.activities[0]).toEqual({
         broker: 'dkb',
         type: 'Buy',
         date: '2019-01-25',
@@ -55,9 +45,9 @@ describe('DKB broker', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const activity = parseData(buySamples[1]);
+      const result = dkb.parsePages(buySamples[1]);
 
-      expect(activity).toEqual({
+      expect(result.activities[0]).toEqual({
         broker: 'dkb',
         type: 'Buy',
         date: '2016-10-10',
@@ -72,9 +62,9 @@ describe('DKB broker', () => {
     });
 
     test('should map pdf data of sample 3 correctly', () => {
-      const activity = parseData(buySamples[2]);
+      const result = dkb.parsePages(buySamples[2]);
 
-      expect(activity).toEqual({
+      expect(result.activities[0]).toEqual({
         broker: 'dkb',
         type: 'Buy',
         date: '2016-10-18',
@@ -91,9 +81,9 @@ describe('DKB broker', () => {
 
   describe('Sell', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const activity = parseData(sellSamples[0]);
+      const result = dkb.parsePages(sellSamples[0]);
 
-      expect(activity).toEqual({
+      expect(result.activities[0]).toEqual({
         broker: 'dkb',
         type: 'Sell',
         date: '2020-01-27',
@@ -110,9 +100,9 @@ describe('DKB broker', () => {
 
   describe('Dividend', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const activity = parseData(dividendsSamples[0]);
+      const result = dkb.parsePages(dividendsSamples[0]);
 
-      expect(activity).toEqual({
+      expect(result.activities[0]).toEqual({
         broker: 'dkb',
         type: 'Dividend',
         date: '2020-02-13',
@@ -127,9 +117,9 @@ describe('DKB broker', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const activity = parseData(dividendsSamples[1]);
+      const result = dkb.parsePages(dividendsSamples[1]);
 
-      expect(activity).toEqual({
+      expect(result.activities[0]).toEqual({
         broker: 'dkb',
         type: 'Dividend',
         date: '2016-03-10',
@@ -143,9 +133,9 @@ describe('DKB broker', () => {
       });
     });
     test('should map pdf data of sample 3 correctly', () => {
-      const activity = parseData(dividendsSamples[2]);
+      const result = dkb.parsePages(dividendsSamples[2]);
 
-      expect(activity).toEqual({
+      expect(result.activities[0]).toEqual({
         broker: 'dkb',
         type: 'Dividend',
         date: '2020-04-08',
@@ -159,9 +149,9 @@ describe('DKB broker', () => {
       });
     });
     test('should map pdf data of sample 4 correctly', () => {
-      const activity = parseData(dividendsSamples[3]);
+      const result = dkb.parsePages(dividendsSamples[3]);
 
-      expect(activity).toEqual({
+      expect(result.activities[0]).toEqual({
         broker: 'dkb',
         type: 'Dividend',
         date: '2020-04-08',
