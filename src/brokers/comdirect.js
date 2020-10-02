@@ -175,7 +175,7 @@ const parseData = textArr => {
     amount,
     fee,
     tax,
-  };
+  });
 };
 
 export const parsePages = contents => {

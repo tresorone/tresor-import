@@ -38,6 +38,7 @@ The status field can contains one of the following values:
 | 1           | Unable to identifiy an implementation with the content of the first page |
 | 2           | More than one implementation was found for the first page                |
 | 4           | Unable to parse given file type                                          |
+| 5           | No activities found for a valid document                                 |
 
 ## Contribute
 

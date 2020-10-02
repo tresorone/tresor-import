@@ -6,35 +6,35 @@ import * as apps from './apps';
 
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
+export const allImplementations = [
+  ...Object.values(brokers),
+  ...Object.values(apps),
+];
+
 export const findImplementation = (pages, extension) => {
   // The broker or app will be selected by the content of the first page
-  const selectdBrokers = Object.values(brokers).filter(broker =>
-    broker.canParsePage(pages[0], extension)
+  return allImplementations.filter(implementation =>
+    implementation.canParsePage(pages[0], extension)
   );
-
-  const selectedApps = Object.values(apps).filter(app =>
-    app.canParsePage(pages[0], extension)
-  );
-
-  return [...selectdBrokers, ...selectedApps];
 };
 
-const parseActivitiesFromPages = (pages, extension) => {
+export const parseActivitiesFromPages = (pages, extension) => {
   let status;
   const implementations = findImplementation(pages, extension);
+
   if (implementations === undefined || implementations.length < 1) {
     status = 1;
   } else if (implementations.length === 1) {
     if (extension === 'pdf') {
-      return implementations[0].parsePages(pages);
+      return filterResultActivities(implementations[0].parsePages(pages));
     } else if (extension === 'csv') {
-      return implementations[0].parsePages(
-        JSON.parse(csvLinesToJSON(pages[0]))
+      return filterResultActivities(
+        implementations[0].parsePages(JSON.parse(csvLinesToJSON(pages[0])))
       );
     } else {
       status = 4;
     }
-  } else if (implementations.length > 2) {
+  } else if (implementations.length > 1) {
     status = 2;
   }
 
@@ -42,6 +42,21 @@ const parseActivitiesFromPages = (pages, extension) => {
     activities: undefined,
     status,
   };
+};
+
+const filterResultActivities = result => {
+  if (result.activities !== undefined) {
+    result.activities = result.activities.filter(
+      activity => activity !== undefined
+    );
+
+    // If no activity exists, set the status code to 5
+    const numberOfActivities = result.activities.length;
+    result.activities = numberOfActivities == 0 ? undefined : result.activities;
+    result.status = numberOfActivities === 0 ? 5 : result.status;
+  }
+
+  return result;
 };
 
 const parsePageToContent = async page => {
