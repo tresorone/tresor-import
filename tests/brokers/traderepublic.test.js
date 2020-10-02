@@ -1,22 +1,14 @@
-import { parseData } from '@/brokers/traderepublic';
+import { getBroker } from '../../src';
+import * as traderepublic from '../../src/brokers/traderepublic';
+import {
+  allSamples,
+  buySamples,
+  sellSamples,
+  dividendSamples,
+  quarterSamples,
+} from './mocks/traderepublic';
 
-const stockSingleBuy = require('./mocks/traderepublic/buy/single_buy_stock_1.json');
-const stockSingleLimitBuy = require('./mocks/traderepublic/buy/single_limit_buy_stock_1.json');
-const stockSingleLimitBuyFinancialTransactionTax = require('./mocks/traderepublic/buy/single_limit_buy_stock_financial_transaction_tax_1.json');
-const stockSingleLimitBuyWithoutExplicitISIN = require('./mocks/traderepublic/buy/single_limit_buy_stock_no_explicit_isin_1.json');
-const etfSavingsPlanBuy = require('./mocks/traderepublic/buy/savings_plan_buy_etf_1.json');
-const stockSell = [
-  require('./mocks/traderepublic/sell/sell_stock_1.json'),
-  require('./mocks/traderepublic/sell/sell_stock_2.json')
-];
-const stockDividend = [
-  require('./mocks/traderepublic/dividend/dividend_1.json'),
-  require('./mocks/traderepublic/dividend/dividend_2.json'),
-  require('./mocks/traderepublic/dividend/dividend_3.json')
-];
-const etfDividend = require('./mocks/traderepublic/dividend/earnings_payout_1.json');
-
-describe('TradeRepublic broker', () => {
+describe('Broker: Trade Republic', () => {
   let consoleErrorSpy;
 
   describe('Check all documents', () => {
