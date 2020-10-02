@@ -19,4 +19,5 @@ export const invalidSamples = [
 /* I do not have access to a dividen sample atm. Skipping for now. (David Holin)
 export const dividendsSamples  = [
     require('./dividend_payout_1.json'),
+];
 */
