@@ -10,7 +10,7 @@ import {
 console.error = jest.fn();
 
 describe('Broker: onvista', () => {
-  let multiPageActivities;
+  let multiPageResult;
   const allSamples = buySamples
     .concat(dividendsSamples)
     .concat(multiPageSamples)
@@ -37,17 +37,17 @@ describe('Broker: onvista', () => {
 
   describe('Multiple Pages', () => {
     test('should parse a PDF with multiple bills', () => {
-      multiPageActivities = onvista.parsePages(multiPageSamples[0]);
-      expect(multiPageActivities.length).toEqual(2);
+      multiPageResult = onvista.parsePages(multiPageSamples[0]);
+      expect(multiPageResult.activities.length).toEqual(2);
       expect(console.error).toHaveBeenCalled();
     });
   });
 
   describe('Buy', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const activity = onvista.parsePages(buySamples[0]);
+      const result = onvista.parsePages(buySamples[0]);
 
-      expect(activity).toEqual([
+      expect(result.activities).toEqual([
         {
           broker: 'onvista',
           type: 'Buy',
@@ -64,9 +64,9 @@ describe('Broker: onvista', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const activity = onvista.parsePages(buySamples[1]);
+      const result = onvista.parsePages(buySamples[1]);
 
-      expect(activity).toEqual([
+      expect(result.activities).toEqual([
         {
           broker: 'onvista',
           type: 'Buy',
@@ -83,9 +83,9 @@ describe('Broker: onvista', () => {
     });
 
     test('should map pdf data of sample 3 correctly', () => {
-      const activity = onvista.parsePages(buySamples[2]);
+      const result = onvista.parsePages(buySamples[2]);
 
-      expect(activity).toEqual([
+      expect(result.activities).toEqual([
         {
           broker: 'onvista',
           type: 'Buy',
@@ -102,9 +102,9 @@ describe('Broker: onvista', () => {
     });
 
     test('should map pdf data of sample 4 correctly', () => {
-      const activity = onvista.parsePages(buySamples[3]);
+      const result = onvista.parsePages(buySamples[3]);
 
-      expect(activity).toEqual([
+      expect(result.activities).toEqual([
         {
           broker: 'onvista',
           type: 'Buy',
@@ -121,9 +121,7 @@ describe('Broker: onvista', () => {
     });
 
     test('should map pdf data of multi-page sample 1 correctly', () => {
-      const activity = multiPageActivities[0];
-
-      expect(activity).toEqual({
+      expect(multiPageResult.activities[0]).toEqual({
         broker: 'onvista',
         type: 'Buy',
         date: '2019-12-27',
@@ -140,9 +138,7 @@ describe('Broker: onvista', () => {
 
   describe('Sell', () => {
     test('should map pdf data of multi-page sample 2 correctly', () => {
-      const activity = multiPageActivities[1];
-
-      expect(activity).toEqual({
+      expect(multiPageResult.activities[1]).toEqual({
         broker: 'onvista',
         type: 'Sell',
         date: '2019-12-27',
@@ -157,9 +153,9 @@ describe('Broker: onvista', () => {
     });
 
     test('should map pdf data of sample 1 correctly', () => {
-      const activity = onvista.parsePages(sellSamples[0]);
+      const result = onvista.parsePages(sellSamples[0]);
 
-      expect(activity).toEqual([
+      expect(result.activities).toEqual([
         {
           broker: 'onvista',
           type: 'Sell',
@@ -236,7 +232,7 @@ describe('Broker: onvista', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      expect(onvista.parsePages(sellSamples[1])).toEqual([
+      expect(onvista.parsePages(sellSamples[1]).activities).toEqual([
         {
           broker: 'onvista',
           type: 'Sell',
@@ -253,7 +249,7 @@ describe('Broker: onvista', () => {
     });
 
     test('should map pdf data of sample 3 correctly', () => {
-      expect(onvista.parsePages(sellSamples[2])).toEqual([
+      expect(onvista.parsePages(sellSamples[2]).activities).toEqual([
         {
           broker: 'onvista',
           type: 'Sell',
@@ -271,7 +267,7 @@ describe('Broker: onvista', () => {
   });
 
   test('should map pdf data of sample 4 correctly', () => {
-    expect(onvista.parsePages(sellSamples[3])).toEqual([
+    expect(onvista.parsePages(sellSamples[3]).activities).toEqual([
       {
         broker: 'onvista',
         type: 'Sell',
@@ -289,9 +285,9 @@ describe('Broker: onvista', () => {
 
   describe('Dividend', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const activity = onvista.parsePages(dividendsSamples[0]);
+      const result = onvista.parsePages(dividendsSamples[0]);
 
-      expect(activity).toEqual([
+      expect(result.activities).toEqual([
         {
           broker: 'onvista',
           type: 'Dividend',
@@ -308,9 +304,9 @@ describe('Broker: onvista', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const activity = onvista.parsePages(dividendsSamples[1]);
+      const result = onvista.parsePages(dividendsSamples[1]);
 
-      expect(activity).toEqual([
+      expect(result.activities).toEqual([
         {
           broker: 'onvista',
           type: 'Dividend',
@@ -327,9 +323,9 @@ describe('Broker: onvista', () => {
     });
 
     test('should map pdf data of sample 3 correctly', () => {
-      const activity = onvista.parsePages(dividendsSamples[2]);
+      const result = onvista.parsePages(dividendsSamples[2]);
 
-      expect(activity).toEqual([
+      expect(result.activities).toEqual([
         {
           broker: 'onvista',
           type: 'Dividend',
@@ -346,7 +342,7 @@ describe('Broker: onvista', () => {
     });
 
     test('should map pdf data of sample 4 correctly', () => {
-      expect(onvista.parsePages(dividendsSamples[3])).toEqual([
+      expect(onvista.parsePages(dividendsSamples[3]).activities).toEqual([
         {
           broker: 'onvista',
           type: 'Dividend',

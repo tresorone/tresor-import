@@ -2,7 +2,7 @@ import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 import Big from 'big.js';
 
-import { parseGermanNum, validateActivity } from '@/helper';
+import { parseGermanNum } from '@/helper';
 
 const getValueByPreviousElement = (textArr, prev, range) =>
   textArr[textArr.findIndex(t => t.includes(prev)) + range];
@@ -131,7 +131,7 @@ const parseData = textArr => {
     tax = findTaxes(textArr);
   }
 
-  return validateActivity({
+  return {
     broker: 'ing',
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
@@ -142,11 +142,14 @@ const parseData = textArr => {
     amount,
     fee,
     tax,
-  });
+  };
 };
 
 export const parsePages = contents => {
-  // parse first page has activity data
-  const activity = parseData(contents[0]);
-  return [activity];
+  const activities = [parseData(contents[0])];
+
+  return {
+    activities,
+    status: 0,
+  };
 };

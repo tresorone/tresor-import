@@ -2,7 +2,7 @@ import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 import Big from 'big.js';
 
-import { parseGermanNum, validateActivity } from '@/helper';
+import { parseGermanNum } from '@/helper';
 
 const getTableValueByKey = (textArr, startLineNumer, key) => {
   const finding = textArr.find(
@@ -222,7 +222,7 @@ export const parsePage = (textArr, startLineNumer) => {
     tax = findDividendTax(textArr, startLineNumer);
   }
 
-  return validateActivity({
+  return {
     broker: 'flatex',
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
@@ -233,7 +233,7 @@ export const parsePage = (textArr, startLineNumer) => {
     amount,
     fee,
     tax,
-  });
+  };
 };
 
 export const parsePages = contents => {
@@ -254,5 +254,8 @@ export const parsePages = contents => {
     }
   }
 
-  return activities;
+  return {
+    activities,
+    status: 0,
+  };
 };

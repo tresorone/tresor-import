@@ -175,11 +175,14 @@ const parseData = textArr => {
     amount,
     fee,
     tax,
-  });
+  };
 };
 
 export const parsePages = contents => {
-  // only first page has activity data
-  const activity = parseData(contents[0]);
-  return [activity];
+  const activities = [parseData(contents[0])];
+
+  return {
+    activities,
+    status: 0,
+  };
 };

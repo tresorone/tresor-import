@@ -61,10 +61,10 @@ describe('Broker: Flatex', () => {
 
   describe('Buy', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const activities = flatex.parsePages(buySamples[0]);
+      const result = flatex.parsePages(buySamples[0]);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
         broker: 'flatex',
         type: 'Buy',
         date: '2019-05-16',
@@ -79,10 +79,10 @@ describe('Broker: Flatex', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const activities = flatex.parsePages(buySamples[1]);
+      const result = flatex.parsePages(buySamples[1]);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
         broker: 'flatex',
         type: 'Buy',
         date: '2020-03-05',
@@ -97,10 +97,10 @@ describe('Broker: Flatex', () => {
     });
 
     test('should map pdf data of sample 3 correctly', () => {
-      const activities = flatex.parsePages(buySamples[2]);
+      const result = flatex.parsePages(buySamples[2]);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
         broker: 'flatex',
         type: 'Buy',
         date: '2019-10-17',
@@ -115,10 +115,10 @@ describe('Broker: Flatex', () => {
     });
 
     test('should map pdf data of sample 5 correctly', () => {
-      const activities = flatex.parsePages(buySamples[4]);
+      const result = flatex.parsePages(buySamples[4]);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
         broker: 'flatex',
         type: 'Buy',
         date: '2018-04-03',
@@ -135,10 +135,10 @@ describe('Broker: Flatex', () => {
 
   describe('Sell', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const activities = flatex.parsePages(sellSamples[0]);
+      const result = flatex.parsePages(sellSamples[0]);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
         broker: 'flatex',
         type: 'Sell',
         date: '2019-05-20',
@@ -153,10 +153,10 @@ describe('Broker: Flatex', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const activities = flatex.parsePages(sellSamples[1]);
+      const result = flatex.parsePages(sellSamples[1]);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
         broker: 'flatex',
         type: 'Sell',
         date: '2019-05-20',
@@ -173,11 +173,11 @@ describe('Broker: Flatex', () => {
 
   describe('Dividend', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const activities = flatex.parsePages(dividendsSamples[0]);
+      const result = flatex.parsePages(dividendsSamples[0]);
 
       // stock
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
         broker: 'flatex',
         type: 'Dividend',
         date: '2020-02-13',
@@ -192,11 +192,11 @@ describe('Broker: Flatex', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const activities = flatex.parsePages(dividendsSamples[1]);
+      const result = flatex.parsePages(dividendsSamples[1]);
 
       // stock
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
         broker: 'flatex',
         type: 'Dividend',
         date: '2019-12-12',
@@ -211,11 +211,11 @@ describe('Broker: Flatex', () => {
     });
 
     test('should map pdf data of sample 3 correctly', () => {
-      const activities = flatex.parsePages(dividendsSamples[2]);
+      const result = flatex.parsePages(dividendsSamples[2]);
 
       // index fund
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
         broker: 'flatex',
         type: 'Dividend',
         date: '2018-11-09',
@@ -232,10 +232,10 @@ describe('Broker: Flatex', () => {
 
   describe('Mixed pages', () => {
     test('should map the multi page documents correctly', () => {
-      const activities = flatex.parsePages(mixedPageSamples[0]);
+      const result = flatex.parsePages(mixedPageSamples[0]);
 
-      expect(activities.length).toEqual(3);
-      expect(activities[0]).toEqual({
+      expect(result.activities.length).toEqual(3);
+      expect(result.activities[0]).toEqual({
         amount: 481.4,
         broker: 'flatex',
         company: 'ADIDAS AG NA O.N.',
@@ -247,7 +247,7 @@ describe('Broker: Flatex', () => {
         tax: 0,
         type: 'Sell',
       });
-      expect(activities[1]).toEqual({
+      expect(result.activities[1]).toEqual({
         amount: 484.4,
         broker: 'flatex',
         company: 'WIRECARD AG',
@@ -259,7 +259,7 @@ describe('Broker: Flatex', () => {
         tax: 0,
         type: 'Buy',
       });
-      expect(activities[2]).toEqual({
+      expect(result.activities[2]).toEqual({
         amount: 329.15,
         broker: 'flatex',
         company: 'WIRECARD AG',

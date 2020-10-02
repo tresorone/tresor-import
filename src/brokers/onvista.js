@@ -207,5 +207,9 @@ export const parsePages = contents => {
       console.error('Error while parsing page (onvista)', e, c);
     }
   }
-  return activities;
+
+  return {
+    activities,
+    status: 0,
+  };
 };

@@ -1,7 +1,7 @@
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 
-import { parseGermanNum, validateActivity } from '@/helper';
+import { parseGermanNum } from '@/helper';
 
 const offsets = {
   shares: 0,
@@ -105,7 +105,7 @@ const parseData = textArr => {
     fee = 0;
   }
 
-  return validateActivity({
+  return {
     broker: 'postbank',
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
@@ -115,11 +115,14 @@ const parseData = textArr => {
     price,
     amount,
     fee,
-  });
+  };
 };
 
 export const parsePages = contents => {
-  // parse first page has activity data
-  const activity = parseData(contents[0]);
-  return [activity];
+  const activities = [parseData(contents[0])];
+
+  return {
+    activities,
+    status: 0,
+  };
 };
