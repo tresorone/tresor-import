@@ -1,4 +1,4 @@
-import { getBroker } from '../../src/';
+import { findImplementation } from '../../src';
 import * as ing from '../../src/brokers/ing';
 import {
   buySamples,
@@ -10,25 +10,41 @@ import {
 describe('Broker: ING', () => {
   let consoleErrorSpy;
 
-  test('Should identify ing as broker', () => {
-    for (let sample of buySamples.concat(sellSamples, dividendsSamples)) {
-      expect(getBroker(sample)).toEqual(ing);
-    }
-  });
+  const allSamples = buySamples.concat(sellSamples, dividendsSamples);
 
-  test('Should not identify ing as broker if ing BIC is not present', () => {
-    try {
-      getBroker(invalidSamples[0]);
-    } catch (e) {
-      expect(e).toEqual('No supported broker found!');
-    }
+  describe('Check all documents', () => {
+    test('Can the document parsed with ING', () => {
+      allSamples.forEach(samples => {
+        expect(samples.some(item => ing.canParsePage(item, 'pdf'))).toEqual(
+          true
+        );
+      });
+    });
+
+    test('Can identify a implementation from the document as ING', () => {
+      allSamples.forEach(samples => {
+        const implementations = findImplementation(samples, 'pdf');
+
+        expect(implementations.length).toEqual(1);
+        expect(implementations[0]).toEqual(ing);
+      });
+    });
+
+    test('Should not identify ing as broker if ing BIC is not present', () => {
+      invalidSamples.forEach(samples => {
+        const implementations = findImplementation(samples, 'pdf');
+
+        expect(implementations.length).toEqual(0);
+      });
+    });
   });
 
   describe('Buy', () => {
     test('Test if buy1 is mapped correctly', () => {
-      const activity = ing.parseData(buySamples[0]);
+      const activities = ing.parsePages(buySamples[0]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Buy',
         date: '2020-03-03',
@@ -43,9 +59,10 @@ describe('Broker: ING', () => {
     });
 
     test('Test if buy2 is mapped correctly', () => {
-      const activity = ing.parseData(buySamples[1]);
+      const activities = ing.parsePages(buySamples[1]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Buy',
         date: '2017-01-10',
@@ -60,9 +77,10 @@ describe('Broker: ING', () => {
     });
 
     test('Test if provision-free buy is mapped correctly', () => {
-      const activity = ing.parseData(buySamples[2]);
+      const activities = ing.parsePages(buySamples[2]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Buy',
         date: '2016-01-22',
@@ -77,9 +95,10 @@ describe('Broker: ING', () => {
     });
 
     test('Test if investment plan is mapped correctly', () => {
-      const activity = ing.parseData(buySamples[3]);
+      const activities = ing.parsePages(buySamples[3]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Buy',
         date: '2019-04-15',
@@ -96,9 +115,10 @@ describe('Broker: ING', () => {
 
   describe('Sell', () => {
     test('Test if sell1 is mapped correctly', () => {
-      const activity = ing.parseData(sellSamples[0]);
+      const activities = ing.parsePages(sellSamples[0]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Sell',
         date: '2020-01-14',
@@ -113,9 +133,10 @@ describe('Broker: ING', () => {
     });
 
     test('Test if sell2 is mapped correctly', () => {
-      const activity = ing.parseData(sellSamples[1]);
+      const activities = ing.parsePages(sellSamples[1]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Sell',
         date: '2019-03-06',
@@ -130,9 +151,10 @@ describe('Broker: ING', () => {
     });
 
     test('Test if sell with taxes is mapped correctly', () => {
-      const activity = ing.parseData(sellSamples[2]);
+      const activities = ing.parsePages(sellSamples[2]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Sell',
         date: '2020-07-21',
@@ -149,9 +171,10 @@ describe('Broker: ING', () => {
 
   describe('Dividend', () => {
     test('Test if dividend1 is mapped correctly', () => {
-      const activity = ing.parseData(dividendsSamples[0]);
+      const activities = ing.parsePages(dividendsSamples[0]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Dividend',
         date: '2020-03-12',
@@ -166,9 +189,10 @@ describe('Broker: ING', () => {
     });
 
     test('Test if dividend2 is mapped correctly', () => {
-      const activity = ing.parseData(dividendsSamples[1]);
+      const activities = ing.parsePages(dividendsSamples[1]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Dividend',
         date: '2020-03-18',
@@ -183,9 +207,10 @@ describe('Broker: ING', () => {
     });
 
     test('Test if dividend3 is mapped correctly', () => {
-      const activity = ing.parseData(dividendsSamples[2]);
+      const activities = ing.parsePages(dividendsSamples[2]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Dividend',
         date: '2020-05-04',
@@ -200,9 +225,10 @@ describe('Broker: ING', () => {
     });
 
     test('Test if dividend4 is mapped correctly', () => {
-      const activity = ing.parseData(dividendsSamples[3]);
+      const activities = ing.parsePages(dividendsSamples[3]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Dividend',
         date: '2020-04-15',
@@ -217,9 +243,10 @@ describe('Broker: ING', () => {
     });
 
     test('Test if dividend5 is mapped correctly', () => {
-      const activity = ing.parseData(dividendsSamples[4]);
+      const activities = ing.parsePages(dividendsSamples[4]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Dividend',
         date: '2020-04-08',
@@ -234,9 +261,10 @@ describe('Broker: ING', () => {
     });
 
     test('Test if dividend_etf is mapped correctly', () => {
-      const activity = ing.parseData(dividendsSamples[5]);
+      const activities = ing.parsePages(dividendsSamples[5]);
 
-      expect(activity).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Dividend',
         date: '2018-08-23',
