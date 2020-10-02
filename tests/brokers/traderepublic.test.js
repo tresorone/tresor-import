@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-import { getBroker } from '../../src';
-import * as traderepublic from '../../src/brokers/traderepublic';
-import {
-  allSamples,
-  buySamples,
-  sellSamples,
-  dividendSamples,
-  quarterSamples,
-} from './mocks/traderepublic';
-
-describe('Broker: Trade Republic', () => {
-=======
 import { parseData } from '@/brokers/traderepublic';
 
 const stockSingleBuy = require('./mocks/traderepublic/buy/single_buy_stock_1.json');
@@ -30,7 +17,6 @@ const stockDividend = [
 const etfDividend = require('./mocks/traderepublic/dividend/earnings_payout_1.json');
 
 describe('TradeRepublic broker', () => {
->>>>>>> Improved Tests which is still wip
   let consoleErrorSpy;
 
   describe('Check all documents', () => {
