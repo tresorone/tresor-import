@@ -119,9 +119,7 @@ describe('Broker: ebase', () => {
     });
 
     test('Can parse multiple ordinary sell orders from a document', () => {
-      console.log(sellSamples[1]);
       const activities = ebase.parsePages(sellSamples[1]);
-      console.log(activities);
       expect(activities.length).toEqual(11);
       expect(activities[0]).toEqual({
         broker: 'ebase',
