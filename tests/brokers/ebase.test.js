@@ -89,7 +89,7 @@ describe('Broker: ebase', () => {
   });
 
   describe('Validate sells', () => {
-    test('Can parse multiple sell orders from a document', () => {
+    test('Can parse multiple eremuneration sell orders from a document', () => {
       const activities = ebase.parsePages(sellSamples[0]);
       expect(activities.length).toEqual(2);
       expect(activities[0]).toEqual({
@@ -117,13 +117,44 @@ describe('Broker: ebase', () => {
         fee: 0.0,
       });
     });
+
+    test('Can parse multiple ordinary sell orders from a document', () => {
+      console.log(sellSamples[1]);
+      const activities = ebase.parsePages(sellSamples[1]);
+      console.log(activities);
+      expect(activities.length).toEqual(11);
+      expect(activities[0]).toEqual({
+        broker: 'ebase',
+        type: 'Sell',
+        date: '2020-09-23',
+        isin: 'FR0000292278',
+        company: 'Magellan C',
+        shares: 18.014988,
+        price: 23.17,
+        amount: 373.54,
+        tax: 0.0,
+        fee: 0.0,
+      });
+      expect(activities[10]).toEqual({
+        broker: 'ebase',
+        type: 'Sell',
+        date: '2020-09-22',
+        isin: 'DE0009848119',
+        company: 'DWS Top Dividende LD',
+        shares: 2.752834,
+        price: 114.58,
+        amount: 315.42,
+        tax: 0.0,
+        fee: 0.0,
+      });
+    });
   });
 
   describe('Mixed Sells, buys and everything in between', () => {
     test('Can parse multiple sell orders from a document', () => {
       const activities = ebase.parsePages(mixedSamples[0]);
-      expect(activities.length).toEqual(316);
-      expect(activities[0]).toEqual({
+      expect(activities.length).toEqual(327);
+      expect(activities[11]).toEqual({
         broker: 'ebase',
         type: 'Buy',
         date: '2020-07-01',

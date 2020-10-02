@@ -5,6 +5,7 @@ export const buySamples = [
 
 export const sellSamples = [
   require('./sell/entgelt_verkauf_single_pdfpage.json'),
+  require('./sell/verkauf_single_pdfpage.json'),
 ];
 
 export const mixedSamples = [
