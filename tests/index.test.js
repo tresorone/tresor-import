@@ -1,29 +1,57 @@
-import { getBroker } from '../src';
+import {
+  allImplementations,
+  findImplementation,
+  parseActivitiesFromPages,
+} from '../src';
 
 describe('PDF bandler', () => {
   let consoleErrorSpy;
 
-  describe('getBroker', () => {
-    test('should return the matching broker', () => {
-      const broker = getBroker(['BIC BYLADEM1001', 'Dividendengutschrift']);
-      expect(typeof broker.parseData).toEqual('function');
-    });
-
-    test('should throw when no matcher was found', () => {
-      try {
-        getBroker(['42']);
-      } catch (e) {
-        expect(e).toEqual('No supported broker found!');
-      }
+  describe('allImplementations', () => {
+    test('All implementations must export (only) the functions canParsePage and parsePages', () => {
+      allImplementations.forEach(implementation => {
+        expect(Object.keys(allImplementations[0]).length).toEqual(2);
+        expect(typeof implementation.canParsePage).toEqual('function');
+        expect(typeof implementation.parsePages).toEqual('function');
+      });
     });
   });
 
-  test('should throw when more than one matcher was found', () => {
-    try {
-      getBroker(['BIC BYLADEM1001', 'Dividendengutschrift', 'comdirect bank']);
-    } catch (e) {
-      expect(e).toEqual('Multiple supported brokers found!');
-    }
+  describe('findImplementation', () => {
+    test('Should return the matching implementation', () => {
+      const implementations = findImplementation(
+        [['BIC BYLADEM1001', 'Dividendengutschrift']],
+        'pdf'
+      );
+      expect(implementations.length).toEqual(1);
+    });
+
+    test('should return no implementation for invalid content', () => {
+      expect(findImplementation(['42']).length).toEqual(0);
+    });
+
+    test('data should return two implementations', () => {
+      const data = [
+        ['BIC BYLADEM1001', 'Dividendengutschrift', 'comdirect bank'],
+      ];
+      const dataExtension = 'pdf';
+
+      const implementations = findImplementation(data, dataExtension);
+      expect(implementations.length).toEqual(2);
+    });
+  });
+
+  describe('parseActivitiesFromPages', () => {
+    test('data with two implementations should not parse any activities', () => {
+      const data = [
+        ['BIC BYLADEM1001', 'Dividendengutschrift', 'comdirect bank'],
+      ];
+      const dataExtension = 'pdf';
+
+      const result = parseActivitiesFromPages(data, dataExtension);
+      expect(result.activities).toEqual(undefined);
+      expect(result.status).toEqual(2);
+    });
   });
 
   beforeEach(() => {
