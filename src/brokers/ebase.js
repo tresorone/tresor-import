@@ -122,7 +122,7 @@ export const parseData = pdfPages => {
         const action = parseBaseAction(pdfPage, i, 'Sell');
         if (action === undefined) {
           return undefined;
-        }// An 'Entgelt Verkauf' entry occupies 9 array entries.
+        } // An 'Entgelt Verkauf' entry occupies 9 array entries.
         actions.push(action);
         i += 8;
       } else if (pdfPage[i] === 'Verkauf') {
@@ -131,7 +131,7 @@ export const parseData = pdfPages => {
           return undefined;
         }
         actions.push(action);
-        i += 7; // A basic 'Verkauf' entry occupies 9 array entries in total
+        i += 8 // A basic 'Verkauf' entry occupies 9 array entries in total
       } else if (pdfPage[i] === 'Vorabpauschale') {
         // This was always blank in the example files I had -> So no parsing could be done.
         i += 3;
