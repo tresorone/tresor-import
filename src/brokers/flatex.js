@@ -169,14 +169,16 @@ const findPayout = (textArr, startLineNumer) => {
 const lineContains = (textArr, lineNumber, value) =>
   textArr[lineNumber].includes(value);
 
-export const canParseData = textArr =>
-  textArr.some(
-    t => t.includes('flatex Bank AG') || t.includes('FinTech Group Bank AG')
+export const canParsePage = (content, extension) =>
+  extension === 'pdf' &&
+  content.some(
+    line =>
+      line.includes('flatex Bank AG') || line.includes('FinTech Group Bank AG')
   ) &&
-  (textArr.some(t => t.includes('Kauf')) ||
-    textArr.some(t => t.includes('Verkauf')) ||
-    textArr.some(t => t.includes('Dividendengutschrift')) ||
-    textArr.some(t => t.includes('Ertragsmitteilung')));
+  (content.some(line => line.includes('Kauf')) ||
+    content.some(line => line.includes('Verkauf')) ||
+    content.some(line => line.includes('Dividendengutschrift')) ||
+    content.some(line => line.includes('Ertragsmitteilung')));
 
 export const parseSinglePage = textArr => {
   return parsePage(textArr, findTableIndexes(textArr)[0]);
