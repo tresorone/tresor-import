@@ -1,4 +1,4 @@
-import { getBroker } from '../../src';
+import { findImplementation } from '../../src';
 import * as comdirect from '../../src/brokers/comdirect';
 import { allSamples, buySamples, dividendSamples } from './__mocks__/comdirect';
 
@@ -8,17 +8,18 @@ describe('Broker: comdirect', () => {
   describe('Check all documents', () => {
     test('Can one page parsed with comdirect', () => {
       allSamples.forEach(samples => {
-        expect(samples.some(item => comdirect.canParseData(item))).toEqual(
-          true
-        );
+        expect(
+          samples.some(item => comdirect.canParsePage(item, 'pdf'))
+        ).toEqual(true);
       });
     });
 
     test('Can identify a broker from one page as comdirect', () => {
       allSamples.forEach(samples => {
-        expect(samples.some(item => getBroker(item) === comdirect)).toEqual(
-          true
-        );
+        const implementations = findImplementation(samples, 'pdf');
+
+        expect(implementations.length).toEqual(1);
+        expect(implementations[0]).toEqual(comdirect);
       });
     });
   });
