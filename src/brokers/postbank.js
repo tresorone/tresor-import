@@ -68,9 +68,10 @@ const isDividend = textArr =>
       t.includes('Ausschüttung Investmentfonds')
   );
 
-export const canParseData = textArr =>
-  textArr.some(t => t.includes('BIC PBNKDEFFXXX')) &&
-  (isBuy(textArr) || isSell(textArr) || isDividend(textArr));
+export const canParsePage = (content, extension) =>
+  extension === 'pdf' &&
+  content.some(line => line.includes('BIC PBNKDEFFXXX')) &&
+  (isBuy(content) || isSell(content) || isDividend(content));
 
 export const parseData = textArr => {
   let type, date, isin, company, shares, price, amount, fee;
