@@ -146,7 +146,7 @@ const findTax = text => {
 export const canParsePage = (content, extension) =>
   extension === 'pdf' && content.some(line => line.includes('BELEGDRUCK=J'));
 
-export const parseData = text => {
+const parseData = text => {
   const isBuy = text.some(t => t.includes('Wir haben für Sie gekauft'));
   const isSell = text.some(t => t.includes('Wir haben für Sie verkauft'));
   const isDividend =

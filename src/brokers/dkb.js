@@ -105,7 +105,7 @@ export const canParsePage = (content, extension) =>
   content.some(line => line.includes('BIC BYLADEM1001')) &&
   (isBuy(content) || isSell(content) || isDividend(content));
 
-export const parseData = textArr => {
+const parseData = textArr => {
   let type, date, isin, company, shares, price, amount, fee, tax;
 
   if (isBuy(textArr)) {

@@ -96,7 +96,7 @@ const findPayout = textArr =>
     getValueByPreviousElement(textArr, 'Gesamtbetrag zu Ihren Gunsten', 2)
   );
 
-export const parseData = textArr => {
+const parseData = textArr => {
   let type, date, isin, company, shares, price, amount, fee, tax;
 
   if (isBuy(textArr)) {
