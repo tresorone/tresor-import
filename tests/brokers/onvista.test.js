@@ -1,29 +1,43 @@
-import { getBroker } from '../../src/';
+import { findImplementation } from '../../src';
 import * as onvista from '../../src/brokers/onvista';
 import {
   buySamples,
   sellSamples,
   dividendsSamples,
-  multiPageSample,
+  multiPageSamples,
 } from './__mocks__/onvista';
 
 console.error = jest.fn();
 
-describe('Onvista Bank broker', () => {
-  test('Our samples should be detected by Onvista Bank handler only', () => {
-    for (let sample of buySamples
-      .concat(dividendsSamples)
-      .concat(multiPageSample)
-      .concat(sellSamples)) {
-      expect(getBroker(sample)).toEqual(onvista);
-    }
-  });
-
+describe('Broker: onvista', () => {
   let multiPageActivities;
+  const allSamples = buySamples
+    .concat(dividendsSamples)
+    .concat(multiPageSamples)
+    .concat(sellSamples);
+
+  describe('Check all documents', () => {
+    test('Can the document parsed with onvista', () => {
+      allSamples.forEach(samples => {
+        expect(samples.some(item => onvista.canParsePage(item, 'pdf'))).toEqual(
+          true
+        );
+      });
+    });
+
+    test('Can identify a implementation from the document as onvista', () => {
+      allSamples.forEach(samples => {
+        const implementations = findImplementation(samples, 'pdf');
+
+        expect(implementations.length).toEqual(1);
+        expect(implementations[0]).toEqual(onvista);
+      });
+    });
+  });
 
   describe('Multiple Pages', () => {
     test('should parse a PDF with multiple bills', () => {
-      multiPageActivities = onvista.parsePages(multiPageSample);
+      multiPageActivities = onvista.parsePages(multiPageSamples[0]);
       expect(multiPageActivities.length).toEqual(2);
       expect(console.error).toHaveBeenCalled();
     });

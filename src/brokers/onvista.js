@@ -143,8 +143,8 @@ const findTax = text => {
   return +totalTax;
 };
 
-export const canParseData = textArr =>
-  textArr.some(t => t.includes('BELEGDRUCK=J'));
+export const canParsePage = (content, extension) =>
+  extension === 'pdf' && content.some(line => line.includes('BELEGDRUCK=J'));
 
 export const parseData = text => {
   const isBuy = text.some(t => t.includes('Wir haben für Sie gekauft'));

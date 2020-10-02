@@ -12,7 +12,7 @@ export const sellSamples = [
   require('./sell-3.json'),
 ];
 
-export const multiPageSample = require('./multi-page.json');
+export const multiPageSamples = [require('./multi-page.json')];
 
 export const dividendsSamples = [
   require('./div-1.json'),
