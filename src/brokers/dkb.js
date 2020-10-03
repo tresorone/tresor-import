@@ -1,6 +1,7 @@
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 
+import { Big } from 'big.js';
 import { parseGermanNum, validateActivity } from '@/helper';
 
 const offsets = {
@@ -9,8 +10,11 @@ const offsets = {
   isin: 3,
 };
 
-const getValueByPreviousElement = (textArr, prev) =>
-  textArr[textArr.findIndex(t => t.includes(prev)) + 1];
+const getValueByPreviousElement = (textArr, prev) => {
+  const index = textArr.findIndex(t => t.includes(prev));
+  if (index < 0) return "";
+  return textArr[index + 1];
+}
 
 const findTableIndex = textArr => textArr.findIndex(t => t.includes('Stück'));
 
@@ -46,10 +50,30 @@ const findFee = textArr =>
 const findDateDividend = textArr =>
   getValueByPreviousElement(textArr, 'Zahlbarkeitstag').split(' ')[0];
 
-const findPayout = textArr =>
-  parseGermanNum(
-    getValueByPreviousElement(textArr, 'Ausmachender Betrag').split(' ')[0]
+const findPayout = textArr => {
+  let index = textArr.indexOf("Ausschüttung");
+  if (index < 0)
+    index = textArr.lastIndexOf("Dividendengutschrift");
+  const currency = textArr[index + 2];
+  const eurAmount = (currency === "EUR") ? textArr[index + 1] : textArr[index + 3];
+  return parseGermanNum(eurAmount.split(' ')[0]);
+}
+
+const findTax = textArr => {
+  const withholdingTaxIndex = textArr.findIndex(t => t.startsWith("Anrechenbare Quellensteuer") && t.endsWith("EUR"))
+  const withholdingTax = (withholdingTaxIndex >= 0) ? parseGermanNum(textArr[withholdingTaxIndex+1]) : 0
+
+  const kap = parseGermanNum(
+    getValueByPreviousElement(textArr, 'Kapitalertragsteuer 25 %').split(' ')[0]
   );
+  const soli = parseGermanNum(
+    getValueByPreviousElement(textArr, 'Solidaritätszuschlag').split(' ')[0]
+  );
+  const churchTax = parseGermanNum(
+    getValueByPreviousElement(textArr, 'Kirchensteuer').split(' ')[0]
+  );
+  return +Big(kap).plus(Big(soli)).plus(Big(churchTax)).plus(Big(withholdingTax));
+}
 
 const isBuy = textArr =>
   textArr.some(
@@ -94,7 +118,7 @@ export const parseData = textArr => {
     amount = findAmount(textArr);
     price = findPrice(textArr);
     fee = findFee(textArr);
-    tax = 0;
+    tax = findTax(textArr);
   } else if (isDividend(textArr)) {
     type = 'Dividend';
     isin = findISIN(textArr);
@@ -104,7 +128,7 @@ export const parseData = textArr => {
     amount = findPayout(textArr);
     price = amount / shares;
     fee = 0;
-    tax = 0;
+    tax = findTax(textArr);
   }
 
   return validateActivity({

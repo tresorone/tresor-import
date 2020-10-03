@@ -12,10 +12,8 @@
     "tax": 0,
     "fee": 12.9,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 62.86,
-    "parsed": true
+    "price": 62.86
   },
   {
     "isin": "LU0302296495",
@@ -30,10 +28,8 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 502.248322147651,
-    "parsed": true
+    "price": 502.248322147651
   },
   {
     "isin": "LU1239760025",
@@ -48,10 +44,8 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 289.90328820116054,
-    "parsed": true
+    "price": 289.90328820116054
   },
   {
     "isin": "LU0490618542",
@@ -66,10 +60,8 @@
     "tax": 0,
     "fee": 2.22,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 45.28041679436102,
-    "parsed": true
+    "price": 45.28041679436102
   },
   {
     "isin": "LU0302296495",
@@ -84,13 +76,10 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 434.9,
-    "parsed": true
+    "price": 434.9
   },
   {
-    "isin": "",
     "wkn": "710000",
     "type": "Buy",
     "company": "DAIMLER",
@@ -102,13 +91,10 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 69.48,
-    "parsed": true
+    "price": 69.48
   },
   {
-    "isin": "",
     "wkn": "710000",
     "type": "Buy",
     "company": "DAIMLER",
@@ -120,13 +106,10 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 65.13,
-    "parsed": true
+    "price": 65.13
   },
   {
-    "isin": "",
     "wkn": "864009",
     "type": "Buy",
     "company": "NINTENDO",
@@ -138,13 +121,10 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 286.98,
-    "parsed": true
+    "price": 286.98
   },
   {
-    "isin": "",
     "wkn": "A1CX3T",
     "type": "Buy",
     "company": "TESLA",
@@ -156,13 +136,10 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 284.25,
-    "parsed": true
+    "price": 284.25
   },
   {
-    "isin": "",
     "wkn": "A1EWWW",
     "type": "Buy",
     "company": "ADIDAS",
@@ -174,13 +151,10 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 194.08,
-    "parsed": true
+    "price": 194.08
   },
   {
-    "isin": "",
     "wkn": "A1JWVX",
     "type": "Buy",
     "company": "FACEBOOK",
@@ -192,13 +166,10 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 162.55,
-    "parsed": true
+    "price": 162.55
   },
   {
-    "isin": "",
     "wkn": "A14R7U",
     "type": "Buy",
     "company": "PAYPAL",
@@ -210,13 +181,10 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 50.2,
-    "parsed": true
+    "price": 50.2
   },
   {
-    "isin": "",
     "wkn": "541523",
     "type": "Buy",
     "company": "LYX.NASDAQ-100",
@@ -228,10 +196,8 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 24.16,
-    "parsed": true
+    "price": 24.16
   },
   {
     "isin": "US64110L1061",
@@ -246,13 +212,10 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 269.84,
-    "parsed": true
+    "price": 269.84
   },
   {
-    "isin": "",
     "wkn": "710000",
     "type": "Buy",
     "company": "DAIMLER",
@@ -264,10 +227,8 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 65.93,
-    "parsed": true
+    "price": 65.93
   },
   {
     "isin": "DE0008490962",
@@ -282,13 +243,10 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 243.43,
-    "parsed": true
+    "price": 243.43
   },
   {
-    "isin": "",
     "wkn": "855686",
     "type": "Buy",
     "company": "DISNEY",
@@ -300,13 +258,10 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 96,
-    "parsed": true
+    "price": 96
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -318,13 +273,10 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 133.53,
-    "parsed": true
+    "price": 133.53
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -336,13 +288,10 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 54.89,
-    "parsed": true
+    "price": 54.89
   },
   {
-    "isin": "",
     "wkn": "906866",
     "type": "Buy",
     "company": "AMAZON",
@@ -354,10 +303,8 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 898.05,
-    "parsed": true
+    "price": 898.05
   },
   {
     "isin": "LU0302296495",
@@ -372,10 +319,8 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 506.25,
-    "parsed": true
+    "price": 506.25
   },
   {
     "isin": "LU1239760025",
@@ -390,10 +335,8 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 279.57089552238807,
-    "parsed": true
+    "price": 279.57089552238807
   },
   {
     "isin": "LU0490618542",
@@ -408,10 +351,8 @@
     "tax": 0,
     "fee": 2.22,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 43.79075281564908,
-    "parsed": true
+    "price": 43.79075281564908
   },
   {
     "isin": "US92826C8394",
@@ -426,10 +367,8 @@
     "tax": 0,
     "fee": 5.4,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 124,
-    "parsed": true
+    "price": 124
   },
   {
     "isin": "US0079031078",
@@ -444,10 +383,8 @@
     "tax": 0,
     "fee": 5.4,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 18.58,
-    "parsed": true
+    "price": 18.58
   },
   {
     "isin": "US38268T1034",
@@ -462,10 +399,8 @@
     "tax": 0,
     "fee": 6.4,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 5.08,
-    "parsed": true
+    "price": 5.08
   },
   {
     "isin": "LU0302296495",
@@ -480,10 +415,8 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 480.9646302250804,
-    "parsed": true
+    "price": 480.9646302250804
   },
   {
     "isin": "LU0490618542",
@@ -498,10 +431,8 @@
     "tax": 0,
     "fee": 2.22,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 42.88534107402032,
-    "parsed": true
+    "price": 42.88534107402032
   },
   {
     "isin": "US4781601046",
@@ -516,10 +447,8 @@
     "tax": 0,
     "fee": 5.4,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 114.84,
-    "parsed": true
+    "price": 114.84
   },
   {
     "isin": "LU0302296495",
@@ -534,10 +463,8 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 468.3125,
-    "parsed": true
+    "price": 468.3125
   },
   {
     "isin": "US5801351017",
@@ -552,13 +479,10 @@
     "tax": 0,
     "fee": 0.37,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 156.17834394904457,
-    "parsed": true
+    "price": 156.17834394904457
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -570,10 +494,8 @@
     "tax": 0,
     "fee": 0.37,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 128.53403141361255,
-    "parsed": true
+    "price": 128.53403141361255
   },
   {
     "isin": "US4781601046",
@@ -588,10 +510,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 111.45124716553288,
-    "parsed": true
+    "price": 111.45124716553288
   },
   {
     "isin": "US8552441094",
@@ -606,13 +526,10 @@
     "tax": 0,
     "fee": 0.37,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 55.17937219730942,
-    "parsed": true
+    "price": 55.17937219730942
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -624,10 +541,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 88.88086642599278,
-    "parsed": true
+    "price": 88.88086642599278
   },
   {
     "isin": "LU0490618542",
@@ -642,10 +557,8 @@
     "tax": 0,
     "fee": 2.22,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 40.02980222162016,
-    "parsed": true
+    "price": 40.02980222162016
   },
   {
     "isin": "US5801351017",
@@ -660,10 +573,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 156.656050955414,
-    "parsed": true
+    "price": 156.656050955414
   },
   {
     "isin": "US4781601046",
@@ -678,13 +589,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 116.43026004728132,
-    "parsed": true
+    "price": 116.43026004728132
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -696,10 +604,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 145.76296296296297,
-    "parsed": true
+    "price": 145.76296296296297
   },
   {
     "isin": "US8552441094",
@@ -714,13 +620,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 60.134310134310134,
-    "parsed": true
+    "price": 60.134310134310134
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -732,10 +635,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 90.6163753449862,
-    "parsed": true
+    "price": 90.6163753449862
   },
   {
     "isin": "US8552441094",
@@ -750,10 +651,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 62.32911392405063,
-    "parsed": true
+    "price": 62.32911392405063
   },
   {
     "isin": "US5801351017",
@@ -768,10 +667,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 163.0794701986755,
-    "parsed": true
+    "price": 163.0794701986755
   },
   {
     "isin": "US4781601046",
@@ -786,13 +683,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 120.73529411764706,
-    "parsed": true
+    "price": 120.73529411764706
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -804,13 +698,10 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 152.6046511627907,
-    "parsed": true
+    "price": 152.6046511627907
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -822,10 +713,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 98.855421686747,
-    "parsed": true
+    "price": 98.855421686747
   },
   {
     "isin": "IE00BTJRMP35",
@@ -840,10 +729,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 42.62337662337662,
-    "parsed": true
+    "price": 42.62337662337662
   },
   {
     "isin": "IE00BK1PV551",
@@ -858,10 +745,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 50.41453428863869,
-    "parsed": true
+    "price": 50.41453428863869
   },
   {
     "isin": "IE00B3XXRP09",
@@ -876,10 +761,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 46.86489058039962,
-    "parsed": true
+    "price": 46.86489058039962
   },
   {
     "isin": "DE000A1C22L5",
@@ -894,10 +777,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 12.828861682729878,
-    "parsed": true
+    "price": 12.828861682729878
   },
   {
     "isin": "LU1239760025",
@@ -912,10 +793,8 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 260.7692307692308,
-    "parsed": true
+    "price": 260.7692307692308
   },
   {
     "isin": "LU1865032954",
@@ -930,10 +809,8 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 284.7673314339981,
-    "parsed": true
+    "price": 284.7673314339981
   },
   {
     "isin": "US55087P1049",
@@ -948,13 +825,10 @@
     "tax": 0,
     "fee": 9.3,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 75,
-    "parsed": true
+    "price": 75
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -966,10 +840,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 169.81034482758622,
-    "parsed": true
+    "price": 169.81034482758622
   },
   {
     "isin": "US8552441094",
@@ -984,10 +856,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 66.54054054054055,
-    "parsed": true
+    "price": 66.54054054054055
   },
   {
     "isin": "IE00BK1PV551",
@@ -1002,10 +872,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 51.83157894736842,
-    "parsed": true
+    "price": 51.83157894736842
   },
   {
     "isin": "US5801351017",
@@ -1020,10 +888,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 169.24398625429552,
-    "parsed": true
+    "price": 169.24398625429552
   },
   {
     "isin": "US4781601046",
@@ -1038,13 +904,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 124.40506329113924,
-    "parsed": true
+    "price": 124.40506329113924
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -1056,10 +919,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 105.67596566523605,
-    "parsed": true
+    "price": 105.67596566523605
   },
   {
     "isin": "IE00BTJRMP35",
@@ -1074,10 +935,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 43.9946380697051,
-    "parsed": true
+    "price": 43.9946380697051
   },
   {
     "isin": "IE00B0M63284",
@@ -1092,10 +951,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 42.84222737819025,
-    "parsed": true
+    "price": 42.84222737819025
   },
   {
     "isin": "IE00B3XXRP09",
@@ -1110,10 +967,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 48.15647921760391,
-    "parsed": true
+    "price": 48.15647921760391
   },
   {
     "isin": "IE00B1FZS244",
@@ -1128,10 +983,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 26.950018241517693,
-    "parsed": true
+    "price": 26.950018241517693
   },
   {
     "isin": "IE00B1FZS350",
@@ -1146,10 +999,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 24.28994082840237,
-    "parsed": true
+    "price": 24.28994082840237
   },
   {
     "isin": "DE000A1C22L5",
@@ -1164,13 +1015,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 13.128997867803838,
-    "parsed": true
+    "price": 13.128997867803838
   },
   {
-    "isin": "",
     "wkn": "855686",
     "type": "Buy",
     "company": "DISNEY",
@@ -1182,10 +1030,8 @@
     "tax": 0,
     "fee": 6.4,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 103.48,
-    "parsed": true
+    "price": 103.48
   },
   {
     "isin": "US7475251036",
@@ -1200,10 +1046,8 @@
     "tax": 0,
     "fee": 12.9,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 73.345,
-    "parsed": true
+    "price": 73.345
   },
   {
     "isin": "US5801351017",
@@ -1218,10 +1062,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 174.39716312056737,
-    "parsed": true
+    "price": 174.39716312056737
   },
   {
     "isin": "US4781601046",
@@ -1236,13 +1078,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 126.8298969072165,
-    "parsed": true
+    "price": 126.8298969072165
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -1254,10 +1093,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 188.65900383141764,
-    "parsed": true
+    "price": 188.65900383141764
   },
   {
     "isin": "US8552441094",
@@ -1272,13 +1109,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 69.50564971751412,
-    "parsed": true
+    "price": 69.50564971751412
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -1290,10 +1124,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 113.95833333333333,
-    "parsed": true
+    "price": 113.95833333333333
   },
   {
     "isin": "US4581401001",
@@ -1308,10 +1140,8 @@
     "tax": 0,
     "fee": 6.4,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 45.49,
-    "parsed": true
+    "price": 45.49
   },
   {
     "isin": "US29355A1079",
@@ -1326,10 +1156,8 @@
     "tax": 0,
     "fee": 9.3,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 11.598,
-    "parsed": true
+    "price": 11.598
   },
   {
     "isin": "US8825081040",
@@ -1344,10 +1172,8 @@
     "tax": 0,
     "fee": 6.4,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 104.2,
-    "parsed": true
+    "price": 104.2
   },
   {
     "isin": "US88579Y1010",
@@ -1362,13 +1188,10 @@
     "tax": 0,
     "fee": 6.4,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 165,
-    "parsed": true
+    "price": 165
   },
   {
-    "isin": "",
     "wkn": "A1CX3T",
     "type": "Buy",
     "company": "TESLA",
@@ -1380,10 +1203,8 @@
     "tax": 0,
     "fee": 6.4,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 200,
-    "parsed": true
+    "price": 200
   },
   {
     "isin": "IE00BTJRMP35",
@@ -1398,10 +1219,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 40.70247933884298,
-    "parsed": true
+    "price": 40.70247933884298
   },
   {
     "isin": "IE00B0M63284",
@@ -1416,10 +1235,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 42.72411798727588,
-    "parsed": true
+    "price": 42.72411798727588
   },
   {
     "isin": "IE00BK1PV551",
@@ -1434,10 +1251,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 50.59578839239856,
-    "parsed": true
+    "price": 50.59578839239856
   },
   {
     "isin": "IE00B3XXRP09",
@@ -1452,10 +1267,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 48.34151128557409,
-    "parsed": true
+    "price": 48.34151128557409
   },
   {
     "isin": "IE00B1FZS244",
@@ -1470,10 +1283,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 26.410439756882376,
-    "parsed": true
+    "price": 26.410439756882376
   },
   {
     "isin": "IE00B1FZS350",
@@ -1488,10 +1299,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 24.124755062050948,
-    "parsed": true
+    "price": 24.124755062050948
   },
   {
     "isin": "DE000A1C22L5",
@@ -1506,13 +1315,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 13.035194495898386,
-    "parsed": true
+    "price": 13.035194495898386
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -1524,10 +1330,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 114.52325581395348,
-    "parsed": true
+    "price": 114.52325581395348
   },
   {
     "isin": "US5801351017",
@@ -1542,10 +1346,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 180.0732600732601,
-    "parsed": true
+    "price": 180.0732600732601
   },
   {
     "isin": "IE00B1FZS350",
@@ -1560,10 +1362,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 24.06514657980456,
-    "parsed": true
+    "price": 24.06514657980456
   },
   {
     "isin": "US4781601046",
@@ -1578,13 +1378,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 122.05955334987593,
-    "parsed": true
+    "price": 122.05955334987593
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -1596,10 +1393,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 165.06711409395973,
-    "parsed": true
+    "price": 165.06711409395973
   },
   {
     "isin": "US8552441094",
@@ -1614,10 +1409,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 72.99703264094956,
-    "parsed": true
+    "price": 72.99703264094956
   },
   {
     "isin": "IE00BTJRMP35",
@@ -1632,10 +1425,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 41.21338912133891,
-    "parsed": true
+    "price": 41.21338912133891
   },
   {
     "isin": "IE00B0M63284",
@@ -1650,10 +1441,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 42.10376282782212,
-    "parsed": true
+    "price": 42.10376282782212
   },
   {
     "isin": "IE00BK1PV551",
@@ -1668,10 +1457,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 50.52847614161108,
-    "parsed": true
+    "price": 50.52847614161108
   },
   {
     "isin": "IE00B3XXRP09",
@@ -1686,10 +1473,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 48.0908203125,
-    "parsed": true
+    "price": 48.0908203125
   },
   {
     "isin": "IE00B1FZS244",
@@ -1704,10 +1489,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 26.22648207312744,
-    "parsed": true
+    "price": 26.22648207312744
   },
   {
     "isin": "DE000A1C22L5",
@@ -1722,10 +1505,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 13.161411010154998,
-    "parsed": true
+    "price": 13.161411010154998
   },
   {
     "isin": "IE00BK1PV551",
@@ -1740,10 +1521,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 52.388297872340424,
-    "parsed": true
+    "price": 52.388297872340424
   },
   {
     "isin": "US5801351017",
@@ -1758,10 +1537,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 184.1947565543071,
-    "parsed": true
+    "price": 184.1947565543071
   },
   {
     "isin": "US4781601046",
@@ -1776,13 +1553,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 123.5427135678392,
-    "parsed": true
+    "price": 123.5427135678392
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -1794,10 +1568,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 179.54379562043795,
-    "parsed": true
+    "price": 179.54379562043795
   },
   {
     "isin": "US8552441094",
@@ -1812,13 +1584,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 74.84802431610942,
-    "parsed": true
+    "price": 74.84802431610942
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -1830,10 +1599,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 120.23199023199024,
-    "parsed": true
+    "price": 120.23199023199024
   },
   {
     "isin": "IE00BTJRMP35",
@@ -1848,10 +1615,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 44.051878354203936,
-    "parsed": true
+    "price": 44.051878354203936
   },
   {
     "isin": "IE00B0M63284",
@@ -1866,10 +1631,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 40.710743801652896,
-    "parsed": true
+    "price": 40.710743801652896
   },
   {
     "isin": "IE00B3XXRP09",
@@ -1884,10 +1647,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 49.77261243052047,
-    "parsed": true
+    "price": 49.77261243052047
   },
   {
     "isin": "IE00B1FZS244",
@@ -1902,10 +1663,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 26.859323882224647,
-    "parsed": true
+    "price": 26.859323882224647
   },
   {
     "isin": "IE00B1FZS350",
@@ -1920,10 +1679,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 23.932620667314545,
-    "parsed": true
+    "price": 23.932620667314545
   },
   {
     "isin": "DE000A1C22L5",
@@ -1938,10 +1695,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 13.560022026431717,
-    "parsed": true
+    "price": 13.560022026431717
   },
   {
     "isin": "US88579Y1010",
@@ -1956,10 +1711,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 158.48387096774192,
-    "parsed": true
+    "price": 158.48387096774192
   },
   {
     "isin": "IE00B0M63284",
@@ -1974,13 +1727,10 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 41.51123595505618,
-    "parsed": true
+    "price": 41.51123595505618
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -1992,10 +1742,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 195.0793650793651,
-    "parsed": true
+    "price": 195.0793650793651
   },
   {
     "isin": "US5801351017",
@@ -2010,10 +1758,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 191.6342412451362,
-    "parsed": true
+    "price": 191.6342412451362
   },
   {
     "isin": "US92826C8394",
@@ -2028,13 +1774,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 163.04635761589404,
-    "parsed": true
+    "price": 163.04635761589404
   },
   {
-    "isin": "",
     "wkn": "855686",
     "type": "Buy",
     "company": "DISNEY",
@@ -2046,10 +1789,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 130.3448275862069,
-    "parsed": true
+    "price": 130.3448275862069
   },
   {
     "isin": "NL0000235190",
@@ -2064,13 +1805,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 129.08136482939634,
-    "parsed": true
+    "price": 129.08136482939634
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -2082,10 +1820,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 125.48469387755102,
-    "parsed": true
+    "price": 125.48469387755102
   },
   {
     "isin": "US4781601046",
@@ -2100,10 +1836,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 117.30310262529832,
-    "parsed": true
+    "price": 117.30310262529832
   },
   {
     "isin": "US8552441094",
@@ -2118,10 +1852,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 86.75485008818342,
-    "parsed": true
+    "price": 86.75485008818342
   },
   {
     "isin": "NL0000388619",
@@ -2136,10 +1868,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 52.70877944325482,
-    "parsed": true
+    "price": 52.70877944325482
   },
   {
     "isin": "IE00BTJRMP35",
@@ -2154,10 +1884,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 43.353873239436616,
-    "parsed": true
+    "price": 43.353873239436616
   },
   {
     "isin": "IE00BK1PV551",
@@ -2172,10 +1900,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 53.50353068984248,
-    "parsed": true
+    "price": 53.50353068984248
   },
   {
     "isin": "IE00B3XXRP09",
@@ -2190,10 +1916,8 @@
     "tax": 0,
     "fee": 1.48,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 51.36079249217936,
-    "parsed": true
+    "price": 51.36079249217936
   },
   {
     "isin": "IE00B1FZS244",
@@ -2208,10 +1932,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 26.940189642596646,
-    "parsed": true
+    "price": 26.940189642596646
   },
   {
     "isin": "IE00B1FZS350",
@@ -2226,10 +1948,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 24.390888081875207,
-    "parsed": true
+    "price": 24.390888081875207
   },
   {
     "isin": "DE000A1C22L5",
@@ -2244,10 +1964,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 13.161411010154998,
-    "parsed": true
+    "price": 13.161411010154998
   },
   {
     "isin": "LU1829221024",
@@ -2262,13 +1980,10 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 26.845,
-    "parsed": true
+    "price": 26.845
   },
   {
-    "isin": "",
     "wkn": "541523",
     "type": "Sell",
     "company": "LYX.NASDAQ-100",
@@ -2280,10 +1995,8 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 26.845,
-    "parsed": true
+    "price": 26.845
   },
   {
     "isin": "NL0000235190",
@@ -2298,10 +2011,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 126.05128205128206,
-    "parsed": true
+    "price": 126.05128205128206
   },
   {
     "isin": "US5801351017",
@@ -2316,13 +2027,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 198.98785425101215,
-    "parsed": true
+    "price": 198.98785425101215
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -2334,10 +2042,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 189.6138996138996,
-    "parsed": true
+    "price": 189.6138996138996
   },
   {
     "isin": "IE00B1FZS244",
@@ -2352,10 +2058,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 26.385714285714286,
-    "parsed": true
+    "price": 26.385714285714286
   },
   {
     "isin": "US92826C8394",
@@ -2370,10 +2074,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 165.06711409395973,
-    "parsed": true
+    "price": 165.06711409395973
   },
   {
     "isin": "US88579Y1010",
@@ -2388,13 +2090,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 147.86786786786786,
-    "parsed": true
+    "price": 147.86786786786786
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -2406,13 +2105,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 125.72890025575448,
-    "parsed": true
+    "price": 125.72890025575448
   },
   {
-    "isin": "",
     "wkn": "855686",
     "type": "Buy",
     "company": "DISNEY",
@@ -2424,10 +2120,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 125.29262086513995,
-    "parsed": true
+    "price": 125.29262086513995
   },
   {
     "isin": "US4781601046",
@@ -2442,10 +2136,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 117.30310262529832,
-    "parsed": true
+    "price": 117.30310262529832
   },
   {
     "isin": "US8552441094",
@@ -2460,10 +2152,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 88.18996415770609,
-    "parsed": true
+    "price": 88.18996415770609
   },
   {
     "isin": "NL0000388619",
@@ -2478,10 +2168,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 57.21254355400697,
-    "parsed": true
+    "price": 57.21254355400697
   },
   {
     "isin": "IE00B0M63284",
@@ -2496,10 +2184,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 42.52734599884859,
-    "parsed": true
+    "price": 42.52734599884859
   },
   {
     "isin": "IE00B1FZS350",
@@ -2514,10 +2200,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 24.820288881424254,
-    "parsed": true
+    "price": 24.820288881424254
   },
   {
     "isin": "IE00B3VVMM84",
@@ -2532,10 +2216,8 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 50.68948035487959,
-    "parsed": true
+    "price": 50.68948035487959
   },
   {
     "isin": "IE00BKX55T58",
@@ -2550,13 +2232,10 @@
     "tax": 0,
     "fee": 7.39,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 57.92004703115814,
-    "parsed": true
+    "price": 57.92004703115814
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -2568,10 +2247,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 207.88135593220338,
-    "parsed": true
+    "price": 207.88135593220338
   },
   {
     "isin": "US5801351017",
@@ -2586,10 +2263,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 193.6220472440945,
-    "parsed": true
+    "price": 193.6220472440945
   },
   {
     "isin": "IE00B1FZS244",
@@ -2604,10 +2279,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 26.865454545454547,
-    "parsed": true
+    "price": 26.865454545454547
   },
   {
     "isin": "US92826C8394",
@@ -2622,10 +2295,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 159.54545454545453,
-    "parsed": true
+    "price": 159.54545454545453
   },
   {
     "isin": "US88579Y1010",
@@ -2640,13 +2311,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 151.41538461538462,
-    "parsed": true
+    "price": 151.41538461538462
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -2658,13 +2326,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 128.63874345549738,
-    "parsed": true
+    "price": 128.63874345549738
   },
   {
-    "isin": "",
     "wkn": "855686",
     "type": "Buy",
     "company": "DISNEY",
@@ -2676,10 +2341,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 120.39119804400978,
-    "parsed": true
+    "price": 120.39119804400978
   },
   {
     "isin": "US4781601046",
@@ -2694,10 +2357,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 119.61070559610705,
-    "parsed": true
+    "price": 119.61070559610705
   },
   {
     "isin": "NL0000235190",
@@ -2712,10 +2373,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 118.79227053140097,
-    "parsed": true
+    "price": 118.79227053140097
   },
   {
     "isin": "US8552441094",
@@ -2730,10 +2389,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 81.50662251655629,
-    "parsed": true
+    "price": 81.50662251655629
   },
   {
     "isin": "NL0000388619",
@@ -2748,10 +2405,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 55.2017937219731,
-    "parsed": true
+    "price": 55.2017937219731
   },
   {
     "isin": "IE00B0M63284",
@@ -2766,10 +2421,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 43.2630345635618,
-    "parsed": true
+    "price": 43.2630345635618
   },
   {
     "isin": "IE00B1FZS350",
@@ -2784,10 +2437,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 25.604852686308494,
-    "parsed": true
+    "price": 25.604852686308494
   },
   {
     "isin": "IE00B3VVMM84",
@@ -2802,10 +2453,8 @@
     "tax": 0,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 50.32972564812484,
-    "parsed": true
+    "price": 50.32972564812484
   },
   {
     "isin": "IE00BKX55T58",
@@ -2820,10 +2469,8 @@
     "tax": 0,
     "fee": 7.39,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 58.75,
-    "parsed": true
+    "price": 58.75
   },
   {
     "isin": "US8825081040",
@@ -2838,13 +2485,10 @@
     "tax": 0,
     "fee": 12.9,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 117.18916666666667,
-    "parsed": true
+    "price": 117.18916666666667
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -2856,10 +2500,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 226.8663594470046,
-    "parsed": true
+    "price": 226.8663594470046
   },
   {
     "isin": "US5801351017",
@@ -2874,10 +2516,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 174.5035460992908,
-    "parsed": true
+    "price": 174.5035460992908
   },
   {
     "isin": "US92826C8394",
@@ -2892,10 +2532,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 161.61184210526315,
-    "parsed": true
+    "price": 161.61184210526315
   },
   {
     "isin": "US88579Y1010",
@@ -2910,10 +2548,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 151.35384615384615,
-    "parsed": true
+    "price": 151.35384615384615
   },
   {
     "isin": "NL0000235190",
@@ -2928,13 +2564,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 129.89445910290237,
-    "parsed": true
+    "price": 129.89445910290237
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -2946,13 +2579,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 128.5378590078329,
-    "parsed": true
+    "price": 128.5378590078329
   },
   {
-    "isin": "",
     "wkn": "855686",
     "type": "Buy",
     "company": "DISNEY",
@@ -2964,10 +2594,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 118.26923076923077,
-    "parsed": true
+    "price": 118.26923076923077
   },
   {
     "isin": "US4781601046",
@@ -2982,10 +2610,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 117.93764988009592,
-    "parsed": true
+    "price": 117.93764988009592
   },
   {
     "isin": "US8552441094",
@@ -3000,10 +2626,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 74.46293494704993,
-    "parsed": true
+    "price": 74.46293494704993
   },
   {
     "isin": "NL0000388619",
@@ -3018,10 +2642,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 52.85407725321888,
-    "parsed": true
+    "price": 52.85407725321888
   },
   {
     "isin": "IE00B0M63284",
@@ -3036,10 +2658,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 44.35174069627851,
-    "parsed": true
+    "price": 44.35174069627851
   },
   {
     "isin": "IE00B1FZS244",
@@ -3054,10 +2674,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 27.485119047619047,
-    "parsed": true
+    "price": 27.485119047619047
   },
   {
     "isin": "IE00B1FZS350",
@@ -3072,10 +2690,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 25.733194009056078,
-    "parsed": true
+    "price": 25.733194009056078
   },
   {
     "isin": "IE00B3VVMM84",
@@ -3090,10 +2706,8 @@
     "tax": 0,
     "fee": 2.96,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 51.74940898345154,
-    "parsed": true
+    "price": 51.74940898345154
   },
   {
     "isin": "IE00BKX55T58",
@@ -3108,13 +2722,10 @@
     "tax": 0,
     "fee": 7.39,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 59.190098534006246,
-    "parsed": true
+    "price": 59.190098534006246
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -3126,13 +2737,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 136.63888888888889,
-    "parsed": true
+    "price": 136.63888888888889
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -3144,10 +2752,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 242.26600985221674,
-    "parsed": true
+    "price": 242.26600985221674
   },
   {
     "isin": "US5801351017",
@@ -3162,10 +2768,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 177.0863309352518,
-    "parsed": true
+    "price": 177.0863309352518
   },
   {
     "isin": "US92826C8394",
@@ -3180,10 +2784,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 166.47457627118644,
-    "parsed": true
+    "price": 166.47457627118644
   },
   {
     "isin": "US88579Y1010",
@@ -3198,13 +2800,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 154.68553459119497,
-    "parsed": true
+    "price": 154.68553459119497
   },
   {
-    "isin": "",
     "wkn": "855686",
     "type": "Buy",
     "company": "DISNEY",
@@ -3216,10 +2815,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 137.7591036414566,
-    "parsed": true
+    "price": 137.7591036414566
   },
   {
     "isin": "NL0000235190",
@@ -3234,10 +2831,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 130.53050397877985,
-    "parsed": true
+    "price": 130.53050397877985
   },
   {
     "isin": "US4781601046",
@@ -3252,10 +2847,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 124.84771573604061,
-    "parsed": true
+    "price": 124.84771573604061
   },
   {
     "isin": "US8552441094",
@@ -3270,10 +2863,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 77.34276729559748,
-    "parsed": true
+    "price": 77.34276729559748
   },
   {
     "isin": "NL0000388619",
@@ -3288,10 +2879,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 53.68593238822246,
-    "parsed": true
+    "price": 53.68593238822246
   },
   {
     "isin": "IE00B0M63284",
@@ -3306,10 +2895,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 44.88456865127582,
-    "parsed": true
+    "price": 44.88456865127582
   },
   {
     "isin": "IE00B1FZS244",
@@ -3324,10 +2911,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 26.70643528561099,
-    "parsed": true
+    "price": 26.70643528561099
   },
   {
     "isin": "IE00B1FZS350",
@@ -3342,10 +2927,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 25.411076711386308,
-    "parsed": true
+    "price": 25.411076711386308
   },
   {
     "isin": "IE00B3VVMM84",
@@ -3360,10 +2943,8 @@
     "tax": 0,
     "fee": 2.96,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 52.00052784375825,
-    "parsed": true
+    "price": 52.00052784375825
   },
   {
     "isin": "IE00BKX55T58",
@@ -3378,10 +2959,8 @@
     "tax": 0,
     "fee": 7.39,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 60.90009891196835,
-    "parsed": true
+    "price": 60.90009891196835
   },
   {
     "isin": "LU0302296495",
@@ -3396,10 +2975,8 @@
     "tax": 138.73,
     "fee": 2.9,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 577.9788888888888,
-    "parsed": true
+    "price": 577.9788888888888
   },
   {
     "isin": "LU0302296495",
@@ -3414,10 +2991,8 @@
     "tax": 4.55,
     "fee": 0,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 578,
-    "parsed": true
+    "price": 578
   },
   {
     "isin": "US92826C8394",
@@ -3432,13 +3007,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 169.6551724137931,
-    "parsed": true
+    "price": 169.6551724137931
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -3450,10 +3022,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 266.57608695652175,
-    "parsed": true
+    "price": 266.57608695652175
   },
   {
     "isin": "US5801351017",
@@ -3468,10 +3038,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 177.5451263537906,
-    "parsed": true
+    "price": 177.5451263537906
   },
   {
     "isin": "US88579Y1010",
@@ -3486,13 +3054,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 159.3527508090615,
-    "parsed": true
+    "price": 159.3527508090615
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -3504,10 +3069,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 142.52173913043478,
-    "parsed": true
+    "price": 142.52173913043478
   },
   {
     "isin": "NL0000235190",
@@ -3522,13 +3085,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 133.89645776566758,
-    "parsed": true
+    "price": 133.89645776566758
   },
   {
-    "isin": "",
     "wkn": "855686",
     "type": "Buy",
     "company": "DISNEY",
@@ -3540,10 +3100,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 130.50397877984085,
-    "parsed": true
+    "price": 130.50397877984085
   },
   {
     "isin": "US4781601046",
@@ -3558,10 +3116,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 130.13227513227514,
-    "parsed": true
+    "price": 130.13227513227514
   },
   {
     "isin": "US8552441094",
@@ -3576,10 +3132,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 79.13183279742765,
-    "parsed": true
+    "price": 79.13183279742765
   },
   {
     "isin": "NL0000388619",
@@ -3594,10 +3148,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 51.57068062827225,
-    "parsed": true
+    "price": 51.57068062827225
   },
   {
     "isin": "IE00B0M63284",
@@ -3612,10 +3164,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 46.18511569731082,
-    "parsed": true
+    "price": 46.18511569731082
   },
   {
     "isin": "IE00B1FZS244",
@@ -3630,10 +3180,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 26.871589668970536,
-    "parsed": true
+    "price": 26.871589668970536
   },
   {
     "isin": "IE00B1FZS350",
@@ -3648,10 +3196,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 25.348198970840482,
-    "parsed": true
+    "price": 25.348198970840482
   },
   {
     "isin": "IE00B3VVMM84",
@@ -3666,10 +3212,8 @@
     "tax": 0,
     "fee": 2.96,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 55.6682678722803,
-    "parsed": true
+    "price": 55.6682678722803
   },
   {
     "isin": "IE00BKX55T58",
@@ -3684,13 +3228,10 @@
     "tax": 0,
     "fee": 7.39,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 62.28755690440061,
-    "parsed": true
+    "price": 62.28755690440061
   },
   {
-    "isin": "",
     "wkn": "A1CX3T",
     "type": "Buy",
     "company": "TESLA",
@@ -3702,10 +3243,8 @@
     "tax": 0,
     "fee": 12.4,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 434.95,
-    "parsed": true
+    "price": 434.95
   },
   {
     "isin": "US88579Y1010",
@@ -3720,13 +3259,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 144.73529411764707,
-    "parsed": true
+    "price": 144.73529411764707
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -3738,10 +3274,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 279.2613636363636,
-    "parsed": true
+    "price": 279.2613636363636
   },
   {
     "isin": "US5801351017",
@@ -3756,10 +3290,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 195.03968253968253,
-    "parsed": true
+    "price": 195.03968253968253
   },
   {
     "isin": "US92826C8394",
@@ -3774,13 +3306,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 182.5278810408922,
-    "parsed": true
+    "price": 182.5278810408922
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -3792,10 +3321,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 155.0788643533123,
-    "parsed": true
+    "price": 155.0788643533123
   },
   {
     "isin": "US4781601046",
@@ -3810,10 +3337,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 135.48209366391185,
-    "parsed": true
+    "price": 135.48209366391185
   },
   {
     "isin": "NL0000235190",
@@ -3828,13 +3353,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 133.44173441734418,
-    "parsed": true
+    "price": 133.44173441734418
   },
   {
-    "isin": "",
     "wkn": "855686",
     "type": "Buy",
     "company": "DISNEY",
@@ -3846,10 +3368,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 127.05426356589147,
-    "parsed": true
+    "price": 127.05426356589147
   },
   {
     "isin": "US8552441094",
@@ -3864,10 +3384,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 77.58675078864353,
-    "parsed": true
+    "price": 77.58675078864353
   },
   {
     "isin": "NL0000388619",
@@ -3882,10 +3400,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 53.16414686825054,
-    "parsed": true
+    "price": 53.16414686825054
   },
   {
     "isin": "IE00B0M63284",
@@ -3900,10 +3416,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 47.38293778062861,
-    "parsed": true
+    "price": 47.38293778062861
   },
   {
     "isin": "IE00B1FZS244",
@@ -3918,10 +3432,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 26.594672426205904,
-    "parsed": true
+    "price": 26.594672426205904
   },
   {
     "isin": "IE00B1FZS350",
@@ -3936,10 +3448,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 25.684979137691236,
-    "parsed": true
+    "price": 25.684979137691236
   },
   {
     "isin": "IE00B3VVMM84",
@@ -3954,10 +3464,8 @@
     "tax": 0,
     "fee": 2.96,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 52.653661143773384,
-    "parsed": true
+    "price": 52.653661143773384
   },
   {
     "isin": "IE00BKX55T58",
@@ -3972,10 +3480,8 @@
     "tax": 0,
     "fee": 7.39,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 62.37022030893897,
-    "parsed": true
+    "price": 62.37022030893897
   },
   {
     "isin": "US29355A1079",
@@ -3990,13 +3496,10 @@
     "tax": 0,
     "fee": 15.3,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 42.646,
-    "parsed": true
+    "price": 42.646
   },
   {
-    "isin": "",
     "wkn": "855686",
     "type": "Buy",
     "company": "DISNEY",
@@ -4008,13 +3511,10 @@
     "tax": 0,
     "fee": 12.4,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 104.6,
-    "parsed": true
+    "price": 104.6
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -4026,10 +3526,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 251.3265306122449,
-    "parsed": true
+    "price": 251.3265306122449
   },
   {
     "isin": "US5801351017",
@@ -4044,10 +3542,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 174.94661921708186,
-    "parsed": true
+    "price": 174.94661921708186
   },
   {
     "isin": "US92826C8394",
@@ -4062,13 +3558,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 165.3872053872054,
-    "parsed": true
+    "price": 165.3872053872054
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -4080,10 +3573,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 147.33532934131736,
-    "parsed": true
+    "price": 147.33532934131736
   },
   {
     "isin": "US88579Y1010",
@@ -4098,10 +3589,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 134.87671232876713,
-    "parsed": true
+    "price": 134.87671232876713
   },
   {
     "isin": "US4781601046",
@@ -4116,10 +3605,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 120.66176470588235,
-    "parsed": true
+    "price": 120.66176470588235
   },
   {
     "isin": "NL0000235190",
@@ -4134,13 +3621,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 105.99137931034483,
-    "parsed": true
+    "price": 105.99137931034483
   },
   {
-    "isin": "",
     "wkn": "855686",
     "type": "Buy",
     "company": "DISNEY",
@@ -4152,10 +3636,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 105.25641025641026,
-    "parsed": true
+    "price": 105.25641025641026
   },
   {
     "isin": "US8552441094",
@@ -4170,10 +3652,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 70.54441260744986,
-    "parsed": true
+    "price": 70.54441260744986
   },
   {
     "isin": "NL0000388619",
@@ -4188,10 +3668,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 48.199608610567516,
-    "parsed": true
+    "price": 48.199608610567516
   },
   {
     "isin": "IE00B0M63284",
@@ -4206,10 +3684,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 44.19509275882705,
-    "parsed": true
+    "price": 44.19509275882705
   },
   {
     "isin": "IE00B1FZS244",
@@ -4224,10 +3700,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 24.31863067807768,
-    "parsed": true
+    "price": 24.31863067807768
   },
   {
     "isin": "IE00B1FZS350",
@@ -4242,10 +3716,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 23.42105263157895,
-    "parsed": true
+    "price": 23.42105263157895
   },
   {
     "isin": "IE00B3VVMM84",
@@ -4260,10 +3732,8 @@
     "tax": 0,
     "fee": 2.96,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 49.460205874968615,
-    "parsed": true
+    "price": 49.460205874968615
   },
   {
     "isin": "IE00BKX55T58",
@@ -4278,10 +3748,8 @@
     "tax": 0,
     "fee": 7.39,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 56.713874496257915,
-    "parsed": true
+    "price": 56.713874496257915
   },
   {
     "isin": "US4781601046",
@@ -4296,13 +3764,10 @@
     "tax": 0,
     "fee": 12.4,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 119.66,
-    "parsed": true
+    "price": 119.66
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -4314,10 +3779,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 227.22222222222223,
-    "parsed": true
+    "price": 227.22222222222223
   },
   {
     "isin": "US5801351017",
@@ -4332,13 +3795,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 147.36526946107784,
-    "parsed": true
+    "price": 147.36526946107784
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -4350,10 +3810,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 142.7536231884058,
-    "parsed": true
+    "price": 142.7536231884058
   },
   {
     "isin": "US92826C8394",
@@ -4368,10 +3826,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 141.61383285302594,
-    "parsed": true
+    "price": 141.61383285302594
   },
   {
     "isin": "US88579Y1010",
@@ -4386,10 +3842,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 121.2807881773399,
-    "parsed": true
+    "price": 121.2807881773399
   },
   {
     "isin": "US4781601046",
@@ -4404,10 +3858,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 116.4066193853428,
-    "parsed": true
+    "price": 116.4066193853428
   },
   {
     "isin": "IE00B1FZS350",
@@ -4422,13 +3874,10 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 17.345070422535212,
-    "parsed": true
+    "price": 17.345070422535212
   },
   {
-    "isin": "",
     "wkn": "855686",
     "type": "Buy",
     "company": "DISNEY",
@@ -4440,10 +3889,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 86.70774647887323,
-    "parsed": true
+    "price": 86.70774647887323
   },
   {
     "isin": "US8552441094",
@@ -4458,10 +3905,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 58.42230130486358,
-    "parsed": true
+    "price": 58.42230130486358
   },
   {
     "isin": "NL0000235190",
@@ -4476,10 +3921,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 52.78670953912111,
-    "parsed": true
+    "price": 52.78670953912111
   },
   {
     "isin": "IE00BKX55T58",
@@ -4494,10 +3937,8 @@
     "tax": 0,
     "fee": 7.39,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 48.103515625,
-    "parsed": true
+    "price": 48.103515625
   },
   {
     "isin": "NL0000388619",
@@ -4512,10 +3953,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 43.51900972590628,
-    "parsed": true
+    "price": 43.51900972590628
   },
   {
     "isin": "IE00B0M63284",
@@ -4530,10 +3969,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 33.7043795620438,
-    "parsed": true
+    "price": 33.7043795620438
   },
   {
     "isin": "IE00B1FZS244",
@@ -4548,10 +3985,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 19.294855053538782,
-    "parsed": true
+    "price": 19.294855053538782
   },
   {
     "isin": "IE00B3VVMM84",
@@ -4566,10 +4001,8 @@
     "tax": 0,
     "fee": 2.96,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 41.13802463979954,
-    "parsed": true
+    "price": 41.13802463979954
   },
   {
     "isin": "US8552441094",
@@ -4584,13 +4017,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 65.64,
-    "parsed": true
+    "price": 65.64
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -4602,10 +4032,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 263.42245989304814,
-    "parsed": true
+    "price": 263.42245989304814
   },
   {
     "isin": "US5801351017",
@@ -4620,13 +4048,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 164.41471571906354,
-    "parsed": true
+    "price": 164.41471571906354
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -4638,10 +4063,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 159.93485342019545,
-    "parsed": true
+    "price": 159.93485342019545
   },
   {
     "isin": "US92826C8394",
@@ -4656,10 +4079,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 157.3482428115016,
-    "parsed": true
+    "price": 157.3482428115016
   },
   {
     "isin": "US4781601046",
@@ -4674,10 +4095,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 135.50964187327824,
-    "parsed": true
+    "price": 135.50964187327824
   },
   {
     "isin": "US88579Y1010",
@@ -4692,13 +4111,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 135.21978021978023,
-    "parsed": true
+    "price": 135.21978021978023
   },
   {
-    "isin": "",
     "wkn": "855686",
     "type": "Buy",
     "company": "DISNEY",
@@ -4710,10 +4126,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 92.44360902255639,
-    "parsed": true
+    "price": 92.44360902255639
   },
   {
     "isin": "NL0000235190",
@@ -4728,10 +4142,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 53.67502726281352,
-    "parsed": true
+    "price": 53.67502726281352
   },
   {
     "isin": "NL0000388619",
@@ -4746,10 +4158,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 44.32943294329433,
-    "parsed": true
+    "price": 44.32943294329433
   },
   {
     "isin": "IE00B0M63284",
@@ -4764,10 +4174,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 34.33550185873606,
-    "parsed": true
+    "price": 34.33550185873606
   },
   {
     "isin": "IE00B1FZS244",
@@ -4782,10 +4190,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 20.330214639515685,
-    "parsed": true
+    "price": 20.330214639515685
   },
   {
     "isin": "IE00B1FZS350",
@@ -4800,10 +4206,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 18.584004024144868,
-    "parsed": true
+    "price": 18.584004024144868
   },
   {
     "isin": "US88579Y1010",
@@ -4818,13 +4222,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 136.61111111111111,
-    "parsed": true
+    "price": 136.61111111111111
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Buy",
     "company": "APPLE",
@@ -4836,10 +4237,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 281.8390804597701,
-    "parsed": true
+    "price": 281.8390804597701
   },
   {
     "isin": "US92826C8394",
@@ -4854,13 +4253,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 170.48611111111111,
-    "parsed": true
+    "price": 170.48611111111111
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Buy",
     "company": "MICROSOFT",
@@ -4872,10 +4268,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 170.17301038062283,
-    "parsed": true
+    "price": 170.17301038062283
   },
   {
     "isin": "US5801351017",
@@ -4890,10 +4284,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 166.0472972972973,
-    "parsed": true
+    "price": 166.0472972972973
   },
   {
     "isin": "US4781601046",
@@ -4908,13 +4300,10 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 137.07520891364902,
-    "parsed": true
+    "price": 137.07520891364902
   },
   {
-    "isin": "",
     "wkn": "855686",
     "type": "Buy",
     "company": "DISNEY",
@@ -4926,10 +4315,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 95.71984435797665,
-    "parsed": true
+    "price": 95.71984435797665
   },
   {
     "isin": "US8552441094",
@@ -4944,10 +4331,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 68.51182197496523,
-    "parsed": true
+    "price": 68.51182197496523
   },
   {
     "isin": "NL0000235190",
@@ -4962,10 +4347,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 55.38807649043869,
-    "parsed": true
+    "price": 55.38807649043869
   },
   {
     "isin": "IE00BKX55T58",
@@ -4980,10 +4363,8 @@
     "tax": 0,
     "fee": 7.39,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 55.219730941704036,
-    "parsed": true
+    "price": 55.219730941704036
   },
   {
     "isin": "NL0000388619",
@@ -4998,10 +4379,8 @@
     "tax": 0,
     "fee": 0.74,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 44.44043321299639,
-    "parsed": true
+    "price": 44.44043321299639
   },
   {
     "isin": "IE00B0M63284",
@@ -5016,10 +4395,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 35.6,
-    "parsed": true
+    "price": 35.6
   },
   {
     "isin": "IE00B1FZS244",
@@ -5034,10 +4411,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 21.08447488584475,
-    "parsed": true
+    "price": 21.08447488584475
   },
   {
     "isin": "IE00B1FZS350",
@@ -5052,10 +4427,8 @@
     "tax": 0,
     "fee": 1.11,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 19.080578512396695,
-    "parsed": true
+    "price": 19.080578512396695
   },
   {
     "isin": "IE00B3VVMM84",
@@ -5070,13 +4443,10 @@
     "tax": 0,
     "fee": 2.96,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 45.40447107628486,
-    "parsed": true
+    "price": 45.40447107628486
   },
   {
-    "isin": "",
     "wkn": "710000",
     "type": "Sell",
     "company": "DAIMLER",
@@ -5088,9 +4458,7 @@
     "tax": 0,
     "fee": 12.4,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 31.72,
-    "parsed": true
+    "price": 31.72
   }
 ]

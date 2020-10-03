@@ -119,10 +119,10 @@ describe('DKB broker', () => {
         isin: 'US0378331005',
         company: 'APPLE INC.',
         shares: 36,
-        price: 0.6019444444444445,
-        amount: 21.67,
+        price: 0.7080555555555555,
+        amount: 25.49,
         fee: 0,
-        tax: 0,
+        tax: 3.82,
       });
     });
 
@@ -136,10 +136,10 @@ describe('DKB broker', () => {
         isin: 'US5949181045',
         company: 'MICROSOFT CORP.',
         shares: 5,
-        price: 0.27799999999999997,
-        amount: 1.39,
+        price: 0.32599999999999996,
+        amount: 1.63,
         fee: 0,
-        tax: 0,
+        tax: 0.24,
       });
     });
     test('should map pdf data of sample 3 correctly', () => {
@@ -156,6 +156,22 @@ describe('DKB broker', () => {
         amount: 4.5,
         fee: 0,
         tax: 0,
+      });
+    });
+    test('should map pdf data of sample 4 correctly', () => {
+      const activity = parseData(dividendsSamples[3]);
+
+      expect(activity).toEqual({
+        broker: 'dkb',
+        type: 'Dividend',
+        date: '2020-04-08',
+        isin: 'IE00B3RBWM25',
+        company: 'VANGUARD FTSE ALL-WORLD U.ETF',
+        shares: 12,
+        price: 0.375,
+        amount: 4.5,
+        fee: 0,
+        tax: 0.83,
       });
     });
   });

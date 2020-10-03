@@ -4,12 +4,47 @@ describe('Heler functions', () => {
   let consoleErrorSpy;
 
   describe('Function: validateActivity', () => {
-    test('Is a valid activity valid', () => {
+    test('Is a valid activity with ISIN', () => {
       const activity = {
         broker: 'traderepublic',
         type: 'Sell',
         date: new Date(2000, 1, 1),
         isin: 'DETRESOR1042',
+        company: 'Tresor 1 Inc.',
+        shares: 42,
+        price: 42,
+        amount: 1764,
+        fee: 1,
+        tax: 0,
+      };
+
+      expect(activity).toEqual(helper.validateActivity(activity));
+    });
+
+    test('Is a valid activity with WKN', () => {
+      const activity = {
+        broker: 'traderepublic',
+        type: 'Sell',
+        date: new Date(2000, 1, 1),
+        wkn: 'T10000',
+        company: 'Tresor 1 Inc.',
+        shares: 42,
+        price: 42,
+        amount: 1764,
+        fee: 1,
+        tax: 0,
+      };
+
+      expect(activity).toEqual(helper.validateActivity(activity));
+    });
+
+    test('Is a valid activity with ISIN and WKN', () => {
+      const activity = {
+        broker: 'traderepublic',
+        type: 'Sell',
+        date: new Date(2000, 1, 1),
+        isin: 'DETRESOR1042',
+        wkn: 'T10000',
         company: 'Tresor 1 Inc.',
         shares: 42,
         price: 42,
@@ -271,6 +306,65 @@ describe('Heler functions', () => {
       expect(helper.validateActivity(activity)).toEqual(undefined);
       expect(console.error).toHaveBeenLastCalledWith(
         "The activity type for comdirect can't be valid with an unknown type.",
+        activity
+      );
+    });
+
+    test('Activity with an invalid wkn should be invalid', () => {
+      const activity = {
+        broker: 'comdirect',
+        type: 'Buy',
+        date: new Date(),
+        wkn: 'TRESOR1',
+        company: 'Tresor 1 Inc.',
+        shares: 42,
+        price: 42,
+        amount: 1764,
+        fee: 1,
+        tax: 0,
+      };
+
+      expect(helper.validateActivity(activity)).toEqual(undefined);
+      expect(console.error).toHaveBeenLastCalledWith(
+        "The activity WKN for comdirect can't be valid with an invalid scheme.",
+        activity
+      );
+    });
+
+    test('Activity without an isin or wkn should be invalid', () => {
+      const activity = {
+        broker: 'comdirect',
+        type: 'Buy',
+        date: new Date(),
+        shares: 42,
+        price: 42,
+        amount: 1764,
+        fee: 1,
+        tax: 0,
+      };
+
+      expect(helper.validateActivity(activity)).toEqual(undefined);
+      expect(console.error).toHaveBeenLastCalledWith(
+        'The activity for comdirect must have at least an ISIN or WKN.',
+        activity
+      );
+    });
+
+    test('Activity without an company, isin or wkn should be invalid', () => {
+      const activity = {
+        broker: 'comdirect',
+        type: 'Buy',
+        date: new Date(),
+        shares: 42,
+        price: 42,
+        amount: 1764,
+        fee: 1,
+        tax: 0,
+      };
+
+      expect(helper.validateActivity(activity, true)).toEqual(undefined);
+      expect(console.error).toHaveBeenLastCalledWith(
+        'The activity for comdirect must have at least a company, ISIN or WKN.',
         activity
       );
     });

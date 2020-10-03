@@ -1,7 +1,7 @@
 import format from 'date-fns/format';
 import Big from 'big.js';
 
-import { parseGermanNum } from '@/helper';
+import { parseGermanNum, validateActivity } from '@/helper';
 import { detectLocale, getKeyMap, getTypeMap, keyNormalizer } from './utils';
 
 const activityNormalizer = typeKeyMap => activity => {
@@ -23,17 +23,32 @@ const activityNormalizer = typeKeyMap => activity => {
     {}
   );
 
-  return {
+  activity = {
     ...activity,
     type,
     ...normalizedNumericFields,
     date: format(new Date(activity.date), 'yyyy-MM-dd'),
   };
+
+  // The following fields can have empty or undefined values. All of these fields (with empty or undefined values) should
+  // be removed. The validation logic for activities will mark activities with empty or undefined values as invalid.
+  ['isin', 'wkn', 'symbol', 'grossCurrency'].forEach(field => {
+    if (activity[field] !== undefined) {
+      const value = activity[field].trim();
+      if (value.length === 0) {
+        delete activity[field];
+      }
+    }
+
+    if (activity[field] === undefined) {
+      delete activity[field];
+    }
+  });
+
+  return activity;
 };
 
-const validateActivity = activity => {
-  const supportedTypes = ['Buy', 'Sell', 'Dividend'];
-
+const validate = activity => {
   // Filter "Buy" cash oposite
   if (activity.type === 'Buy' && activity.amount < 0) {
     return [];
@@ -55,7 +70,7 @@ const validateActivity = activity => {
   }
 
   // filter cash movements and other non-supported types
-  if (!supportedTypes.includes(activity.type)) {
+  if (!['Buy', 'Sell', 'Dividend'].includes(activity.type)) {
     return [];
   }
 
@@ -84,14 +99,15 @@ const validateActivity = activity => {
     activity.price = +Big(activity.amount).div(Big(activity.shares));
   }
 
-  activity.parsed = true;
+  activity = validateActivity(activity, true);
+  if (activity === undefined) {
+    return [];
+  }
 
   return [activity];
 };
 
 export const parse = transactions => {
-  console.log(`processing ${transactions.length} transactions...`);
-
   const locale = detectLocale(transactions);
   if (!locale) {
     throw new Error('Locale could not be detected!');
@@ -111,9 +127,8 @@ export const parse = transactions => {
     .filter(({ shares }) => shares !== undefined)
     .filter(({ type }) => Boolean(type))
     .map(normalizeActivity)
-    .flatMap(validateActivity);
+    .flatMap(validate);
 
-  console.log(`found ${activities.length} valid activities 🎉`);
   console.table(activities);
 
   return activities;

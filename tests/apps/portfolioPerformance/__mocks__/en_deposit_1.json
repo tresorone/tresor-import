@@ -13,8 +13,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.6452777777777777,
-    "parsed": true
+    "price": 0.6452777777777777
   },
   {
     "isin": "US09247X1019",
@@ -30,8 +29,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 2.914,
-    "parsed": true
+    "price": 2.914
   },
   {
     "isin": "DE000A0F5UH1",
@@ -47,8 +45,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.22063157894736843,
-    "parsed": true
+    "price": 0.22063157894736843
   },
   {
     "isin": "US0378331005",
@@ -64,8 +61,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.6875,
-    "parsed": true
+    "price": 0.6875
   },
   {
     "isin": "US09247X1019",
@@ -81,8 +77,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 2.912,
-    "parsed": true
+    "price": 2.912
   },
   {
     "isin": "DE000A0F5UH1",
@@ -98,8 +93,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.5189473684210526,
-    "parsed": true
+    "price": 0.5189473684210526
   },
   {
     "isin": "US0378331005",
@@ -115,8 +109,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.6927777777777778,
-    "parsed": true
+    "price": 0.6927777777777778
   },
   {
     "isin": "LU0392495700",
@@ -132,8 +125,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 1.045125,
-    "parsed": true
+    "price": 1.045125
   },
   {
     "isin": "US09247X1019",
@@ -149,8 +141,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 2.996,
-    "parsed": true
+    "price": 2.996
   },
   {
     "isin": "DE000A0F5UH1",
@@ -166,8 +157,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.25863157894736843,
-    "parsed": true
+    "price": 0.25863157894736843
   },
   {
     "isin": "US0378331005",
@@ -183,8 +173,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.6958333333333333,
-    "parsed": true
+    "price": 0.6958333333333333
   },
   {
     "isin": "US09247X1019",
@@ -200,8 +189,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 2.97,
-    "parsed": true
+    "price": 2.97
   },
   {
     "isin": "DE000A0F5UH1",
@@ -217,8 +205,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.20378947368421052,
-    "parsed": true
+    "price": 0.20378947368421052
   },
   {
     "isin": "US0378331005",
@@ -234,8 +221,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.7080555555555555,
-    "parsed": true
+    "price": 0.7080555555555555
   },
   {
     "isin": "US09247X1019",
@@ -251,8 +237,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 3.336,
-    "parsed": true
+    "price": 3.336
   },
   {
     "isin": "IE00B8GKDB10",
@@ -268,8 +253,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.36650020751609924,
-    "parsed": true
+    "price": 0.36650020751609924
   },
   {
     "isin": "DE000A0F5UH1",
@@ -285,8 +269,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.1771578947368421,
-    "parsed": true
+    "price": 0.1771578947368421
   },
   {
     "isin": "US0378331005",
@@ -302,15 +285,12 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.7560377358490566,
-    "parsed": true
+    "price": 0.7560377358490566
   },
   {
     "isin": "IE00BJ5JNY98",
-    "wkn": "",
     "type": "Dividend",
     "company": "MSCI World Information Technology",
-    "symbol": "",
     "date": "2020-06-24",
     "shares": 23,
     "amount": 0.6,
@@ -319,8 +299,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.02608695652173913,
-    "parsed": true
+    "price": 0.02608695652173913
   },
   {
     "isin": "US09247X1019",
@@ -336,8 +315,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 3.2,
-    "parsed": true
+    "price": 3.2
   },
   {
     "isin": "IE00B8GKDB10",
@@ -353,7 +331,6 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.3591042554384816,
-    "parsed": true
+    "price": 0.3591042554384816
   }
 ]

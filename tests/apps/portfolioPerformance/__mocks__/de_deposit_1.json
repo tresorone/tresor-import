@@ -1,6 +1,5 @@
 [
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Dividend",
     "company": "APPLE",
@@ -13,11 +12,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.5466666666666666,
-    "parsed": true
+    "price": 0.5466666666666666
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Dividend",
     "company": "MICROSOFT",
@@ -30,11 +27,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.3426315789473684,
-    "parsed": true
+    "price": 0.3426315789473684
   },
   {
-    "isin": "",
     "wkn": "855686",
     "type": "Dividend",
     "company": "DISNEY",
@@ -47,11 +42,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.6475,
-    "parsed": true
+    "price": 0.6475
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Dividend",
     "company": "APPLE",
@@ -64,8 +57,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.5483704086911536,
-    "parsed": true
+    "price": 0.5483704086911536
   },
   {
     "isin": "US8552441094",
@@ -81,8 +73,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.26877470355731226,
-    "parsed": true
+    "price": 0.26877470355731226
   },
   {
     "isin": "US92826C8394",
@@ -98,8 +89,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.18666666666666668,
-    "parsed": true
+    "price": 0.18666666666666668
   },
   {
     "isin": "US4781601046",
@@ -115,11 +105,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.6787175989085948,
-    "parsed": true
+    "price": 0.6787175989085948
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Dividend",
     "company": "MICROSOFT",
@@ -132,8 +120,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.34515728081078495,
-    "parsed": true
+    "price": 0.34515728081078495
   },
   {
     "isin": "US5801351017",
@@ -149,8 +136,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.8704883227176221,
-    "parsed": true
+    "price": 0.8704883227176221
   },
   {
     "isin": "IE00B3XXRP09",
@@ -166,8 +152,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.20456707897240722,
-    "parsed": true
+    "price": 0.20456707897240722
   },
   {
     "isin": "IE00BK1PV551",
@@ -183,11 +168,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 1.1364815775817332,
-    "parsed": true
+    "price": 1.1364815775817332
   },
   {
-    "isin": "",
     "wkn": "A1EWWW",
     "type": "Dividend",
     "company": "ADIDAS",
@@ -200,11 +183,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 3.35,
-    "parsed": true
+    "price": 3.35
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Dividend",
     "company": "APPLE",
@@ -217,11 +198,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.5825761624799572,
-    "parsed": true
+    "price": 0.5825761624799572
   },
   {
-    "isin": "",
     "wkn": "710000",
     "type": "Dividend",
     "company": "DAIMLER",
@@ -234,8 +213,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 3.25,
-    "parsed": true
+    "price": 3.25
   },
   {
     "isin": "US8552441094",
@@ -251,8 +229,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.2711961176134742,
-    "parsed": true
+    "price": 0.2711961176134742
   },
   {
     "isin": "IE00B1FZS244",
@@ -268,8 +245,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.17147026632615833,
-    "parsed": true
+    "price": 0.17147026632615833
   },
   {
     "isin": "IE00B1FZS350",
@@ -285,8 +261,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.19723865877712032,
-    "parsed": true
+    "price": 0.19723865877712032
   },
   {
     "isin": "US4581401001",
@@ -302,8 +277,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.238,
-    "parsed": true
+    "price": 0.238
   },
   {
     "isin": "US92826C8394",
@@ -319,8 +293,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.19,
-    "parsed": true
+    "price": 0.19
   },
   {
     "isin": "US4781601046",
@@ -336,8 +309,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.7115520907158044,
-    "parsed": true
+    "price": 0.7115520907158044
   },
   {
     "isin": "US88579Y1010",
@@ -353,11 +325,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 1.0766666666666667,
-    "parsed": true
+    "price": 1.0766666666666667
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Dividend",
     "company": "MICROSOFT",
@@ -370,8 +340,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.34542387178405737,
-    "parsed": true
+    "price": 0.34542387178405737
   },
   {
     "isin": "US5801351017",
@@ -387,8 +356,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.8766716196136701,
-    "parsed": true
+    "price": 0.8766716196136701
   },
   {
     "isin": "IE00B0M63284",
@@ -404,8 +372,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.8930286153255234,
-    "parsed": true
+    "price": 0.8930286153255234
   },
   {
     "isin": "US7475251036",
@@ -421,11 +388,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.4625,
-    "parsed": true
+    "price": 0.4625
   },
   {
-    "isin": "",
     "wkn": "864009",
     "type": "Dividend",
     "company": "NINTENDO",
@@ -438,8 +403,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 4.415,
-    "parsed": true
+    "price": 4.415
   },
   {
     "isin": "IE00B3XXRP09",
@@ -455,8 +419,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.19919834811125955,
-    "parsed": true
+    "price": 0.19919834811125955
   },
   {
     "isin": "LU1829221024",
@@ -472,11 +435,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.2,
-    "parsed": true
+    "price": 0.2
   },
   {
-    "isin": "",
     "wkn": "855686",
     "type": "Dividend",
     "company": "DISNEY",
@@ -489,8 +450,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.67,
-    "parsed": true
+    "price": 0.67
   },
   {
     "isin": "US8825081040",
@@ -506,11 +466,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.585,
-    "parsed": true
+    "price": 0.585
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Dividend",
     "company": "APPLE",
@@ -523,8 +481,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.5849621914681125,
-    "parsed": true
+    "price": 0.5849621914681125
   },
   {
     "isin": "DE000A1C22L5",
@@ -540,8 +497,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.3227699530516432,
-    "parsed": true
+    "price": 0.3227699530516432
   },
   {
     "isin": "US8552441094",
@@ -557,8 +513,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.27582376897445393,
-    "parsed": true
+    "price": 0.27582376897445393
   },
   {
     "isin": "IE00B1FZS244",
@@ -574,8 +529,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.22458116695551705,
-    "parsed": true
+    "price": 0.22458116695551705
   },
   {
     "isin": "IE00B1FZS350",
@@ -591,8 +545,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.21909744931327665,
-    "parsed": true
+    "price": 0.21909744931327665
   },
   {
     "isin": "US4581401001",
@@ -608,8 +561,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.244,
-    "parsed": true
+    "price": 0.244
   },
   {
     "isin": "US92826C8394",
@@ -625,8 +577,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.1968503937007874,
-    "parsed": true
+    "price": 0.1968503937007874
   },
   {
     "isin": "NL0000388619",
@@ -642,8 +593,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.3426124197002141,
-    "parsed": true
+    "price": 0.3426124197002141
   },
   {
     "isin": "US4781601046",
@@ -659,8 +609,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.7287009063444109,
-    "parsed": true
+    "price": 0.7287009063444109
   },
   {
     "isin": "US88579Y1010",
@@ -676,11 +625,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 1.105740181268882,
-    "parsed": true
+    "price": 1.105740181268882
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Dividend",
     "company": "MICROSOFT",
@@ -693,8 +640,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.35374888483767114,
-    "parsed": true
+    "price": 0.35374888483767114
   },
   {
     "isin": "US5801351017",
@@ -710,8 +656,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.8959402706486235,
-    "parsed": true
+    "price": 0.8959402706486235
   },
   {
     "isin": "IE00B0M63284",
@@ -727,8 +672,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.3890312173830534,
-    "parsed": true
+    "price": 0.3890312173830534
   },
   {
     "isin": "US7475251036",
@@ -744,8 +688,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.4825,
-    "parsed": true
+    "price": 0.4825
   },
   {
     "isin": "IE00B3VVMM84",
@@ -761,8 +704,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.5830164765525983,
-    "parsed": true
+    "price": 0.5830164765525983
   },
   {
     "isin": "IE00BKX55T58",
@@ -778,8 +720,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.24456202233980012,
-    "parsed": true
+    "price": 0.24456202233980012
   },
   {
     "isin": "IE00B3XXRP09",
@@ -795,11 +736,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.20774938169826876,
-    "parsed": true
+    "price": 0.20774938169826876
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Dividend",
     "company": "APPLE",
@@ -812,8 +751,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.594482579976687,
-    "parsed": true
+    "price": 0.594482579976687
   },
   {
     "isin": "US8825081040",
@@ -829,8 +767,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.69,
-    "parsed": true
+    "price": 0.69
   },
   {
     "isin": "US8825081040",
@@ -846,8 +783,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.69,
-    "parsed": true
+    "price": 0.69
   },
   {
     "isin": "IE00B1FZS244",
@@ -863,8 +799,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.17250747079597936,
-    "parsed": true
+    "price": 0.17250747079597936
   },
   {
     "isin": "IE00B1FZS350",
@@ -880,8 +815,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.1527702618324106,
-    "parsed": true
+    "price": 0.1527702618324106
   },
   {
     "isin": "US8552441094",
@@ -897,11 +831,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.3169550173010381,
-    "parsed": true
+    "price": 0.3169550173010381
   },
   {
-    "isin": "",
     "wkn": "864009",
     "type": "Dividend",
     "company": "NINTENDO",
@@ -914,8 +846,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 1.89,
-    "parsed": true
+    "price": 1.89
   },
   {
     "isin": "US4581401001",
@@ -931,8 +862,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.242,
-    "parsed": true
+    "price": 0.242
   },
   {
     "isin": "NL0000388619",
@@ -948,8 +878,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.3461109043542985,
-    "parsed": true
+    "price": 0.3461109043542985
   },
   {
     "isin": "US92826C8394",
@@ -965,8 +894,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.22792022792022792,
-    "parsed": true
+    "price": 0.22792022792022792
   },
   {
     "isin": "US4781601046",
@@ -982,8 +910,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.7267380802352447,
-    "parsed": true
+    "price": 0.7267380802352447
   },
   {
     "isin": "US88579Y1010",
@@ -999,11 +926,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 1.0948054973212207,
-    "parsed": true
+    "price": 1.0948054973212207
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Dividend",
     "company": "MICROSOFT",
@@ -1016,8 +941,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.38831347217581763,
-    "parsed": true
+    "price": 0.38831347217581763
   },
   {
     "isin": "US5801351017",
@@ -1033,8 +957,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.9501025290498974,
-    "parsed": true
+    "price": 0.9501025290498974
   },
   {
     "isin": "US7475251036",
@@ -1050,8 +973,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.4725,
-    "parsed": true
+    "price": 0.4725
   },
   {
     "isin": "IE00B0M63284",
@@ -1067,8 +989,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.06363285769379097,
-    "parsed": true
+    "price": 0.06363285769379097
   },
   {
     "isin": "IE00B3XXRP09",
@@ -1084,8 +1005,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.18136850783182193,
-    "parsed": true
+    "price": 0.18136850783182193
   },
   {
     "isin": "IE00B3VVMM84",
@@ -1101,8 +1021,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.1340724506896996,
-    "parsed": true
+    "price": 0.1340724506896996
   },
   {
     "isin": "IE00BKX55T58",
@@ -1118,11 +1037,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.2108171416559056,
-    "parsed": true
+    "price": 0.2108171416559056
   },
   {
-    "isin": "",
     "wkn": "855686",
     "type": "Dividend",
     "company": "DISNEY",
@@ -1135,8 +1052,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.669124218051832,
-    "parsed": true
+    "price": 0.669124218051832
   },
   {
     "isin": "US8825081040",
@@ -1152,8 +1068,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.695,
-    "parsed": true
+    "price": 0.695
   },
   {
     "isin": "US8825081040",
@@ -1169,8 +1084,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.6966666666666667,
-    "parsed": true
+    "price": 0.6966666666666667
   },
   {
     "isin": "DE000A1C22L5",
@@ -1186,11 +1100,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.10228586676154051,
-    "parsed": true
+    "price": 0.10228586676154051
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Dividend",
     "company": "APPLE",
@@ -1203,8 +1115,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.601158860453887,
-    "parsed": true
+    "price": 0.601158860453887
   },
   {
     "isin": "US8552441094",
@@ -1220,8 +1131,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.3213776461555336,
-    "parsed": true
+    "price": 0.3213776461555336
   },
   {
     "isin": "IE00B1FZS244",
@@ -1237,8 +1147,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.2327265545277988,
-    "parsed": true
+    "price": 0.2327265545277988
   },
   {
     "isin": "IE00B1FZS350",
@@ -1254,8 +1163,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.17144952782616668,
-    "parsed": true
+    "price": 0.17144952782616668
   },
   {
     "isin": "US4581401001",
@@ -1271,8 +1179,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.252,
-    "parsed": true
+    "price": 0.252
   },
   {
     "isin": "US92826C8394",
@@ -1288,8 +1195,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.2289774970390841,
-    "parsed": true
+    "price": 0.2289774970390841
   },
   {
     "isin": "US4781601046",
@@ -1305,8 +1211,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.7084545369240874,
-    "parsed": true
+    "price": 0.7084545369240874
   },
   {
     "isin": "US88579Y1010",
@@ -1322,11 +1227,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 1.108365019011407,
-    "parsed": true
+    "price": 1.108365019011407
   },
   {
-    "isin": "",
     "wkn": "870747",
     "type": "Dividend",
     "company": "MICROSOFT",
@@ -1339,8 +1242,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.3848492435351765,
-    "parsed": true
+    "price": 0.3848492435351765
   },
   {
     "isin": "US5801351017",
@@ -1356,8 +1258,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.9482989552638629,
-    "parsed": true
+    "price": 0.9482989552638629
   },
   {
     "isin": "NL0000388619",
@@ -1373,8 +1274,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.34907277544023685,
-    "parsed": true
+    "price": 0.34907277544023685
   },
   {
     "isin": "US7475251036",
@@ -1390,8 +1290,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.48,
-    "parsed": true
+    "price": 0.48
   },
   {
     "isin": "IE00B3XXRP09",
@@ -1407,8 +1306,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.2654575432811212,
-    "parsed": true
+    "price": 0.2654575432811212
   },
   {
     "isin": "IE00B3VVMM84",
@@ -1424,8 +1322,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.1803719471207708,
-    "parsed": true
+    "price": 0.1803719471207708
   },
   {
     "isin": "IE00BKX55T58",
@@ -1441,11 +1338,9 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.3043779200553729,
-    "parsed": true
+    "price": 0.3043779200553729
   },
   {
-    "isin": "",
     "wkn": "865985",
     "type": "Dividend",
     "company": "APPLE",
@@ -1458,8 +1353,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.6448051231091974,
-    "parsed": true
+    "price": 0.6448051231091974
   },
   {
     "isin": "US8825081040",
@@ -1475,8 +1369,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.7058333333333333,
-    "parsed": true
+    "price": 0.7058333333333333
   },
   {
     "isin": "IE00BK1PV551",
@@ -1492,8 +1385,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 1.1559585040537006,
-    "parsed": true
+    "price": 1.1559585040537006
   },
   {
     "isin": "US8552441094",
@@ -1509,8 +1401,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.3190743338008415,
-    "parsed": true
+    "price": 0.3190743338008415
   },
   {
     "isin": "IE00B1FZS244",
@@ -1526,8 +1417,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.18790555155010816,
-    "parsed": true
+    "price": 0.18790555155010816
   },
   {
     "isin": "IE00B1FZS350",
@@ -1543,7 +1433,6 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
-    "price": 0.1904841297959694,
-    "parsed": true
+    "price": 0.1904841297959694
   }
 ]
