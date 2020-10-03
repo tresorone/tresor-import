@@ -173,9 +173,11 @@ const findTax = textArr => {
   }
 
   const searchTermWithholdingTax = 'Quellensteuer';
-  if (textArr.indexOf(searchTermWithholdingTax) > -1) {
-    const lineWithValue =
-      textArr[textArr.indexOf(searchTermWithholdingTax) + 1];
+  const lineWithWithholdingTax = textArr.findIndex(line =>
+    line.includes(searchTermWithholdingTax)
+  );
+  if (lineWithWithholdingTax > -1) {
+    const lineWithValue = textArr[lineWithWithholdingTax + 1];
     totalTax = totalTax.plus(findAndConvertNumber(lineWithValue, textArr));
   }
 
