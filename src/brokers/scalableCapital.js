@@ -4,16 +4,16 @@ import Big from 'big.js';
 
 import { parseGermanNum, validateActivity } from '@/helper';
 
-export const isPageTypeBuy = content =>
+const isPageTypeBuy = content =>
   content.some(line => line.includes('Wertpapierabrechnung: Kauf'));
 
-export const isPageTypeSell = content =>
+const isPageTypeSell = content =>
   content.some(line => line.includes('Wertpapierabrechnung: Verkauf'));
 
-export const isPageTypeDividend = content =>
+const isPageTypeDividend = content =>
   content.some(line => line.includes('Fondsausschüttung'));
 
-export const findOrderDate = content => {
+const findOrderDate = content => {
   let orderDate =
     content[
       findLineNumberByCurrentAndPreviousLineContent(
@@ -32,15 +32,18 @@ export const findOrderDate = content => {
   return content[findLineNumberByContent(content, 'Handelsdatum') + 2];
 };
 
-export const findPayDate = content =>
+const findPayDate = content =>
   content[findLineNumberByContent(content, 'Zahltag') + 1];
 
-export const findByStartingTerm = (content, term) =>
+const findByStartingTerm = (content, term) =>
   content[content.findIndex(line => line.startsWith(term))].substring(
     term.length
   );
 
-export const findLineNumberByCurrentAndPreviousLineContent = (
+const findLineNumberByContent = (content, term, contains = true) =>
+  content.findIndex(line => (contains ? line.includes(term) : line === term));
+
+const findLineNumberByCurrentAndPreviousLineContent = (
   content,
   firstTerm,
   secondTerm
@@ -59,19 +62,16 @@ export const findLineNumberByCurrentAndPreviousLineContent = (
   return undefined;
 };
 
-export const findLineNumberByContent = (content, term) =>
-  content.findIndex(line => line.includes(term));
+const findISIN = content => findByStartingTerm(content, 'ISIN: ');
 
-export const findISIN = content => findByStartingTerm(content, 'ISIN: ');
-
-export const findCompany = (content, isDividend) =>
+const findCompany = (content, isDividend) =>
   isDividend
-    ? content[findLineNumberByContent(content, 'Zahltag:') - 4]
+    ? content[findLineNumberByContent(content, 'p.STK') + 1]
     : content[findLineNumberByContent(content, 'Auftragszeit:') + 5];
 
-export const findShares = (content, isDividend) => {
+const findShares = (content, isDividend) => {
   const line = isDividend
-    ? content[findLineNumberByContent(content, 'Fondsausschüttung') + 1]
+    ? content[findLineNumberByContent(content, 'Ausschüttung', false) - 1]
     : content[
         findLineNumberByCurrentAndPreviousLineContent(
           content,
@@ -82,15 +82,15 @@ export const findShares = (content, isDividend) => {
   return parseGermanNum(line.split(' ')[1]);
 };
 
-export const findAmount = (content, isCredit, isDividend) =>
+const findAmount = (content, isCredit, isDividend) =>
   parseGermanNum(
     content[
       isDividend
         ? findLineNumberByCurrentAndPreviousLineContent(
             content,
-            'Bruttobetrag',
-            'EUR'
-          ) + 1
+            'Valuta',
+            'Zu Gunsten Konto'
+          ) - 3
         : findLineNumberByCurrentAndPreviousLineContent(
             content,
             isCredit ? 'Zu Gunsten Konto' : 'Zu Lasten Konto',
@@ -98,6 +98,81 @@ export const findAmount = (content, isCredit, isDividend) =>
           ) + 1
     ]
   );
+
+const findPricePerShare = (content, isDividend) => {
+  if (!isDividend) {
+    return parseGermanNum(
+      content[findLineNumberByContent(content, 'Ausführungsplatz:') + 1]
+    );
+  }
+
+  const lineNumberOfValue = findLineNumberByContent(content, 'p.STK');
+  const pricePerShareValue = content[lineNumberOfValue];
+  const pricePerShare = pricePerShareValue.split(' ')[0].trim();
+  const currency = content[lineNumberOfValue - 1];
+
+  if (currency === 'EUR') {
+    return parseGermanNum(pricePerShare);
+  }
+
+  return +Big(parseGermanNum(pricePerShare)).div(
+    findExchangeRate(content, currency)
+  );
+};
+
+const findExchangeRate = (content, currency) => {
+  // Find the value of "EUR/USD 1,1869" by searching for "EUR/USD"
+  const searchTerm = 'EUR/' + currency;
+  const exchangeRateValue =
+    content[findLineNumberByContent(content, searchTerm) - 1];
+
+  return Big(parseGermanNum(exchangeRateValue));
+};
+
+const findTax = content => {
+  var totalTax = Big(0);
+
+  const searchTermTax = 'Kapitalertragsteuer';
+  const lineWithTax = findLineNumberByContent(content, searchTermTax);
+  if (lineWithTax > -1) {
+    totalTax = totalTax.plus(Big(parseGermanNum(content[lineWithTax + 1])));
+  }
+
+  const searchTermChurchTax = 'Kirchensteuer';
+  const lineWithChurchTax = findLineNumberByContent(
+    content,
+    searchTermChurchTax
+  );
+  if (lineWithChurchTax > -1) {
+    totalTax = totalTax.plus(
+      Big(parseGermanNum(content[lineWithChurchTax + 1]))
+    );
+  }
+
+  const searchTermSolidarityTax = 'Solidaritätszuschlag';
+  const lineWithSolidarityTax = findLineNumberByContent(
+    content,
+    searchTermSolidarityTax
+  );
+  if (lineWithSolidarityTax > -1) {
+    totalTax = totalTax.plus(
+      Big(parseGermanNum(content[lineWithSolidarityTax + 1]))
+    );
+  }
+
+  const searchTermWithholdingTax = 'Quellensteuer';
+  const lineWithWithholdingTax = findLineNumberByContent(
+    content,
+    searchTermWithholdingTax
+  );
+  if (lineWithWithholdingTax > -1) {
+    totalTax = totalTax.plus(
+      Big(parseGermanNum(content[lineWithWithholdingTax + 1]))
+    );
+  }
+
+  return +totalTax;
+};
 
 export const canParseData = content =>
   content.some(line =>
@@ -107,7 +182,7 @@ export const canParseData = content =>
     isPageTypeSell(content) ||
     isPageTypeDividend(content));
 
-export const parseData = content => {
+const parseData = content => {
   let type, date, isin, company, shares, price, amount, fee, tax;
 
   if (isPageTypeBuy(content)) {
@@ -117,9 +192,9 @@ export const parseData = content => {
     date = findOrderDate(content);
     shares = findShares(content, false);
     amount = findAmount(content, false, false);
-    price = +Big(amount).div(Big(shares));
+    price = findPricePerShare(content, false);
     fee = 0;
-    tax = 0;
+    tax = findTax(content);
   } else if (isPageTypeSell(content)) {
     type = 'Sell';
     isin = findISIN(content);
@@ -127,9 +202,9 @@ export const parseData = content => {
     date = findOrderDate(content);
     shares = findShares(content, false);
     amount = findAmount(content, true, false);
-    price = +Big(amount).div(Big(shares));
+    price = findPricePerShare(content, false);
     fee = 0;
-    tax = 0;
+    tax = findTax(content);
   } else if (isPageTypeDividend(content)) {
     type = 'Dividend';
     isin = findISIN(content);
@@ -137,9 +212,9 @@ export const parseData = content => {
     date = findPayDate(content);
     shares = findShares(content, true);
     amount = findAmount(content, false, true);
-    price = +Big(amount).div(Big(shares));
+    price = findPricePerShare(content, true);
     fee = 0;
-    tax = 0;
+    tax = findTax(content);
   } else {
     console.error('Unknown page type for scalable.capital');
   }
