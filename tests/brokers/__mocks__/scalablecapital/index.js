@@ -10,6 +10,7 @@ export const allSamples = [
 
   // dividends
   require('./dividend/etf110_without_taxes.json'),
+  require('./dividend/dividend_USD_with_withholding_taxes.json'),
 ];
 
 export const buySamples = [
@@ -23,4 +24,5 @@ export const sellSamples = [require('./sell/market_order.json')];
 
 export const dividendSamples = [
   require('./dividend/etf110_without_taxes.json'),
+  require('./dividend/dividend_USD_with_withholding_taxes.json'),
 ];

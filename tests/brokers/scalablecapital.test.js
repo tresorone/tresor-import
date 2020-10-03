@@ -140,6 +140,24 @@ describe('Broker: scalable.capital', () => {
         tax: 0,
       });
     });
+
+    test('Can the stock dividend in USD with withholding taxes be parsed from the document', () => {
+      const activities = scalableCapital.parsePages(dividendSamples[1]);
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'scalablecapital',
+        type: 'Dividend',
+        date: '2020-09-30',
+        isin: 'US3765361080',
+        company: 'Gladstone Commercial Corp.',
+        shares: 33,
+        price: 0.10674047097153871,
+        amount: 2.6,
+        fee: 0,
+        tax: 0.92,
+      });
+    });
   });
 
   beforeEach(() => {
