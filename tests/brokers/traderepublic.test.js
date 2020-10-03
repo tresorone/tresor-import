@@ -249,6 +249,24 @@ describe('Broker: Trade Republic', () => {
         type: 'Dividend',
       });
     });
+
+    test('Should map the pdf data correctly for: Realty Income Corp with other withholding tax format', () => {
+      const activities = traderepublic.parsePages(dividendSamples[5]);
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        amount: 0.83,
+        broker: 'traderepublic',
+        company: 'Realty Income Corp.',
+        date: '2020-09-15',
+        fee: 0,
+        isin: 'US7561091049',
+        price: 0.1968537057289476,
+        shares: 5,
+        tax: 0.15142592748380584,
+        type: 'Dividend',
+      });
+    });
   });
 
   describe('Validate quarter statement', () => {

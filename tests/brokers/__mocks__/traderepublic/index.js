@@ -16,6 +16,7 @@ export const allSamples = [
   require('./dividend/ishares_euro_stoxx_select_dividend_30.json'),
   require('./dividend/ishares_developed_markets_property_yield.json'),
   require('./dividend/gazprom_third_party_expenses_and_withholding_tax.json'),
+  require('./dividend/realty_income_with_other_withholding_tax_format.json'),
 
   // quarter statement
   require('./quarter_statement/without_stocks.json'),
@@ -41,6 +42,7 @@ export const dividendSamples = [
   require('./dividend/ishares_euro_stoxx_select_dividend_30.json'),
   require('./dividend/ishares_developed_markets_property_yield.json'),
   require('./dividend/gazprom_third_party_expenses_and_withholding_tax.json'),
+  require('./dividend/realty_income_with_other_withholding_tax_format.json'),
 ];
 
 export const quarterSamples = [
