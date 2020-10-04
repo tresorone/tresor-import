@@ -158,10 +158,10 @@ describe('Broker: ING', () => {
         isin: 'US5949181045',
         company: 'Microsoft Corp.',
         shares: 32,
-        price: 0.385625,
+        price: 0.45389737647316397,
         amount: 12.34,
         fee: 0,
-        tax: 0,
+        tax: 2.18,
       });
     });
 
@@ -175,10 +175,10 @@ describe('Broker: ING', () => {
         isin: 'NL0000388619',
         company: 'Unilever N.V.',
         shares: 8,
-        price: 0.34875,
+        price: 0.4104,
         amount: 2.79,
         fee: 0,
-        tax: 0,
+        tax: 0.49,
       });
     });
 
@@ -192,7 +192,7 @@ describe('Broker: ING', () => {
         isin: 'IE00BZ163G84',
         company: 'Vanguard EUR Corp.Bond U.ETF',
         shares: 29,
-        price: 0.02,
+        price: 0.020034,
         amount: 0.58,
         fee: 0,
         tax: 0,
@@ -209,7 +209,7 @@ describe('Broker: ING', () => {
         isin: 'DE000A0F5UH1',
         company: 'iSh.ST.Gl.Sel.Div.100 U.ETF DE',
         shares: 34,
-        price: 0.17705882352941177,
+        price: 0.177136,
         amount: 6.02,
         fee: 0,
         tax: 0,
@@ -226,10 +226,10 @@ describe('Broker: ING', () => {
         isin: 'IE00B3RBWM25',
         company: 'Vanguard FTSE All-World U.ETF',
         shares: 270,
-        price: 0.30596296296296294,
+        price: 0.37524009432835165,
         amount: 82.61,
         fee: 0,
-        tax: 0,
+        tax: 18.7,
       });
     });
 
@@ -243,7 +243,7 @@ describe('Broker: ING', () => {
         isin: 'LU0392494562',
         company: 'ComStage-MSCI World TRN U.ETF',
         shares: 12,
-        price: 0.9408333333333333,
+        price: 0.9411004908292431,
         amount: 11.29,
         fee: 0,
         tax: 0,
