@@ -249,6 +249,40 @@ describe('Broker: ING', () => {
         tax: 0,
       });
     });
+
+    test('Test if dividend with taxes from a ETF is mapped correctly', () => {
+      const activity = ing.parseData(dividendsSamples[6]);
+
+      expect(activity).toEqual({
+        broker: 'ing',
+        type: 'Dividend',
+        date: '2020-09-15',
+        isin: 'DE0006289382',
+        company: 'iSh.DJ Glob.Titans 50 U.ETF DE',
+        shares: 53,
+        price: 0.055626,
+        amount: 2.41,
+        fee: 0,
+        tax: 0.54,
+      });
+    });
+
+    test('Test if dividend with taxes from a stock is mapped correctly', () => {
+      const activity = ing.parseData(dividendsSamples[7]);
+
+      expect(activity).toEqual({
+        broker: 'ing',
+        type: 'Dividend',
+        date: '2020-09-18',
+        isin: 'US94106L1098',
+        company: 'Waste Management Inc. (Del.)',
+        shares: 6,
+        price: 0.4608279344592755,
+        amount: 2.06,
+        fee: 0,
+        tax: 0.7,
+      });
+    });
   });
 
   beforeEach(() => {
