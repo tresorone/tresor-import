@@ -174,7 +174,8 @@ const findTax = content => {
   return +totalTax;
 };
 
-export const canParseData = content =>
+export const canParsePage = (content, extension) =>
+  extension === 'pdf' &&
   content.some(line =>
     line.includes('Scalable Capital Vermögensverwaltung GmbH')
   ) &&

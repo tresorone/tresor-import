@@ -1,4 +1,4 @@
-import { getBroker } from '../../src';
+import { findImplementation } from '../../src';
 import * as scalableCapital from '../../src/brokers/scalableCapital';
 import {
   allSamples,
@@ -11,19 +11,20 @@ describe('Broker: scalable.capital', () => {
   let consoleErrorSpy;
 
   describe('Check all documents', () => {
-    test('Can one page be parsed with scalable.capital', () => {
+    test('Can the document parsed with scalable.capital', () => {
       allSamples.forEach(samples => {
         expect(
-          samples.some(item => scalableCapital.canParseData(item))
+          samples.some(item => scalableCapital.canParsePage(item, 'pdf'))
         ).toEqual(true);
       });
     });
 
-    test('Can identify a broker from one page as scalable.capital', () => {
+    test('Can identify a implementation from the document as scalable.capital', () => {
       allSamples.forEach(samples => {
-        expect(
-          samples.some(item => getBroker(item) === scalableCapital)
-        ).toEqual(true);
+        const implementations = findImplementation(samples, 'pdf');
+
+        expect(implementations.length).toEqual(1);
+        expect(implementations[0]).toEqual(scalableCapital);
       });
     });
   });

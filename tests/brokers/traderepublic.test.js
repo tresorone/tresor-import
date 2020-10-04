@@ -257,7 +257,8 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Should map the pdf data correctly for: Realty Income Corp with other withholding tax format', () => {
-      const activities = traderepublic.parsePages(dividendSamples[5]);
+      const activities = traderepublic.parsePages(dividendSamples[5])
+        .activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
