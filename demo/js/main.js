@@ -1,12 +1,15 @@
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import parse from 'date-fns/parse';
 import { de } from 'date-fns/locale';
-import getActivities from '../../src';
+import getActivities, { parseActivitiesFromPages } from '../../src';
 
 new Vue({
   el: '#app',
   data: {
     activities: [],
+    jsonInputActive: false,
+    jsonContent: '',
+    jsonExtension: 'pdf',
   },
   methods: {
     showHoldingWarning(a) {
@@ -40,22 +43,45 @@ new Vue({
     formatPrice(p = 0) {
       return this.numberWithCommas(p.toFixed(2));
     },
+    handleParserResults(result) {
+      if (result.activities) {
+        console.table(result.activities);
+      }
+
+      if (!result.successful) {
+        return;
+      }
+
+      this.activities.push(...result.activities);
+    },
+    loadJson() {
+      let content = undefined;
+
+      try {
+        content = JSON.parse(this.jsonContent);
+      } catch (exception) {
+        console.error(exception);
+      }
+
+      if (content === undefined) {
+        return;
+      }
+
+      const result = parseActivitiesFromPages(content, this.jsonExtension);
+
+      this.handleParserResults({
+        file: 'Json Input',
+        activities: result.activities,
+        status: result.status,
+        successful: result.activities !== undefined && result.status === 0,
+      });
+    },
     async fileHandler() {
       const results = await Promise.all(
         Array.from(this.$refs.myFiles.files).map(getActivities)
       );
-      results.forEach(result => {
-        console.log(result);
-        if (result.activities) {
-          console.table(result.activities);
-        }
 
-        if (!result.successful) {
-          return;
-        }
-
-        this.activities.push(...result.activities);
-      });
+      results.forEach(this.handleParserResults);
     },
   },
 });
