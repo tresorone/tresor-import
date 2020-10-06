@@ -183,7 +183,7 @@ export const canParsePage = (content, extension) =>
     isPageTypeSell(content) ||
     isPageTypeDividend(content));
 
-const parseData = content => {
+const parsePage = content => {
   let type, date, isin, company, shares, price, amount, fee, tax;
 
   if (isPageTypeBuy(content)) {
@@ -239,12 +239,7 @@ export const parsePages = contents => {
 
   for (let content of contents) {
     try {
-      let activity = parseData(content);
-      if (activity === undefined) {
-        return;
-      }
-
-      activities.push(activity);
+      activities.push(parsePage(content));
     } catch (exception) {
       console.error(
         'Error while parsing page (scalable.capital)',
@@ -254,5 +249,8 @@ export const parsePages = contents => {
     }
   }
 
-  return activities;
+  return {
+    activities,
+    status: 0,
+  };
 };

@@ -31,7 +31,7 @@ describe('Broker: scalable.capital', () => {
 
   describe('Validate buys', () => {
     test('Can the market order be parsed from the document', () => {
-      const activities = scalableCapital.parsePages(buySamples[0]);
+      const activities = scalableCapital.parsePages(buySamples[0]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -49,7 +49,7 @@ describe('Broker: scalable.capital', () => {
     });
 
     test('Can the saving plan order be parsed from the document - vanguard', () => {
-      const activities = scalableCapital.parsePages(buySamples[1]);
+      const activities = scalableCapital.parsePages(buySamples[1]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -67,7 +67,7 @@ describe('Broker: scalable.capital', () => {
     });
 
     test('Can the saving plan order be parsed from the document - comstage', () => {
-      const activities = scalableCapital.parsePages(buySamples[2]);
+      const activities = scalableCapital.parsePages(buySamples[2]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -85,7 +85,7 @@ describe('Broker: scalable.capital', () => {
     });
 
     test('Can the limit order be parsed from the document', () => {
-      const activities = scalableCapital.parsePages(buySamples[3]);
+      const activities = scalableCapital.parsePages(buySamples[3]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -105,7 +105,7 @@ describe('Broker: scalable.capital', () => {
 
   describe('Validate sells', () => {
     test('Can the order be parsed from the document', () => {
-      const activities = scalableCapital.parsePages(sellSamples[0]);
+      const activities = scalableCapital.parsePages(sellSamples[0]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -125,7 +125,8 @@ describe('Broker: scalable.capital', () => {
 
   describe('Validate dividends', () => {
     test('Can the etf dividend be parsed from the document', () => {
-      const activities = scalableCapital.parsePages(dividendSamples[0]);
+      const activities = scalableCapital.parsePages(dividendSamples[0])
+        .activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -143,7 +144,8 @@ describe('Broker: scalable.capital', () => {
     });
 
     test('Can the stock dividend in USD with withholding taxes be parsed from the document', () => {
-      const activities = scalableCapital.parsePages(dividendSamples[1]);
+      const activities = scalableCapital.parsePages(dividendSamples[1])
+        .activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
