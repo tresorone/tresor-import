@@ -1,6 +1,6 @@
 import * as helper from '../../src/helper';
 
-describe('Heler functions', () => {
+describe('Helper functions', () => {
   let consoleErrorSpy;
 
   describe('Function: validateActivity', () => {

@@ -9,6 +9,7 @@ export const allSamples = [
   // sells
   require('./sell/limit_order_tesla.json'),
   require('./sell/limit_order_stryker.json'),
+  require('./sell/limit_order_workhorse_group_tax_refund.json'),
 
   // dividends
   require('./dividend/royal_dutch_shell_with_taxes.json'),
@@ -34,6 +35,7 @@ export const buySamples = [
 export const sellSamples = [
   require('./sell/limit_order_tesla.json'),
   require('./sell/limit_order_stryker.json'),
+  require('./sell/limit_order_workhorse_group_tax_refund.json'),
 ];
 
 export const dividendSamples = [

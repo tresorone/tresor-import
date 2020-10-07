@@ -1,4 +1,4 @@
-import { findImplementation } from '../../src';
+import { findImplementation } from '@/index';
 import * as traderepublic from '../../src/brokers/traderepublic';
 import {
   allSamples,
@@ -155,6 +155,24 @@ describe('Broker: Trade Republic', () => {
         price: 168.92,
         shares: 99,
         tax: 52.97,
+        type: 'Sell',
+      });
+    });
+
+    test('Map a limit sell order with tax returns correctly: Workgroup', () => {
+      const activities = traderepublic.parsePages(sellSamples[2]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        amount: 1005.00,
+        broker: 'traderepublic',
+        company: 'Workhorse Group Inc.',
+        date: '2020-10-02',
+        fee: 1,
+        isin: 'US98138J2069',
+        price: 20.10,
+        shares: 50,
+        tax: -6.93,
         type: 'Sell',
       });
     });
