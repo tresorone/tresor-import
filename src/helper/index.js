@@ -107,11 +107,11 @@ export function validateActivity(activity, findSecurityAlsoByCompany = false) {
     return undefined;
   }
 
-  if (Number(activity.tax) !== activity.tax || activity.tax < 0) {
+  if (Number(activity.tax) !== activity.tax) {
     console.error(
       'The tax amount in activity for ' +
         activity.broker +
-        ' must be a number greater than 0.',
+        ' must be a number that can be positive, negative or zero.',
       activity
     );
     return undefined;

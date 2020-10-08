@@ -167,7 +167,9 @@ const findTax = textArr => {
     lineNumber += 2
   ) {
     const lineContent = textArr[lineNumber].split(' EUR')[0];
-    const lineParsedAmount = Math.abs(parseGermanNum(lineContent));
+    // A positive tax amount in the json indicates tax return and a negative tax amount indicates a paid tax
+    // TresorOne handles this the other way around
+    const lineParsedAmount = -parseGermanNum(lineContent);
 
     totalTax = totalTax.plus(Big(lineParsedAmount));
   }
@@ -298,6 +300,7 @@ export const parsePage = content => {
     isSell(content) ||
     isDividend(content)
   ) {
+
     foundActivities.push(parseOrderOrDividend(content));
   } else if (isOverviewStatement(content)) {
     for (let lineNumber = 0; lineNumber < content.length; lineNumber++) {
@@ -311,6 +314,7 @@ export const parsePage = content => {
   }
 
   let validatedActivities = [];
+
   foundActivities.forEach(activity => {
     if (validateActivity(activity)) {
       validatedActivities.push(activity);
