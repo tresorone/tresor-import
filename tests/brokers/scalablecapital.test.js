@@ -119,6 +119,24 @@ describe('Broker: scalable.capital', () => {
         tax: 0,
       });
     });
+
+    test('Can a order made from Oskar be parsed from the document', () => {
+      const activities = scalableCapital.parsePages(buySamples[5]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'oskar',
+        type: 'Buy',
+        date: '2020-09-24',
+        isin: 'IE00BZ163L38',
+        company: 'Vang.USD Em.Mkts Gov.Bd U.ETF',
+        shares: 0.01,
+        price: 43.87,
+        amount: 0.44,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate sells', () => {
