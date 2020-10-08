@@ -56,6 +56,42 @@ describe('Helper functions', () => {
       expect(activity).toEqual(helper.validateActivity(activity));
     });
 
+    test('Is a valid activity with a tax return', () => {
+      const activity = {
+        broker: 'traderepublic',
+        type: 'Sell',
+        date: new Date(2000, 1, 1),
+        isin: 'DETRESOR1042',
+        wkn: 'T10000',
+        company: 'Tresor 1 Inc.',
+        shares: 42,
+        price: 42,
+        amount: 1764,
+        fee: 1,
+        tax: -200,
+      };
+
+      expect(activity).toEqual(helper.validateActivity(activity));
+    });
+
+    test('Is a valid activity with a tax payout', () => {
+      const activity = {
+        broker: 'traderepublic',
+        type: 'Sell',
+        date: new Date(2000, 1, 1),
+        isin: 'DETRESOR1042',
+        wkn: 'T10000',
+        company: 'Tresor 1 Inc.',
+        shares: 42,
+        price: 42,
+        amount: 1764,
+        fee: 1,
+        tax: 200,
+      };
+
+      expect(activity).toEqual(helper.validateActivity(activity));
+    });
+
     test('Activity without broker should be invalid', () => {
       const activity = {
         broker: undefined,
