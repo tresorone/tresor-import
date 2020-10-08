@@ -167,7 +167,7 @@ const findTax = textArr => {
     lineNumber += 2
   ) {
     const lineContent = textArr[lineNumber].split(' EUR')[0];
-    // A positive tax amount in the json indicates tax return and a positive tax amount in the json indicates a paid tax
+    // A positive tax amount in the json indicates tax return and a negative tax amount indicates a paid tax
     // TresorOne handles this the other way around
     const lineParsedAmount = -parseGermanNum(lineContent);
 
