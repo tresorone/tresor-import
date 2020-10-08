@@ -1,9 +1,10 @@
 export const allSamples = [
   // buys
   require('./buy/market_order.json'),
-  require('./buy/saving_plan_vanguard.json'),
+  require('./buy/saving_plan_vanguard_all_world.json'),
   require('./buy/saving_plan_comstage.json'),
   require('./buy/limit_order.json'),
+  require('./buy/Oskar_vanguard.json'),
 
   // sells
   require('./sell/market_order.json'),
@@ -15,9 +16,10 @@ export const allSamples = [
 
 export const buySamples = [
   require('./buy/market_order.json'),
-  require('./buy/saving_plan_vanguard.json'),
+  require('./buy/saving_plan_vanguard_all_world.json'),
   require('./buy/saving_plan_comstage.json'),
   require('./buy/limit_order.json'),
+  require('./buy/Oskar_vanguard.json'),
 ];
 
 export const sellSamples = [require('./sell/market_order.json')];

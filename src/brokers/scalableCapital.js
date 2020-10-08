@@ -176,8 +176,10 @@ const findTax = content => {
 
 export const canParsePage = (content, extension) =>
   extension === 'pdf' &&
-  content.some(line =>
-    line.includes('Scalable Capital Vermögensverwaltung GmbH')
+  content.some(
+    line =>
+      line.includes('Oskar.de GmbH') ||
+      line.includes('Scalable Capital Vermögensverwaltung GmbH')
   ) &&
   (isPageTypeBuy(content) ||
     isPageTypeSell(content) ||
