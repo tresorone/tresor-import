@@ -2,25 +2,32 @@ import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 import Big from 'big.js';
 
-import { parseGermanNum, validateActivity } from '@/helper';
+import { parseGermanNum, validateActivity, findFirstIsinIndexInArray } from '@/helper';
 
-const findISIN = text => text[text.findIndex(t => t === 'ISIN') + 3];
 
-const findCompany = text => text[text.findIndex(t => t === 'ISIN') + 1];
+const findISIN = text => {
+  return text[findFirstIsinIndexInArray(text)];
+}
+
+const findCompany = text => {
+  // Sometimes a company name is split in two during JSONifying.
+  const indexIsinString = text.findIndex(t => t === 'ISIN')
+  const name_index_one = text[indexIsinString + 1];
+  if(findFirstIsinIndexInArray(text.slice(indexIsinString)) > 3) {
+    return name_index_one.concat(' ', text[indexIsinString + 2]);
+  }
+  return name_index_one;
+}
 
 const findDateBuySell = textArr => {
   const idx = textArr.findIndex(t => t.toLowerCase() === 'orderabrechnung');
-  const date = textArr[idx + 2].substr(3, 10).trim();
-
-  return date;
+  return textArr[idx + 2].substr(3, 10).trim();
 };
 
 const findDateDividend = textArr => {
   const keyword = 'schlusstag';
   const dateLine = textArr.find(t => t.toLowerCase().includes(keyword));
-  const date = dateLine.substr(keyword.length).trim();
-
-  return date;
+  return dateLine.substr(keyword.length).trim();
 };
 
 const findShares = textArr => {
@@ -159,7 +166,8 @@ const parseData = textArr => {
     price = +Big(amount).div(Big(shares));
     fee = findFee(textArr);
     tax = 0;
-  } else if (isSell(textArr)) {
+  }
+  else if (isSell(textArr)) {
     type = 'Sell';
     isin = findISIN(textArr);
     company = findCompany(textArr);
@@ -169,7 +177,8 @@ const parseData = textArr => {
     price = +Big(amount).div(Big(shares));
     fee = findFee(textArr);
     tax = findTax(textArr);
-  } else if (isDividend(textArr)) {
+  }
+  else if (isDividend(textArr)) {
     type = 'Dividend';
     isin = findISIN(textArr);
     company = findCompany(textArr);
@@ -180,7 +189,6 @@ const parseData = textArr => {
     fee = 0;
     tax = findDividendTax(textArr);
   }
-
   return validateActivity({
     broker: 'consorsbank',
     type,
