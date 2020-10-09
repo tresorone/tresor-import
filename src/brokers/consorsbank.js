@@ -28,7 +28,7 @@ const findDateBuySell = textArr => {
 };
 
 const findDateDividend = textArr => {
-  const keyword = 'schlusstag';
+  const keyword = 'valuta';
   const dateLine = textArr.find(t => t.toLowerCase().includes(keyword));
   return dateLine.substr(keyword.length).trim();
 };

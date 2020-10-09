@@ -14,6 +14,7 @@ export const dividendsSamples = [
   require('./dividends/ertrag_alerian_mlp_etf_2.json'),
   require('./dividends/dividend_volkswagen_ag.json'),
   require('./dividends/dividend_diageo.json'),
+  require('./dividends/dividend_cisco_system_inc.json'),
 ];
 
 export const oldDividendsSamples = [require('./dividends/divOld.json')];
