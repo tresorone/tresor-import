@@ -406,6 +406,24 @@ describe('Helper functions', () => {
     });
   });
 
+  describe('Function: findFirstIsinIndexInArray', () => {
+
+    test('Can find first ISIN in array', () => {
+      const testArray = ['foo', 'DE0005140008', 'bar' ]
+      expect(helper.findFirstIsinIndexInArray(testArray)).toEqual(1);
+    });
+
+    test('Can find first ISIN in array when multiple isins are present', () => {
+      const testArray = ['foo', 'zap', 'DE0005140008', 'DE0005140009', 'bar' ]
+      expect(helper.findFirstIsinIndexInArray(testArray)).toEqual(2);
+    });
+
+    test('Returns undefined when no ISINs are present', () => {
+      const testArray = ['foo', 'bar' ]
+      expect(helper.findFirstIsinIndexInArray(testArray)).toEqual(undefined);
+    });
+  });
+
   beforeEach(() => {
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
   });

@@ -1,4 +1,4 @@
-import { findImplementation } from '../../src';
+import { findImplementation } from '@/index';
 import * as consorsbank from '../../src/brokers/consorsbank';
 import {
   buySamples,
@@ -6,7 +6,6 @@ import {
   dividendsSamples,
   oldDividendsSamples,
 } from './__mocks__/consorsbank';
-
 console.error = jest.fn();
 
 describe('Broker: Consorsbank', () => {
@@ -154,7 +153,7 @@ describe('Broker: Consorsbank', () => {
   });
 
   describe('Dividend', () => {
-    test('should map pdf data of sample 1 correctly', () => {
+    test('should map pdf data of ertrag_alerian_mlp_etf_1.json correctly', () => {
       const activity = consorsbank.parsePages(dividendsSamples[0]).activities;
 
       expect(activity).toEqual([
@@ -173,7 +172,7 @@ describe('Broker: Consorsbank', () => {
       ]);
     });
 
-    test('should map pdf data of sample 2 correctly', () => {
+    test('should map pdf data of ertrag_global_x_superdividend_etf correctly', () => {
       const activity = consorsbank.parsePages(dividendsSamples[1]).activities;
 
       expect(activity).toEqual([
@@ -192,7 +191,7 @@ describe('Broker: Consorsbank', () => {
       ]);
     });
 
-    test('should map pdf data of sample 3 correctly', () => {
+    test('should map pdf data of dividend_vanguard ftse_etf.json correctly', () => {
       const activity = consorsbank.parsePages(dividendsSamples[2]).activities;
 
       expect(activity).toEqual([
@@ -211,7 +210,7 @@ describe('Broker: Consorsbank', () => {
       ]);
     });
 
-    test('should map pdf data of sample 4 correctly', () => {
+    test('should map pdf data of ertrag_alerian_mlp_etf_2.json', () => {
       expect(consorsbank.parsePages(dividendsSamples[3]).activities).toEqual([
         {
           amount: 236.73,
@@ -228,7 +227,7 @@ describe('Broker: Consorsbank', () => {
       ]);
     });
 
-    test('should map pdf data of sample 5 correctly', () => {
+    test('should map pdf data of dividend_volkswagen_ag.json', () => {
       expect(consorsbank.parsePages(dividendsSamples[4]).activities).toEqual([
         {
           amount: 67.2,
@@ -240,6 +239,23 @@ describe('Broker: Consorsbank', () => {
           price: 4.8,
           shares: 14,
           tax: 18.68,
+          type: 'Dividend',
+        },
+      ]);
+    });
+
+    test('should map pdf data of dividend_diageo.json', () => {
+      expect(consorsbank.parsePages(dividendsSamples[5]).activities).toEqual([
+        {
+          amount: 1.53,
+          broker: 'consorsbank',
+          company: 'DIAGEO PLC Reg. Shares LS -,28935185',
+          date: '2020-08-12',
+          fee: 0,
+          isin: 'GB0002374006',
+          price: 0.4625640560518797,
+          shares: 3.30765,
+          tax: 0,
           type: 'Dividend',
         },
       ]);
