@@ -43,16 +43,16 @@ const findAmount = textArr =>
   parseGermanNum(getValueByPreviousElement(textArr, 'Kurswert').trim());
 
 const findFee = textArr => {
-  const provision = parseGermanNum(
+  const provision = Big(parseGermanNum(
     getValueByPreviousElement(textArr, 'Provision').split(' ')[0].trim()
-  );
-  const abwicklungskosten = parseGermanNum(
-      getValueByPreviousElement(textArr, 'Abwicklungskosten Börse')
-  );
-  const transaktionsentgelt = parseGermanNum(
-      getValueByPreviousElement(textArr, 'Transaktionsentgelt Börse')
-  );
-  return provision+abwicklungskosten+transaktionsentgelt;
+  ));
+  const abwicklungskosten = Big(parseGermanNum(
+    getValueByPreviousElement(textArr, 'Abwicklungskosten Börse')
+  ));
+  const transaktionsentgelt = Big(parseGermanNum(
+    getValueByPreviousElement(textArr, 'Transaktionsentgelt Börse')
+  ));
+  return +provision.plus(abwicklungskosten).plus(transaktionsentgelt);
 };
 
 const findDateDividend = textArr =>
@@ -125,8 +125,7 @@ const parseData = textArr => {
     price = findPrice(textArr);
     fee = findFee(textArr);
     tax = 0;
-  }
-  else if (isSell(textArr)) {
+  } else if (isSell(textArr)) {
     type = 'Sell';
     isin = findISIN(textArr);
     company = findCompany(textArr);
@@ -136,8 +135,7 @@ const parseData = textArr => {
     price = findPrice(textArr);
     fee = findFee(textArr);
     tax = findTax(textArr);
-  }
-  else if (isDividend(textArr)) {
+  } else if (isDividend(textArr)) {
     type = 'Dividend';
     isin = findISIN(textArr);
     company = findCompany(textArr);
