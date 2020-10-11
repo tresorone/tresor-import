@@ -32,8 +32,10 @@ const findOrderDate = content => {
   return content[findLineNumberByContent(content, 'Handelsdatum') + 2];
 };
 
-const findPayDate = content =>
-  content[findLineNumberByContent(content, 'Zahltag') + 1];
+const findPayDate = content => {
+  const term = 'Valuta: ';
+  return content[findLineNumberByContent(content, term)].substring(term.length);
+};
 
 const findByStartingTerm = (content, term) =>
   content[content.findIndex(line => line.startsWith(term))].substring(
