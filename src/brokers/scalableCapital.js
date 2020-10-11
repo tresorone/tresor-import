@@ -17,6 +17,14 @@ const isPageTypeDividend = content =>
       line.includes('Dividendenabrechnung')
   );
 
+const isBrokerGratisbroker = content =>
+  content.some(line => line.includes('GRATISBROKER GmbH'));
+
+const isBrokerScalableCapital = content =>
+  content.some(line =>
+    line.includes('Scalable Capital Vermögensverwaltung GmbH')
+  );
+
 const findOrderDate = content => {
   let orderDate =
     content[
@@ -182,11 +190,7 @@ const findTax = content => {
 
 export const canParsePage = (content, extension) =>
   extension === 'pdf' &&
-  content.some(
-    line =>
-      line.includes('GRATISBROKER GmbH') ||
-      line.includes('Scalable Capital Vermögensverwaltung GmbH')
-  ) &&
+  (isBrokerGratisbroker(content) || isBrokerScalableCapital(content)) &&
   (isPageTypeBuy(content) ||
     isPageTypeSell(content) ||
     isPageTypeDividend(content));
@@ -228,8 +232,13 @@ const parsePage = content => {
     console.error('Unknown page type for scalable.capital');
   }
 
+  let broker = 'scalablecapital';
+  if (isBrokerGratisbroker(content)) {
+    broker = 'gratisbroker';
+  }
+
   return validateActivity({
-    broker: 'scalablecapital',
+    broker,
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
     isin,
