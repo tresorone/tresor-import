@@ -11,7 +11,11 @@ const isPageTypeSell = content =>
   content.some(line => line.includes('Wertpapierabrechnung: Verkauf'));
 
 const isPageTypeDividend = content =>
-  content.some(line => line.includes('Fondsausschüttung'));
+  content.some(
+    line =>
+      line.includes('Fondsausschüttung') ||
+      line.includes('Dividendenabrechnung')
+  );
 
 const findOrderDate = content => {
   let orderDate =
@@ -178,8 +182,10 @@ const findTax = content => {
 
 export const canParsePage = (content, extension) =>
   extension === 'pdf' &&
-  content.some(line =>
-    line.includes('Scalable Capital Vermögensverwaltung GmbH')
+  content.some(
+    line =>
+      line.includes('GRATISBROKER GmbH') ||
+      line.includes('Scalable Capital Vermögensverwaltung GmbH')
   ) &&
   (isPageTypeBuy(content) ||
     isPageTypeSell(content) ||
