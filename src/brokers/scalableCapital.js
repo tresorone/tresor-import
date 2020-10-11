@@ -25,6 +25,9 @@ const isBrokerScalableCapital = content =>
     line.includes('Scalable Capital Vermögensverwaltung GmbH')
   );
 
+const isBrokerOskar = content =>
+  content.some(line => line.includes('Oskar.de GmbH'));
+
 const findOrderDate = content => {
   let orderDate =
     content[
@@ -190,7 +193,9 @@ const findTax = content => {
 
 export const canParsePage = (content, extension) =>
   extension === 'pdf' &&
-  (isBrokerGratisbroker(content) || isBrokerScalableCapital(content)) &&
+  (isBrokerGratisbroker(content) ||
+    isBrokerScalableCapital(content) ||
+    isBrokerOskar(content)) &&
   (isPageTypeBuy(content) ||
     isPageTypeSell(content) ||
     isPageTypeDividend(content));
@@ -235,6 +240,8 @@ const parsePage = content => {
   let broker = 'scalablecapital';
   if (isBrokerGratisbroker(content)) {
     broker = 'gratisbroker';
+  } else if (isBrokerOskar(content)) {
+    broker = 'oskar';
   }
 
   return validateActivity({
