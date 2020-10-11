@@ -277,5 +277,22 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('should map pdf data of dividend_pepsico.json', () => {
+      expect(consorsbank.parsePages(dividendsSamples[7]).activities).toEqual([
+        {
+          amount: 1.26,
+          broker: 'consorsbank',
+          company: 'PEPSICO INC. Registered Shares DL -,0166',
+          date: '2020-09-30',
+          fee: 0,
+          isin: 'US7134481081',
+          price: 0.8723949318008724,
+          shares: 1.4443,
+          tax: 0.19,
+          type: 'Dividend',
+        },
+      ]);
+    });
   });
 });

@@ -431,10 +431,7 @@ describe('Helper functions', () => {
       );
     });
     test('Does not match for invalid ISINs', () => {
-      const invalidIsinValues = ['XX023440008', '120005140008', '023456708GB'];
-      console.log(helper.isinRegex.test(invalidIsinValues[0]));
-      console.log(helper.isinRegex.test(invalidIsinValues[1]));
-      console.log(helper.isinRegex.test(invalidIsinValues[2]));
+      const invalidIsinValues = ['XX023440008', '120005140008', '023456708GB', '0011140008'];
       invalidIsinValues.forEach(
         isin => expect(helper.isinRegex.test(isin)).toEqual(false)
       );

@@ -15,6 +15,7 @@ export const dividendsSamples = [
   require('./dividends/dividend_volkswagen_ag.json'),
   require('./dividends/dividend_diageo.json'),
   require('./dividends/dividend_cisco_system_inc.json'),
+  require('./dividends/dividend_pepsico.json'),
 ];
 
 export const oldDividendsSamples = [require('./dividends/divOld.json')];
