@@ -101,6 +101,24 @@ describe('Broker: scalable.capital', () => {
         tax: 0,
       });
     });
+
+    test('Can the BioNTech order be parsed from the document of Gratisbroker', () => {
+      const activities = scalableCapital.parsePages(buySamples[4]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'gratisbroker',
+        type: 'Buy',
+        date: '2020-10-05',
+        isin: 'US09075V1026',
+        company: 'BioNTech SE',
+        shares: 34,
+        price: 63.92,
+        amount: 2173.28,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate sells', () => {
@@ -159,6 +177,25 @@ describe('Broker: scalable.capital', () => {
         amount: 2.6,
         fee: 0,
         tax: 0.92,
+      });
+    });
+
+    test('Can the stock dividend from Volkswagen with taxes be parsed from the document of Gratisbroker', () => {
+      const activities = scalableCapital.parsePages(dividendSamples[2])
+        .activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'gratisbroker',
+        type: 'Dividend',
+        date: '2020-10-05',
+        isin: 'DE0007664039',
+        company: 'Volkswagen AG',
+        shares: 12,
+        price: 4.86,
+        amount: 42.94,
+        fee: 0,
+        tax: 15.38,
       });
     });
   });

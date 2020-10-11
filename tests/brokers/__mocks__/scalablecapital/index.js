@@ -4,6 +4,7 @@ export const allSamples = [
   require('./buy/saving_plan_vanguard.json'),
   require('./buy/saving_plan_comstage.json'),
   require('./buy/limit_order.json'),
+  require('./buy/biontech_from_gratisbroker.json'),
 
   // sells
   require('./sell/market_order.json'),
@@ -11,6 +12,7 @@ export const allSamples = [
   // dividends
   require('./dividend/etf110_without_taxes.json'),
   require('./dividend/dividend_USD_with_withholding_taxes.json'),
+  require('./dividend/volkswagen_with_taxes_gratisbroker.json'),
 ];
 
 export const buySamples = [
@@ -18,6 +20,7 @@ export const buySamples = [
   require('./buy/saving_plan_vanguard.json'),
   require('./buy/saving_plan_comstage.json'),
   require('./buy/limit_order.json'),
+  require('./buy/biontech_from_gratisbroker.json'),
 ];
 
 export const sellSamples = [require('./sell/market_order.json')];
@@ -25,4 +28,5 @@ export const sellSamples = [require('./sell/market_order.json')];
 export const dividendSamples = [
   require('./dividend/etf110_without_taxes.json'),
   require('./dividend/dividend_USD_with_withholding_taxes.json'),
+  require('./dividend/volkswagen_with_taxes_gratisbroker.json'),
 ];
