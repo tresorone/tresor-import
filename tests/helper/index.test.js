@@ -423,6 +423,24 @@ describe('Helper functions', () => {
     });
   });
 
+  describe('Regex: isinRegex works as expected', () => {
+    test('Matches for valid ISINs', () => {
+      const validIsinValues = ['US0005141111', 'DE0005140008', 'GB0011140008'];
+      validIsinValues.forEach(
+        isin => expect(helper.isinRegex.test(isin)).toEqual(true)
+      );
+    });
+    test('Does not match for invalid ISINs', () => {
+      const invalidIsinValues = ['XX023440008', '120005140008', '023456708GB'];
+      console.log(helper.isinRegex.test(invalidIsinValues[0]));
+      console.log(helper.isinRegex.test(invalidIsinValues[1]));
+      console.log(helper.isinRegex.test(invalidIsinValues[2]));
+      invalidIsinValues.forEach(
+        isin => expect(helper.isinRegex.test(isin)).toEqual(false)
+      );
+    });
+  });
+
   beforeEach(() => {
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
   });
