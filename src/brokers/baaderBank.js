@@ -234,7 +234,7 @@ const parsePage = content => {
     fee = 0;
     tax = findTax(content);
   } else {
-    console.error('Unknown page type for scalable.capital');
+    console.error('Unknown page type for Baader Bank');
   }
 
   let broker = 'scalablecapital';
@@ -266,7 +266,7 @@ export const parsePages = contents => {
       activities.push(parsePage(content));
     } catch (exception) {
       console.error(
-        'Error while parsing page (scalable.capital)',
+        'Error while parsing page (Baader Bank)',
         exception,
         content
       );
