@@ -22,9 +22,9 @@ const findCompany = (text, span) => {
 };
 
 const findDateBuySell = textArr => {
-  const dateLine = textArr[textArr.findIndex(t => t.includes('Geschäftstag'))];
-  const date = dateLine.split(':')[1].trim().substr(0, 10);
-  return date;
+  const dateLine = textArr[textArr.findIndex(t => t.includes('Valuta'))+1];
+  const date = dateLine.split(/\s+/)
+  return date[date.length-3];
 };
 
 const findDateDividend = textArr => {
@@ -96,7 +96,7 @@ const findFee = textArr => {
 const findPurchaseReduction = textArr => {
   let reduction = Big(0);
   const lineWithReduction = textArr.findIndex(t =>
-    t.includes('Reduktion Kaufaufschlag')
+    t.includes('Reduktion Kaufaufschlag') && t.includes("EUR")
   );
   if (lineWithReduction < 0) {
     return +reduction;
@@ -142,7 +142,8 @@ const parseData = textArr => {
     price = +foundAmount.div(Big(shares));
     fee = +totalFee;
     tax = 0;
-  } else if (isSell(textArr)) {
+  }
+  else if (isSell(textArr)) {
     type = 'Sell';
     isin = findISIN(textArr, 2);
     company = findCompany(textArr, 1);
@@ -152,7 +153,8 @@ const parseData = textArr => {
     price = +Big(amount).div(Big(shares));
     fee = findFee(textArr);
     tax = 0;
-  } else if (isDividend(textArr)) {
+  }
+  else if (isDividend(textArr)) {
     type = 'Dividend';
     isin = findISIN(textArr, 3);
     company = findCompany(textArr, 2);

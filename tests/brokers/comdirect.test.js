@@ -1,4 +1,4 @@
-import { findImplementation } from '../../src';
+import { findImplementation } from '@/index';
 import * as comdirect from '../../src/brokers/comdirect';
 import { allSamples, buySamples, dividendSamples } from './__mocks__/comdirect';
 
@@ -32,7 +32,7 @@ describe('Broker: comdirect', () => {
       expect(result.activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
-        date: '2020-08-07',
+        date: '2020-08-11',
         isin: 'DE0007231334',
         company: 'Sixt SE',
         shares: 0.55,
@@ -50,12 +50,30 @@ describe('Broker: comdirect', () => {
       expect(result.activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
-        date: '2020-04-01',
+        date: '2020-04-06',
         isin: 'LU0187079347',
         company: 'Robeco Global Consumer Trends',
         shares: 0.108,
         price: 235.09259259259258,
         amount: 24.84,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can parse the order with purchase reduction for ISIN LU0079474960be', () => {
+      const result = comdirect.parsePages(buySamples[2]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Buy',
+        date: '4152-11-09',
+        isin: 'LU0079474960',
+        company: 'AB SICAV I-American Growth Ptf',
+        shares: 0.644,
+        price: 116.44409937888199,
+        amount: 74.99,
         fee: 0,
         tax: 0,
       });
