@@ -6,7 +6,7 @@ import {
   mixedSamples,
   sellSamples,
 } from './__mocks__/ebase';
-import { canParseData, parseData } from '@/brokers/ebase';
+import { canParsePage, parseData } from '@/brokers/ebase';
 import { allValidSamples } from './__mocks__/ebase';
 
 // David Holin: No dividend samples test yet, as no example document is available
@@ -14,12 +14,12 @@ describe('Broker: ebase', () => {
   let consoleErrorSpy;
 
   test('should only accept revenue-summary reports', () => {
-    expect(canParseData(['Fondsertrag / Vorabpauschale', 'ebase Depot flex standard'])).toEqual(true);
+    expect(canParsePage(['Fondsertrag / Vorabpauschale', 'ebase Depot flex standard'], "pdf")).toEqual(true);
   });
 
   test('should reject unknown PDF files', () => {
     expect(
-      canParseData(['This String should never occur in a legitimate document'])
+      canParsePage(['This String should never occur in a legitimate document'])
     ).toEqual(false);
   });
 
@@ -47,7 +47,7 @@ describe('Broker: ebase', () => {
   describe('Check all documents', () => {
     test('Can parse one page containing sell orders with ebase', () => {
       sellSamples.forEach(samples => {
-        expect(samples.some(item => ebase.canParseData(item))).toEqual(true);
+        expect(samples.some(item => ebase.canParsePage(item, "pdf"))).toEqual(true);
       });
     });
 
@@ -64,8 +64,8 @@ describe('Broker: ebase', () => {
   describe('Validate buys', () => {
     test('Can parse multiple buy orders from a document', () => {
       const activities = ebase.parsePages(buySamples[0]);
-      expect(activities.length).toEqual(11);
-      expect(activities[0]).toEqual({
+      expect(activities.activities.length).toEqual(11);
+      expect(activities.activities[0]).toEqual({
         broker: 'ebase',
         type: 'Buy',
         date: '2020-07-01',
@@ -77,7 +77,7 @@ describe('Broker: ebase', () => {
         tax: 0.0,
         fee: 0.0,
       });
-      expect(activities[10]).toEqual({
+      expect(activities.activities[10]).toEqual({
         broker: 'ebase',
         type: 'Buy',
         date: '2020-07-01',
@@ -95,8 +95,8 @@ describe('Broker: ebase', () => {
   describe('Validate sells', () => {
     test('Can parse multiple eremuneration sell orders from a document', () => {
       const activities = ebase.parsePages(sellSamples[0]);
-      expect(activities.length).toEqual(2);
-      expect(activities[0]).toEqual({
+      expect(activities.activities.length).toEqual(2);
+      expect(activities.activities[0]).toEqual({
         broker: 'ebase',
         type: 'Sell',
         date: '2019-12-19',
@@ -108,7 +108,7 @@ describe('Broker: ebase', () => {
         tax: 0.0,
         fee: 0.0,
       });
-      expect(activities[1]).toEqual({
+      expect(activities.activities[1]).toEqual({
         broker: 'ebase',
         type: 'Sell',
         date: '2018-12-19',
@@ -124,8 +124,8 @@ describe('Broker: ebase', () => {
 
     test('Can parse multiple ordinary sell orders from a document', () => {
       const activities = ebase.parsePages(sellSamples[1]);
-      expect(activities.length).toEqual(11);
-      expect(activities[0]).toEqual({
+      expect(activities.activities.length).toEqual(11);
+      expect(activities.activities[0]).toEqual({
         broker: 'ebase',
         type: 'Sell',
         date: '2020-09-23',
@@ -137,7 +137,7 @@ describe('Broker: ebase', () => {
         tax: 0.0,
         fee: 0.0,
       });
-      expect(activities[10]).toEqual({
+      expect(activities.activities[10]).toEqual({
         broker: 'ebase',
         type: 'Sell',
         date: '2020-09-22',
@@ -155,8 +155,8 @@ describe('Broker: ebase', () => {
   describe('Mixed Sells, buys and everything in between', () => {
     test('Can parse multiple sell orders from a document', () => {
       const activities = ebase.parsePages(mixedSamples[0]);
-      expect(activities.length).toEqual(327);
-      expect(activities[11]).toEqual({
+      expect(activities.activities.length).toEqual(327);
+      expect(activities.activities[11]).toEqual({
         broker: 'ebase',
         type: 'Buy',
         date: '2020-07-01',

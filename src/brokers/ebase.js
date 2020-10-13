@@ -15,9 +15,12 @@ const parseShare = shareString => {
   }
 };
 
-const parsePrice = priceString => {
+//Takes a string that starts with a number that uses a comma instead of a .
+//for decimal place division and followed by a single space and extracts that
+//number as a float. e. G.: "388,29 EUR [...]" -> 388.29
+const parseNumberBeforeSpace = input => {
   try {
-    return +Big(parseGermanNum(priceString.split(' ')[0])).abs();
+    return +Big(parseGermanNum(input.split(' ')[0])).abs();
   } catch (e) {
     if (e.message === '[big.js] Invalid number') {
       return undefined;
@@ -27,70 +30,24 @@ const parsePrice = priceString => {
   }
 };
 
-const parseAmount = amountString => {
-  try {
-    return +Big(parseGermanNum(amountString.split(' ')[0])).abs();
-  } catch (e) {
-    if (e.message === '[big.js] Invalid number') {
-      return undefined;
-    } else {
-      throw e; // re-throw the error unchanged
-    }
-  }
-};
-
-function verifyActivity(
-  type,
-  date,
-  isin,
-  company,
-  shares,
-  price,
-  amount,
-  tax,
-  fee
-) {
+function parseBaseAction(pdfArray, pdfOffset, actionType) {
   const activity = {
     broker: 'ebase',
-    type,
-    date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
-    isin,
-    company,
-    shares,
-    price,
-    amount,
-    tax,
-    fee,
+    type: actionType,
+    date: format(
+      parse(pdfArray[pdfOffset + 6], 'dd.MM.yyyy', new Date()),
+      'yyyy-MM-dd'
+    ),
+    isin: pdfArray[pdfOffset + 2],
+    company: pdfArray[pdfOffset + 1],
+    shares: parseShare(pdfArray[pdfOffset + 4]),
+    price: parseNumberBeforeSpace(pdfArray[pdfOffset + 5]),
+    amount: parseNumberBeforeSpace(pdfArray[pdfOffset + 7]),
+    tax: 0,
+    fee: 0,
   };
   return validateActivity(activity);
 }
-
-function parseBaseAction(pdfArray, i, actionType) {
-  const type = actionType;
-  const company = pdfArray[i + 1];
-  const isin = pdfArray[i + 2];
-  const shares = parseShare(pdfArray[i + 4]);
-  const price = parsePrice(pdfArray[i + 5]);
-  const date = pdfArray[i + 6];
-  const amount = parseAmount(pdfArray[i + 7]);
-  const tax = 0;
-  const fee = 0;
-  return verifyActivity(
-    type,
-    date,
-    isin,
-    company,
-    shares,
-    price,
-    amount,
-    tax,
-    fee
-  );
-}
-
-export const canParseData = (textArr) =>
-  (textArr.some(t => t.includes('ebase Depot flex standard')) &&
-  textArr.some(line => line.includes('Fondsertrag / Vorabpauschale')));
 
 export const parseData = pdfPages => {
   // Action can be: Fondsertrag (Ausschüttung), Ansparplan, Wiederanlage Fondsertrag, Entgelt Verkauf
@@ -107,8 +64,7 @@ export const parseData = pdfPages => {
         actions.push(action);
         // An 'Ansparplan'/'Wiederanlage Fondsertrag' entry occupies 7 array entries.
         i += 6;
-      }
-      else if (pdfPage[i] === 'Wiederanlage Fondsertrag') {
+      } else if (pdfPage[i] === 'Wiederanlage Fondsertrag') {
         const action = parseBaseAction(pdfPage, i, 'Sell');
         if (action === undefined) {
           return undefined;
@@ -116,28 +72,24 @@ export const parseData = pdfPages => {
         actions.push(action);
         // An 'Ansparplan'/'Wiederanlage Fondsertrag' entry occupies 7 array entries.
         i += 6;
-      }
-      else if (pdfPage[i] === 'Fondsertrag (Ausschüttung)') {
+      } else if (pdfPage[i] === 'Fondsertrag (Ausschüttung)') {
         // This was always blank in the example files I had -> So no parsing could be done.
         i += 3;
-      }
-      else if (pdfPage[i] === 'Entgelt Verkauf') {
+      } else if (pdfPage[i] === 'Entgelt Verkauf') {
         const action = parseBaseAction(pdfPage, i, 'Sell');
         if (action === undefined) {
           return undefined;
         } // An 'Entgelt Verkauf' entry occupies 9 array entries.
         actions.push(action);
         i += 8;
-      }
-      else if (pdfPage[i] === 'Verkauf') {
+      } else if (pdfPage[i] === 'Verkauf') {
         const action = parseBaseAction(pdfPage, i, 'Sell');
         if (action === undefined) {
           return undefined;
         }
         actions.push(action);
         i += 8; // A basic 'Verkauf' entry occupies 9 array entries in total
-      }
-      else if (pdfPage[i] === 'Vorabpauschale') {
+      } else if (pdfPage[i] === 'Vorabpauschale') {
         // This was always blank in the example files I had -> So no parsing could be done.
         i += 3;
       }
@@ -149,9 +101,12 @@ export const parseData = pdfPages => {
 
 export const canParsePage = (content, extension) =>
   extension === 'pdf' &&
-  (content.some(line => line.includes('ebase Depot flex standard')) &&
-  content.some(line => line.includes('Fondsertrag / Vorabpauschale')))
+  content.some(line => line.includes('ebase Depot flex standard')) &&
+  content.some(line => line.includes('Fondsertrag / Vorabpauschale'));
 
 export const parsePages = contents => {
-  return parseData(contents);
+  return {
+    activities: parseData(contents),
+    status: 0,
+  };
 };
