@@ -1,5 +1,6 @@
 const path = require('path');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+
 // bundles tresor-import source into the dist folder for distribution to Tresor One or other apps
 
 module.exports = {
@@ -9,6 +10,7 @@ module.exports = {
   output: {
     filename: 'tresor-import.js',
     path: path.resolve(__dirname, 'dist'),
+    libraryTarget: 'umd',
   },
   resolve: {
     alias: {
