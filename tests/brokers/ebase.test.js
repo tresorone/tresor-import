@@ -14,7 +14,12 @@ describe('Broker: ebase', () => {
   let consoleErrorSpy;
 
   test('should only accept revenue-summary reports', () => {
-    expect(canParsePage(['Fondsertrag / Vorabpauschale', 'ebase Depot flex standard'], "pdf")).toEqual(true);
+    expect(
+      canParsePage(
+        ['Fondsertrag / Vorabpauschale', 'ebase Depot flex standard'],
+        'pdf'
+      )
+    ).toEqual(true);
   });
 
   test('should reject unknown PDF files', () => {
@@ -47,7 +52,9 @@ describe('Broker: ebase', () => {
   describe('Check all documents', () => {
     test('Can parse one page containing sell orders with ebase', () => {
       sellSamples.forEach(samples => {
-        expect(samples.some(item => ebase.canParsePage(item, "pdf"))).toEqual(true);
+        expect(samples.some(item => ebase.canParsePage(item, 'pdf'))).toEqual(
+          true
+        );
       });
     });
 
