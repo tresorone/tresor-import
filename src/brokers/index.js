@@ -6,7 +6,7 @@ import * as ing from './ing';
 import * as flatex from './flatex';
 import * as pb from './postbank';
 import * as consorsbank from './consorsbank';
-import * as scalableCapital from './scalableCapital';
+import * as baaderBank from './baaderBank';
 
 export {
   comdirect,
@@ -17,5 +17,5 @@ export {
   pb,
   flatex,
   consorsbank,
-  scalableCapital,
+  baaderBank,
 };

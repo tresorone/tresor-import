@@ -1,7 +1,12 @@
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import parse from 'date-fns/parse';
 import { de } from 'date-fns/locale';
-import getActivities, { parseActivitiesFromPages } from '../../src';
+// Use the webpack version to ensure, that the published version works fine and not only the src/ one.
+import getActivities, {
+  parseActivitiesFromPages,
+} from '../bundle/tresor-import';
+// To use the published version, uncomment the following line after running: npm run build
+// import getActivities, { parseActivitiesFromPages } from '../../dist/tresor-import';
 
 new Vue({
   el: '#app',
