@@ -279,9 +279,10 @@ describe('Broker: ING', () => {
     });
 
     test('Test if dividend with taxes from a ETF is mapped correctly', () => {
-      const activity = ing.parseData(dividendsSamples[6]);
+      const activity = ing.parsePages(dividendsSamples[6]).activities;
 
-      expect(activity).toEqual({
+      expect(activity.length).toEqual(1);
+      expect(activity[0]).toEqual({
         broker: 'ing',
         type: 'Dividend',
         date: '2020-09-15',
@@ -296,9 +297,10 @@ describe('Broker: ING', () => {
     });
 
     test('Test if dividend with taxes from a stock is mapped correctly', () => {
-      const activity = ing.parseData(dividendsSamples[7]);
+      const activity = ing.parsePages(dividendsSamples[7]).activities;
 
-      expect(activity).toEqual({
+      expect(activity.length).toEqual(1);
+      expect(activity[0]).toEqual({
         broker: 'ing',
         type: 'Dividend',
         date: '2020-09-18',
