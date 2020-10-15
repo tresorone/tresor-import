@@ -72,13 +72,14 @@ export const formatNumber = value => {
 export const findLineNumberByContent = (content, term) =>
   content.findIndex(line => line.includes(term));
 
-export const canParseData = content =>
+export const canParsePage = (content, extension) =>
+  extension === 'pdf' &&
   content.some(line => line.includes('1822direkt')) &&
   (isPageTypeBuy(content) ||
     isPageTypeSell(content) ||
     isPageTypeDividend(content));
 
-export const parseData = content => {
+export const parsePage = content => {
   let type, date, isin, company, shares, price, amount, fee, tax;
 
   if (isPageTypeBuy(content)) {
@@ -137,12 +138,7 @@ export const parsePages = contents => {
 
   for (let content of contents) {
     try {
-      let activity = parseData(content);
-      if (activity === undefined) {
-        return;
-      }
-
-      activities.push(activity);
+      activities.push(parsePage(content));
     } catch (exception) {
       console.error(
         'Error while parsing page (1822direkt)',
@@ -152,5 +148,8 @@ export const parsePages = contents => {
     }
   }
 
-  return activities;
+  return {
+    activities,
+    status: 0,
+  };
 };

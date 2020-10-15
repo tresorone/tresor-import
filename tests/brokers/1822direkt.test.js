@@ -1,4 +1,4 @@
-import { getBroker } from '../../src';
+import { findImplementation } from '@/index';
 import * as _1822direkt from '../../src/brokers/1822direkt';
 import {
   allSamples,
@@ -11,26 +11,27 @@ describe('Broker: 1822direkt', () => {
   let consoleErrorSpy;
 
   describe('Check all documents', () => {
-    test('Can one page parsed with 1822direkt', () => {
+    test('Can the document parsed with 1822direkt', () => {
       allSamples.forEach(samples => {
-        expect(samples.some(item => _1822direkt.canParseData(item))).toEqual(
-          true
-        );
+        expect(
+          samples.some(item => _1822direkt.canParsePage(item, 'pdf'))
+        ).toEqual(true);
       });
     });
 
-    test('Can identify a broker from one page as 1822direkt', () => {
+    test('Can identify a implementation from the document as 1822direkt', () => {
       allSamples.forEach(samples => {
-        expect(samples.some(item => getBroker(item) === _1822direkt)).toEqual(
-          true
-        );
+        const implementations = findImplementation(samples, 'pdf');
+
+        expect(implementations.length).toEqual(1);
+        expect(implementations[0]).toEqual(_1822direkt);
       });
     });
   });
 
   describe('Validate buys', () => {
     test('Can the direct market order parsed from the document', () => {
-      const activities = _1822direkt.parsePages(buySamples[0]);
+      const activities = _1822direkt.parsePages(buySamples[0]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -48,7 +49,7 @@ describe('Broker: 1822direkt', () => {
     });
 
     test('Can the exchange market order parsed from the document', () => {
-      const activities = _1822direkt.parsePages(buySamples[1]);
+      const activities = _1822direkt.parsePages(buySamples[1]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -66,7 +67,7 @@ describe('Broker: 1822direkt', () => {
     });
 
     test('Can the saving plan order parsed from the document - comstage', () => {
-      const activities = _1822direkt.parsePages(buySamples[2]);
+      const activities = _1822direkt.parsePages(buySamples[2]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -86,7 +87,7 @@ describe('Broker: 1822direkt', () => {
 
   describe('Validate sells', () => {
     test('Can the order parsed from the document', () => {
-      const activities = _1822direkt.parsePages(sellSamples[0]);
+      const activities = _1822direkt.parsePages(sellSamples[0]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -106,7 +107,7 @@ describe('Broker: 1822direkt', () => {
 
   describe('Validate dividends', () => {
     test('Can the etf dividend be parsed from the document', () => {
-      const activities = _1822direkt.parsePages(dividendSamples[0]);
+      const activities = _1822direkt.parsePages(dividendSamples[0]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
