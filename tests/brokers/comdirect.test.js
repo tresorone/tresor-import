@@ -1,4 +1,4 @@
-import { getBroker } from '../../src';
+import { findImplementation } from '../../src';
 import * as comdirect from '../../src/brokers/comdirect';
 import { allSamples, buySamples, dividendSamples } from './__mocks__/comdirect';
 
@@ -8,27 +8,28 @@ describe('Broker: comdirect', () => {
   describe('Check all documents', () => {
     test('Can one page parsed with comdirect', () => {
       allSamples.forEach(samples => {
-        expect(samples.some(item => comdirect.canParseData(item))).toEqual(
-          true
-        );
+        expect(
+          samples.some(item => comdirect.canParsePage(item, 'pdf'))
+        ).toEqual(true);
       });
     });
 
     test('Can identify a broker from one page as comdirect', () => {
       allSamples.forEach(samples => {
-        expect(samples.some(item => getBroker(item) === comdirect)).toEqual(
-          true
-        );
+        const implementations = findImplementation(samples, 'pdf');
+
+        expect(implementations.length).toEqual(1);
+        expect(implementations[0]).toEqual(comdirect);
       });
     });
   });
 
   describe('Validate buys', () => {
     test('Can the order parsed from the document', () => {
-      const activities = comdirect.parsePages(buySamples[0]);
+      const result = comdirect.parsePages(buySamples[0]);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
         date: '2020-08-07',
@@ -43,10 +44,10 @@ describe('Broker: comdirect', () => {
     });
 
     test('Can the order with purchase reduction parsed from the document', () => {
-      const activities = comdirect.parsePages(buySamples[1]);
+      const result = comdirect.parsePages(buySamples[1]);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
         date: '2020-04-01',
@@ -63,10 +64,10 @@ describe('Broker: comdirect', () => {
 
   describe('Validate dividends', () => {
     test('Can the dividend in USD parsed from the document', () => {
-      const activities = comdirect.parsePages(dividendSamples[0]);
+      const result = comdirect.parsePages(dividendSamples[0]);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Dividend',
         date: '2020-07-27',
@@ -81,10 +82,10 @@ describe('Broker: comdirect', () => {
     });
 
     test('Can the dividend in EUR parsed from the document', () => {
-      const activities = comdirect.parsePages(dividendSamples[1]);
+      const result = comdirect.parsePages(dividendSamples[1]);
 
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Dividend',
         date: '2020-05-08',

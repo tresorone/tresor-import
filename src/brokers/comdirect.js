@@ -118,11 +118,12 @@ const isDividend = textArr =>
   textArr.some(t => t.includes('Ertragsgutschrift')) ||
   textArr.some(t => t.includes('Dividendengutschrift'));
 
-export const canParseData = textArr =>
-  textArr.some(t => t.includes('comdirect bank')) &&
-  (isBuy(textArr) || isSell(textArr) || isDividend(textArr));
+export const canParsePage = (content, extension) =>
+  extension === 'pdf' &&
+  content.some(line => line.includes('comdirect bank')) &&
+  (isBuy(content) || isSell(content) || isDividend(content));
 
-export const parseData = textArr => {
+const parseData = textArr => {
   let type, date, isin, company, shares, price, amount, fee, tax;
 
   if (isBuy(textArr)) {
@@ -178,7 +179,10 @@ export const parseData = textArr => {
 };
 
 export const parsePages = contents => {
-  // only first page has activity data
-  const activity = parseData(contents[0]);
-  return [activity];
+  const activities = [parseData(contents[0])];
+
+  return {
+    activities,
+    status: 0,
+  };
 };

@@ -12,10 +12,8 @@
     "tax": 0,
     "fee": 10,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 138.05,
-    "parsed": true
+    "price": 138.05
   },
   {
     "isin": "US0231351067",
@@ -30,10 +28,8 @@
     "tax": 0,
     "fee": 10,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 1464.99,
-    "parsed": true
+    "price": 1464.99
   },
   {
     "isin": "DE000A0F5UH1",
@@ -48,10 +44,8 @@
     "tax": 0,
     "fee": 10.86,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 26.091578947368422,
-    "parsed": true
+    "price": 26.091578947368422
   },
   {
     "isin": "IE00BTJRMP35",
@@ -66,10 +60,8 @@
     "tax": 0,
     "fee": 10.88,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 41.681176470588234,
-    "parsed": true
+    "price": 41.681176470588234
   },
   {
     "isin": "US02079K3059",
@@ -84,10 +76,8 @@
     "tax": 0,
     "fee": 10,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 964.3,
-    "parsed": true
+    "price": 964.3
   },
   {
     "isin": "LU0392495700",
@@ -102,10 +92,8 @@
     "tax": 0,
     "fee": 10.88,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 61.6235,
-    "parsed": true
+    "price": 61.6235
   },
   {
     "isin": "US09247X1019",
@@ -120,10 +108,8 @@
     "tax": 0,
     "fee": 10,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 365.97,
-    "parsed": true
+    "price": 365.97
   },
   {
     "isin": "US01609W1027",
@@ -138,10 +124,8 @@
     "tax": 0,
     "fee": 10,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 147.4,
-    "parsed": true
+    "price": 147.4
   },
   {
     "isin": "LU1861132840",
@@ -156,10 +140,8 @@
     "tax": 0,
     "fee": 10.85,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 51.84,
-    "parsed": true
+    "price": 51.84
   },
   {
     "isin": "IE00B4L5Y983",
@@ -174,10 +156,8 @@
     "tax": 0,
     "fee": 9.3,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 56.41,
-    "parsed": true
+    "price": 56.41
   },
   {
     "isin": "IE00BGHQ0G80",
@@ -192,10 +172,8 @@
     "tax": 0,
     "fee": 3.9,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 23.2827,
-    "parsed": true
+    "price": 23.2827
   },
   {
     "isin": "LU1841731745",
@@ -210,10 +188,8 @@
     "tax": 0,
     "fee": 10,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 18.838,
-    "parsed": true
+    "price": 18.838
   },
   {
     "isin": "IE00B8GKDB10",
@@ -228,10 +204,8 @@
     "tax": 0,
     "fee": 0.49,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 51.9302472918376,
-    "parsed": true
+    "price": 51.9302472918376
   },
   {
     "isin": "LU1861132840",
@@ -246,10 +220,8 @@
     "tax": 0,
     "fee": 10,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 59.55,
-    "parsed": true
+    "price": 59.55
   },
   {
     "isin": "IE00B8GKDB10",
@@ -264,10 +236,8 @@
     "tax": 0,
     "fee": 0.49,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 51.90976007308894,
-    "parsed": true
+    "price": 51.90976007308894
   },
   {
     "isin": "US0378331005",
@@ -282,10 +252,8 @@
     "tax": 0,
     "fee": 10,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 257.9,
-    "parsed": true
+    "price": 257.9
   },
   {
     "isin": "LU1781541179",
@@ -300,10 +268,8 @@
     "tax": 0,
     "fee": 10,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 9.924,
-    "parsed": true
+    "price": 9.924
   },
   {
     "isin": "IE00B8GKDB10",
@@ -318,10 +284,8 @@
     "tax": 0,
     "fee": 0.49,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 47.09516991937307,
-    "parsed": true
+    "price": 47.09516991937307
   },
   {
     "isin": "US0378331005",
@@ -336,10 +300,8 @@
     "tax": 0,
     "fee": 10,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 232.45,
-    "parsed": true
+    "price": 232.45
   },
   {
     "isin": "LU1781541179",
@@ -354,10 +316,8 @@
     "tax": 0,
     "fee": 10,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 8.443,
-    "parsed": true
+    "price": 8.443
   },
   {
     "isin": "IE00B8GKDB10",
@@ -372,14 +332,11 @@
     "tax": 0,
     "fee": 0.49,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 39.31992261839229,
-    "parsed": true
+    "price": 39.31992261839229
   },
   {
     "isin": "IE00BKM4H312",
-    "wkn": "",
     "type": "Buy",
     "company": "MSCI USA Dividend IQ UCITS",
     "symbol": "QDVD.DE",
@@ -390,14 +347,11 @@
     "tax": 0,
     "fee": 1,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 30.44,
-    "parsed": true
+    "price": 30.44
   },
   {
     "isin": "US0846707026",
-    "wkn": "",
     "type": "Buy",
     "company": "Berkshire Hathaway Inc.",
     "symbol": "BRYN.F",
@@ -408,14 +362,11 @@
     "tax": 0,
     "fee": 1,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 174.2,
-    "parsed": true
+    "price": 174.2
   },
   {
     "isin": "US9182041080",
-    "wkn": "",
     "type": "Buy",
     "company": "V.F. Corp.",
     "symbol": "VFP.DE",
@@ -426,14 +377,11 @@
     "tax": 0,
     "fee": 1,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 56.5,
-    "parsed": true
+    "price": 56.5
   },
   {
     "isin": "DE0005552004",
-    "wkn": "",
     "type": "Buy",
     "company": "Deutsche Post AG",
     "symbol": "DPW.DE",
@@ -444,10 +392,8 @@
     "tax": 0,
     "fee": 1,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 27.27,
-    "parsed": true
+    "price": 27.27
   },
   {
     "isin": "IE00B8GKDB10",
@@ -462,14 +408,11 @@
     "tax": 0,
     "fee": 0.49,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 41.34486579456563,
-    "parsed": true
+    "price": 41.34486579456563
   },
   {
     "isin": "IE00BKM4H312",
-    "wkn": "",
     "type": "Buy",
     "company": "MSCI USA Dividend IQ UCITS",
     "symbol": "QDVD.DE",
@@ -480,10 +423,8 @@
     "tax": 0,
     "fee": 1,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 29.75,
-    "parsed": true
+    "price": 29.75
   },
   {
     "isin": "DE000A0F5UH1",
@@ -498,17 +439,13 @@
     "tax": 0,
     "fee": 1,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 21.765121951219513,
-    "parsed": true
+    "price": 21.765121951219513
   },
   {
     "isin": "IE00BJ5JNY98",
-    "wkn": "",
     "type": "Buy",
     "company": "MSCI World Information Technology",
-    "symbol": "",
     "date": "2020-05-11",
     "shares": 18,
     "amount": 95.35,
@@ -516,17 +453,13 @@
     "tax": 0,
     "fee": 1,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 5.2972222222222225,
-    "parsed": true
+    "price": 5.2972222222222225
   },
   {
     "isin": "IE00BJ5JNY98",
-    "wkn": "",
     "type": "Buy",
     "company": "MSCI World Information Technology",
-    "symbol": "",
     "date": "2020-05-14",
     "shares": 2,
     "amount": 10.2,
@@ -534,10 +467,8 @@
     "tax": 0,
     "fee": 1,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 5.1,
-    "parsed": true
+    "price": 5.1
   },
   {
     "isin": "DE000A0F5UH1",
@@ -552,17 +483,13 @@
     "tax": 0,
     "fee": 1,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 23.395,
-    "parsed": true
+    "price": 23.395
   },
   {
     "isin": "IE00BJ5JNY98",
-    "wkn": "",
     "type": "Buy",
     "company": "MSCI World Information Technology",
-    "symbol": "",
     "date": "2020-06-04",
     "shares": 3,
     "amount": 16.2,
@@ -570,10 +497,8 @@
     "tax": 0,
     "fee": 1,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 5.4,
-    "parsed": true
+    "price": 5.4
   },
   {
     "isin": "IE00B8GKDB10",
@@ -588,14 +513,11 @@
     "tax": 0,
     "fee": 0.49,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 44.314848133015445,
-    "parsed": true
+    "price": 44.314848133015445
   },
   {
     "isin": "IE00BKM4H312",
-    "wkn": "",
     "type": "Buy",
     "company": "MSCI USA Dividend IQ UCITS",
     "symbol": "QDVD.DE",
@@ -606,10 +528,8 @@
     "tax": 0,
     "fee": 1,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 28.99,
-    "parsed": true
+    "price": 28.99
   },
   {
     "isin": "DE000A0F5UH1",
@@ -624,10 +544,8 @@
     "tax": 0,
     "fee": 1,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 22.5,
-    "parsed": true
+    "price": 22.5
   },
   {
     "isin": "IE00B652H904",
@@ -642,9 +560,7 @@
     "tax": 0,
     "fee": 1,
     "currency": "EUR",
-    "grossCurrency": "",
     "exchangeRate": 0,
-    "price": 15.291929824561404,
-    "parsed": true
+    "price": 15.291929824561404
   }
 ]

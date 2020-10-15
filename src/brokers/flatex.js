@@ -2,7 +2,7 @@ import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 import Big from 'big.js';
 
-import { parseGermanNum, validateActivity } from '@/helper';
+import { parseGermanNum } from '@/helper';
 
 const getTableValueByKey = (textArr, startLineNumer, key) => {
   const finding = textArr.find(
@@ -169,14 +169,16 @@ const findPayout = (textArr, startLineNumer) => {
 const lineContains = (textArr, lineNumber, value) =>
   textArr[lineNumber].includes(value);
 
-export const canParseData = textArr =>
-  textArr.some(
-    t => t.includes('flatex Bank AG') || t.includes('FinTech Group Bank AG')
+export const canParsePage = (content, extension) =>
+  extension === 'pdf' &&
+  content.some(
+    line =>
+      line.includes('flatex Bank AG') || line.includes('FinTech Group Bank AG')
   ) &&
-  (textArr.some(t => t.includes('Kauf')) ||
-    textArr.some(t => t.includes('Verkauf')) ||
-    textArr.some(t => t.includes('Dividendengutschrift')) ||
-    textArr.some(t => t.includes('Ertragsmitteilung')));
+  (content.some(line => line.includes('Kauf')) ||
+    content.some(line => line.includes('Verkauf')) ||
+    content.some(line => line.includes('Dividendengutschrift')) ||
+    content.some(line => line.includes('Ertragsmitteilung')));
 
 export const parseSinglePage = textArr => {
   return parsePage(textArr, findTableIndexes(textArr)[0]);
@@ -220,7 +222,7 @@ export const parsePage = (textArr, startLineNumer) => {
     tax = findDividendTax(textArr, startLineNumer);
   }
 
-  return validateActivity({
+  return {
     broker: 'flatex',
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
@@ -231,7 +233,7 @@ export const parsePage = (textArr, startLineNumer) => {
     amount,
     fee,
     tax,
-  });
+  };
 };
 
 export const parsePages = contents => {
@@ -252,5 +254,8 @@ export const parsePages = contents => {
     }
   }
 
-  return activities;
+  return {
+    activities,
+    status: 0,
+  };
 };

@@ -1,4 +1,4 @@
-import { getBroker } from '../../src';
+import { findImplementation } from '@/index';
 import * as consorsbank from '../../src/brokers/consorsbank';
 import {
   buySamples,
@@ -6,25 +6,39 @@ import {
   dividendsSamples,
   oldDividendsSamples,
 } from './__mocks__/consorsbank';
-
 console.error = jest.fn();
 
-describe('Consorsbank broker', () => {
-  test('Our samples should be detected by Consorsbank handler only', () => {
-    for (let sample of buySamples
-      .concat(dividendsSamples)
-      .concat(sellSamples)) {
-      expect(getBroker(sample[0])).toEqual(consorsbank);
-    }
+describe('Broker: Consorsbank', () => {
+  const allSamples = buySamples.concat(dividendsSamples).concat(sellSamples);
+
+  describe('Check all documents', () => {
+    test('Can the document parsed with Consorsbank', () => {
+      allSamples.forEach(samples => {
+        expect(
+          samples.some(item => consorsbank.canParsePage(item, 'pdf'))
+        ).toEqual(true);
+      });
+    });
+
+    test('Can identify a implementation from the document as Consorsbank', () => {
+      allSamples.forEach(samples => {
+        const implementations = findImplementation(samples, 'pdf');
+
+        expect(implementations.length).toEqual(1);
+        expect(implementations[0]).toEqual(consorsbank);
+      });
+    });
   });
 
   test('PDFs with the old Consorsbank format should not be accepted', () => {
-    expect(consorsbank.canParseData(oldDividendsSamples[0])).toEqual(false);
+    expect(consorsbank.canParsePage(oldDividendsSamples[0], 'pdf')).toEqual(
+      false
+    );
   });
 
   describe('Buy', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const activity = consorsbank.parsePages(buySamples[0]);
+      const activity = consorsbank.parsePages(buySamples[0]).activities;
 
       expect(activity).toEqual([
         {
@@ -43,7 +57,7 @@ describe('Consorsbank broker', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const activity = consorsbank.parsePages(buySamples[1]);
+      const activity = consorsbank.parsePages(buySamples[1]).activities;
 
       expect(activity).toEqual([
         {
@@ -62,7 +76,7 @@ describe('Consorsbank broker', () => {
     });
 
     test('should map pdf data of sample 3 correctly', () => {
-      const activity = consorsbank.parsePages(buySamples[2]);
+      const activity = consorsbank.parsePages(buySamples[2]).activities;
 
       expect(activity).toEqual([
         {
@@ -81,7 +95,7 @@ describe('Consorsbank broker', () => {
     });
 
     test('should map pdf data of sample 4 correctly', () => {
-      const activity = consorsbank.parsePages(buySamples[3]);
+      const activity = consorsbank.parsePages(buySamples[3]).activities;
 
       expect(activity).toEqual([
         {
@@ -102,7 +116,7 @@ describe('Consorsbank broker', () => {
 
   describe('Sell', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const activity = consorsbank.parsePages(sellSamples[0]);
+      const activity = consorsbank.parsePages(sellSamples[0]).activities;
 
       expect(activity).toEqual([
         {
@@ -121,7 +135,7 @@ describe('Consorsbank broker', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      expect(consorsbank.parsePages(sellSamples[1])).toEqual([
+      expect(consorsbank.parsePages(sellSamples[1]).activities).toEqual([
         {
           amount: 22.59,
           broker: 'consorsbank',
@@ -139,15 +153,15 @@ describe('Consorsbank broker', () => {
   });
 
   describe('Dividend', () => {
-    test('should map pdf data of sample 1 correctly', () => {
-      const activity = consorsbank.parsePages(dividendsSamples[0]);
+    test('should map pdf data of ertrag_alerian_mlp_etf_1.json correctly', () => {
+      const activity = consorsbank.parsePages(dividendsSamples[0]).activities;
 
       expect(activity).toEqual([
         {
           amount: 186.79,
           broker: 'consorsbank',
           company: 'Alerian MLP ETF Registered Shares o.N.',
-          date: '2020-05-06',
+          date: '2020-05-14',
           fee: 0,
           isin: 'US00162Q8666',
           price: 0.13836296296296297,
@@ -158,15 +172,15 @@ describe('Consorsbank broker', () => {
       ]);
     });
 
-    test('should map pdf data of sample 2 correctly', () => {
-      const activity = consorsbank.parsePages(dividendsSamples[1]);
+    test('should map pdf data of ertrag_global_x_superdividend_etf correctly', () => {
+      const activity = consorsbank.parsePages(dividendsSamples[1]).activities;
 
       expect(activity).toEqual([
         {
           amount: 71.02,
           broker: 'consorsbank',
           company: 'Global X SuperDividend ETF Registered Shares o.N.',
-          date: '2020-03-03',
+          date: '2020-03-12',
           fee: 0,
           isin: 'US37950E5490',
           price: 0.10926153846153847,
@@ -177,15 +191,15 @@ describe('Consorsbank broker', () => {
       ]);
     });
 
-    test('should map pdf data of sample 3 correctly', () => {
-      const activity = consorsbank.parsePages(dividendsSamples[2]);
+    test('should map pdf data of dividend_vanguard ftse_etf.json correctly', () => {
+      const activity = consorsbank.parsePages(dividendsSamples[2]).activities;
 
       expect(activity).toEqual([
         {
           amount: 9.75,
           broker: 'consorsbank',
           company: 'Vanguard FTSE D.A.P.x.J.U.ETF Registered Shares o.N.',
-          date: '2018-09-26',
+          date: '2018-10-10',
           fee: 0,
           isin: 'IE00B9F5YL18',
           price: 0.21195652173913043,
@@ -196,13 +210,13 @@ describe('Consorsbank broker', () => {
       ]);
     });
 
-    test('should map pdf data of sample 4 correctly', () => {
-      expect(consorsbank.parsePages(dividendsSamples[3])).toEqual([
+    test('should map pdf data of ertrag_alerian_mlp_etf_2.json', () => {
+      expect(consorsbank.parsePages(dividendsSamples[3]).activities).toEqual([
         {
           amount: 236.73,
           broker: 'consorsbank',
           company: 'Alerian MLP ETF Registered Shares o.N.',
-          date: '2020-02-12',
+          date: '2020-02-20',
           fee: 0,
           isin: 'US00162Q8666',
           price: 0.17535555555555554,
@@ -213,18 +227,69 @@ describe('Consorsbank broker', () => {
       ]);
     });
 
-    test('should map pdf data of sample 5 correctly', () => {
-      expect(consorsbank.parsePages(dividendsSamples[4])).toEqual([
+    test('should map pdf data of dividend_volkswagen_ag.json', () => {
+      expect(consorsbank.parsePages(dividendsSamples[4]).activities).toEqual([
         {
           amount: 67.2,
           broker: 'consorsbank',
           company: 'VOLKSWAGEN AG Inhaber-Stammaktien o.N.',
-          date: '2019-05-14',
+          date: '2019-05-17',
           fee: 0,
           isin: 'DE0007664005',
           price: 4.8,
           shares: 14,
           tax: 18.68,
+          type: 'Dividend',
+        },
+      ]);
+    });
+
+    test('should map pdf data of dividend_diageo.json', () => {
+      expect(consorsbank.parsePages(dividendsSamples[5]).activities).toEqual([
+        {
+          amount: 1.53,
+          broker: 'consorsbank',
+          company: 'DIAGEO PLC Reg. Shares LS -,28935185',
+          date: '2020-10-08',
+          fee: 0,
+          isin: 'GB0002374006',
+          price: 0.4625640560518797,
+          shares: 3.30765,
+          tax: 0,
+          type: 'Dividend',
+        },
+      ]);
+    });
+
+    test('should map pdf data of dividend_cisco_system_inc.json', () => {
+      expect(consorsbank.parsePages(dividendsSamples[6]).activities).toEqual([
+        {
+          amount: 0.27,
+          broker: 'consorsbank',
+          company: 'CISCO SYSTEMS INC. Registered Shares DL-,001',
+          date: '2020-04-22',
+          fee: 0,
+          isin: 'US17275R1023',
+          price: 0.33889795406049955,
+          shares: 0.7967,
+          tax: 0.04,
+          type: 'Dividend',
+        },
+      ]);
+    });
+
+    test('should map pdf data of dividend_pepsico.json', () => {
+      expect(consorsbank.parsePages(dividendsSamples[7]).activities).toEqual([
+        {
+          amount: 1.26,
+          broker: 'consorsbank',
+          company: 'PEPSICO INC. Registered Shares DL -,0166',
+          date: '2020-09-30',
+          fee: 0,
+          isin: 'US7134481081',
+          price: 0.8723949318008724,
+          shares: 1.4443,
+          tax: 0.19,
           type: 'Dividend',
         },
       ]);

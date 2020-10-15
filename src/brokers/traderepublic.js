@@ -61,6 +61,12 @@ const findShares = textArr => {
   return parseGermanNum(shares);
 };
 
+const findPriceOfShare = textArr => {
+  const lineWithValue =
+    textArr[textArr.findIndex(t => t.includes(' Stk.')) + 1];
+  return +findAndConvertNumber(lineWithValue, textArr);
+};
+
 const findAmount = textArr => {
   const searchTerm = 'GESAMT';
   const totalAmountLine = textArr[textArr.indexOf(searchTerm) + 1];
@@ -75,15 +81,46 @@ const findPayout = textArr => {
   return parseGermanNum(totalAmount);
 };
 
+const findExchangeRate = (textArr, currency) => {
+  // Find the value of "1,1869 EUR/USD" by searching for "EUR/USD"
+  const searchTerm = 'EUR/' + currency;
+  const totalExchangeRateLine =
+    textArr[textArr.findIndex(line => line.includes(searchTerm))];
+  const exchangeRateValue = totalExchangeRateLine.split(' ')[0].trim();
+  return Big(parseGermanNum(exchangeRateValue));
+};
+
+const findAndConvertNumber = (valueWithCurrency, textArr) => {
+  const lineElements = valueWithCurrency.split(' ');
+  const value = Big(Math.abs(parseGermanNum(lineElements[0])));
+  if (lineElements[1] === 'EUR') {
+    // No currency conversion is required.
+    return value;
+  }
+
+  // Convert the number with the exchange rate from document.
+  return value.div(findExchangeRate(textArr, lineElements[1]));
+};
+
 const findFee = textArr => {
+  var totalFee = Big(0);
+
   const searchTerm = 'Fremdkostenzuschlag';
   if (textArr.indexOf(searchTerm) > -1) {
     const feeLine = textArr[textArr.indexOf(searchTerm) + 1];
     const feeNumberString = feeLine.split(' EUR')[0];
-    return Math.abs(parseGermanNum(feeNumberString));
-  } else {
-    return 0;
+
+    totalFee = totalFee.plus(Big(Math.abs(parseGermanNum(feeNumberString))));
   }
+
+  const searchTermThirdPartyExpenses = 'Fremde Spesen';
+  if (textArr.indexOf(searchTermThirdPartyExpenses) > -1) {
+    const lineWithValue =
+      textArr[textArr.indexOf(searchTermThirdPartyExpenses) + 1];
+    totalFee = totalFee.plus(findAndConvertNumber(lineWithValue, textArr));
+  }
+
+  return totalFee;
 };
 
 const findTax = textArr => {
@@ -130,12 +167,23 @@ const findTax = textArr => {
     lineNumber += 2
   ) {
     const lineContent = textArr[lineNumber].split(' EUR')[0];
-    const lineParsedAmount = Math.abs(parseGermanNum(lineContent));
+    // A positive tax amount in the json indicates tax return and a negative tax amount indicates a paid tax
+    // TresorOne handles this the other way around
+    const lineParsedAmount = -parseGermanNum(lineContent);
 
     totalTax = totalTax.plus(Big(lineParsedAmount));
   }
 
-  return +totalTax;
+  const searchTermWithholdingTax = 'Quellensteuer';
+  const lineWithWithholdingTax = textArr.findIndex(line =>
+    line.includes(searchTermWithholdingTax)
+  );
+  if (lineWithWithholdingTax > -1) {
+    const lineWithValue = textArr[lineWithWithholdingTax + 1];
+    totalTax = totalTax.plus(findAndConvertNumber(lineWithValue, textArr));
+  }
+
+  return totalTax;
 };
 
 const isBuySingle = textArr => textArr.some(t => t.includes('Kauf am'));
@@ -147,51 +195,89 @@ const isSell = textArr => textArr.some(t => t.includes('Verkauf am'));
 
 const isDividend = textArr => textArr.some(t => t.includes('mit dem Ex-Tag'));
 
-export const canParseData = textArr =>
-  textArr.some(t => t.includes('TRADE REPUBLIC BANK GMBH')) &&
-  (isBuySingle(textArr) ||
-    isBuySavingsPlan(textArr) ||
-    isSell(textArr) ||
-    isDividend(textArr));
+const isOverviewStatement = content =>
+  content.some(
+    line =>
+      line.includes('DEPOTAUSZUG') || line.includes('JAHRESDEPOTABSTIMMUNG')
+  );
 
-export const parseData = textArr => {
-  let type, date, isin, company, shares, price, amount, fee, tax;
+export const canParsePage = (content, extension) =>
+  extension === 'pdf' &&
+  content.some(line => line.includes('TRADE REPUBLIC BANK GMBH')) &&
+  (isBuySingle(content) ||
+    isBuySavingsPlan(content) ||
+    isSell(content) ||
+    isDividend(content) ||
+    isOverviewStatement(content));
+
+export const parsePositionAsActivity = (content, startLineNumber) => {
+  // Find the line with ISIN and the next line with the date
+  let lineNumberOfISIN;
+  let lineOfDate;
+  for (
+    let lineNumber = startLineNumber;
+    lineNumber < content.length;
+    lineNumber++
+  ) {
+    const line = content[lineNumber];
+    if (line.includes('ISIN:') && lineNumberOfISIN === undefined) {
+      lineNumberOfISIN = lineNumber;
+    }
+
+    if (lineNumberOfISIN !== undefined && /^\d{2}\.\d{2}\.\d{4}$/.test(line)) {
+      lineOfDate = lineNumber;
+      break;
+    }
+  }
+
+  const numberOfShares = parseGermanNum(content[startLineNumber].split(' ')[0]);
+  const toalAmount = parseGermanNum(content[lineOfDate + 1]);
+
+  return {
+    broker: 'traderepublic',
+    type: 'Buy',
+    date: format(
+      parse(content[lineOfDate], 'dd.MM.yyyy', new Date()),
+      'yyyy-MM-dd'
+    ),
+    isin: content[lineNumberOfISIN].split(' ')[1],
+    company: content[startLineNumber + 1],
+    shares: numberOfShares,
+    // We need to calculate the buy-price per share because in the overview is only the current price per share available.
+    price: +Big(toalAmount).div(Big(numberOfShares)),
+    amount: toalAmount,
+    fee: 0,
+    tax: 0,
+  };
+};
+
+export const parseOrderOrDividend = textArr => {
+  let type, date, isin, company, shares, price, amount;
 
   if (isBuySingle(textArr) || isBuySavingsPlan(textArr)) {
     type = 'Buy';
-    isin = findISIN(textArr);
     company = findCompany(textArr);
     date = isBuySavingsPlan(textArr)
       ? findDateBuySavingsPlan(textArr)
       : findDateSingleBuy(textArr);
-    shares = findShares(textArr);
     amount = findAmount(textArr);
-    price = +Big(amount).div(Big(shares));
-    fee = findFee(textArr);
-    tax = findTax(textArr);
   } else if (isSell(textArr)) {
     type = 'Sell';
-    isin = findISIN(textArr);
     company = findCompany(textArr);
     date = findDateSell(textArr);
-    shares = findShares(textArr);
     amount = findAmount(textArr);
-    price = +Big(amount).div(Big(shares));
-    fee = findFee(textArr);
-    tax = findTax(textArr);
   } else if (isDividend(textArr)) {
     type = 'Dividend';
-    isin = findISIN(textArr);
     company = findCompany(textArr);
     date = findDateDividend(textArr);
-    shares = findShares(textArr);
     amount = findPayout(textArr);
-    price = +Big(amount).div(Big(shares));
-    fee = findFee(textArr);
-    tax = findTax(textArr);
   }
 
-  return validateActivity({
+  isin = findISIN(textArr);
+  shares = findShares(textArr);
+  price = findPriceOfShare(textArr);
+
+  return {
     broker: 'traderepublic',
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
@@ -200,13 +286,63 @@ export const parseData = textArr => {
     shares,
     price,
     amount,
-    fee,
-    tax,
+    fee: +findFee(textArr),
+    tax: +findTax(textArr),
+  };
+};
+
+export const parsePage = content => {
+  let foundActivities = [];
+
+  if (
+    isBuySingle(content) ||
+    isBuySavingsPlan(content) ||
+    isSell(content) ||
+    isDividend(content)
+  ) {
+
+    foundActivities.push(parseOrderOrDividend(content));
+  } else if (isOverviewStatement(content)) {
+    for (let lineNumber = 0; lineNumber < content.length; lineNumber++) {
+      const line = content[lineNumber];
+      if (!line.includes(' Stk.')) {
+        continue;
+      }
+
+      foundActivities.push(parsePositionAsActivity(content, lineNumber));
+    }
+  }
+
+  let validatedActivities = [];
+
+  foundActivities.forEach(activity => {
+    if (validateActivity(activity)) {
+      validatedActivities.push(activity);
+    }
   });
+
+  return validatedActivities;
 };
 
 export const parsePages = contents => {
-  // trade republic only has one-page PDFs
-  const activity = parseData(contents[0]);
-  return [activity];
+  let activities = [];
+
+  for (let content of contents) {
+    try {
+      parsePage(content).forEach(activity => {
+        activities.push(activity);
+      });
+    } catch (exception) {
+      console.error(
+        'Error while parsing page (trade republic)',
+        exception,
+        content
+      );
+    }
+  }
+
+  return {
+    activities,
+    status: 0,
+  };
 };

@@ -2,25 +2,35 @@ import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 import Big from 'big.js';
 
-import { parseGermanNum, validateActivity } from '@/helper';
+import {
+  parseGermanNum,
+  validateActivity,
+  findFirstIsinIndexInArray,
+} from '@/helper';
 
-const findISIN = text => text[text.findIndex(t => t === 'ISIN') + 3];
+const findISIN = text => {
+  return text[findFirstIsinIndexInArray(text)];
+};
 
-const findCompany = text => text[text.findIndex(t => t === 'ISIN') + 1];
+const findCompany = text => {
+  // Sometimes a company name is split in two during JSONifying.
+  const indexIsinString = text.findIndex(t => t === 'ISIN');
+  const name_index_one = text[indexIsinString + 1];
+  if (findFirstIsinIndexInArray(text.slice(indexIsinString)) > 3) {
+    return name_index_one.concat(' ', text[indexIsinString + 2]);
+  }
+  return name_index_one;
+};
 
 const findDateBuySell = textArr => {
   const idx = textArr.findIndex(t => t.toLowerCase() === 'orderabrechnung');
-  const date = textArr[idx + 2].substr(3, 10).trim();
-
-  return date;
+  return textArr[idx + 2].substr(3, 10).trim();
 };
 
 const findDateDividend = textArr => {
-  const keyword = 'schlusstag';
+  const keyword = 'valuta';
   const dateLine = textArr.find(t => t.toLowerCase().includes(keyword));
-  const date = dateLine.substr(keyword.length).trim();
-
-  return date;
+  return dateLine.substr(keyword.length).trim();
 };
 
 const findShares = textArr => {
@@ -123,9 +133,13 @@ const isDividend = textArr =>
     ['ertragsgutschrift', 'dividendengutschrift'].includes(t.toLowerCase())
   );
 
-export const canParseData = textArr => {
-  const isConsors = textArr.some(
-    t => t.toLowerCase && t.toLowerCase().includes('consorsbank')
+export const canParsePage = (content, extension) => {
+  if (extension !== 'pdf') {
+    return false;
+  }
+
+  const isConsors = content.some(
+    line => line.toLowerCase && line.toLowerCase().includes('consorsbank')
   );
 
   if (!isConsors) {
@@ -133,14 +147,16 @@ export const canParseData = textArr => {
   }
 
   const isSupportedType =
-    isBuy(textArr) || isSell(textArr) || isDividend(textArr);
+    isBuy(content) || isSell(content) || isDividend(content);
 
-  const isOldFormat = textArr.some(t => t.includes('IBAN') && t !== 'IBAN');
+  const isOldFormat = content.some(
+    line => line.includes('IBAN') && line !== 'IBAN'
+  );
 
   return isSupportedType && !isOldFormat;
 };
 
-export const parseData = textArr => {
+const parseData = textArr => {
   let type, date, isin, company, shares, price, amount, fee, tax;
 
   if (isBuy(textArr)) {
@@ -174,7 +190,6 @@ export const parseData = textArr => {
     fee = 0;
     tax = findDividendTax(textArr);
   }
-
   return validateActivity({
     broker: 'consorsbank',
     type,
@@ -190,7 +205,10 @@ export const parseData = textArr => {
 };
 
 export const parsePages = contents => {
-  // only first page has activity data
-  const activity = parseData(contents[0]);
-  return [activity];
+  const activities = [parseData(contents[0])];
+
+  return {
+    activities,
+    status: 0,
+  };
 };

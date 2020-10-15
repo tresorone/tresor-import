@@ -1,6 +1,7 @@
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 
+import { Big } from 'big.js';
 import { parseGermanNum, validateActivity } from '@/helper';
 
 const offsets = {
@@ -9,8 +10,11 @@ const offsets = {
   isin: 3,
 };
 
-const getValueByPreviousElement = (textArr, prev) =>
-  textArr[textArr.findIndex(t => t.includes(prev)) + 1];
+const getValueByPreviousElement = (textArr, prev) => {
+  const index = textArr.findIndex(t => t.includes(prev));
+  if (index < 0) return '';
+  return textArr[index + 1];
+};
 
 const findTableIndex = textArr => textArr.findIndex(t => t.includes('Stück'));
 
@@ -38,18 +42,54 @@ const findPrice = textArr =>
 const findAmount = textArr =>
   parseGermanNum(getValueByPreviousElement(textArr, 'Kurswert').trim());
 
-const findFee = textArr =>
-  parseGermanNum(
+const findFee = textArr => {
+  const provision = Big(parseGermanNum(
     getValueByPreviousElement(textArr, 'Provision').split(' ')[0].trim()
-  );
+  ));
+  const abwicklungskosten = Big(parseGermanNum(
+    getValueByPreviousElement(textArr, 'Abwicklungskosten Börse')
+  ));
+  const transaktionsentgelt = Big(parseGermanNum(
+    getValueByPreviousElement(textArr, 'Transaktionsentgelt Börse')
+  ));
+  return +provision.plus(abwicklungskosten).plus(transaktionsentgelt);
+};
 
 const findDateDividend = textArr =>
   getValueByPreviousElement(textArr, 'Zahlbarkeitstag').split(' ')[0];
 
-const findPayout = textArr =>
-  parseGermanNum(
-    getValueByPreviousElement(textArr, 'Ausmachender Betrag').split(' ')[0]
+const findPayout = textArr => {
+  let index = textArr.indexOf('Ausschüttung');
+  if (index < 0) index = textArr.lastIndexOf('Dividendengutschrift');
+  const currency = textArr[index + 2];
+  const eurAmount =
+    currency === 'EUR' ? textArr[index + 1] : textArr[index + 3];
+  return parseGermanNum(eurAmount.split(' ')[0]);
+};
+
+const findTax = textArr => {
+  const withholdingTaxIndex = textArr.findIndex(
+    t => t.startsWith('Anrechenbare Quellensteuer') && t.endsWith('EUR')
   );
+  const withholdingTax =
+    withholdingTaxIndex >= 0
+      ? parseGermanNum(textArr[withholdingTaxIndex + 1])
+      : 0;
+
+  const kap = parseGermanNum(
+    getValueByPreviousElement(textArr, 'Kapitalertragsteuer 25 %').split(' ')[0]
+  );
+  const soli = parseGermanNum(
+    getValueByPreviousElement(textArr, 'Solidaritätszuschlag').split(' ')[0]
+  );
+  const churchTax = parseGermanNum(
+    getValueByPreviousElement(textArr, 'Kirchensteuer').split(' ')[0]
+  );
+  return +Big(kap)
+    .plus(Big(soli))
+    .plus(Big(churchTax))
+    .plus(Big(withholdingTax));
+};
 
 const isBuy = textArr =>
   textArr.some(
@@ -68,13 +108,13 @@ const isDividend = textArr =>
       t.includes('Ausschüttung Investmentfonds')
   );
 
-export const canParseData = textArr =>
-  textArr.some(t => t.includes('BIC BYLADEM1001')) &&
-  (isBuy(textArr) || isSell(textArr) || isDividend(textArr));
+export const canParsePage = (content, extension) =>
+  extension === 'pdf' &&
+  content.some(line => line.includes('BIC BYLADEM1001')) &&
+  (isBuy(content) || isSell(content) || isDividend(content));
 
-export const parseData = textArr => {
+const parseData = textArr => {
   let type, date, isin, company, shares, price, amount, fee, tax;
-
   if (isBuy(textArr)) {
     type = 'Buy';
     isin = findISIN(textArr);
@@ -94,7 +134,7 @@ export const parseData = textArr => {
     amount = findAmount(textArr);
     price = findPrice(textArr);
     fee = findFee(textArr);
-    tax = 0;
+    tax = findTax(textArr);
   } else if (isDividend(textArr)) {
     type = 'Dividend';
     isin = findISIN(textArr);
@@ -104,7 +144,7 @@ export const parseData = textArr => {
     amount = findPayout(textArr);
     price = amount / shares;
     fee = 0;
-    tax = 0;
+    tax = findTax(textArr);
   }
 
   return validateActivity({
@@ -123,6 +163,10 @@ export const parseData = textArr => {
 
 export const parsePages = contents => {
   // parse first page has activity data
-  const activity = parseData(contents[0]);
-  return [activity];
+  const activities = [parseData(contents[0])];
+
+  return {
+    activities,
+    status: 0,
+  };
 };
