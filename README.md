@@ -5,13 +5,13 @@ This is the PDF and PP-CSV Import used on [tresor.one](https://tresor.one)
 ## Installation
 
 ```bash
-npm install tresor-import
+npm install @tresor.one/import
 ```
 
 ## Usage
 
 ```js
-import getActivities from 'tresor-import';
+import getActivities from '@tresor.one/import';
 
 async fileHandler() {
   const results = await Promise.all(Array.from(this.$refs.myFiles.files).map(getActivities));
