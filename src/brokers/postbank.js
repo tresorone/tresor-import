@@ -70,12 +70,11 @@ const isDividend = textArr =>
 
 export const canParsePage = (content, extension) =>
   extension === 'pdf' &&
-  (content.some(line => line.includes('BIC PBNKDEFFXXX')) ||
-    content.some(line => line.includes('Postbank'))) &&
+  content.some(line => line.includes('BIC PBNKDEFFXXX')) &&
   (isBuy(content) || isSell(content) || isDividend(content));
 
 const parseData = textArr => {
-  let type, date, isin, company, shares, price, amount, fee, tax;
+  let type, date, isin, company, shares, price, amount, fee;
 
   if (isBuy(textArr)) {
     type = 'Buy';
@@ -86,9 +85,7 @@ const parseData = textArr => {
     amount = findAmount(textArr);
     price = findPrice(textArr);
     fee = findFee(textArr);
-    tax = 0;
-  }
-  else if (isSell(textArr)) {
+  } else if (isSell(textArr)) {
     type = 'Sell';
     isin = findISIN(textArr);
     company = findCompany(textArr);
@@ -97,9 +94,7 @@ const parseData = textArr => {
     amount = findAmount(textArr);
     price = findPrice(textArr);
     fee = findFee(textArr);
-    tax = 0;
-  }
-  else if (isDividend(textArr)) {
+  } else if (isDividend(textArr)) {
     type = 'Dividend';
     isin = findISIN(textArr);
     company = findCompany(textArr);
@@ -108,7 +103,6 @@ const parseData = textArr => {
     amount = findPayout(textArr);
     price = amount / shares;
     fee = 0;
-    tax = 0;
   }
 
   return {
@@ -121,7 +115,6 @@ const parseData = textArr => {
     price,
     amount,
     fee,
-    tax,
   };
 };
 

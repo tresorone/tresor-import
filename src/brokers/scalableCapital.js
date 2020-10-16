@@ -11,22 +11,7 @@ const isPageTypeSell = content =>
   content.some(line => line.includes('Wertpapierabrechnung: Verkauf'));
 
 const isPageTypeDividend = content =>
-  content.some(
-    line =>
-      line.includes('Fondsausschüttung') ||
-      line.includes('Dividendenabrechnung')
-  );
-
-const isBrokerGratisbroker = content =>
-  content.some(line => line.includes('GRATISBROKER GmbH'));
-
-const isBrokerScalableCapital = content =>
-  content.some(line =>
-    line.includes('Scalable Capital Vermögensverwaltung GmbH')
-  );
-
-const isBrokerOskar = content =>
-  content.some(line => line.includes('Oskar.de GmbH'));
+  content.some(line => line.includes('Fondsausschüttung'));
 
 const findOrderDate = content => {
   let orderDate =
@@ -47,10 +32,8 @@ const findOrderDate = content => {
   return content[findLineNumberByContent(content, 'Handelsdatum') + 2];
 };
 
-const findPayDate = content => {
-  const term = 'Valuta: ';
-  return content[findLineNumberByContent(content, term)].substring(term.length);
-};
+const findPayDate = content =>
+  content[findLineNumberByContent(content, 'Zahltag') + 1];
 
 const findByStartingTerm = (content, term) =>
   content[content.findIndex(line => line.startsWith(term))].substring(
@@ -193,9 +176,9 @@ const findTax = content => {
 
 export const canParsePage = (content, extension) =>
   extension === 'pdf' &&
-  (isBrokerGratisbroker(content) ||
-    isBrokerScalableCapital(content) ||
-    isBrokerOskar(content)) &&
+  content.some(line =>
+    line.includes('Scalable Capital Vermögensverwaltung GmbH')
+  ) &&
   (isPageTypeBuy(content) ||
     isPageTypeSell(content) ||
     isPageTypeDividend(content));
@@ -234,18 +217,11 @@ const parsePage = content => {
     fee = 0;
     tax = findTax(content);
   } else {
-    console.error('Unknown page type for Baader Bank');
-  }
-
-  let broker = 'scalablecapital';
-  if (isBrokerGratisbroker(content)) {
-    broker = 'gratisbroker';
-  } else if (isBrokerOskar(content)) {
-    broker = 'oskar';
+    console.error('Unknown page type for scalable.capital');
   }
 
   return validateActivity({
-    broker,
+    broker: 'scalablecapital',
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
     isin,
@@ -266,7 +242,7 @@ export const parsePages = contents => {
       activities.push(parsePage(content));
     } catch (exception) {
       console.error(
-        'Error while parsing page (Baader Bank)',
+        'Error while parsing page (scalable.capital)',
         exception,
         content
       );

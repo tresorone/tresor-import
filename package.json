@@ -1,20 +1,15 @@
 {
-  "name": "@tresor.one/import",
-  "version": "2.1.0",
+  "name": "tresor-import",
+  "version": "2.0.0",
   "description": "Creates Tresor One activities from PDF statements of brokers",
-  "files": [
-    "dist"
-  ],
-  "main": "dist/tresor-import.js",
+  "main": "src/index.js",
   "scripts": {
-    "build": "./node_modules/.bin/webpack --config=webpack.build.js",
-    "watch": "npm run dev",
-    "dev": "./node_modules/.bin/webpack --config=webpack.dev.js",
-    "demo": "serve demo",
-    "start": "concurrently --kill-others \"npm run demo\" \"npm run dev\"",
+    "build": "webpack",
+    "watch": "webpack --watch",
+    "start": "npm run build && serve & npm run watch",
     "test": "jest --verbose",
     "lint": "eslint .",
-    "precommit": "pretty-quick --staged --no-restage && npm run lint && npm t"
+    "precommit": "pretty-quick --staged --no-restage && npm run lint && npm t && npm audit --audit-level=moderate"
   },
   "keywords": [
     "tresor",
@@ -33,9 +28,6 @@
   "devDependencies": {
     "@babel/preset-env": "^7.9.5",
     "babel-jest": "^25.4.0",
-    "babel-loader": "^8.1.0",
-    "before-build-webpack": "^0.2.9",
-    "concurrently": "^5.3.0",
     "copy-webpack-plugin": "^6.0.4",
     "eslint": "^6.8.0",
     "eslint-plugin-jest": "^23.8.2",
@@ -48,13 +40,12 @@
     "prettier": "2.0.5",
     "pretty-quick": "^2.0.1",
     "serve": "^11.3.2",
-    "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11"
   },
   "husky": {
     "hooks": {
-      "pre-commit": ""
+      "pre-commit": "npm run precommit"
     }
   },
   "jest": {

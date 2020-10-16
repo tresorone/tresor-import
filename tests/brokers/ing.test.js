@@ -181,10 +181,10 @@ describe('Broker: ING', () => {
         isin: 'US5949181045',
         company: 'Microsoft Corp.',
         shares: 32,
-        price: 0.45389737647316397,
+        price: 0.385625,
         amount: 12.34,
         fee: 0,
-        tax: 2.18,
+        tax: 0,
       });
     });
 
@@ -199,10 +199,10 @@ describe('Broker: ING', () => {
         isin: 'NL0000388619',
         company: 'Unilever N.V.',
         shares: 8,
-        price: 0.4104,
+        price: 0.34875,
         amount: 2.79,
         fee: 0,
-        tax: 0.49,
+        tax: 0,
       });
     });
 
@@ -217,7 +217,7 @@ describe('Broker: ING', () => {
         isin: 'IE00BZ163G84',
         company: 'Vanguard EUR Corp.Bond U.ETF',
         shares: 29,
-        price: 0.020034,
+        price: 0.02,
         amount: 0.58,
         fee: 0,
         tax: 0,
@@ -235,7 +235,7 @@ describe('Broker: ING', () => {
         isin: 'DE000A0F5UH1',
         company: 'iSh.ST.Gl.Sel.Div.100 U.ETF DE',
         shares: 34,
-        price: 0.177136,
+        price: 0.17705882352941177,
         amount: 6.02,
         fee: 0,
         tax: 0,
@@ -253,10 +253,10 @@ describe('Broker: ING', () => {
         isin: 'IE00B3RBWM25',
         company: 'Vanguard FTSE All-World U.ETF',
         shares: 270,
-        price: 0.37524009432835165,
+        price: 0.30596296296296294,
         amount: 82.61,
         fee: 0,
-        tax: 18.7,
+        tax: 0,
       });
     });
 
@@ -271,46 +271,10 @@ describe('Broker: ING', () => {
         isin: 'LU0392494562',
         company: 'ComStage-MSCI World TRN U.ETF',
         shares: 12,
-        price: 0.9411004908292431,
+        price: 0.9408333333333333,
         amount: 11.29,
         fee: 0,
         tax: 0,
-      });
-    });
-
-    test('Test if dividend with taxes from a ETF is mapped correctly', () => {
-      const activity = ing.parsePages(dividendsSamples[6]).activities;
-
-      expect(activity.length).toEqual(1);
-      expect(activity[0]).toEqual({
-        broker: 'ing',
-        type: 'Dividend',
-        date: '2020-09-15',
-        isin: 'DE0006289382',
-        company: 'iSh.DJ Glob.Titans 50 U.ETF DE',
-        shares: 53,
-        price: 0.055626,
-        amount: 2.41,
-        fee: 0,
-        tax: 0.54,
-      });
-    });
-
-    test('Test if dividend with taxes from a stock is mapped correctly', () => {
-      const activity = ing.parsePages(dividendsSamples[7]).activities;
-
-      expect(activity.length).toEqual(1);
-      expect(activity[0]).toEqual({
-        broker: 'ing',
-        type: 'Dividend',
-        date: '2020-09-18',
-        isin: 'US94106L1098',
-        company: 'Waste Management Inc. (Del.)',
-        shares: 6,
-        price: 0.4608279344592755,
-        amount: 2.06,
-        fee: 0,
-        tax: 0.7,
       });
     });
   });

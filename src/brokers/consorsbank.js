@@ -2,35 +2,25 @@ import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 import Big from 'big.js';
 
-import {
-  parseGermanNum,
-  validateActivity,
-  findFirstIsinIndexInArray,
-} from '@/helper';
+import { parseGermanNum, validateActivity } from '@/helper';
 
-const findISIN = text => {
-  return text[findFirstIsinIndexInArray(text)];
-};
+const findISIN = text => text[text.findIndex(t => t === 'ISIN') + 3];
 
-const findCompany = text => {
-  // Sometimes a company name is split in two during JSONifying.
-  const indexIsinString = text.findIndex(t => t === 'ISIN');
-  const name_index_one = text[indexIsinString + 1];
-  if (findFirstIsinIndexInArray(text.slice(indexIsinString)) > 3) {
-    return name_index_one.concat(' ', text[indexIsinString + 2]);
-  }
-  return name_index_one;
-};
+const findCompany = text => text[text.findIndex(t => t === 'ISIN') + 1];
 
 const findDateBuySell = textArr => {
   const idx = textArr.findIndex(t => t.toLowerCase() === 'orderabrechnung');
-  return textArr[idx + 2].substr(3, 10).trim();
+  const date = textArr[idx + 2].substr(3, 10).trim();
+
+  return date;
 };
 
 const findDateDividend = textArr => {
-  const keyword = 'valuta';
+  const keyword = 'schlusstag';
   const dateLine = textArr.find(t => t.toLowerCase().includes(keyword));
-  return dateLine.substr(keyword.length).trim();
+  const date = dateLine.substr(keyword.length).trim();
+
+  return date;
 };
 
 const findShares = textArr => {
@@ -190,6 +180,7 @@ const parseData = textArr => {
     fee = 0;
     tax = findDividendTax(textArr);
   }
+
   return validateActivity({
     broker: 'consorsbank',
     type,

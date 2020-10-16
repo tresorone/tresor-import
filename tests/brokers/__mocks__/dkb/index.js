@@ -2,7 +2,6 @@ export const buySamples = [
     require('./buy-1.json'),
     require('./buy-2.json'),
     require('./buy-3.json'),
-    require('./sell_stop_market_order_invesco_msci_world.json'),
 ];
 
 export const sellSamples  = [

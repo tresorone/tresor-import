@@ -42,18 +42,10 @@ const findPrice = textArr =>
 const findAmount = textArr =>
   parseGermanNum(getValueByPreviousElement(textArr, 'Kurswert').trim());
 
-const findFee = textArr => {
-  const provision = Big(parseGermanNum(
+const findFee = textArr =>
+  parseGermanNum(
     getValueByPreviousElement(textArr, 'Provision').split(' ')[0].trim()
-  ));
-  const abwicklungskosten = Big(parseGermanNum(
-    getValueByPreviousElement(textArr, 'Abwicklungskosten Börse')
-  ));
-  const transaktionsentgelt = Big(parseGermanNum(
-    getValueByPreviousElement(textArr, 'Transaktionsentgelt Börse')
-  ));
-  return +provision.plus(abwicklungskosten).plus(transaktionsentgelt);
-};
+  );
 
 const findDateDividend = textArr =>
   getValueByPreviousElement(textArr, 'Zahlbarkeitstag').split(' ')[0];
@@ -115,6 +107,7 @@ export const canParsePage = (content, extension) =>
 
 const parseData = textArr => {
   let type, date, isin, company, shares, price, amount, fee, tax;
+
   if (isBuy(textArr)) {
     type = 'Buy';
     isin = findISIN(textArr);

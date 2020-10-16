@@ -1,11 +1,11 @@
 import { findImplementation } from '../../src';
-import * as baaderBank from '../../src/brokers/baaderBank';
+import * as scalableCapital from '../../src/brokers/scalableCapital';
 import {
   allSamples,
   buySamples,
   sellSamples,
   dividendSamples,
-} from './__mocks__/baaderbank';
+} from './__mocks__/scalablecapital';
 
 describe('Broker: scalable.capital', () => {
   let consoleErrorSpy;
@@ -14,7 +14,7 @@ describe('Broker: scalable.capital', () => {
     test('Can the document parsed with scalable.capital', () => {
       allSamples.forEach(samples => {
         expect(
-          samples.some(item => baaderBank.canParsePage(item, 'pdf'))
+          samples.some(item => scalableCapital.canParsePage(item, 'pdf'))
         ).toEqual(true);
       });
     });
@@ -24,14 +24,14 @@ describe('Broker: scalable.capital', () => {
         const implementations = findImplementation(samples, 'pdf');
 
         expect(implementations.length).toEqual(1);
-        expect(implementations[0]).toEqual(baaderBank);
+        expect(implementations[0]).toEqual(scalableCapital);
       });
     });
   });
 
   describe('Validate buys', () => {
     test('Can the market order be parsed from the document', () => {
-      const activities = baaderBank.parsePages(buySamples[0]).activities;
+      const activities = scalableCapital.parsePages(buySamples[0]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -49,7 +49,7 @@ describe('Broker: scalable.capital', () => {
     });
 
     test('Can the saving plan order be parsed from the document - vanguard', () => {
-      const activities = baaderBank.parsePages(buySamples[1]).activities;
+      const activities = scalableCapital.parsePages(buySamples[1]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -67,7 +67,7 @@ describe('Broker: scalable.capital', () => {
     });
 
     test('Can the saving plan order be parsed from the document - comstage', () => {
-      const activities = baaderBank.parsePages(buySamples[2]).activities;
+      const activities = scalableCapital.parsePages(buySamples[2]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -85,7 +85,7 @@ describe('Broker: scalable.capital', () => {
     });
 
     test('Can the limit order be parsed from the document', () => {
-      const activities = baaderBank.parsePages(buySamples[3]).activities;
+      const activities = scalableCapital.parsePages(buySamples[3]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -101,47 +101,11 @@ describe('Broker: scalable.capital', () => {
         tax: 0,
       });
     });
-
-    test('Can the BioNTech order be parsed from the document of Gratisbroker', () => {
-      const activities = baaderBank.parsePages(buySamples[4]).activities;
-
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
-        broker: 'gratisbroker',
-        type: 'Buy',
-        date: '2020-10-05',
-        isin: 'US09075V1026',
-        company: 'BioNTech SE',
-        shares: 34,
-        price: 63.92,
-        amount: 2173.28,
-        fee: 0,
-        tax: 0,
-      });
-    });
-
-    test('Can a order made from Oskar be parsed from the document', () => {
-      const activities = baaderBank.parsePages(buySamples[5]).activities;
-
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
-        broker: 'oskar',
-        type: 'Buy',
-        date: '2020-09-24',
-        isin: 'IE00BZ163L38',
-        company: 'Vang.USD Em.Mkts Gov.Bd U.ETF',
-        shares: 0.01,
-        price: 43.87,
-        amount: 0.44,
-        fee: 0,
-        tax: 0,
-      });
-    });
   });
 
   describe('Validate sells', () => {
     test('Can the order be parsed from the document', () => {
-      const activities = baaderBank.parsePages(sellSamples[0]).activities;
+      const activities = scalableCapital.parsePages(sellSamples[0]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -161,7 +125,8 @@ describe('Broker: scalable.capital', () => {
 
   describe('Validate dividends', () => {
     test('Can the etf dividend be parsed from the document', () => {
-      const activities = baaderBank.parsePages(dividendSamples[0]).activities;
+      const activities = scalableCapital.parsePages(dividendSamples[0])
+        .activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -179,7 +144,8 @@ describe('Broker: scalable.capital', () => {
     });
 
     test('Can the stock dividend in USD with withholding taxes be parsed from the document', () => {
-      const activities = baaderBank.parsePages(dividendSamples[1]).activities;
+      const activities = scalableCapital.parsePages(dividendSamples[1])
+        .activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -193,24 +159,6 @@ describe('Broker: scalable.capital', () => {
         amount: 2.6,
         fee: 0,
         tax: 0.92,
-      });
-    });
-
-    test('Can the stock dividend from Volkswagen with taxes be parsed from the document of Gratisbroker', () => {
-      const activities = baaderBank.parsePages(dividendSamples[2]).activities;
-
-      expect(activities.length).toEqual(1);
-      expect(activities[0]).toEqual({
-        broker: 'gratisbroker',
-        type: 'Dividend',
-        date: '2020-10-05',
-        isin: 'DE0007664039',
-        company: 'Volkswagen AG',
-        shares: 12,
-        price: 4.86,
-        amount: 42.94,
-        fee: 0,
-        tax: 15.38,
       });
     });
   });
