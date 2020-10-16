@@ -406,6 +406,38 @@ describe('Helper functions', () => {
     });
   });
 
+  describe('Function: findFirstIsinIndexInArray', () => {
+    test('Can find first ISIN in array', () => {
+      const testArray = ['foo', 'DE0005140008', 'bar'];
+      expect(helper.findFirstIsinIndexInArray(testArray)).toEqual(1);
+    });
+
+    test('Can find first ISIN in array when multiple isins are present', () => {
+      const testArray = ['foo', 'zap', 'DE0005140008', 'DE0005140009', 'bar'];
+      expect(helper.findFirstIsinIndexInArray(testArray)).toEqual(2);
+    });
+
+    test('Returns undefined when no ISINs are present', () => {
+      const testArray = ['foo', 'bar'];
+      expect(helper.findFirstIsinIndexInArray(testArray)).toEqual(undefined);
+    });
+  });
+
+  describe('Regex: isinRegex works as expected', () => {
+    test('Matches for valid ISINs', () => {
+      const validIsinValues = ['US0005141111', 'DE0005140008', 'GB0011140008'];
+      validIsinValues.forEach(
+        isin => expect(helper.isinRegex.test(isin)).toEqual(true)
+      );
+    });
+    test('Does not match for invalid ISINs', () => {
+      const invalidIsinValues = ['XX023440008', '120005140008', '023456708GB', '0011140008'];
+      invalidIsinValues.forEach(
+        isin => expect(helper.isinRegex.test(isin)).toEqual(false)
+      );
+    });
+  });
+
   beforeEach(() => {
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
   });

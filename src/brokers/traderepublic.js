@@ -300,7 +300,6 @@ export const parsePage = content => {
     isSell(content) ||
     isDividend(content)
   ) {
-
     foundActivities.push(parseOrderOrDividend(content));
   } else if (isOverviewStatement(content)) {
     for (let lineNumber = 0; lineNumber < content.length; lineNumber++) {
