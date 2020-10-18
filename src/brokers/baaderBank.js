@@ -101,12 +101,11 @@ const findShares = (content, isDividend) => {
 
 const findAmount = (content, type) => {
   if (type === 'Dividend') {
-    return parseGermanNum(content[content.lastIndexOf('Bruttobetrag')+2]);
-  }
-  else if (type === 'Buy' || type === 'Sell') {
+    return parseGermanNum(content[content.lastIndexOf('Bruttobetrag') + 2]);
+  } else if (type === 'Buy' || type === 'Sell') {
     return parseGermanNum(content[content.indexOf('Kurswert') + 1]);
   }
-}
+};
 
 const findPricePerShare = (content, isDividend) => {
   if (!isDividend) {
@@ -205,8 +204,7 @@ const parsePage = content => {
     price = findPricePerShare(content, false);
     fee = 0;
     tax = findTax(content);
-  }
-  else if (isPageTypeSell(content)) {
+  } else if (isPageTypeSell(content)) {
     type = 'Sell';
     isin = findISIN(content);
     company = findCompany(content, false);
@@ -216,8 +214,7 @@ const parsePage = content => {
     price = findPricePerShare(content, false);
     fee = 0;
     tax = findTax(content);
-  }
-  else if (isPageTypeDividend(content)) {
+  } else if (isPageTypeDividend(content)) {
     type = 'Dividend';
     isin = findISIN(content);
     company = findCompany(content, true);
@@ -234,8 +231,7 @@ const parsePage = content => {
   let broker = 'scalablecapital';
   if (isBrokerGratisbroker(content)) {
     broker = 'gratisbroker';
-  }
-  else if (isBrokerOskar(content)) {
+  } else if (isBrokerOskar(content)) {
     broker = 'oskar';
   }
 

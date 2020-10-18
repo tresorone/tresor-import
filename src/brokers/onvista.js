@@ -55,7 +55,7 @@ const findAmount = text => {
 const findPayout = text => {
   const amount =
     text[text.findIndex(t => t.includes('Betrag zu Ihren Gunsten')) + 2];
-  return parseGermanNum(amount);
+  return Big(parseGermanNum(amount));
 };
 
 const findFee = text => {
@@ -174,9 +174,9 @@ const parseData = text => {
   } else if (isDividend) {
     type = 'Dividend';
     date = findDateDividend(text);
-    amount = findPayout(text);
     fee = 0;
     tax = findTax(text);
+    amount = +findPayout(text).plus(tax);
     shares = findShares(text);
     price = +Big(amount).div(shares);
   }

@@ -268,7 +268,7 @@ export const parseOrderOrDividend = textArr => {
     date = findDateDividend(textArr);
     tax = +findTax(textArr);
     fee = +findFee(textArr);
-    amount = +(findDividendNetPayout(textArr).plus(tax).plus(fee));
+    amount = +findDividendNetPayout(textArr).plus(tax).plus(fee);
   }
   isin = findISIN(textArr);
   shares = findShares(textArr);
@@ -297,8 +297,7 @@ export const parsePage = content => {
     isDividend(content)
   ) {
     foundActivities.push(parseOrderOrDividend(content));
-  }
-  else if (isOverviewStatement(content)) {
+  } else if (isOverviewStatement(content)) {
     for (let lineNumber = 0; lineNumber < content.length; lineNumber++) {
       const line = content[lineNumber];
       if (!line.includes(' Stk.')) {

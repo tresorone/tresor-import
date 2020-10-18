@@ -48,7 +48,7 @@ const findDateDividend = textArr =>
 
 const findPayout = textArr =>
   parseGermanNum(
-    getValueByPreviousElement(textArr, 'Ausmachender Betrag').split(' ')[0]
+    textArr[textArr.indexOf('Ausschüttung')+3]
   );
 
 const isBuy = textArr =>

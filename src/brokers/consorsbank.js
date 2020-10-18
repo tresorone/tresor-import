@@ -49,21 +49,19 @@ const findDividendShares = textArr => {
 };
 
 const findAmount = (textArr, type) => {
-  let amount, idx
+  let amount, idx;
   if (type === 'Buy') {
-  idx = textArr.findIndex(t => t.includes('zulasten Konto-Nr'));
-  amount = textArr[idx - 1];
-  }
-  else if (type === 'Sell') {
+    idx = textArr.indexOf("Kurswert");
+    amount = textArr[idx + 2];
+  } else if (type === 'Sell') {
     idx = textArr.findIndex(t => t.includes('Kurswert'));
-    amount = textArr[idx +2];
-  }
-  else if (type === 'Dividend') {
+    amount = textArr[idx + 2];
+  } else if (type === 'Dividend') {
     idx = textArr.indexOf('Brutto in EUR');
     if (idx < 0) {
       idx = textArr.indexOf('Brutto');
     }
-    amount = textArr[idx +1].split(' ')[0];
+    amount = textArr[idx + 1].split(' ')[0];
   }
   return parseGermanNum(amount);
 };
