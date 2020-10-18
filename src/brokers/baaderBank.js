@@ -100,15 +100,11 @@ const findShares = (content, isDividend) => {
 };
 
 const findAmount = (content, type) => {
-  if (type === "Dividend") {
+  if (type === 'Dividend') {
     return parseGermanNum(content[content.lastIndexOf('Bruttobetrag')+2]);
   }
-  else if (type === "Buy") {
-    return parseGermanNum(content[findLineNumberByCurrentAndPreviousLineContent(
-      content,'Zu Lasten Konto','EUR') + 1]);
-  }
-  else if (type === "Sell") {
-    return parseGermanNum(content[content.indexOf("Kurswert") + 1]);
+  else if (type === 'Buy' || type === 'Sell') {
+    return parseGermanNum(content[content.indexOf('Kurswert') + 1]);
   }
 }
 
