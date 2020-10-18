@@ -190,7 +190,7 @@ describe('Broker: scalable.capital', () => {
         company: 'Gladstone Commercial Corp.',
         shares: 33,
         price: 0.10674047097153871,
-        amount: 2.6,
+        amount: 3.52,
         fee: 0,
         tax: 0.92,
       });
@@ -208,7 +208,7 @@ describe('Broker: scalable.capital', () => {
         company: 'Volkswagen AG',
         shares: 12,
         price: 4.86,
-        amount: 42.94,
+        amount: 58.32,
         fee: 0,
         tax: 15.38,
       });

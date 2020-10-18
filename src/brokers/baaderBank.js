@@ -99,22 +99,18 @@ const findShares = (content, isDividend) => {
   return parseGermanNum(line.split(' ')[1]);
 };
 
-const findAmount = (content, isCredit, isDividend) =>
-  parseGermanNum(
-    content[
-      isDividend
-        ? findLineNumberByCurrentAndPreviousLineContent(
-            content,
-            'Valuta',
-            'Zu Gunsten Konto'
-          ) - 3
-        : findLineNumberByCurrentAndPreviousLineContent(
-            content,
-            isCredit ? 'Zu Gunsten Konto' : 'Zu Lasten Konto',
-            'EUR'
-          ) + 1
-    ]
-  );
+const findAmount = (content, type) => {
+  if (type === "Dividend") {
+    return parseGermanNum(content[content.lastIndexOf('Bruttobetrag')+2]);
+  }
+  else if (type === "Buy") {
+    return parseGermanNum(content[findLineNumberByCurrentAndPreviousLineContent(
+      content,'Zu Lasten Konto','EUR') + 1]);
+  }
+  else if (type === "Sell") {
+    return parseGermanNum(content[content.indexOf("Kurswert") + 1]);
+  }
+}
 
 const findPricePerShare = (content, isDividend) => {
   if (!isDividend) {
@@ -209,27 +205,29 @@ const parsePage = content => {
     company = findCompany(content, false);
     date = findOrderDate(content);
     shares = findShares(content, false);
-    amount = findAmount(content, false, false);
+    amount = findAmount(content, 'Buy');
     price = findPricePerShare(content, false);
     fee = 0;
     tax = findTax(content);
-  } else if (isPageTypeSell(content)) {
+  }
+  else if (isPageTypeSell(content)) {
     type = 'Sell';
     isin = findISIN(content);
     company = findCompany(content, false);
     date = findOrderDate(content);
     shares = findShares(content, false);
-    amount = findAmount(content, true, false);
+    amount = findAmount(content, 'Sell');
     price = findPricePerShare(content, false);
     fee = 0;
     tax = findTax(content);
-  } else if (isPageTypeDividend(content)) {
+  }
+  else if (isPageTypeDividend(content)) {
     type = 'Dividend';
     isin = findISIN(content);
     company = findCompany(content, true);
     date = findPayDate(content);
     shares = findShares(content, true);
-    amount = findAmount(content, false, true);
+    amount = findAmount(content, 'Dividend');
     price = findPricePerShare(content, true);
     fee = 0;
     tax = findTax(content);
@@ -240,7 +238,8 @@ const parsePage = content => {
   let broker = 'scalablecapital';
   if (isBrokerGratisbroker(content)) {
     broker = 'gratisbroker';
-  } else if (isBrokerOskar(content)) {
+  }
+  else if (isBrokerOskar(content)) {
     broker = 'oskar';
   }
 
