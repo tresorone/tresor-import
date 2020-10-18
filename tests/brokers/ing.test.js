@@ -182,7 +182,7 @@ describe('Broker: ING', () => {
         company: 'Microsoft Corp.',
         shares: 32,
         price: 0.45389737647316397,
-        amount: 12.34,
+        amount: 14.524716047141247,
         fee: 0,
         tax: 2.18,
       });
@@ -200,7 +200,7 @@ describe('Broker: ING', () => {
         company: 'Unilever N.V.',
         shares: 8,
         price: 0.4104,
-        amount: 2.79,
+        amount: 3.28,
         fee: 0,
         tax: 0.49,
       });
@@ -254,7 +254,7 @@ describe('Broker: ING', () => {
         company: 'Vanguard FTSE All-World U.ETF',
         shares: 270,
         price: 0.37524009432835165,
-        amount: 82.61,
+        amount: 101.31291390424165,
         fee: 0,
         tax: 18.7,
       });
@@ -272,7 +272,7 @@ describe('Broker: ING', () => {
         company: 'ComStage-MSCI World TRN U.ETF',
         shares: 12,
         price: 0.9411004908292431,
-        amount: 11.29,
+        amount: 11.28907259106174,
         fee: 0,
         tax: 0,
       });
@@ -290,7 +290,7 @@ describe('Broker: ING', () => {
         company: 'iSh.DJ Glob.Titans 50 U.ETF DE',
         shares: 53,
         price: 0.055626,
-        amount: 2.41,
+        amount: 2.95,
         fee: 0,
         tax: 0.54,
       });
@@ -308,7 +308,7 @@ describe('Broker: ING', () => {
         company: 'Waste Management Inc. (Del.)',
         shares: 6,
         price: 0.4608279344592755,
-        amount: 2.06,
+        amount: 2.764967606755653,
         fee: 0,
         tax: 0.7,
       });
