@@ -1,18 +1,18 @@
 export const buySamples = [
-  require('./buy-1.json'),
-  require('./buy-2.json'),
-  require('./buy-3.json'),
+  require('./buy/buy_stock_eur_provision_1.json'),
+  require('./buy/buy_stock_eur_provision_2.json'),
+  require('./buy/buy_stock_eur_provision_bonification.json'),
 ];
 
 export const sellSamples = [
-  require('./sell/sell-1.json'),
+  require('./sell/sell_etf_LU1861132840.json'),
   require('./sell/sell_stop_market_order_invesco_msci_world.json'),
   require('./sell/sell_etf_IE00B4L5Y983.json'),
 ];
 
 export const dividendsSamples = [
-  require('./div-1.json'),
-  require('./div-2.json'),
-  require('./div-3.json'),
-  require('./div-4.json'),
+  require('./dividend/dividend_taxed_usd_1.json'),
+  require('./dividend/dividend_taxed_usd_2.json'),
+  require('./dividend/dividend_taxed_usd_3.json'),
+  require('./dividend/dividend_taxed_usd_4.json'),
 ];

@@ -43,19 +43,30 @@ const findAmount = textArr =>
   parseGermanNum(getValueByPreviousElement(textArr, 'Kurswert').trim());
 
 const findFee = textArr => {
-  const provision = Big(parseGermanNum(
-    getValueByPreviousElement(textArr, 'Provision').split(' ')[0].trim()
-  ));
-  const abwicklungskosten = Big(parseGermanNum(
-    getValueByPreviousElement(textArr, 'Abwicklungskosten Börse')
-  ));
-  const transaktionsentgelt = Big(parseGermanNum(
-    getValueByPreviousElement(textArr, 'Transaktionsentgelt Börse')
-  ));
-  const transferFee = Big(parseGermanNum(
-    getValueByPreviousElement(textArr, 'Übertragungs-/Liefergebühr')
-  ));
-  return +provision.plus(abwicklungskosten).plus(transaktionsentgelt).plus(transferFee);
+  const provision = Big(
+    parseGermanNum(
+      getValueByPreviousElement(textArr, 'Provision').split(' ')[0].trim()
+    )
+  );
+  const abwicklungskosten = Big(
+    parseGermanNum(
+      getValueByPreviousElement(textArr, 'Abwicklungskosten Börse')
+    )
+  );
+  const transaktionsentgelt = Big(
+    parseGermanNum(
+      getValueByPreviousElement(textArr, 'Transaktionsentgelt Börse')
+    )
+  );
+  const transferFee = Big(
+    parseGermanNum(
+      getValueByPreviousElement(textArr, 'Übertragungs-/Liefergebühr')
+    )
+  );
+  return +provision
+    .plus(abwicklungskosten)
+    .plus(transaktionsentgelt)
+    .plus(transferFee);
 };
 
 const findDateDividend = textArr =>
