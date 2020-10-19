@@ -52,7 +52,10 @@ const findFee = textArr => {
   const transaktionsentgelt = Big(parseGermanNum(
     getValueByPreviousElement(textArr, 'Transaktionsentgelt Börse')
   ));
-  return +provision.plus(abwicklungskosten).plus(transaktionsentgelt);
+  const transferFee = Big(parseGermanNum(
+    getValueByPreviousElement(textArr, 'Übertragungs-/Liefergebühr')
+  ));
+  return +provision.plus(abwicklungskosten).plus(transaktionsentgelt).plus(transferFee);
 };
 
 const findDateDividend = textArr =>

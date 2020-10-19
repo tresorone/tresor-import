@@ -113,6 +113,23 @@ describe('DKB broker', () => {
         tax: 0,
       });
     });
+
+    test('Can parse IE00B4L5Y983 regular buys', () => {
+      const result = dkb.parsePages(sellSamples[2]);
+
+      expect(result.activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Sell',
+        date: '2020-10-14',
+        isin: 'IE00B4L5Y983',
+        company: 'ISHSIII-CORE MSCI WORLD U.ETF',
+        shares: 60,
+        price: 57.104,
+        amount: 3426.24,
+        fee: 10.86,
+        tax: 0,
+      });
+    });
   });
 
   describe('Dividend', () => {
