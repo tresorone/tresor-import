@@ -55,8 +55,8 @@ describe('Broker: comdirect', () => {
         company: 'Robeco Global Consumer Trends',
         shares: 0.108,
         price: 235.09259259259258,
-        amount: 25.94,
-        fee: 0,
+        amount: 25.39,
+        fee: -0.55,
         tax: 0,
       });
     });
@@ -72,9 +72,9 @@ describe('Broker: comdirect', () => {
         isin: 'LU0079474960',
         company: 'AB SICAV I-American Growth Ptf',
         shares: 0.644,
-        price: 116.44409937888199,
+        price: 122.57025271966882,
         amount: 78.93524275146672,
-        fee: -3.945242751466712,
+        fee: -3.94524275146672,
         tax: 0,
       });
     });
