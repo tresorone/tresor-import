@@ -203,8 +203,8 @@ describe('Broker: Flatex', () => {
         isin: 'US5949181045',
         company: 'MICROSOFT',
         shares: 16,
-        amount: 6.23, // only available in USD, thus using net dividend in EUR
-        price: 6.23 / 16,
+        amount: 7.326928257160815, // only available in USD, thus using net dividend in EUR
+        price: 7.326928257160815 / 16,
         fee: 0,
         tax: 0, // skip bc only available in USD
       });

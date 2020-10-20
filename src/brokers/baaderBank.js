@@ -101,6 +101,7 @@ const findShares = (content, isDividend) => {
 
 const findAmount = (content, type) => {
   if (type === 'Dividend') {
+    //First occurence of Bruttobetrag  can be in foreign currency; last Occurence is in €
     return parseGermanNum(content[content.lastIndexOf('Bruttobetrag') + 2]);
   } else if (type === 'Buy' || type === 'Sell') {
     return parseGermanNum(content[content.indexOf('Kurswert') + 1]);

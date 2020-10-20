@@ -157,13 +157,13 @@ const findPayout = (textArr, startLineNumer) => {
         getTableValueByKey(textArr, startLineNumer, 'grundlage').split(' ')[0]
       )
     : 0; // Bemessungsgrundlage
-  const netDividend = getTableValueByKey(textArr, startLineNumer, 'Endbetrag')
-    ? parseGermanNum(
-        getTableValueByKey(textArr, startLineNumer, 'Endbetrag').split(' ')[0]
-      )
-    : 0;
 
-  return assessmentBasis > 0 ? assessmentBasis : netDividend;
+  if (assessmentBasis <= 0) {
+    const payoutForeign = getTableValueByKey(textArr, startLineNumer, 'Bruttodividende').split(' ')[0];
+    const conversionRate = getTableValueByKey(textArr, startLineNumer, 'Devisenkurs').split(' ')[0];
+    return +(Big(parseGermanNum(payoutForeign)).div(parseGermanNum(conversionRate)));
+  }
+  return assessmentBasis;
 };
 
 const lineContains = (textArr, lineNumber, value) =>

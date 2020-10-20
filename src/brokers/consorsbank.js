@@ -50,13 +50,13 @@ const findDividendShares = textArr => {
 
 const findAmount = (textArr, type) => {
   let amount, idx;
-  if (type === 'Buy') {
+
+  if (type === 'Buy' || type === 'Sell') {
     idx = textArr.indexOf("Kurswert");
     amount = textArr[idx + 2];
-  } else if (type === 'Sell') {
-    idx = textArr.findIndex(t => t.includes('Kurswert'));
-    amount = textArr[idx + 2];
-  } else if (type === 'Dividend') {
+  }
+  else if (type === 'Dividend') {
+    // "Brutto in EUR" is only present if the dividend is paid in a foreign currency, otherwise its just "Brutto"
     idx = textArr.indexOf('Brutto in EUR');
     if (idx < 0) {
       idx = textArr.indexOf('Brutto');
