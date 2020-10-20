@@ -25,7 +25,7 @@ describe('Broker: comdirect', () => {
   });
 
   describe('Validate buys', () => {
-    test('Can the order parsed from the document', () => {
+    test('Can the order parsed from saving_plan', () => {
       const result = comdirect.parsePages(buySamples[0]);
 
       expect(result.activities.length).toEqual(1);
@@ -43,7 +43,7 @@ describe('Broker: comdirect', () => {
       });
     });
 
-    test('Can the order with purchase reduction parsed from the document', () => {
+    test('Can the order with purchase reduction be parsed from purchase_reduction', () => {
       const result = comdirect.parsePages(buySamples[1]);
 
       expect(result.activities.length).toEqual(1);
@@ -55,13 +55,13 @@ describe('Broker: comdirect', () => {
         company: 'Robeco Global Consumer Trends',
         shares: 0.108,
         price: 235.09259259259258,
-        amount: 24.84,
+        amount: 25.94,
         fee: 0,
         tax: 0,
       });
     });
 
-    test('Can parse the order with purchase reduction for ISIN LU0079474960be', () => {
+    test('Can parse the order with purchase reduction from purchase_reduction_usd_1', () => {
       const result = comdirect.parsePages(buySamples[2]);
 
       expect(result.activities.length).toEqual(1);
@@ -73,8 +73,8 @@ describe('Broker: comdirect', () => {
         company: 'AB SICAV I-American Growth Ptf',
         shares: 0.644,
         price: 116.44409937888199,
-        amount: 74.99,
-        fee: 0,
+        amount: 78.93524275146672,
+        fee: -3.945242751466712,
         tax: 0,
       });
     });

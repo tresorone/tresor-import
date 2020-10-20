@@ -100,11 +100,11 @@ export function validateActivity(activity, findSecurityAlsoByCompany = false) {
     return undefined;
   }
 
-  if (Number(activity.fee) !== activity.fee || activity.fee < 0) {
+  if (Number(activity.fee) !== activity.fee) {
     console.error(
       'The fee amount in activity for ' +
         activity.broker +
-        ' must be a number greater than 0.',
+        ' must be a number that can be positive, negative or 0. ',
       activity
     );
     return undefined;

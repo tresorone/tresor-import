@@ -13,14 +13,14 @@ const findCompany = (text, span) => {
   const companyLine = text[text.findIndex(t => t.includes('/ISIN')) + span];
   // span = 2 means its a dividend PDF - dividends dont have the WKN in the same line
   return span === 2
-      ? companyLine.trim()
-      : companyLine.substr(0, companyLine.length - 6).trim();
+    ? companyLine.trim()
+    : companyLine.substr(0, companyLine.length - 6).trim();
 };
 
 const findDateBuySell = textArr => {
-  const dateLine = textArr[textArr.findIndex(t => t.includes('Valuta'))+1];
-  const date = dateLine.split(/\s+/)
-  return date[date.length-3];
+  const dateLine = textArr[textArr.findIndex(t => t.includes('Valuta')) + 1];
+  const date = dateLine.split(/\s+/);
+  return date[date.length - 3];
 };
 
 const findDateDividend = textArr => {
@@ -88,17 +88,19 @@ const findFee = textArr => {
 
 const findPurchaseReduction = textArr => {
   const reduction = Big(0);
-  const lineWithReduction = textArr.findIndex(t => t.includes('Reduktion Kaufaufschlag'));
+  const lineWithReduction = textArr.findIndex(t =>
+    t.includes('Reduktion Kaufaufschlag')
+  );
   if (lineWithReduction < 0) {
-    return +reduction
+    return +reduction;
   }
   let rate = 1;
 
   if (!textArr[lineWithReduction].includes('EUR')) {
-    rate = parseGermanNum(textArr[lineWithReduction-1].split(' ')[3]);
+    rate = parseGermanNum(textArr[lineWithReduction - 1].split(' ')[3]);
   }
-  const reductionValueSplit = textArr[lineWithReduction].split(' ')
-  let reductionValue = reductionValueSplit[reductionValueSplit.length-1]
+  const reductionValueSplit = textArr[lineWithReduction].split(' ');
+  let reductionValue = reductionValueSplit[reductionValueSplit.length - 1];
   if (reductionValue.endsWith('-')) {
     reductionValue = Big(parseGermanNum(reductionValue.slice(0, -1))).abs();
   }
@@ -136,8 +138,7 @@ const parseData = textArr => {
     price = +foundAmount.div(Big(shares));
     fee = +totalFee;
     tax = 0;
-  }
-  else if (isSell(textArr)) {
+  } else if (isSell(textArr)) {
     type = 'Sell';
     isin = findISIN(textArr, 2);
     company = findCompany(textArr, 1);
@@ -147,8 +148,7 @@ const parseData = textArr => {
     price = +Big(amount).div(Big(shares));
     fee = findFee(textArr);
     tax = 0;
-  }
-  else if (isDividend(textArr)) {
+  } else if (isDividend(textArr)) {
     type = 'Dividend';
     isin = findISIN(textArr, 3);
     company = findCompany(textArr, 2);
