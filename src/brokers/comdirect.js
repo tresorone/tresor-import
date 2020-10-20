@@ -6,19 +6,15 @@ import { parseGermanNum, validateActivity } from '@/helper';
 
 const findISIN = (text, span) => {
   const isinLine = text[text.findIndex(t => t.includes('/ISIN')) + span];
-  const isin = isinLine.substr(isinLine.length - 12);
-  return isin;
+  return isinLine.substr(isinLine.length - 12);
 };
 
 const findCompany = (text, span) => {
   const companyLine = text[text.findIndex(t => t.includes('/ISIN')) + span];
   // span = 2 means its a dividend PDF - dividends dont have the WKN in the same line
-  const company =
-    span === 2
+  return span === 2
       ? companyLine.trim()
       : companyLine.substr(0, companyLine.length - 6).trim();
-
-  return company;
 };
 
 const findDateBuySell = textArr => {
@@ -29,10 +25,7 @@ const findDateBuySell = textArr => {
 
 const findDateDividend = textArr => {
   const dateLine = textArr[textArr.findIndex(t => t.includes('zahlbar ab'))];
-  const datePart = dateLine.split('zahlbar ab')[1].trim().substr(0, 10);
-  const date = datePart;
-
-  return date;
+  return dateLine.split('zahlbar ab')[1].trim().substr(0, 10);
 };
 
 const findShares = textArr => {
@@ -94,21 +87,22 @@ const findFee = textArr => {
 };
 
 const findPurchaseReduction = textArr => {
-  let reduction = Big(0);
-  const lineWithReduction = textArr.findIndex(t =>
-    t.includes('Reduktion Kaufaufschlag') && t.includes("EUR")
-  );
+  const reduction = Big(0);
+  const lineWithReduction = textArr.findIndex(t => t.includes('Reduktion Kaufaufschlag'));
   if (lineWithReduction < 0) {
-    return +reduction;
+    return +reduction
   }
+  let rate = 1;
 
-  const reductionLineContent = textArr[lineWithReduction];
-  let reductionValue = reductionLineContent.split('EUR').pop();
+  if (!textArr[lineWithReduction].includes('EUR')) {
+    rate = parseGermanNum(textArr[lineWithReduction-1].split(' ')[3]);
+  }
+  const reductionValueSplit = textArr[lineWithReduction].split(' ')
+  let reductionValue = reductionValueSplit[reductionValueSplit.length-1]
   if (reductionValue.endsWith('-')) {
-    reductionValue = reductionValue.slice(0, -1);
+    reductionValue = Big(parseGermanNum(reductionValue.slice(0, -1))).abs();
   }
-
-  return +reduction.minus(Big(parseGermanNum(reductionValue)));
+  return +Big(reductionValue).div(rate);
 };
 
 const isBuy = textArr => textArr.some(t => t.includes('Wertpapierkauf'));
@@ -130,7 +124,7 @@ const parseData = textArr => {
     const reduction = findPurchaseReduction(textArr);
     const foundAmount = Big(findAmount(textArr));
     const totalAmount = foundAmount.plus(reduction);
-    const totalFee = Big(findFee(textArr)).plus(reduction); // Use plus instead of minus to prevent multiply with -1
+    const totalFee = Big(findFee(textArr)).minus(reduction); // Use plus instead of minus to prevent multiply with -1
 
     type = 'Buy';
     isin = findISIN(textArr, 2);
