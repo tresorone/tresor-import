@@ -44,6 +44,23 @@ describe('DKB broker', () => {
       });
     });
 
+    test('Can parse invesco_msci_world buy action', () => {
+      const result = dkb.parsePages(buySamples[3]);
+
+      expect(result.activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Sell',
+        date: '2020-09-10',
+        isin: 'IE00B60SX394',
+        company: 'I.M.-I.MSCI WORLD UETF',
+        shares: 92,
+        price: 58.887,
+        amount: 5417.60,
+        fee: 16.32,
+        tax: 0,
+      });
+    });
+
     test('should map pdf data of sample 2 correctly', () => {
       const result = dkb.parsePages(buySamples[1]);
 
@@ -96,6 +113,8 @@ describe('DKB broker', () => {
         tax: 0,
       });
     });
+
+
   });
 
   describe('Dividend', () => {

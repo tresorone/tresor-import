@@ -164,13 +164,13 @@ describe('Broker: Trade Republic', () => {
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
-        amount: 1005.00,
+        amount: 1005.0,
         broker: 'traderepublic',
         company: 'Workhorse Group Inc.',
         date: '2020-10-02',
         fee: 1,
         isin: 'US98138J2069',
-        price: 20.10,
+        price: 20.1,
         shares: 50,
         tax: -6.93,
         type: 'Sell',
