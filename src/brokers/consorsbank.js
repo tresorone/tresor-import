@@ -52,10 +52,9 @@ const findAmount = (textArr, type) => {
   let amount, idx;
 
   if (type === 'Buy' || type === 'Sell') {
-    idx = textArr.indexOf("Kurswert");
+    idx = textArr.indexOf('Kurswert');
     amount = textArr[idx + 2];
-  }
-  else if (type === 'Dividend') {
+  } else if (type === 'Dividend') {
     // "Brutto in EUR" is only present if the dividend is paid in a foreign currency, otherwise its just "Brutto"
     idx = textArr.indexOf('Brutto in EUR');
     if (idx < 0) {
@@ -99,7 +98,8 @@ const findDividendTax = textArr => {
     const isTax =
       line.toLowerCase().includes('steuer') &&
       !line.toLowerCase().includes('anrechenbare quellensteuer') &&
-      !line.toLowerCase().includes('abzgl. quellensteuer');
+      !line.toLowerCase().includes('abzgl. quellensteuer') &&
+      !line.toLowerCase().includes('geänderter steuer');
 
     if (!isTax && !isAddition) {
       return totalTax;
