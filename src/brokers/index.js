@@ -1,4 +1,5 @@
 import * as comdirect from './comdirect';
+import * as degiro from './degiro.js';
 import * as dkb from './dkb';
 import * as traderepublic from './traderepublic';
 import * as onvista from './onvista';
@@ -11,6 +12,7 @@ import * as baaderBank from './baaderBank';
 
 export {
   comdirect,
+  degiro,
   dkb,
   traderepublic,
   onvista,
