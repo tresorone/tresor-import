@@ -1,5 +1,6 @@
 import * as comdirect from './comdirect';
 import * as dkb from './dkb';
+import * as ebase from './ebase';
 import * as traderepublic from './traderepublic';
 import * as onvista from './onvista';
 import * as ing from './ing';
@@ -12,6 +13,7 @@ import * as baaderBank from './baaderBank';
 export {
   comdirect,
   dkb,
+  ebase,
   traderepublic,
   onvista,
   ing,
