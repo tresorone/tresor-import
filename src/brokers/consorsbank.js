@@ -89,30 +89,39 @@ const findTax = textArr => {
 };
 
 const findDividendTax = textArr => {
-  const sum = textArr.reduce((acc, t, i) => {
+  const sum = textArr.reduce((totalTax, line, lineNumer) => {
     // is addition (Zuschlag)
-    const isAddition = t.toLowerCase().includes('zuschlag');
-
-    // is withholding tax (Quellensteuer)
-    const isWithholdingTax = t.toLowerCase().includes('quellensteuer');
+    const isAddition = line.toLowerCase().includes('zuschlag');
 
     // is tax, excl. irrelevant withholding tax lines
     const isTax =
-      t.toLowerCase().includes('steuer') &&
-      !t.toLowerCase().includes('anrechenbare quellensteuer') &&
-      !t.toLowerCase().includes('abzgl. quellensteuer');
+      line.toLowerCase().includes('steuer') &&
+      !line.toLowerCase().includes('anrechenbare quellensteuer') &&
+      !line.toLowerCase().includes('abzgl. quellensteuer');
 
-    if (isTax || isAddition) {
-      const offset = isWithholdingTax ? 1 : 3;
-      const [amount, currency] = textArr[i + offset].split(' ');
-
-      // ignore all USD taxes
-      if (currency !== 'USD') {
-        return acc.plus(Big(parseGermanNum(amount)));
-      }
+    if (!isTax && !isAddition) {
+      return totalTax;
     }
 
-    return acc;
+    // There are two different types of dividend tax declarations:
+    // 1)
+    //    "Quellensteuer in EUR",
+    //    "35,51 EUR",     <-- This is the current tax amount
+    // OR
+    //    "abzgl. Kapitalertragsteuer",
+    //    "2,34 EUR",     <-- This is the current tax amount
+    // 2)
+    //   "abzgl. Kapitalertragsteuer",
+    //   "24,51 % von",
+    //   "67,20 EUR",     <-- Assessment basis
+    //   "16,47 EUR",     <-- This is the current tax amount
+    let nextLineContent = textArr[lineNumer + 1];
+    if (nextLineContent.includes('%')) {
+      // The line after something with `steuer` contains a `%`. We have the second type of declaration and need to skip 2 more lines.
+      nextLineContent = textArr[lineNumer + 3];
+    }
+
+    return totalTax.plus(Big(parseGermanNum(nextLineContent.split(' ')[0])));
   }, Big(0));
 
   return Math.abs(+sum);
@@ -190,6 +199,7 @@ const parseData = textArr => {
     fee = 0;
     tax = findDividendTax(textArr);
   }
+
   return validateActivity({
     broker: 'consorsbank',
     type,
