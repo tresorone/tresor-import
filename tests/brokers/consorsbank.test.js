@@ -294,5 +294,22 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('should map pdf data of illinois tool works', () => {
+      expect(consorsbank.parsePages(dividendsSamples[8]).activities).toEqual([
+        {
+          amount: 23.29,
+          broker: 'consorsbank',
+          company: 'ILLINOIS TOOL WORKS INC. Registered Shares o.N.',
+          date: '2020-10-14',
+          fee: 0,
+          isin: 'US4523081093',
+          price: 0.9704166666666667,
+          shares: 24,
+          tax: 5.95,
+          type: 'Dividend',
+        },
+      ]);
+    });
   });
 });
