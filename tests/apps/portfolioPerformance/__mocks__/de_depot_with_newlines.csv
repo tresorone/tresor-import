@@ -1,0 +1,5 @@
+Datum;Typ;Wert;Buchungswährung;Bruttobetrag;Währung Bruttobetrag;Wechselkurs;Gebühren;Steuern;Stück;ISIN;WKN;Ticker-Symbol;Wertpapiername;Notiz
+2020-09-10T15:32;Kauf;541,00;EUR;;;;1,00;0,00;10;US7561091049;899744;RY6.F;REALTY INC. CORP.    DL 1;"Note
+with
+new line"
+2020-06-17T09:38;Kauf;285,00;EUR;;;;1,00;0,00;5;US7561091049;899744;RY6.F;REALTY INC. CORP.    DL 1;
