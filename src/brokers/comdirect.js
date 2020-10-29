@@ -20,12 +20,15 @@ const findCompany = (text, span) => {
 const findDateBuySell = textArr => {
   const dateLine = textArr[textArr.findIndex(t => t.includes('Valuta')) + 1];
   const date = dateLine.split(/\s+/);
-  return format(parse(date[date.length - 3], 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd');
+  return format(
+    parse(date[date.length - 3], 'dd.MM.yyyy', new Date()),
+    'yyyy-MM-dd'
+  );
 };
 
 const findDateDividend = textArr => {
   const dateLine = textArr[textArr.findIndex(t => t.includes('zahlbar ab'))];
-  const date =  dateLine.split('zahlbar ab')[1].trim().substr(0, 10);
+  const date = dateLine.split('zahlbar ab')[1].trim().substr(0, 10);
   return format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd');
 };
 
@@ -61,7 +64,7 @@ const findDividendShares = textArr => {
   return parseGermanNum(shares);
 };
 
-const findAmount = (textArr) => {
+const findAmount = textArr => {
   const priceArea = textArr.slice(
     textArr.findIndex(t => t.includes('Kurswert'))
   );
@@ -69,10 +72,10 @@ const findAmount = (textArr) => {
   const amount = Big(parseGermanNum(priceLine.split('EUR')[1].trim()));
   // If there is a currency-rate within the price line a foreign reduction
   // has not yet been factored in
-  if (priceLine.includes("Devisenkurs")) {
-    return amount.plus(findPurchaseReduction(textArr))
+  if (priceLine.includes('Devisenkurs')) {
+    return amount.plus(findPurchaseReduction(textArr));
   }
-  return amount
+  return amount;
 };
 
 const findPayout = textArr => {
@@ -89,12 +92,16 @@ const findFee = (textArr, amount) => {
   return Big(parseGermanNum(totalCost)).minus(Big(amount));
 };
 
-const findPayoutTax = (textArr, foreignTransaction) => {
+const findPayoutTax = (textArr, fxRate) => {
   let payoutTax = Big(0);
-  if (!(foreignTransaction===undefined)) {
-    const withholdingTaxIndex = textArr.findIndex(line => line.includes('Quellensteuer'));
-    const withholdingTax = parseGermanNum(textArr[withholdingTaxIndex].split(/\s+/)[4]);
-    payoutTax = Big(withholdingTax).div(foreignTransaction[0]);
+  if (!(fxRate === undefined)) {
+    const withholdingTaxIndex = textArr.findIndex(line =>
+      line.includes('Quellensteuer')
+    );
+    const withholdingTax = parseGermanNum(
+      textArr[withholdingTaxIndex].split(/\s+/)[4]
+    );
+    payoutTax = Big(withholdingTax).div(fxRate);
   }
   return payoutTax;
 };
@@ -120,16 +127,49 @@ const findPurchaseReduction = textArr => {
   return Big(reductionValue).div(rate);
 };
 
-const findForeignTransaction = textArr => {
-  const foreignIndex = textArr.findIndex(line => line.includes('zum Devisenkurs:'));
-  let foreignCurrency, fxRate
-  if ( foreignIndex > 0 ) {
+const findPayoutFxRate = textArr => {
+  const foreignIndex = textArr.findIndex(line =>
+    line.includes('zum Devisenkurs:')
+  );
+  if (foreignIndex > 0) {
+    // For dividend operations:
     const foreignLine = textArr[foreignIndex].split(/\s+/);
-    fxRate = parseGermanNum(foreignLine[3])
-    foreignCurrency = foreignLine[2].split('/')[1];
-    return [fxRate, foreignCurrency];
+    return parseGermanNum(foreignLine[3]);
   }
-}
+};
+
+const findPayoutForeignCurrency = textArr => {
+  const foreignIndex = textArr.findIndex(line =>
+    line.includes('zum Devisenkurs:')
+  );
+  if (foreignIndex > 0) {
+    // For dividend operations:
+    const foreignLine = textArr[foreignIndex].split(/\s+/);
+    return foreignLine[2].split('/')[1];
+  }
+};
+
+const findBuyFxRate = textArr => {
+  const foreignIndex = textArr.findIndex(line =>
+    line.includes('Umrechnung zum Devisenkurs ')
+  );
+  if (foreignIndex > 0) {
+    // For dividend operations:
+    const foreignLine = textArr[foreignIndex].split(/\s+/);
+    return parseGermanNum(foreignLine[3]);
+  }
+};
+
+const findBuyForeignCurrency = textArr => {
+  const currencyIndex = textArr.findIndex(line =>
+    line.includes('Zum comdirect Preis von')
+  );
+  if (currencyIndex > 0) {
+    // For dividend operations:
+    const foreignLine = textArr[currencyIndex+1].split(/\s+/);
+    return foreignLine[2];
+  }
+};
 
 const isBuy = textArr => textArr.some(t => t.includes('Wertpapierkauf'));
 const isSell = textArr => textArr.some(t => t.includes('Wertpapierverkauf'));
@@ -144,9 +184,8 @@ export const canParsePage = (content, extension) =>
   (isBuy(content) || isSell(content) || isDividend(content));
 
 const parseData = textArr => {
-  let type, date, isin, company, shares, price, amount, fee, tax;
+  let type, date, isin, company, shares, price, amount, fee, tax, fxRate, foreignCurrency;
 
-  const foreignTransaction = findForeignTransaction(textArr);
   if (isBuy(textArr)) {
     type = 'Buy';
     date = findDateBuySell(textArr);
@@ -154,8 +193,10 @@ const parseData = textArr => {
     company = findCompany(textArr, 1);
     amount = +findAmount(textArr);
     shares = findShares(textArr);
+    price = +Big(amount).div(shares);
     fee = +findFee(textArr, amount); // Use plus instead of minus to prevent multiply with -1
-    price = +(Big(amount).div(shares));
+    fxRate = findBuyFxRate(textArr);
+    foreignCurrency = findBuyForeignCurrency(textArr);
     tax = 0;
   } else if (isSell(textArr)) {
     type = 'Sell';
@@ -175,11 +216,13 @@ const parseData = textArr => {
     shares = findDividendShares(textArr);
     amount = findPayout(textArr);
     price = +Big(amount).div(Big(shares));
+    fxRate = findPayoutFxRate(textArr);
+    foreignCurrency = findPayoutForeignCurrency(textArr);
     fee = 0;
-    tax = +findPayoutTax(textArr, foreignTransaction);
+    tax = +findPayoutTax(textArr, fxRate);
   }
-  let activity
-  if (!(foreignTransaction===undefined)) {
+  let activity;
+  if (!(fxRate === undefined) && !(foreignCurrency === undefined)) {
     activity = {
       broker: 'comdirect',
       type,
@@ -191,11 +234,10 @@ const parseData = textArr => {
       amount,
       fee,
       tax,
-      fxRate: foreignTransaction[0],
-      foreignCurrency: foreignTransaction[1],
+      fxRate,
+      foreignCurrency,
     };
-  }
-  else {
+  } else {
     activity = {
       broker: 'comdirect',
       type,
