@@ -144,7 +144,7 @@ describe('DKB broker', () => {
         price: 78.82,
         amount: 30.01,
         fee: 0,
-        tax: 0,
+        tax: 0.37,
       });
     });
   });
