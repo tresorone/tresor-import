@@ -113,7 +113,11 @@ const isBuy = textArr =>
   );
 
 const isSell = textArr =>
-  textArr.some(t => t.includes('Wertpapier Abrechnung Verkauf'));
+  textArr.some(
+    t =>
+      t.includes('Wertpapier Abrechnung Verkauf') ||
+      t.includes('Wertpapier Abrechnung Rücknahme')
+  );
 
 const isDividend = textArr =>
   textArr.some(
