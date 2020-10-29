@@ -1,8 +1,6 @@
 import { findImplementation } from '@/index';
 import * as ersteBank from '../../src/brokers/ersteBank';
-import {
-  buySamples,
-} from './__mocks__/ersteBank';
+import { buySamples } from './__mocks__/ersteBank';
 
 const allSamples = buySamples; //.concat(sellSamples).concat(dividendSamples);
 describe('Broker: Erste Bank', () => {
@@ -40,7 +38,7 @@ describe('Broker: Erste Bank', () => {
         company: 'OESTERREICHISCHE POST AG',
         shares: 33,
         price: 30.9,
-        amount: 1019.70,
+        amount: 1019.7,
         fee: 22.35,
         tax: 0,
       });
@@ -58,7 +56,7 @@ describe('Broker: Erste Bank', () => {
         company: 'FLUGHAFEN WIEN AG',
         shares: 36,
         price: 28.1,
-        amount: 1011.60,
+        amount: 1011.6,
         fee: 22.35,
         tax: 0,
       });
@@ -94,8 +92,8 @@ describe('Broker: Erste Bank', () => {
         company: 'ROYAL DUTCH SHELL',
         shares: 72,
         price: 23.55,
-        amount: 1695.60,
-        fee: 28.50,
+        amount: 1695.6,
+        fee: 28.5,
         tax: 0,
       });
     });
@@ -130,8 +128,8 @@ describe('Broker: Erste Bank', () => {
         company: 'ALTRIA GROUP INC.',
         shares: 40,
         price: 42.29,
-        amount: 1691.60,
-        fee: 23.60,
+        amount: 1691.6,
+        fee: 23.6,
         tax: 0,
       });
     });
@@ -149,7 +147,7 @@ describe('Broker: Erste Bank', () => {
         shares: 11,
         price: 153.26,
         amount: 1685.86,
-        fee: 22.90,
+        fee: 22.9,
         tax: 0,
       });
     });
@@ -166,6 +164,8 @@ describe('Broker: Erste Bank', () => {
         company: 'AT & T INC.',
         shares: 20,
         price: 34.3705,
+        fxRate: 1.1056,
+        foreignCurrency: 'USD',
         amount: 687.41,
         fee: 24.63,
         tax: 0,
@@ -184,6 +184,8 @@ describe('Broker: Erste Bank', () => {
         company: 'AT & T INC.',
         shares: 30,
         price: 33.16733333333333,
+        fxRate: 1.105,
+        foreignCurrency: 'USD',
         amount: 995.02,
         fee: 24.66,
         tax: 0,
@@ -202,6 +204,8 @@ describe('Broker: Erste Bank', () => {
         company: 'WALT DISNEY CO., THE',
         shares: 13,
         price: 137.76846153846154,
+        fxRate: 1.1033,
+        foreignCurrency: 'USD',
         amount: 1790.99,
         fee: 23.99,
         tax: 0,
@@ -220,6 +224,8 @@ describe('Broker: Erste Bank', () => {
         company: 'MICROSOFT CORP.',
         shares: 6,
         price: 170.03666666666666,
+        fxRate: 1.1791,
+        foreignCurrency: 'USD',
         amount: 1020.22,
         fee: 23.34,
         tax: 0,
