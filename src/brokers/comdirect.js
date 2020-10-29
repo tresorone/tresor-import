@@ -20,12 +20,13 @@ const findCompany = (text, span) => {
 const findDateBuySell = textArr => {
   const dateLine = textArr[textArr.findIndex(t => t.includes('Valuta')) + 1];
   const date = dateLine.split(/\s+/);
-  return date[date.length - 3];
+  return format(parse(date[date.length - 3], 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd');
 };
 
 const findDateDividend = textArr => {
   const dateLine = textArr[textArr.findIndex(t => t.includes('zahlbar ab'))];
-  return dateLine.split('zahlbar ab')[1].trim().substr(0, 10);
+  const date =  dateLine.split('zahlbar ab')[1].trim().substr(0, 10);
+  return format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd');
 };
 
 const findShares = textArr => {
@@ -88,6 +89,16 @@ const findFee = (textArr, amount) => {
   return Big(parseGermanNum(totalCost)).minus(Big(amount));
 };
 
+const findPayoutTax = (textArr, foreignTransaction) => {
+  let payoutTax = Big(0);
+  if (!(foreignTransaction===undefined)) {
+    const withholdingTaxIndex = textArr.findIndex(line => line.includes('Quellensteuer'));
+    const withholdingTax = parseGermanNum(textArr[withholdingTaxIndex].split(/\s+/)[4]);
+    payoutTax = Big(withholdingTax).div(foreignTransaction[0]);
+  }
+  return payoutTax;
+};
+
 const findPurchaseReduction = textArr => {
   const reduction = Big(0);
   const lineWithReduction = textArr.findIndex(t =>
@@ -109,6 +120,17 @@ const findPurchaseReduction = textArr => {
   return Big(reductionValue).div(rate);
 };
 
+const findForeignTransaction = textArr => {
+  const foreignIndex = textArr.findIndex(line => line.includes('zum Devisenkurs:'));
+  let foreignCurrency, fxRate
+  if ( foreignIndex > 0 ) {
+    const foreignLine = textArr[foreignIndex].split(/\s+/);
+    fxRate = parseGermanNum(foreignLine[3])
+    foreignCurrency = foreignLine[2].split('/')[1];
+    return [fxRate, foreignCurrency];
+  }
+}
+
 const isBuy = textArr => textArr.some(t => t.includes('Wertpapierkauf'));
 const isSell = textArr => textArr.some(t => t.includes('Wertpapierverkauf'));
 
@@ -124,6 +146,7 @@ export const canParsePage = (content, extension) =>
 const parseData = textArr => {
   let type, date, isin, company, shares, price, amount, fee, tax;
 
+  const foreignTransaction = findForeignTransaction(textArr);
   if (isBuy(textArr)) {
     type = 'Buy';
     date = findDateBuySell(textArr);
@@ -153,19 +176,38 @@ const parseData = textArr => {
     amount = findPayout(textArr);
     price = +Big(amount).div(Big(shares));
     fee = 0;
-    tax = 0;
+    tax = +findPayoutTax(textArr, foreignTransaction);
   }
-  const activity = {
-    broker: 'comdirect',
-    type,
-    date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
-    isin,
-    company,
-    shares,
-    price,
-    amount,
-    fee,
-    tax,
+  let activity
+  if (!(foreignTransaction===undefined)) {
+    activity = {
+      broker: 'comdirect',
+      type,
+      date,
+      isin,
+      company,
+      shares,
+      price,
+      amount,
+      fee,
+      tax,
+      fxRate: foreignTransaction[0],
+      foreignCurrency: foreignTransaction[1],
+    };
+  }
+  else {
+    activity = {
+      broker: 'comdirect',
+      type,
+      date,
+      isin,
+      company,
+      shares,
+      price,
+      amount,
+      fee,
+      tax,
+    };
   }
   return validateActivity(activity);
 };

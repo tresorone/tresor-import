@@ -95,7 +95,9 @@ describe('Broker: comdirect', () => {
         price: 0.007280978021605879,
         amount: 0.43,
         fee: 0,
-        tax: 0,
+        tax: 0.07655665192242259,
+        fxRate: 1.175600,
+        foreignCurrency: 'USD',
       });
     });
 
