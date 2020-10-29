@@ -91,7 +91,9 @@ const findTax = textArr => {
       : 0;
 
   const kap = parseGermanNum(
-    getValueByPreviousElement(textArr, 'Kapitalertragsteuer 25 %').split(' ')[0]
+    // We want to geht the line `Kapitalertragsteuer 25 % auf 3,15 EUR` and not `Berechnungsgrundlage für
+    // die Kapitalertragsteuer` so we need to match `Kapitalertragsteuer ` with a space at the End.
+    getValueByPreviousElement(textArr, 'Kapitalertragsteuer ').split(' ')[0]
   );
   const soli = parseGermanNum(
     getValueByPreviousElement(textArr, 'Solidaritätszuschlag').split(' ')[0]
