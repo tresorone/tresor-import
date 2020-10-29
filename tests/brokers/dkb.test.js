@@ -130,6 +130,23 @@ describe('DKB broker', () => {
         tax: 0,
       });
     });
+
+    test('Can parse a redemption of ETF fragments', () => {
+      const result = dkb.parsePages(sellSamples[3]);
+
+      expect(result.activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Sell',
+        date: '2020-10-28',
+        isin: 'IE00B3RBWM25',
+        company: 'VANGUARD FTSE ALL-WORLD U.ETF',
+        shares: 0.3807,
+        price: 78.82,
+        amount: 30.01,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   describe('Dividend', () => {

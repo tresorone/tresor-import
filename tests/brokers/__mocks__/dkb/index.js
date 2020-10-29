@@ -8,6 +8,7 @@ export const sellSamples = [
   require('./sell/sell_etf_LU1861132840.json'),
   require('./sell/sell_stop_market_order_invesco_msci_world.json'),
   require('./sell/sell_etf_IE00B4L5Y983.json'),
+  require('./sell/redemption_etf.json'),
 ];
 
 export const dividendsSamples = [
