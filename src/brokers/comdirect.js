@@ -146,25 +146,18 @@ const findPayoutFxrateForeignCurrency = textArr => {
   return [undefined, undefined];
 };
 
-const findBuyFxRate = textArr => {
+const findBuyFxrateForeignCurrency = textArr => {
   const foreignIndex = textArr.findIndex(line =>
     line.includes('Umrechnung zum Devisenkurs ')
   );
   if (foreignIndex > 0) {
-    const foreignLine = textArr[foreignIndex].split(/\s+/);
-    return parseGermanNum(foreignLine[3]);
+    const fxRateLine = textArr[foreignIndex].split(/\s+/);
+    const foreignCurrency= textArr[foreignIndex-3].split(/\s+/);
+    return [parseGermanNum(fxRateLine[3]), foreignCurrency[2]];
   }
+  return [undefined, undefined];
 };
 
-const findBuyForeignCurrency = textArr => {
-  const currencyIndex = textArr.findIndex(line =>
-    line.includes('Umrechnung zum Devisenkurs')
-  );
-  if (currencyIndex > 0) {
-    const foreignLine = textArr[currencyIndex-3].split(/\s+/);
-    return foreignLine[2];
-  }
-};
 
 const isBuy = textArr => textArr.some(t => t.includes('Wertpapierkauf'));
 const isSell = textArr => textArr.some(t => t.includes('Wertpapierverkauf'));
@@ -189,10 +182,9 @@ const parseData = textArr => {
     amount = +findAmount(textArr);
     shares = findShares(textArr);
     price = +Big(amount).div(shares);
-    fee = +findFee(textArr, amount); // Use plus instead of minus to prevent multiply with -1
-    fxRate = findBuyFxRate(textArr);
-    foreignCurrency = findBuyForeignCurrency(textArr);
+    fee = +findFee(textArr, amount);
     tax = 0;
+    [fxRate, foreignCurrency] = findBuyFxrateForeignCurrency(textArr);
   } else if (isSell(textArr)) {
     type = 'Sell';
     isin = findISIN(textArr, 2);
