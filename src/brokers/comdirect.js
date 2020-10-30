@@ -97,17 +97,15 @@ const findPayoutTax = (textArr, fxRate) => {
   const withholdingTaxIndex = textArr.findIndex(line =>
     line.includes('Quellensteuer')
   );
-  if ( withholdingTaxIndex > 0 ) {
+  if (withholdingTaxIndex > 0) {
     const withholdingTax = parseGermanNum(
       textArr[withholdingTaxIndex].split(/\s+/)[4]
     );
-    if ( fxRate !== undefined && fxRate > 0) {
+    if (fxRate !== undefined && fxRate > 0) {
       payoutTax = payoutTax.plus(withholdingTax).div(fxRate);
-    }
-    else {
+    } else {
       payoutTax = payoutTax.plus(withholdingTax);
     }
-
   }
   return payoutTax;
 };
@@ -146,18 +144,17 @@ const findPayoutFxrateForeignCurrency = textArr => {
   return [undefined, undefined];
 };
 
-const findBuyFxrateForeignCurrency = textArr => {
+const findBuyFxRateForeignCurrency = textArr => {
   const foreignIndex = textArr.findIndex(line =>
     line.includes('Umrechnung zum Devisenkurs ')
   );
   if (foreignIndex > 0) {
     const fxRateLine = textArr[foreignIndex].split(/\s+/);
-    const foreignCurrency= textArr[foreignIndex-3].split(/\s+/);
+    const foreignCurrency = textArr[foreignIndex - 3].split(/\s+/);
     return [parseGermanNum(fxRateLine[3]), foreignCurrency[2]];
   }
   return [undefined, undefined];
 };
-
 
 const isBuy = textArr => textArr.some(t => t.includes('Wertpapierkauf'));
 const isSell = textArr => textArr.some(t => t.includes('Wertpapierverkauf'));
@@ -172,7 +169,17 @@ export const canParsePage = (content, extension) =>
   (isBuy(content) || isSell(content) || isDividend(content));
 
 const parseData = textArr => {
-  let type, date, isin, company, shares, price, amount, fee, tax, fxRate, foreignCurrency;
+  let type,
+    date,
+    isin,
+    company,
+    shares,
+    price,
+    amount,
+    fee,
+    tax,
+    fxRate,
+    foreignCurrency;
 
   if (isBuy(textArr)) {
     type = 'Buy';
@@ -184,7 +191,7 @@ const parseData = textArr => {
     price = +Big(amount).div(shares);
     fee = +findFee(textArr, amount);
     tax = 0;
-    [fxRate, foreignCurrency] = findBuyFxrateForeignCurrency(textArr);
+    [fxRate, foreignCurrency] = findBuyFxRateForeignCurrency(textArr);
   } else if (isSell(textArr)) {
     type = 'Sell';
     isin = findISIN(textArr, 2);
