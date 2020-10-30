@@ -94,14 +94,20 @@ const findFee = (textArr, amount) => {
 
 const findPayoutTax = (textArr, fxRate) => {
   let payoutTax = Big(0);
-  if (!(fxRate === undefined)) {
-    const withholdingTaxIndex = textArr.findIndex(line =>
-      line.includes('Quellensteuer')
-    );
+  const withholdingTaxIndex = textArr.findIndex(line =>
+    line.includes('Quellensteuer')
+  );
+  if ( withholdingTaxIndex > 0 ) {
     const withholdingTax = parseGermanNum(
       textArr[withholdingTaxIndex].split(/\s+/)[4]
     );
-    payoutTax = Big(withholdingTax).div(fxRate);
+    if ( fxRate !== undefined && fxRate > 0) {
+      payoutTax = payoutTax.plus(withholdingTax).div(fxRate);
+    }
+    else {
+      payoutTax = payoutTax.plus(withholdingTax);
+    }
+
   }
   return payoutTax;
 };
@@ -127,26 +133,17 @@ const findPurchaseReduction = textArr => {
   return Big(reductionValue).div(rate);
 };
 
-const findPayoutFxRate = textArr => {
+const findPayoutFxrateForeignCurrency = textArr => {
   const foreignIndex = textArr.findIndex(line =>
     line.includes('zum Devisenkurs:')
   );
   if (foreignIndex > 0) {
-    // For dividend operations:
     const foreignLine = textArr[foreignIndex].split(/\s+/);
-    return parseGermanNum(foreignLine[3]);
+    const fxRate = parseGermanNum(foreignLine[3]);
+    const foreignCurrency = foreignLine[2].split('/')[1];
+    return [fxRate, foreignCurrency];
   }
-};
-
-const findPayoutForeignCurrency = textArr => {
-  const foreignIndex = textArr.findIndex(line =>
-    line.includes('zum Devisenkurs:')
-  );
-  if (foreignIndex > 0) {
-    // For dividend operations:
-    const foreignLine = textArr[foreignIndex].split(/\s+/);
-    return foreignLine[2].split('/')[1];
-  }
+  return [undefined, undefined];
 };
 
 const findBuyFxRate = textArr => {
@@ -154,7 +151,6 @@ const findBuyFxRate = textArr => {
     line.includes('Umrechnung zum Devisenkurs ')
   );
   if (foreignIndex > 0) {
-    // For dividend operations:
     const foreignLine = textArr[foreignIndex].split(/\s+/);
     return parseGermanNum(foreignLine[3]);
   }
@@ -162,11 +158,10 @@ const findBuyFxRate = textArr => {
 
 const findBuyForeignCurrency = textArr => {
   const currencyIndex = textArr.findIndex(line =>
-    line.includes('Zum comdirect Preis von')
+    line.includes('Umrechnung zum Devisenkurs')
   );
   if (currencyIndex > 0) {
-    // For dividend operations:
-    const foreignLine = textArr[currencyIndex+1].split(/\s+/);
+    const foreignLine = textArr[currencyIndex-3].split(/\s+/);
     return foreignLine[2];
   }
 };
@@ -216,40 +211,27 @@ const parseData = textArr => {
     shares = findDividendShares(textArr);
     amount = findPayout(textArr);
     price = +Big(amount).div(Big(shares));
-    fxRate = findPayoutFxRate(textArr);
-    foreignCurrency = findPayoutForeignCurrency(textArr);
+    [fxRate, foreignCurrency] = findPayoutFxrateForeignCurrency(textArr);
     fee = 0;
     tax = +findPayoutTax(textArr, fxRate);
   }
-  let activity;
-  if (!(fxRate === undefined) && !(foreignCurrency === undefined)) {
-    activity = {
-      broker: 'comdirect',
-      type,
-      date,
-      isin,
-      company,
-      shares,
-      price,
-      amount,
-      fee,
-      tax,
-      fxRate,
-      foreignCurrency,
-    };
-  } else {
-    activity = {
-      broker: 'comdirect',
-      type,
-      date,
-      isin,
-      company,
-      shares,
-      price,
-      amount,
-      fee,
-      tax,
-    };
+  let activity = {
+    broker: 'comdirect',
+    type,
+    date,
+    isin,
+    company,
+    shares,
+    price,
+    amount,
+    fee,
+    tax,
+  };
+  if (fxRate !== undefined) {
+    activity.fxRate = fxRate;
+  }
+  if (foreignCurrency !== undefined) {
+    activity.foreignCurrency = foreignCurrency;
   }
   return validateActivity(activity);
 };
