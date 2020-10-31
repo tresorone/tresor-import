@@ -20,3 +20,7 @@ export const dividendsSamples = [
   require('./div-3.json'),
   require('./div-4.json'),
 ];
+
+export const portfolioOverviewSamples = [
+  require('./portfolioOverview/overview.json'),
+];

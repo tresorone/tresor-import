@@ -5,6 +5,7 @@ import {
   sellSamples,
   dividendsSamples,
   multiPageSamples,
+  portfolioOverviewSamples,
 } from './__mocks__/onvista';
 
 console.error = jest.fn();
@@ -14,7 +15,8 @@ describe('Broker: onvista', () => {
   const allSamples = buySamples
     .concat(dividendsSamples)
     .concat(multiPageSamples)
-    .concat(sellSamples);
+    .concat(sellSamples)
+    .concat(portfolioOverviewSamples);
 
   describe('Check all documents', () => {
     test('Can the document parsed with onvista', () => {
@@ -368,6 +370,47 @@ describe('Broker: onvista', () => {
           tax: 6.32,
         },
       ]);
+    });
+  });
+
+  describe('Portfolio Overview', () => {
+    test('Should map the overview to transfer in activities', () => {
+      const activities = onvista.parsePages(portfolioOverviewSamples[0])
+        .activities;
+
+      expect(activities.length).toEqual(10);
+      expect(activities.slice(0, 2)).toEqual([
+        {
+          broker: 'onvista',
+          type: 'TransferIn',
+          date: '2020-10-11',
+          isin: 'US88579Y1010',
+          company: '3M RG',
+          shares: 3,
+          price: 139.12,
+          amount: 417.36,
+        },
+        {
+          broker: 'onvista',
+          type: 'TransferIn',
+          date: '2020-10-11',
+          isin: 'KYG017191142',
+          company: 'ALIBABA GRP RG',
+          shares: 30,
+          price: 30.5527,
+          amount: 916.58,
+        },
+      ]);
+      expect(activities[activities.length - 1]).toEqual({
+        broker: 'onvista',
+        type: 'TransferIn',
+        date: '2020-10-11',
+        isin: 'IE00B1FZS467',
+        company: 'ISHS GLB INFRA USD',
+        shares: 4.1283,
+        price: 23.9808,
+        amount: 99,
+      });
     });
   });
 });
