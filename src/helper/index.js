@@ -48,7 +48,11 @@ export function parseGermanNum(n) {
   return parseFloat(n.replace(/\./g, '').replace(',', '.'));
 }
 
-export function validateActivity(activity, findSecurityAlsoByCompany = false) {
+export function validateActivity(
+  activity,
+  findSecurityAlsoByCompany = false,
+  missingFeeAndTax = false
+) {
   // All fields must have a value unequal undefined
   if (!every(values(activity), a => !!a || a === 0)) {
     console.error(
@@ -106,24 +110,40 @@ export function validateActivity(activity, findSecurityAlsoByCompany = false) {
     return undefined;
   }
 
-  if (Number(activity.fee) !== activity.fee) {
-    console.error(
-      'The fee amount in activity for ' +
-        activity.broker +
-        ' must be a number that can be positive, negative or 0. ',
-      activity
-    );
-    return undefined;
-  }
+  if (missingFeeAndTax) {
+    if (activity['fee'] !== undefined) {
+      console.error(
+        'The field fee has to be undefined in activity for ' + activity.broker
+      );
+      return undefined;
+    }
 
-  if (Number(activity.tax) !== activity.tax) {
-    console.error(
-      'The tax amount in activity for ' +
-        activity.broker +
-        ' must be a number that can be positive, negative or zero.',
-      activity
-    );
-    return undefined;
+    if (activity['tax'] !== undefined) {
+      console.error(
+        'The field tax has to be undefined in activity for ' + activity.broker
+      );
+      return undefined;
+    }
+  } else {
+    if (Number(activity.fee) !== activity.fee) {
+      console.error(
+        'The fee amount in activity for ' +
+          activity.broker +
+          ' must be a number that can be positive, negative or 0.',
+        activity
+      );
+      return undefined;
+    }
+
+    if (Number(activity.tax) !== activity.tax) {
+      console.error(
+        'The tax amount in activity for ' +
+          activity.broker +
+          ' must be a number that can be positive, negative or zero.',
+        activity
+      );
+      return undefined;
+    }
   }
 
   // Tresor One will search the security for PDF Documents with ISIN or WKN. For Imports of .csv File from Portfolio Performance
@@ -165,7 +185,7 @@ export function validateActivity(activity, findSecurityAlsoByCompany = false) {
     return undefined;
   }
 
-  if (!['Buy', 'Sell', 'Dividend'].includes(activity.type)) {
+  if (!['Buy', 'Sell', 'Dividend', 'TransferIn'].includes(activity.type)) {
     console.error(
       'The activity type for ' +
         activity.broker +
