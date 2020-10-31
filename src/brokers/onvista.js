@@ -143,15 +143,23 @@ const findTax = text => {
   return +totalTax;
 };
 
-export const canParsePage = (content, extension) =>
-  extension === 'pdf' && content.some(line => line.includes('BELEGDRUCK=J'));
+const isOverviewPage = content =>
+  content.some(line => line.includes('Depotübersicht Wertpapiere'));
 
-const parseData = text => {
-  const isBuy = text.some(t => t.includes('Wir haben für Sie gekauft'));
-  const isSell = text.some(t => t.includes('Wir haben für Sie verkauft'));
+export const canParsePage = (content, extension) =>
+  extension === 'pdf' &&
+  content.some(
+    line =>
+      line.includes('BELEGDRUCK=J') ||
+      line.includes('Depotübersicht Wertpapiere')
+  );
+
+const parsePage = text => {
+  const isBuy = text.some(line => line.includes('Wir haben für Sie gekauft'));
+  const isSell = text.some(line => line.includes('Wir haben für Sie verkauft'));
   const isDividend =
-    text.some(t => t.includes('Erträgnisgutschrift')) ||
-    text.some(t => t.includes('Dividendengutschrift'));
+    text.some(line => line.includes('Erträgnisgutschrift')) ||
+    text.some(line => line.includes('Dividendengutschrift'));
 
   let type, date, isin, company, shares, price, amount, fee, tax;
 
@@ -198,13 +206,66 @@ const parseData = text => {
   });
 };
 
-export const parsePages = contents => {
+const parseOverview = content => {
   let activities = [];
-  for (let c of contents) {
+
+  const date = format(
+    parse(
+      content[content.findIndex(line => line.includes('Datum:')) + 1],
+      'dd.MM.yy HH:mm:ss',
+      new Date()
+    ),
+    'yyyy-MM-dd'
+  );
+
+  for (
+    let tableStartLine = content.findIndex(line =>
+      line.includes('Aktueller Wert')
+    );
+    tableStartLine < content.length;
+    tableStartLine += 16
+  ) {
+    const shares = content[tableStartLine + 1].trim();
+    if (shares === '/') {
+      break;
+    }
+
+    activities.push(
+      validateActivity(
+        {
+          broker: 'onvista',
+          type: 'TransferIn',
+          date,
+          isin: content[tableStartLine + 3].split('/')[1].trim(),
+          company: content[tableStartLine + 2],
+          shares: parseGermanNum(shares),
+          price: parseGermanNum(content[tableStartLine + 9].split(' ')[0]),
+          amount: parseGermanNum(content[tableStartLine + 10].split(' ')[0]),
+        },
+        true,
+        true
+      )
+    );
+  }
+
+  return activities;
+};
+
+export const parsePages = pages => {
+  let activities = [];
+
+  const isOverview = isOverviewPage(pages[0]);
+  for (let page of pages) {
     try {
-      activities.push(parseData(c));
+      if (isOverview) {
+        parseOverview(page).forEach(activity => {
+          activities.push(activity);
+        });
+      } else {
+        activities.push(parsePage(page));
+      }
     } catch (e) {
-      console.error('Error while parsing page (onvista)', e, c);
+      console.error('Error while parsing page (onvista)', e, page);
     }
   }
 
