@@ -1,8 +1,10 @@
+import Big from 'big.js';
+
 import { findImplementation } from '@/index';
 import * as ersteBank from '../../src/brokers/ersteBank';
-import { buySamples } from './__mocks__/ersteBank';
+import { buySamples, dividendSamples } from './__mocks__/ersteBank';
 
-const allSamples = buySamples; //.concat(sellSamples).concat(dividendSamples);
+const allSamples = buySamples.concat(dividendSamples);
 describe('Broker: Erste Bank', () => {
   let consoleErrorSpy;
 
@@ -229,6 +231,224 @@ describe('Broker: Erste Bank', () => {
         amount: 1020.22,
         fee: 23.34,
         tax: 0,
+      });
+    });
+
+    test('Parse an older export from 2017 correctly (0)', () => {
+      const activities = ersteBank.parsePages(buySamples[11]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ersteBank',
+        type: 'Buy',
+        date: '2017-03-06',
+        isin: 'AT0000A05HR3',
+        company: 'ERSTE BOND EMERGING MARKETS CORPOR.',
+        shares: 999,
+        price: 170.6674974974975,
+        amount: +Big(171198.63).minus(701.8),
+        fee: 701.8,
+        tax: 0,
+      });
+    });
+
+    test('Parse an older export from 2017 correctly (1)', () => {
+      const activities = ersteBank.parsePages(buySamples[12]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ersteBank',
+        type: 'Buy',
+        date: '2017-03-03',
+        isin: 'AT0000A08SH5',
+        company: 'ERSTE IMMOBILIENFONDS',
+        shares: 999,
+        price: 126.6085085085085,
+        amount: +Big(127991.88).minus(1509.98),
+        fee: 1509.98,
+        tax: 0,
+      });
+    });
+
+    test('Parse an older export from 2017 correctly (2)', () => {
+      const activities = ersteBank.parsePages(buySamples[13]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ersteBank',
+        type: 'Buy',
+        date: '2017-03-06',
+        isin: 'AT0000660600',
+        company: 'ESPA SELECT BOND (T)',
+        shares: 999,
+        price: 161.9953053053053,
+        amount: +Big(162337.5).minus(504.19),
+        fee: 504.19,
+        tax: 0,
+      });
+    });
+
+    test('Parse an older export from 2017 correctly (3)', () => {
+      const activities = ersteBank.parsePages(buySamples[14]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ersteBank',
+        type: 'Buy',
+        date: '2017-03-06',
+        isin: 'AT0000707674',
+        company: 'ESPA BEST OF WORLD',
+        shares: 999,
+        price: 108.2912012012012,
+        amount: +Big(108761.13).minus(578.22),
+        fee: 578.22,
+        tax: 0,
+      });
+    });
+
+    test('Parse an export from 2020 correctly (0)', () => {
+      const activities = ersteBank.parsePages(buySamples[15]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ersteBank',
+        type: 'Buy',
+        date: '2020-05-14',
+        isin: 'AT0000A11F86',
+        company: 'YOU INVEST ACTIVE EUR R T',
+        shares: 999,
+        price: 107.4,
+        amount: 107292.6,
+        fee: 2029.86,
+        tax: 0,
+      });
+    });
+
+    test('Parse an export from 2020 correctly (1)', () => {
+      const activities = ersteBank.parsePages(buySamples[16]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ersteBank',
+        type: 'Buy',
+        date: '2020-05-12',
+        isin: 'AT0000753504',
+        company: 'ERSTE STOCK TECHNO EUR R T',
+        shares: 999,
+        price: 102.06,
+        amount: 101957.94,
+        fee: 360.07,
+        tax: 0,
+      });
+    });
+
+    test('Parse an export from 2020 correctly (2)', () => {
+      const activities = ersteBank.parsePages(buySamples[17]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ersteBank',
+        type: 'Buy',
+        date: '2020-05-12',
+        isin: 'AT0000705678',
+        company: 'ERSTE WWF STOCK ENV EUR R T',
+        shares: 999,
+        price: 167.87,
+        amount: 167702.13,
+        fee: 435.12,
+        tax: 0,
+      });
+    });
+
+    test('Parse an export from 2020 correctly (3)', () => {
+      const activities = ersteBank.parsePages(buySamples[18]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ersteBank',
+        type: 'Buy',
+        date: '2020-05-14',
+        isin: 'AT0000680970',
+        company: 'ERSTE STOCK EM GLOBAL EUR R T',
+        shares: 999,
+        price: 191.35,
+        amount: 191158.65,
+        fee: 234.21,
+        tax: 0,
+      });
+    });
+
+    test('Parse an export from 2020 correctly (4)', () => {
+      const activities = ersteBank.parsePages(buySamples[19]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ersteBank',
+        type: 'Buy',
+        date: '2020-05-14',
+        isin: 'AT0000A296E8',
+        company: 'ERSTE FUTURE INVEST EUR R T',
+        shares: 999,
+        price: 110.79,
+        amount: 110679.21,
+        fee: 550.4,
+        tax: 0,
+      });
+    });
+  });
+
+  describe('Validate Dividends', () => {
+    test('Map the buy order for dividend from 2017 correctly', () => {
+      const activities = ersteBank.parsePages(dividendSamples[0]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ersteBank',
+        type: 'Dividend',
+        date: '2017-07-03',
+        isin: 'AT0000707674',
+        company: 'ESPA BEST OF WORLD',
+        shares: 138,
+        price: 2,
+        amount: 276,
+        fee: 0,
+        tax: 70.89,
+      });
+    });
+
+    test('Map the buy order for dividend from 2018 correctly', () => {
+      const activities = ersteBank.parsePages(dividendSamples[1]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ersteBank',
+        type: 'Dividend',
+        date: '2018-07-02',
+        isin: 'AT0000707674',
+        company: 'ESPA BEST OF WORLD',
+        shares: 138,
+        price: 2.5,
+        amount: 345,
+        fee: 0,
+        tax: 141.7,
+      });
+    });
+
+    test('Map the buy order for dividend from 2018 correctly', () => {
+      const activities = ersteBank.parsePages(dividendSamples[2]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ersteBank',
+        type: 'Dividend',
+        date: '2019-07-01',
+        isin: 'AT0000707674',
+        company: 'ESPA BEST OF WORLD EUR R A',
+        shares: 138,
+        price: 2.5,
+        amount: 345,
+        fee: 0,
+        tax: 142.42,
       });
     });
   });

@@ -10,4 +10,19 @@ export const buySamples = [
   require('./buy/limit_buy_usd_stock_US00206R1023_2.json'),
   require('./buy/limit_buy_usd_stock_US2546871060.json'),
   require('./buy/limit_buy_usd_stock_US5949181045.json'),
+  require('./buy/2017_buy_0.json'),
+  require('./buy/2017_buy_1.json'),
+  require('./buy/2017_buy_2.json'),
+  require('./buy/2017_buy_3.json'),
+  require('./buy/2020_buy_0.json'),
+  require('./buy/2020_buy_1.json'),
+  require('./buy/2020_buy_2.json'),
+  require('./buy/2020_buy_3.json'),
+  require('./buy/2020_buy_4.json'),
+];
+
+export const dividendSamples = [
+  require('./dividend/2017_div.json'),
+  require('./dividend/2018_div.json'),
+  require('./dividend/2019_div.json'),
 ];

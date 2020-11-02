@@ -4,13 +4,6 @@ import Big from 'big.js';
 
 import { parseGermanNum, validateActivity } from '@/helper';
 
-const stringAtIndexOf = (pageArray, indexOf, inLineIndex, lineOffset = 0) => {
-  const lineIndex = pageArray.indexOf(indexOf) + lineOffset;
-  if (lineIndex >= 0) {
-    return pageArray[lineIndex].split(/\s+/)[inLineIndex];
-  }
-};
-
 const findForeignCurrencyFxRate = pageArray => {
   const foreignIndex = pageArray.findIndex(line =>
     line.includes('umgerechneter FW - Endwert')
@@ -33,7 +26,14 @@ const findIsinBuy = pageArray => {
   return pageArray[isinIndex].split(/\s/)[0];
 };
 
-const findCompany = pageArray => {
+const findIsinPayout = ( pageArray ) => {
+  const lineIndex = pageArray.indexOf('Ausschüttung') + 2;
+  if (lineIndex >= 0) {
+    return pageArray[lineIndex].split(/\s+/)[0];
+  }
+};
+
+const findCompanyBuy = pageArray => {
   const companyIndex =
     pageArray.findIndex(line => line.includes('Ihr Auftrag vom')) + 1;
   if (companyIndex >= 0) {
@@ -98,7 +98,7 @@ const findSharesDividend = pageArray => {
   }
 };
 
-const findFee = (pageArray, legacyDocument = false) => {
+const findFeeBuy = (pageArray, legacyDocument = false) => {
   // For foreign buy the fees are located somewhere else
   let completeFee = Big(0);
   // Legacy Documents list the fees differently and list the initial charge
@@ -175,17 +175,16 @@ const isOldBuy = pageArray => {
 
 export const canParsePage = (pageArray, extension) => {
   try {
-      const isErsteBankFile = pageArray
-        .join('')
-        .includes('ESTERREICHISCHENSPARKASSEN');
+    const isErsteBankFile = pageArray
+      .join('')
+      .includes('ESTERREICHISCHENSPARKASSEN');
     return (
       extension === 'pdf' &&
       (isBuy(pageArray) || isOldBuy(pageArray) || isDividend(pageArray)) &&
       isErsteBankFile
     );
-  }
-  catch (TypeError) {
-    return false
+  } catch (TypeError) {
+    return false;
   }
 };
 
@@ -198,26 +197,26 @@ export const parsePages = content => {
   if (isBuy(pdfPagesConcat)) {
     type = 'Buy';
     isin = findIsinBuy(pdfPagesConcat);
-    company = findCompany(pdfPagesConcat);
+    company = findCompanyBuy(pdfPagesConcat);
     date = findDateBuy(pdfPagesConcat);
     amount = findAmountBuy(pdfPagesConcat);
     shares = findSharesBuy(pdfPagesConcat);
     price = +Big(amount).div(shares);
     tax = 0;
-    fee = +findFee(pdfPagesConcat);
+    fee = +findFeeBuy(pdfPagesConcat);
   } else if (isOldBuy(pdfPagesConcat)) {
     type = 'Buy';
     isin = findIsinBuy(pdfPagesConcat);
-    company = findCompany(pdfPagesConcat);
+    company = findCompanyBuy(pdfPagesConcat);
     date = findDateBuy(pdfPagesConcat);
-    fee = +findFee(pdfPagesConcat, true);
+    fee = +findFeeBuy(pdfPagesConcat, true);
     amount = +Big(findAmountBuy(pdfPagesConcat, true)).minus(fee);
     shares = findSharesBuy(pdfPagesConcat);
     price = +Big(amount).div(shares);
     tax = 0;
   } else if (isDividend(pdfPagesConcat)) {
     type = 'Dividend';
-    isin = stringAtIndexOf(pdfPagesConcat, 'Ausschüttung', 0, 2);
+    isin = findIsinPayout(pdfPagesConcat, 'Ausschüttung', 0, 2);
     company = findCompanyDividend(pdfPagesConcat);
     date = findDateDividend(pdfPagesConcat);
     amount = findAmountDividend(pdfPagesConcat);
