@@ -166,13 +166,13 @@ const findTax = textArr => {
     totalTax = totalTax.plus(Big(lineParsedAmount));
   }
 
-  // Find Foreign Tax
+  // Find Withholding Tax in foreign currency
   const searchTermWithholdingTax = 'Quellensteuer';
-  const lineWithWithholdingTax = textArr.findIndex(line =>
+  const withholdingTaxLine = textArr.findIndex(line =>
     line.includes(searchTermWithholdingTax)
   );
-  if (lineWithWithholdingTax > -1) {
-    const lineWithValue = textArr[lineWithWithholdingTax + 1];
+  if (withholdingTaxLine > -1 && !textArr[withholdingTaxLine+1].includes('EUR')) {
+    const lineWithValue = textArr[withholdingTaxLine + 1];
     totalTax = totalTax.plus(findAndConvertNumber(lineWithValue, textArr));
   }
   return totalTax;

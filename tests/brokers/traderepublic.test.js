@@ -292,6 +292,25 @@ describe('Broker: Trade Republic', () => {
         type: 'Dividend',
       });
     });
+
+    test('Should map the pdf data correctly for: Unilever with other withholding tax format', () => {
+      const activities = traderepublic.parsePages(dividendSamples[6])
+        .activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        amount: 2.05,
+        broker: 'traderepublic',
+        company: 'Unilever N.V.',
+        date: '2020-09-09',
+        fee: 0,
+        isin: 'NL0000388619',
+        price: 0.41,
+        shares: 5,
+        tax: 0.31,
+        type: 'Dividend',
+      });
+    });
   });
 
   describe('Validate quarter statement', () => {
