@@ -8,4 +8,5 @@ export const sellSamples = [
 export const dividendSamples = [
   require('./dividend/dividend_etf_usd.json'),
   require('./dividend/dividend_stock_usd.json'),
+  require('./dividend/dividend_stock_usd_2.json'),
 ]

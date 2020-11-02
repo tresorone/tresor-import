@@ -44,7 +44,6 @@ describe('Smartbroker broker test', () => {
     });
   });
 
-
   describe('Dividend', () => {
     test('should parse dividend_etf_usd correctly', () => {
       const result = smartbroker.parsePages(dividendSamples[0]);
@@ -77,6 +76,23 @@ describe('Smartbroker broker test', () => {
         amount: 7.88,
         fee: 0,
         tax: 2.07,
+      });
+    });
+
+    test('should parse dividend_stock_usd_2 correctly', () => {
+      const result = smartbroker.parsePages(dividendSamples[2]);
+
+      expect(result.activities[0]).toEqual({
+        broker: 'smartbroker',
+        type: 'Dividend',
+        date: '2020-10-30',
+        isin: 'US5021751020',
+        company: 'LTC Properties Inc. Registered Shares DL -,01',
+        shares: 32,
+        price: 0.160625,
+        amount: 5.14,
+        fee: 0,
+        tax: 1.34,
       });
     });
   });
