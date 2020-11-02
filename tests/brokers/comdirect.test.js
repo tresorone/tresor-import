@@ -1,4 +1,4 @@
-import { findImplementation } from '../../src';
+import { findImplementation } from '@/index';
 import * as comdirect from '../../src/brokers/comdirect';
 import { allSamples, buySamples, dividendSamples } from './__mocks__/comdirect';
 
@@ -25,14 +25,14 @@ describe('Broker: comdirect', () => {
   });
 
   describe('Validate buys', () => {
-    test('Can the order parsed from the document', () => {
+    test('Can the order parsed from saving_plan', () => {
       const result = comdirect.parsePages(buySamples[0]);
 
       expect(result.activities.length).toEqual(1);
       expect(result.activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
-        date: '2020-08-07',
+        date: '2020-08-11',
         isin: 'DE0007231334',
         company: 'Sixt SE',
         shares: 0.55,
@@ -43,21 +43,41 @@ describe('Broker: comdirect', () => {
       });
     });
 
-    test('Can the order with purchase reduction parsed from the document', () => {
+    test('Can the order with purchase reduction be parsed from purchase_reduction', () => {
       const result = comdirect.parsePages(buySamples[1]);
 
       expect(result.activities.length).toEqual(1);
       expect(result.activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
-        date: '2020-04-01',
+        date: '2020-04-06',
         isin: 'LU0187079347',
         company: 'Robeco Global Consumer Trends',
         shares: 0.108,
         price: 235.09259259259258,
-        amount: 24.84,
-        fee: 0,
+        amount: 25.39,
+        fee: -0.55,
         tax: 0,
+      });
+    });
+
+    test('Can parse the order with purchase reduction from purchase_reduction_usd_1', () => {
+      const result = comdirect.parsePages(buySamples[2]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Buy',
+        date: '4152-11-09',
+        isin: 'LU0079474960',
+        company: 'AB SICAV I-American Growth Ptf',
+        shares: 0.644,
+        price: 122.57025271966882,
+        amount: 78.93524275146672,
+        fee: -3.94524275146672,
+        tax: 0,
+        fxRate: 1.1761,
+        foreignCurrency: 'USD',
       });
     });
   });
@@ -77,7 +97,9 @@ describe('Broker: comdirect', () => {
         price: 0.007280978021605879,
         amount: 0.43,
         fee: 0,
-        tax: 0,
+        tax: 0.07655665192242259,
+        fxRate: 1.1756,
+        foreignCurrency: 'USD',
       });
     });
 

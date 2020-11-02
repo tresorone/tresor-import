@@ -1,6 +1,6 @@
 {
   "name": "@tresor.one/import",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Creates Tresor One activities from PDF statements of brokers",
   "files": [
     "dist"
@@ -11,6 +11,7 @@
     "watch": "npm run dev",
     "dev": "./node_modules/.bin/webpack --config=webpack.dev.js",
     "demo": "serve demo",
+    "prepare": "npm run build",
     "start": "concurrently --kill-others \"npm run demo\" \"npm run dev\"",
     "test": "jest --verbose",
     "lint": "eslint .",

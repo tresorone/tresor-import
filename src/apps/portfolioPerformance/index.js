@@ -134,6 +134,13 @@ export const canParsePage = (content, extension) =>
   );
 
 export const parsePages = content => {
+  if (content.length === 0) {
+    return {
+      activities: [],
+      status: 5,
+    };
+  }
+
   const locale = detectLocale(content);
   if (!locale) {
     throw new Error('Locale could not be detected!');

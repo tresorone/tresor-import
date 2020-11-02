@@ -99,22 +99,14 @@ const findShares = (content, isDividend) => {
   return parseGermanNum(line.split(' ')[1]);
 };
 
-const findAmount = (content, isCredit, isDividend) =>
-  parseGermanNum(
-    content[
-      isDividend
-        ? findLineNumberByCurrentAndPreviousLineContent(
-            content,
-            'Valuta',
-            'Zu Gunsten Konto'
-          ) - 3
-        : findLineNumberByCurrentAndPreviousLineContent(
-            content,
-            isCredit ? 'Zu Gunsten Konto' : 'Zu Lasten Konto',
-            'EUR'
-          ) + 1
-    ]
-  );
+const findAmount = (content, type) => {
+  if (type === 'Dividend') {
+    //First occurence of Bruttobetrag  can be in foreign currency; last Occurence is in €
+    return parseGermanNum(content[content.lastIndexOf('Bruttobetrag') + 2]);
+  } else if (type === 'Buy' || type === 'Sell') {
+    return parseGermanNum(content[content.indexOf('Kurswert') + 1]);
+  }
+};
 
 const findPricePerShare = (content, isDividend) => {
   if (!isDividend) {
@@ -209,7 +201,7 @@ const parsePage = content => {
     company = findCompany(content, false);
     date = findOrderDate(content);
     shares = findShares(content, false);
-    amount = findAmount(content, false, false);
+    amount = findAmount(content, 'Buy');
     price = findPricePerShare(content, false);
     fee = 0;
     tax = findTax(content);
@@ -219,7 +211,7 @@ const parsePage = content => {
     company = findCompany(content, false);
     date = findOrderDate(content);
     shares = findShares(content, false);
-    amount = findAmount(content, true, false);
+    amount = findAmount(content, 'Sell');
     price = findPricePerShare(content, false);
     fee = 0;
     tax = findTax(content);
@@ -229,7 +221,7 @@ const parsePage = content => {
     company = findCompany(content, true);
     date = findPayDate(content);
     shares = findShares(content, true);
-    amount = findAmount(content, false, true);
+    amount = findAmount(content, 'Dividend');
     price = findPricePerShare(content, true);
     fee = 0;
     tax = findTax(content);

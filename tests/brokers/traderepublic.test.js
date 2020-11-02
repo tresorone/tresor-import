@@ -185,7 +185,7 @@ describe('Broker: Trade Republic', () => {
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
-        amount: 118.21,
+        amount: 160.17499384432017,
         broker: 'traderepublic',
         company: 'Royal Dutch Shell',
         date: '2020-03-23',
@@ -204,7 +204,7 @@ describe('Broker: Trade Republic', () => {
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
-        amount: 9.67,
+        amount: 11.87,
         broker: 'traderepublic',
         company: 'iSh.ST.Eur.Sel.Div.30 U.ETF DE',
         date: '2020-07-15',
@@ -223,7 +223,7 @@ describe('Broker: Trade Republic', () => {
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
-        amount: 8.34,
+        amount: 10.23,
         broker: 'traderepublic',
         company: 'iSh.EO ST.Sel.Div.30 U.ETF DE',
         date: '2020-07-15',
@@ -242,7 +242,7 @@ describe('Broker: Trade Republic', () => {
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
-        amount: 17.52,
+        amount: 24.33,
         broker: 'traderepublic',
         company: 'iShsII-Dev.Mkts Prop.Yld U.ETF',
         date: '2020-02-26',
@@ -261,7 +261,7 @@ describe('Broker: Trade Republic', () => {
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
-        amount: 12.54,
+        amount: 15.648939253517566,
         broker: 'traderepublic',
         company: 'Gazprom PJSC',
         date: '2020-08-18',
@@ -280,7 +280,7 @@ describe('Broker: Trade Republic', () => {
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
-        amount: 0.83,
+        amount: 0.9814259274838059,
         broker: 'traderepublic',
         company: 'Realty Income Corp.',
         date: '2020-09-15',
@@ -289,6 +289,25 @@ describe('Broker: Trade Republic', () => {
         price: 0.1968537057289476,
         shares: 5,
         tax: 0.15142592748380584,
+        type: 'Dividend',
+      });
+    });
+
+    test('Should map the pdf data correctly for: Unilever with other withholding tax format', () => {
+      const activities = traderepublic.parsePages(dividendSamples[6])
+        .activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        amount: 2.05,
+        broker: 'traderepublic',
+        company: 'Unilever N.V.',
+        date: '2020-09-09',
+        fee: 0,
+        isin: 'NL0000388619',
+        price: 0.41,
+        shares: 5,
+        tax: 0.31,
         type: 'Dividend',
       });
     });

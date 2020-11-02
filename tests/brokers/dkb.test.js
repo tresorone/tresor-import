@@ -44,23 +44,6 @@ describe('DKB broker', () => {
       });
     });
 
-    test('Can parse invesco_msci_world buy action', () => {
-      const result = dkb.parsePages(buySamples[3]);
-
-      expect(result.activities[0]).toEqual({
-        broker: 'dkb',
-        type: 'Sell',
-        date: '2020-09-10',
-        isin: 'IE00B60SX394',
-        company: 'I.M.-I.MSCI WORLD UETF',
-        shares: 92,
-        price: 58.887,
-        amount: 5417.60,
-        fee: 16.32,
-        tax: 0,
-      });
-    });
-
     test('should map pdf data of sample 2 correctly', () => {
       const result = dkb.parsePages(buySamples[1]);
 
@@ -114,7 +97,56 @@ describe('DKB broker', () => {
       });
     });
 
+    test('Can parse invesco_msci_world buy action', () => {
+      const result = dkb.parsePages(sellSamples[1]);
 
+      expect(result.activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Sell',
+        date: '2020-09-10',
+        isin: 'IE00B60SX394',
+        company: 'I.M.-I.MSCI WORLD UETF',
+        shares: 92,
+        price: 58.887,
+        amount: 5417.6,
+        fee: 16.32,
+        tax: 0,
+      });
+    });
+
+    test('Can parse IE00B4L5Y983 regular buys', () => {
+      const result = dkb.parsePages(sellSamples[2]);
+
+      expect(result.activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Sell',
+        date: '2020-10-14',
+        isin: 'IE00B4L5Y983',
+        company: 'ISHSIII-CORE MSCI WORLD U.ETF',
+        shares: 60,
+        price: 57.104,
+        amount: 3426.24,
+        fee: 10.86,
+        tax: 0,
+      });
+    });
+
+    test('Can parse a redemption of ETF fragments', () => {
+      const result = dkb.parsePages(sellSamples[3]);
+
+      expect(result.activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Sell',
+        date: '2020-10-28',
+        isin: 'IE00B3RBWM25',
+        company: 'VANGUARD FTSE ALL-WORLD U.ETF',
+        shares: 0.3807,
+        price: 78.82,
+        amount: 30.01,
+        fee: 0,
+        tax: 0.37,
+      });
+    });
   });
 
   describe('Dividend', () => {

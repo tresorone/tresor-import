@@ -12,7 +12,10 @@ const offsets = {
 
 const getValueByPreviousElement = (textArr, prev) => {
   const index = textArr.findIndex(t => t.includes(prev));
-  if (index < 0) return '';
+  if (index < 0) {
+    return '';
+  }
+
   return textArr[index + 1];
 };
 
@@ -42,17 +45,43 @@ const findPrice = textArr =>
 const findAmount = textArr =>
   parseGermanNum(getValueByPreviousElement(textArr, 'Kurswert').trim());
 
-const findFee = textArr => {
-  const provision = Big(parseGermanNum(
-    getValueByPreviousElement(textArr, 'Provision').split(' ')[0].trim()
-  ));
-  const abwicklungskosten = Big(parseGermanNum(
-    getValueByPreviousElement(textArr, 'Abwicklungskosten Börse')
-  ));
-  const transaktionsentgelt = Big(parseGermanNum(
-    getValueByPreviousElement(textArr, 'Transaktionsentgelt Börse')
-  ));
-  return +provision.plus(abwicklungskosten).plus(transaktionsentgelt);
+const findFee = pages => {
+  let totalFee = Big(0);
+
+  pages.forEach(page => {
+    const provisionValue = getValueByPreviousElement(page, 'Provision');
+    if (provisionValue !== '') {
+      totalFee = totalFee.plus(
+        Big(parseGermanNum(provisionValue.split(' ')[0].trim()))
+      );
+    }
+
+    const abwicklungskostenValue = getValueByPreviousElement(
+      page,
+      'Abwicklungskosten Börse'
+    );
+    if (abwicklungskostenValue !== '') {
+      totalFee = totalFee.plus(Big(parseGermanNum(abwicklungskostenValue)));
+    }
+
+    const transactionValue = getValueByPreviousElement(
+      page,
+      'Transaktionsentgelt Börse'
+    );
+    if (transactionValue !== '') {
+      totalFee = totalFee.plus(Big(parseGermanNum(transactionValue)));
+    }
+
+    const transferValue = getValueByPreviousElement(
+      page,
+      'Übertragungs-/Liefergebühr'
+    );
+    if (transferValue !== '') {
+      totalFee = totalFee.plus(Big(parseGermanNum(transferValue)));
+    }
+  });
+
+  return +totalFee;
 };
 
 const findDateDividend = textArr =>
@@ -67,28 +96,38 @@ const findPayout = textArr => {
   return parseGermanNum(eurAmount.split(' ')[0]);
 };
 
-const findTax = textArr => {
-  const withholdingTaxIndex = textArr.findIndex(
-    t => t.startsWith('Anrechenbare Quellensteuer') && t.endsWith('EUR')
-  );
-  const withholdingTax =
-    withholdingTaxIndex >= 0
-      ? parseGermanNum(textArr[withholdingTaxIndex + 1])
-      : 0;
+const findTax = pages => {
+  let totalTax = Big(0);
 
-  const kap = parseGermanNum(
-    getValueByPreviousElement(textArr, 'Kapitalertragsteuer 25 %').split(' ')[0]
-  );
-  const soli = parseGermanNum(
-    getValueByPreviousElement(textArr, 'Solidaritätszuschlag').split(' ')[0]
-  );
-  const churchTax = parseGermanNum(
-    getValueByPreviousElement(textArr, 'Kirchensteuer').split(' ')[0]
-  );
-  return +Big(kap)
-    .plus(Big(soli))
-    .plus(Big(churchTax))
-    .plus(Big(withholdingTax));
+  pages.forEach(page => {
+    const withholdingTaxIndex = page.findIndex(
+      t => t.startsWith('Anrechenbare Quellensteuer') && t.endsWith('EUR')
+    );
+    const withholdingTax =
+      withholdingTaxIndex >= 0
+        ? parseGermanNum(page[withholdingTaxIndex + 1])
+        : 0;
+
+    const kap = parseGermanNum(
+      // We want to geht the line `Kapitalertragsteuer 25 % auf 3,15 EUR` and not `Berechnungsgrundlage für
+      // die Kapitalertragsteuer` so we need to match `Kapitalertragsteuer ` with a space at the End.
+      getValueByPreviousElement(page, 'Kapitalertragsteuer ').split(' ')[0]
+    );
+    const soli = parseGermanNum(
+      getValueByPreviousElement(page, 'Solidaritätszuschlag').split(' ')[0]
+    );
+    const churchTax = parseGermanNum(
+      getValueByPreviousElement(page, 'Kirchensteuer').split(' ')[0]
+    );
+
+    totalTax = totalTax
+      .plus(kap)
+      .plus(soli)
+      .plus(churchTax)
+      .plus(withholdingTax);
+  });
+
+  return +totalTax;
 };
 
 const isBuy = textArr =>
@@ -99,7 +138,11 @@ const isBuy = textArr =>
   );
 
 const isSell = textArr =>
-  textArr.some(t => t.includes('Wertpapier Abrechnung Verkauf'));
+  textArr.some(
+    t =>
+      t.includes('Wertpapier Abrechnung Verkauf') ||
+      t.includes('Wertpapier Abrechnung Rücknahme')
+  );
 
 const isDividend = textArr =>
   textArr.some(
@@ -113,60 +156,57 @@ export const canParsePage = (content, extension) =>
   content.some(line => line.includes('BIC BYLADEM1001')) &&
   (isBuy(content) || isSell(content) || isDividend(content));
 
-const parseData = textArr => {
+export const parsePages = pages => {
   let type, date, isin, company, shares, price, amount, fee, tax;
-  if (isBuy(textArr)) {
+  const firstPage = pages[0];
+
+  if (isBuy(firstPage)) {
     type = 'Buy';
-    isin = findISIN(textArr);
-    company = findCompany(textArr);
-    date = findDateBuySell(textArr);
-    shares = findShares(textArr);
-    amount = findAmount(textArr);
-    price = findPrice(textArr);
-    fee = findFee(textArr);
-    tax = 0;
-  } else if (isSell(textArr)) {
+    isin = findISIN(firstPage);
+    company = findCompany(firstPage);
+    date = findDateBuySell(firstPage);
+    shares = findShares(firstPage);
+    amount = findAmount(firstPage);
+    price = findPrice(firstPage);
+    fee = findFee(pages);
+    tax = findTax(pages);
+  } else if (isSell(firstPage)) {
     type = 'Sell';
-    isin = findISIN(textArr);
-    company = findCompany(textArr);
-    date = findDateBuySell(textArr);
-    shares = findShares(textArr);
-    amount = findAmount(textArr);
-    price = findPrice(textArr);
-    fee = findFee(textArr);
-    tax = findTax(textArr);
-  } else if (isDividend(textArr)) {
+    isin = findISIN(firstPage);
+    company = findCompany(firstPage);
+    date = findDateBuySell(firstPage);
+    shares = findShares(firstPage);
+    amount = findAmount(firstPage);
+    price = findPrice(firstPage);
+    fee = findFee(pages);
+    tax = findTax(pages);
+  } else if (isDividend(firstPage)) {
     type = 'Dividend';
-    isin = findISIN(textArr);
-    company = findCompany(textArr);
-    date = findDateDividend(textArr);
-    shares = findShares(textArr);
-    amount = findPayout(textArr);
+    isin = findISIN(firstPage);
+    company = findCompany(firstPage);
+    date = findDateDividend(firstPage);
+    shares = findShares(firstPage);
+    amount = findPayout(firstPage);
     price = amount / shares;
-    fee = 0;
-    tax = findTax(textArr);
+    fee = findFee(pages);
+    tax = findTax(pages);
   }
 
-  return validateActivity({
-    broker: 'dkb',
-    type,
-    date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
-    isin,
-    company,
-    shares,
-    price,
-    amount,
-    fee,
-    tax,
-  });
-};
-
-export const parsePages = contents => {
-  // parse first page has activity data
-  const activities = [parseData(contents[0])];
-
   return {
-    activities,
+    activities: [
+      validateActivity({
+        broker: 'dkb',
+        type,
+        date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
+        isin,
+        company,
+        shares,
+        price,
+        amount,
+        fee,
+        tax,
+      }),
+    ],
     status: 0,
   };
 };

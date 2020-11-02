@@ -188,9 +188,10 @@ const parseData = text => {
   } else if (isDividend(text)) {
     type = 'Dividend';
     date = findDateDividend(text);
-    amount = findPayout(text);
     fee = 0;
     tax = findTax(text);
+    amount = +findPayout(text).plus(tax);
+    shares = findShares(text);
     price = +Big(amount).div(shares);
   }
   const activity = {

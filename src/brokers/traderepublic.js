@@ -8,50 +8,42 @@ const findISIN = text => {
   if (text.some(t => t.includes('ISIN:'))) {
     // Newer PDFs from traderepublic do contain an explicit "ISIN" string
     const isinLine = text[text.findIndex(t => t.includes('ISIN:'))];
-    const isin = isinLine.substr(isinLine.length - 12);
-    return isin;
+    return isinLine.substr(isinLine.length - 12);
   } else {
     // Older PDFs from traderepublic do not contain an explicit "ISIN" string, here we look up the
     // ISIN value by referencing it from the "shares" index.
-    const isinLine = text[text.findIndex(t => t.includes('Stk.')) - 1];
-    return isinLine;
+    return text[text.findIndex(t => t.includes('Stk.')) - 1];
   }
 };
 
 const findCompany = text => {
-  const companyLine = text[text.findIndex(t => t.includes('BETRAG')) + 1];
-  return companyLine;
+  return text[text.findIndex(t => t.includes('BETRAG')) + 1];
 };
 
 const findDateSingleBuy = textArr => {
   // Extract the date from a string like this: "Market-Order Kauf am 04.02.2020, um 14:02 Uhr an der Lang & Schwarz Exchange."
   const searchTerm = 'Kauf am ';
   const dateLine = textArr[textArr.findIndex(t => t.includes(searchTerm))];
-  const date = dateLine.split(searchTerm)[1].trim().substr(0, 10);
-  return date;
+  return dateLine.split(searchTerm)[1].trim().substr(0, 10);
 };
 
 const findDateBuySavingsPlan = textArr => {
   // Extract the date from a string like this: "Sparplanausführung am 16.01.2020 an der Lang & Schwarz Exchange."
   const searchTerm = 'Sparplanausführung am ';
   const dateLine = textArr[textArr.findIndex(t => t.includes(searchTerm))];
-  const date = dateLine.split(searchTerm)[1].trim().substr(0, 10);
-  return date;
+  return dateLine.split(searchTerm)[1].trim().substr(0, 10);
 };
 
 const findDateSell = textArr => {
   // Extract the date from a string like this: "Market-Order Verkauf am 04.02.2020, um 14:02 Uhr an der Lang & Schwarz Exchange."
   const searchTerm = 'Verkauf am ';
   const dateLine = textArr[textArr.findIndex(t => t.includes(searchTerm))];
-  const date = dateLine.split(searchTerm)[1].trim().substr(0, 10);
-  return date;
+  return dateLine.split(searchTerm)[1].trim().substr(0, 10);
 };
 
 const findDateDividend = textArr => {
   const searchTerm = 'VALUTA';
-  const dateLine = textArr[textArr.indexOf(searchTerm) + 3];
-  const date = dateLine;
-  return date;
+  return textArr[textArr.indexOf(searchTerm) + 3];
 };
 
 const findShares = textArr => {
@@ -71,14 +63,14 @@ const findAmount = textArr => {
   const searchTerm = 'GESAMT';
   const totalAmountLine = textArr[textArr.indexOf(searchTerm) + 1];
   const totalAmount = totalAmountLine.split(' ')[0].trim();
-  return parseGermanNum(totalAmount);
+  return Big(parseGermanNum(totalAmount));
 };
 
-const findPayout = textArr => {
+const findDividendNetPayout = textArr => {
   const searchTerm = 'GESAMT';
   const totalAmountLine = textArr[textArr.lastIndexOf(searchTerm) + 1];
   const totalAmount = totalAmountLine.split(' ')[0].trim();
-  return parseGermanNum(totalAmount);
+  return Big(parseGermanNum(totalAmount));
 };
 
 const findExchangeRate = (textArr, currency) => {
@@ -91,6 +83,7 @@ const findExchangeRate = (textArr, currency) => {
 };
 
 const findAndConvertNumber = (valueWithCurrency, textArr) => {
+  // Find a value and convert it to EUR using the rate given in the document.
   const lineElements = valueWithCurrency.split(' ');
   const value = Big(Math.abs(parseGermanNum(lineElements[0])));
   if (lineElements[1] === 'EUR') {
@@ -103,7 +96,7 @@ const findAndConvertNumber = (valueWithCurrency, textArr) => {
 };
 
 const findFee = textArr => {
-  var totalFee = Big(0);
+  let totalFee = Big(0);
 
   const searchTerm = 'Fremdkostenzuschlag';
   if (textArr.indexOf(searchTerm) > -1) {
@@ -124,7 +117,7 @@ const findFee = textArr => {
 };
 
 const findTax = textArr => {
-  var totalTax = Big(0);
+  let totalTax = Big(0);
 
   // There are three `BETRAG` values in each document. After the second, there are the taxes located.
   const searchTerm = 'BETRAG';
@@ -143,6 +136,7 @@ const findTax = textArr => {
   if (isDividend(textArr)) {
     // The dividend documents needs quite other logic...
     // For dividends in other currencies we need to search the last field `Zwischensumme` and skip all lines which contains `EUR` to find the first tax field.
+
     const searchTermSubtotal = 'Zwischensumme';
     const subtotalLineNumber = textArr.lastIndexOf(searchTermSubtotal);
     if (subtotalLineNumber > -1) {
@@ -159,7 +153,6 @@ const findTax = textArr => {
       skipLineCounter = 2;
     }
   }
-
   // Parse all taxes in the range of relevant line numbers
   for (
     let lineNumber = startTaxLineNumber + skipLineCounter;
@@ -170,19 +163,18 @@ const findTax = textArr => {
     // A positive tax amount in the json indicates tax return and a negative tax amount indicates a paid tax
     // TresorOne handles this the other way around
     const lineParsedAmount = -parseGermanNum(lineContent);
-
     totalTax = totalTax.plus(Big(lineParsedAmount));
   }
 
+  // Find Withholding Tax in foreign currency
   const searchTermWithholdingTax = 'Quellensteuer';
-  const lineWithWithholdingTax = textArr.findIndex(line =>
+  const withholdingTaxLine = textArr.findIndex(line =>
     line.includes(searchTermWithholdingTax)
   );
-  if (lineWithWithholdingTax > -1) {
-    const lineWithValue = textArr[lineWithWithholdingTax + 1];
+  if (withholdingTaxLine > -1 && !textArr[withholdingTaxLine+1].includes('EUR')) {
+    const lineWithValue = textArr[withholdingTaxLine + 1];
     totalTax = totalTax.plus(findAndConvertNumber(lineWithValue, textArr));
   }
-
   return totalTax;
 };
 
@@ -252,7 +244,7 @@ export const parsePositionAsActivity = (content, startLineNumber) => {
 };
 
 export const parseOrderOrDividend = textArr => {
-  let type, date, isin, company, shares, price, amount;
+  let type, date, isin, company, shares, price, amount, tax, fee;
 
   if (isBuySingle(textArr) || isBuySavingsPlan(textArr)) {
     type = 'Buy';
@@ -260,19 +252,24 @@ export const parseOrderOrDividend = textArr => {
     date = isBuySavingsPlan(textArr)
       ? findDateBuySavingsPlan(textArr)
       : findDateSingleBuy(textArr);
-    amount = findAmount(textArr);
+    amount = +findAmount(textArr);
+    fee = +findFee(textArr);
+    tax = +findTax(textArr);
   } else if (isSell(textArr)) {
     type = 'Sell';
     company = findCompany(textArr);
     date = findDateSell(textArr);
-    amount = findAmount(textArr);
+    amount = +findAmount(textArr);
+    fee = +findFee(textArr);
+    tax = +findTax(textArr);
   } else if (isDividend(textArr)) {
     type = 'Dividend';
     company = findCompany(textArr);
     date = findDateDividend(textArr);
-    amount = findPayout(textArr);
+    tax = +findTax(textArr);
+    fee = +findFee(textArr);
+    amount = +findDividendNetPayout(textArr).plus(tax).plus(fee);
   }
-
   isin = findISIN(textArr);
   shares = findShares(textArr);
   price = findPriceOfShare(textArr);
@@ -286,14 +283,13 @@ export const parseOrderOrDividend = textArr => {
     shares,
     price,
     amount,
-    fee: +findFee(textArr),
-    tax: +findTax(textArr),
+    tax,
+    fee,
   };
 };
 
 export const parsePage = content => {
   let foundActivities = [];
-
   if (
     isBuySingle(content) ||
     isBuySavingsPlan(content) ||
@@ -311,7 +307,6 @@ export const parsePage = content => {
       foundActivities.push(parsePositionAsActivity(content, lineNumber));
     }
   }
-
   let validatedActivities = [];
 
   foundActivities.forEach(activity => {

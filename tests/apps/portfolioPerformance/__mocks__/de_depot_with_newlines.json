@@ -1,0 +1,34 @@
+[
+  {
+    "isin": "US7561091049",
+    "wkn": "899744",
+    "type": "Buy",
+    "company": "REALTY INC. CORP.    DL 1",
+    "symbol": "RY6.F",
+    "date": "2020-09-10",
+    "shares": 10,
+    "amount": 540,
+    "grossAmount": 0,
+    "tax": 0,
+    "fee": 1,
+    "currency": "EUR",
+    "exchangeRate": 0,
+    "price": 54
+  },
+  {
+    "isin": "US7561091049",
+    "wkn": "899744",
+    "type": "Buy",
+    "company": "REALTY INC. CORP.    DL 1",
+    "symbol": "RY6.F",
+    "date": "2020-06-17",
+    "shares": 5,
+    "amount": 284,
+    "grossAmount": 0,
+    "tax": 0,
+    "fee": 1,
+    "currency": "EUR",
+    "exchangeRate": 0,
+    "price": 56.8
+  }
+]

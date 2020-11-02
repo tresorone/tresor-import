@@ -6,33 +6,30 @@ import { parseGermanNum, validateActivity } from '@/helper';
 
 const findISIN = (text, span) => {
   const isinLine = text[text.findIndex(t => t.includes('/ISIN')) + span];
-  const isin = isinLine.substr(isinLine.length - 12);
-  return isin;
+  return isinLine.substr(isinLine.length - 12);
 };
 
 const findCompany = (text, span) => {
   const companyLine = text[text.findIndex(t => t.includes('/ISIN')) + span];
   // span = 2 means its a dividend PDF - dividends dont have the WKN in the same line
-  const company =
-    span === 2
-      ? companyLine.trim()
-      : companyLine.substr(0, companyLine.length - 6).trim();
-
-  return company;
+  return span === 2
+    ? companyLine.trim()
+    : companyLine.substr(0, companyLine.length - 6).trim();
 };
 
 const findDateBuySell = textArr => {
-  const dateLine = textArr[textArr.findIndex(t => t.includes('Geschäftstag'))];
-  const date = dateLine.split(':')[1].trim().substr(0, 10);
-  return date;
+  const dateLine = textArr[textArr.findIndex(t => t.includes('Valuta')) + 1];
+  const date = dateLine.split(/\s+/);
+  return format(
+    parse(date[date.length - 3], 'dd.MM.yyyy', new Date()),
+    'yyyy-MM-dd'
+  );
 };
 
 const findDateDividend = textArr => {
   const dateLine = textArr[textArr.findIndex(t => t.includes('zahlbar ab'))];
-  const datePart = dateLine.split('zahlbar ab')[1].trim().substr(0, 10);
-  const date = datePart;
-
-  return date;
+  const date = dateLine.split('zahlbar ab')[1].trim().substr(0, 10);
+  return format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd');
 };
 
 const findShares = textArr => {
@@ -51,7 +48,7 @@ const findShares = textArr => {
       return;
     }
 
-    if (!hasPiece || element.length == 0) {
+    if (!hasPiece || element.length === 0) {
       return;
     }
 
@@ -72,8 +69,13 @@ const findAmount = textArr => {
     textArr.findIndex(t => t.includes('Kurswert'))
   );
   const priceLine = priceArea[priceArea.findIndex(t => t.includes('EUR'))];
-  const amount = priceLine.split('EUR')[1].trim();
-  return parseGermanNum(amount);
+  const amount = Big(parseGermanNum(priceLine.split('EUR')[1].trim()));
+  // If there is a currency-rate within the price line a foreign reduction
+  // has not yet been factored in
+  if (priceLine.includes('Devisenkurs')) {
+    return amount.plus(findPurchaseReduction(textArr));
+  }
+  return amount;
 };
 
 const findPayout = textArr => {
@@ -83,32 +85,75 @@ const findPayout = textArr => {
   return parseGermanNum(amount);
 };
 
-const findFee = textArr => {
-  const amount = findAmount(textArr);
+const findFee = (textArr, amount) => {
   const totalCostLine =
     textArr[textArr.findIndex(t => t.includes('Zu Ihren')) + 1];
   const totalCost = totalCostLine.split('EUR').pop().trim();
+  return Big(parseGermanNum(totalCost)).minus(Big(amount));
+};
 
-  const diff = +Big(parseGermanNum(totalCost)).minus(Big(amount));
-  return Math.abs(diff);
+const findPayoutTax = (textArr, fxRate) => {
+  let payoutTax = Big(0);
+  const withholdingTaxIndex = textArr.findIndex(line =>
+    line.includes('Quellensteuer')
+  );
+  if (withholdingTaxIndex > 0) {
+    const withholdingTax = parseGermanNum(
+      textArr[withholdingTaxIndex].split(/\s+/)[4]
+    );
+    if (fxRate !== undefined && fxRate > 0) {
+      payoutTax = payoutTax.plus(withholdingTax).div(fxRate);
+    } else {
+      payoutTax = payoutTax.plus(withholdingTax);
+    }
+  }
+  return payoutTax;
 };
 
 const findPurchaseReduction = textArr => {
-  let reduction = Big(0);
+  const reduction = Big(0);
   const lineWithReduction = textArr.findIndex(t =>
     t.includes('Reduktion Kaufaufschlag')
   );
   if (lineWithReduction < 0) {
     return +reduction;
   }
-
-  const reductionLineContent = textArr[lineWithReduction];
-  let reductionValue = reductionLineContent.split('EUR').pop();
-  if (reductionValue.endsWith('-')) {
-    reductionValue = reductionValue.slice(0, -1);
+  let rate = 1;
+  // Sometimes the reduction is in euro. If not the rate will be determined to adjust to the right currency.
+  if (!textArr[lineWithReduction].includes('EUR')) {
+    rate = parseGermanNum(textArr[lineWithReduction - 1].split(' ')[3]);
   }
+  const reductionValueSplit = textArr[lineWithReduction].split(' ');
+  let reductionValue = reductionValueSplit[reductionValueSplit.length - 1];
+  if (reductionValue.endsWith('-')) {
+    reductionValue = Big(parseGermanNum(reductionValue.slice(0, -1))).abs();
+  }
+  return Big(reductionValue).div(rate);
+};
 
-  return +reduction.minus(Big(parseGermanNum(reductionValue)));
+const findPayoutFxrateForeignCurrency = textArr => {
+  const foreignIndex = textArr.findIndex(line =>
+    line.includes('zum Devisenkurs:')
+  );
+  if (foreignIndex > 0) {
+    const foreignLine = textArr[foreignIndex].split(/\s+/);
+    const fxRate = parseGermanNum(foreignLine[3]);
+    const foreignCurrency = foreignLine[2].split('/')[1];
+    return [fxRate, foreignCurrency];
+  }
+  return [undefined, undefined];
+};
+
+const findBuyFxRateForeignCurrency = textArr => {
+  const foreignIndex = textArr.findIndex(line =>
+    line.includes('Umrechnung zum Devisenkurs ')
+  );
+  if (foreignIndex > 0) {
+    const fxRateLine = textArr[foreignIndex].split(/\s+/);
+    const foreignCurrency = textArr[foreignIndex - 3].split(/\s+/);
+    return [parseGermanNum(fxRateLine[3]), foreignCurrency[2]];
+  }
+  return [undefined, undefined];
 };
 
 const isBuy = textArr => textArr.some(t => t.includes('Wertpapierkauf'));
@@ -124,33 +169,38 @@ export const canParsePage = (content, extension) =>
   (isBuy(content) || isSell(content) || isDividend(content));
 
 const parseData = textArr => {
-  let type, date, isin, company, shares, price, amount, fee, tax;
+  let type,
+    date,
+    isin,
+    company,
+    shares,
+    price,
+    amount,
+    fee,
+    tax,
+    fxRate,
+    foreignCurrency;
 
   if (isBuy(textArr)) {
-    const reduction = findPurchaseReduction(textArr);
-    const foundAmount = Big(findAmount(textArr));
-    const totalAmount = foundAmount.plus(reduction);
-    const totalFee = Big(findFee(textArr)).plus(reduction); // Use plus instead of minus to prevent multiply with -1
-
     type = 'Buy';
+    date = findDateBuySell(textArr);
     isin = findISIN(textArr, 2);
     company = findCompany(textArr, 1);
-    date = findDateBuySell(textArr);
+    amount = +findAmount(textArr);
     shares = findShares(textArr);
-    amount = +totalAmount;
-    price = 0;
-    price = +foundAmount.div(Big(shares));
-    fee = +totalFee;
+    price = +Big(amount).div(shares);
+    fee = +findFee(textArr, amount);
     tax = 0;
+    [fxRate, foreignCurrency] = findBuyFxRateForeignCurrency(textArr);
   } else if (isSell(textArr)) {
     type = 'Sell';
     isin = findISIN(textArr, 2);
     company = findCompany(textArr, 1);
     date = findDateBuySell(textArr);
     shares = findShares(textArr);
-    amount = findAmount(textArr);
+    amount = +findAmount(textArr);
     price = +Big(amount).div(Big(shares));
-    fee = findFee(textArr);
+    fee = +findFee(textArr, amount);
     tax = 0;
   } else if (isDividend(textArr)) {
     type = 'Dividend';
@@ -160,14 +210,14 @@ const parseData = textArr => {
     shares = findDividendShares(textArr);
     amount = findPayout(textArr);
     price = +Big(amount).div(Big(shares));
+    [fxRate, foreignCurrency] = findPayoutFxrateForeignCurrency(textArr);
     fee = 0;
-    tax = 0;
+    tax = +findPayoutTax(textArr, fxRate);
   }
-
-  return validateActivity({
+  let activity = {
     broker: 'comdirect',
     type,
-    date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
+    date,
     isin,
     company,
     shares,
@@ -175,7 +225,14 @@ const parseData = textArr => {
     amount,
     fee,
     tax,
-  });
+  };
+  if (fxRate !== undefined) {
+    activity.fxRate = fxRate;
+  }
+  if (foreignCurrency !== undefined) {
+    activity.foreignCurrency = foreignCurrency;
+  }
+  return validateActivity(activity);
 };
 
 export const parsePages = contents => {

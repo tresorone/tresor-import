@@ -145,10 +145,15 @@ const findTaxes = content => {
   return +totalTax;
 };
 
-const findPayout = textArr =>
-  parseGermanNum(
-    getValueByPreviousElement(textArr, 'Gesamtbetrag zu Ihren Gunsten', 2)
-  );
+const findPayout = textArr => {
+  const bruttoIndex = textArr.indexOf('Brutto');
+  if (!(textArr[bruttoIndex + 1] === 'EUR')) {
+    const foreignPayout = parseGermanNum(textArr[bruttoIndex + 2]);
+    return Big(foreignPayout).div(findExchangeRate(textArr));
+  } else {
+    return Big(parseGermanNum(textArr[bruttoIndex + 2]));
+  }
+};
 
 const parseData = textArr => {
   let type, date, isin, company, shares, price, amount, fee, tax;
@@ -179,7 +184,7 @@ const parseData = textArr => {
     company = findCompany(textArr);
     date = findDate(textArr);
     shares = findShares(textArr);
-    amount = findPayout(textArr);
+    amount = +findPayout(textArr);
     price = findPrice(textArr);
     fee = 0;
     tax = findTaxes(textArr);

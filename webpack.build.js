@@ -4,7 +4,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 // bundles tresor-import source into the dist folder for distribution to Tresor One or other apps
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: './src/index.js',
   // devtool: 'inline-source-map',
   output: {
