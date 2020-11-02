@@ -190,8 +190,7 @@ const parseData = text => {
     date = findDateDividend(text);
     fee = 0;
     tax = findTax(text);
-    amount = +findPayout(text).plus(tax);
-    shares = findShares(text);
+    amount = +Big(findPayout(text)).plus(tax);
     price = +Big(amount).div(shares);
   }
   const activity = {
