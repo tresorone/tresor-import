@@ -79,7 +79,7 @@ const findAmount = ( textArr, fxRate, foreignCurrency ) => {
   // If there is a currency-rate within the price line a foreign reduction
   // has not yet been factored in
   if (amountLine.includes('Devisenkurs')) {
-    return amount.plus(findPurchaseReduction(textArr));
+    return amount.plus(findPurchaseReduction(textArr, fxRate, foreignCurrency ));
   }
   return amount;
 };
@@ -96,9 +96,8 @@ const findPayout = ( textArr, fxRate ) => {
 
 const findFee = (textArr, amount) => {
   const totalCostLine =
-    textArr[textArr.findIndex(t => t.includes('Zu Ihren')) + 1];
-  const totalCost = totalCostLine.split('EUR').pop().trim();
-  return Big(parseGermanNum(totalCost)).minus(Big(amount));
+    textArr[textArr.findIndex(t => t.includes('Zu Ihren')) + 1].split(/\s+/);
+  return Big(parseGermanNum(totalCostLine[totalCostLine.length-1])).minus(Big(amount));
 };
 
 const findPayoutTax = (textArr, fxRate) => {
@@ -119,25 +118,25 @@ const findPayoutTax = (textArr, fxRate) => {
   return payoutTax;
 };
 
-const findPurchaseReduction = textArr => {
+const findPurchaseReduction = ( textArr, fxRate, foreignCurrency ) => {
   const reduction = Big(0);
-  const lineWithReduction = textArr.findIndex(t =>
+  const reductionIndex = textArr.findIndex(t =>
     t.includes('Reduktion Kaufaufschlag')
   );
-  if (lineWithReduction < 0) {
+  if (reductionIndex < 0) {
     return +reduction;
   }
   let rate = 1;
-  // Sometimes the reduction is in euro. If not the rate will be determined to adjust to the right currency.
-  if (!textArr[lineWithReduction].includes('EUR')) {
-    rate = parseGermanNum(textArr[lineWithReduction - 1].split(' ')[3]);
-  }
-  const reductionValueSplit = textArr[lineWithReduction].split(' ');
-  let reductionValue = reductionValueSplit[reductionValueSplit.length - 1];
+  const reductionLine = textArr[reductionIndex].split(/\s+/);
+  let reductionValue = reductionLine[reductionLine.length - 1];
   if (reductionValue.endsWith('-')) {
     reductionValue = Big(parseGermanNum(reductionValue.slice(0, -1))).abs();
   }
-  return Big(reductionValue).div(rate);
+  // Sometimes the reduction is in euro. If not the fxRate will be applied
+  if (reductionLine.includes(foreignCurrency)) {
+    return Big(reductionValue).div(rate);
+  }
+  return Big(reductionValue)
 };
 
 const findPayoutFxrateForeignCurrency = textArr => {
