@@ -112,6 +112,25 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('should map pdf data of old buy sample correctly', () => {
+      const activity = consorsbank.parsePages(buySamples[4]).activities;
+
+      expect(activity).toEqual([
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'PAYPAL HDGS INC.DL-,0001',
+          date: '2015-08-06',
+          fee: 13.9,
+          isin: 'US70450Y1038',
+          price: 35.784000,
+          shares: 100,
+          amount: 3578.40,
+          tax: 0,
+        },
+      ]);
+    });
   });
 
   describe('Sell', () => {

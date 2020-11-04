@@ -3,6 +3,7 @@ export const buySamples = [
   require('./buy2.json'),
   require('./buy3.json'),
   require('./buy4.json'),
+  require('./buyOld.json'),
 ];
 
 export const sellSamples = [require('./sell1.json'), require('./sell2.json')];

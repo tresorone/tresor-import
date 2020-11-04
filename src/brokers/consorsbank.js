@@ -23,7 +23,8 @@ const findCompany = text => {
 };
 
 const findDateBuySell = textArr => {
-  const idx = textArr.findIndex(t => t.toLowerCase() === 'orderabrechnung');
+  // Before 12/2015 the headline is 'Wertpapierabrechnung'
+  const idx = textArr.findIndex(t => t.toLowerCase() === 'orderabrechnung' || t.toLowerCase() === 'wertpapierabrechnung');
   return textArr[idx + 2].substr(3, 10).trim();
 };
 
@@ -53,7 +54,9 @@ const findAmount = (textArr, type) => {
 
   if (type === 'Buy' || type === 'Sell') {
     idx = textArr.indexOf('Kurswert');
-    amount = textArr[idx + 2];
+    // Documents before 12/2015 have an empty line after 'Kurswert'
+    var hasEmptyLineAfterAmountLabel = textArr[idx + 1] == '';
+    amount = hasEmptyLineAfterAmountLabel ? textArr[idx + 3] : textArr[idx + 2];
   } else if (type === 'Dividend') {
     // "Brutto in EUR" is only present if the dividend is paid in a foreign currency, otherwise its just "Brutto"
     idx = textArr.indexOf('Brutto in EUR');
@@ -130,12 +133,14 @@ const findDividendTax = textArr => {
 };
 
 const isBuy = textArr => {
-  const idx = textArr.findIndex(t => t.toLowerCase() === 'orderabrechnung');
+  // Before 12/2015 the headline is 'Wertpapierabrechnung'
+  const idx = textArr.findIndex(t => t.toLowerCase() === 'orderabrechnung' || t.toLowerCase() === 'wertpapierabrechnung');
   return idx >= 0 && textArr[idx + 1].toLowerCase() === 'kauf';
 };
 
 const isSell = textArr => {
-  const idx = textArr.findIndex(t => t.toLowerCase() === 'orderabrechnung');
+  // Before 12/2015 the headline is 'Wertpapierabrechnung'
+  const idx = textArr.findIndex(t => t.toLowerCase() === 'orderabrechnung' || t.toLowerCase() === 'wertpapierabrechnung');
   return idx >= 0 && textArr[idx + 1].toLowerCase() === 'verkauf';
 };
 
