@@ -6,19 +6,17 @@ import { parseGermanNum, validateActivity } from '@/helper';
 
 const findForeignCurrencyFxRate = pageArray => {
   const foreignIndex = pageArray.findIndex(line =>
-    line.includes('umgerechneter FW - Endwert')
+    line.includes('-Kurs Mitte')
   );
-  let foreignCurrency, fxRate;
-  if (foreignIndex > 0) {
-    const foreignIndexLine = pageArray[foreignIndex - 1].split(' ');
-    fxRate = parseGermanNum(foreignIndexLine[2]);
-    foreignCurrency = foreignIndexLine[0].split('-')[0];
-  }
+  if (foreignIndex <= 0) {return [undefined, undefined]; }
+  const foreignIndexLine = pageArray[foreignIndex].split(' ');
+  const fxRate = parseGermanNum(foreignIndexLine[2]);
+  const foreignCurrency = foreignIndexLine[0].split('-')[0];
   return [fxRate, foreignCurrency];
 };
 
 const isForeignCurrencyTransaction = pageArray =>
-  pageArray.some(line => line.includes('umgerechneter FW - Endwert'));
+  pageArray.some(line => line.includes('-Kurs Mitte'));
 
 const findIsinBuy = pageArray => {
   const isinIndex =
@@ -48,10 +46,13 @@ const findCompanyDividend = pageArray => {
   }
 };
 
-const findDateBuy = pageArray => {
-  const dateIndex =
-    pageArray.findIndex(line => line.includes('Verrechnungskonto')) - 1;
-  const date = pageArray[dateIndex].split(/(\s+)/)[6];
+const findDateBuy = ( pageArray, legacyDocument = false ) => {
+  const dateIndex = legacyDocument ?
+    pageArray.findIndex(line => line.includes('Kauf aus Wertpapierliste vom')) :
+    pageArray.findIndex(line => line.includes('uf Marktplatz vom'))
+
+  const dateLine = pageArray[dateIndex].split(/(\s+)/);
+  const date = dateLine[dateLine.length-1];
   return format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd');
 };
 
@@ -121,7 +122,10 @@ const findFeeBuy = (pageArray, legacyDocument = false) => {
         parseGermanNum(pageArray[bonificationLine].split(/\s+/)[3])
       );
     }
-  } else {
+    return completeFee;
+  }
+  // If the document is a in a newer format, choose this parser for fees
+  else {
     const feeIndex = pageArray.indexOf('Summe Kosten und Geb');
     // if the transaction is in EUR
     if (feeIndex > 0) {
@@ -158,6 +162,14 @@ const findTaxPayout = pageArray => {
   if (kestTwoIndex >= 0) {
     completeTax = completeTax.plus(
       Big(parseGermanNum(pageArray[kestTwoIndex].split(/\s+/)[6])).abs()
+    );
+  }
+  const kestOneIndex = pageArray.findIndex(line =>
+    line.includes('KESt I pro Stück')
+  );
+  if (kestOneIndex >= 0) {
+    completeTax = completeTax.plus(
+      Big(parseGermanNum(pageArray[kestOneIndex].split(/\s+/)[6])).abs()
     );
   }
   return completeTax;
@@ -208,7 +220,7 @@ export const parsePages = content => {
     type = 'Buy';
     isin = findIsinBuy(pdfPagesConcat);
     company = findCompanyBuy(pdfPagesConcat);
-    date = findDateBuy(pdfPagesConcat);
+    date = findDateBuy(pdfPagesConcat, true);
     fee = +findFeeBuy(pdfPagesConcat, true);
     amount = +Big(findAmountBuy(pdfPagesConcat, true)).minus(fee);
     shares = findSharesBuy(pdfPagesConcat);
@@ -216,7 +228,7 @@ export const parsePages = content => {
     tax = 0;
   } else if (isDividend(pdfPagesConcat)) {
     type = 'Dividend';
-    isin = findIsinPayout(pdfPagesConcat, 'Ausschüttung', 0, 2);
+    isin = findIsinPayout(pdfPagesConcat);
     company = findCompanyDividend(pdfPagesConcat);
     date = findDateDividend(pdfPagesConcat);
     amount = findAmountDividend(pdfPagesConcat);
@@ -227,7 +239,7 @@ export const parsePages = content => {
   }
 
   let activity;
-  const foreignInformation = findForeignCurrencyFxRate(pdfPagesConcat);
+  const [fxRate, foreignCurrency] = findForeignCurrencyFxRate(pdfPagesConcat);
   activity = {
     broker: broker,
     type: type,
@@ -241,11 +253,11 @@ export const parsePages = content => {
     fee: fee,
   };
 
-  if (foreignInformation[0] !== undefined) {
-    activity.fxRate = foreignInformation[0];
+  if (fxRate !== undefined) {
+    activity.fxRate = fxRate;
   }
-  if (foreignInformation[1] !== undefined) {
-    activity.foreignCurrency = foreignInformation[1];
+  if (foreignCurrency !== undefined) {
+    activity.foreignCurrency = foreignCurrency;
   }
 
   const activities = [validateActivity(activity)];

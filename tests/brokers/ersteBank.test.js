@@ -35,7 +35,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2020-06-09',
+        date: '2020-06-05',
         isin: 'AT0000APOST4',
         company: 'OESTERREICHISCHE POST AG',
         shares: 33,
@@ -53,7 +53,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2020-06-05',
+        date: '2020-06-03',
         isin: 'AT00000VIE62',
         company: 'FLUGHAFEN WIEN AG',
         shares: 36,
@@ -71,7 +71,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2020-06-05',
+        date: '2020-06-03',
         isin: 'DE0005773303',
         company: 'FRAPORT AG FFM.AIRPORT.SERVICE AG',
         shares: 22,
@@ -89,7 +89,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2020-02-07',
+        date: '2020-02-05',
         isin: 'GB00B03MLX29',
         company: 'ROYAL DUTCH SHELL',
         shares: 72,
@@ -107,7 +107,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2020-03-06',
+        date: '2020-03-04',
         isin: 'GB0004544929',
         company: 'IMPERIAL BRANDS PLC',
         shares: 17,
@@ -125,7 +125,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2019-11-14',
+        date: '2019-11-12',
         isin: 'US02209S1033',
         company: 'ALTRIA GROUP INC.',
         shares: 40,
@@ -143,7 +143,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2019-12-20',
+        date: '2019-12-18',
         isin: 'US88579Y1010',
         company: '3M CO.',
         shares: 11,
@@ -161,7 +161,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2019-09-17',
+        date: '2019-09-13',
         isin: 'US00206R1023',
         company: 'AT & T INC.',
         shares: 20,
@@ -181,7 +181,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2019-09-20',
+        date: '2019-09-18',
         isin: 'US00206R1023',
         company: 'AT & T INC.',
         shares: 30,
@@ -201,7 +201,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2019-12-04',
+        date: '2019-12-02',
         isin: 'US2546871060',
         company: 'WALT DISNEY CO., THE',
         shares: 13,
@@ -221,7 +221,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2020-09-21',
+        date: '2020-09-17',
         isin: 'US5949181045',
         company: 'MICROSOFT CORP.',
         shares: 6,
@@ -241,7 +241,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2017-03-06',
+        date: '2017-03-02',
         isin: 'AT0000A05HR3',
         company: 'ERSTE BOND EMERGING MARKETS CORPOR.',
         shares: 999,
@@ -259,7 +259,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2017-03-03',
+        date: '2017-03-01',
         isin: 'AT0000A08SH5',
         company: 'ERSTE IMMOBILIENFONDS',
         shares: 999,
@@ -277,7 +277,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2017-03-06',
+        date: '2017-03-02',
         isin: 'AT0000660600',
         company: 'ESPA SELECT BOND (T)',
         shares: 999,
@@ -295,7 +295,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2017-03-06',
+        date: '2017-03-02',
         isin: 'AT0000707674',
         company: 'ESPA BEST OF WORLD',
         shares: 999,
@@ -313,7 +313,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2020-05-14',
+        date: '2020-05-12',
         isin: 'AT0000A11F86',
         company: 'YOU INVEST ACTIVE EUR R T',
         shares: 999,
@@ -331,7 +331,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2020-05-12',
+        date: '2020-05-11',
         isin: 'AT0000753504',
         company: 'ERSTE STOCK TECHNO EUR R T',
         shares: 999,
@@ -349,7 +349,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2020-05-12',
+        date: '2020-05-11',
         isin: 'AT0000705678',
         company: 'ERSTE WWF STOCK ENV EUR R T',
         shares: 999,
@@ -367,7 +367,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2020-05-14',
+        date: '2020-05-12',
         isin: 'AT0000680970',
         company: 'ERSTE STOCK EM GLOBAL EUR R T',
         shares: 999,
@@ -385,7 +385,7 @@ describe('Broker: Erste Bank', () => {
       expect(activities[0]).toEqual({
         broker: 'ersteBank',
         type: 'Buy',
-        date: '2020-05-14',
+        date: '2020-05-12',
         isin: 'AT0000A296E8',
         company: 'ERSTE FUTURE INVEST EUR R T',
         shares: 999,
@@ -434,7 +434,7 @@ describe('Broker: Erste Bank', () => {
       });
     });
 
-    test('Map the buy order for dividend from 2018 correctly', () => {
+    test('Map the buy order for dividend from 2019 correctly', () => {
       const activities = ersteBank.parsePages(dividendSamples[2]).activities;
 
       expect(activities.length).toEqual(1);
