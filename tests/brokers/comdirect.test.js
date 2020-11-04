@@ -34,7 +34,7 @@ describe('Broker: comdirect', () => {
       expect(result.activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
-        date: '2020-08-11',
+        date: '2020-08-07',
         isin: 'DE0007231334',
         wkn: "723133",
         company: 'Sixt SE',
@@ -53,7 +53,7 @@ describe('Broker: comdirect', () => {
       expect(result.activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
-        date: '2020-04-06',
+        date: '2020-04-01',
         isin: 'LU0187079347',
         wkn: "A0CA0W",
         company: 'Robeco Global Consumer Trends',
@@ -72,7 +72,7 @@ describe('Broker: comdirect', () => {
       expect(result.activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
-        date: '4152-11-09',
+        date: '2020-10-07',
         isin: 'LU0079474960',
         wkn: "986838",
         company: 'AB SICAV I-American Growth Ptf',
@@ -93,7 +93,7 @@ describe('Broker: comdirect', () => {
       expect(result.activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
-        date: '2020-11-04',
+        date: '2020-11-02',
         isin: 'DE0006464506',
         wkn: '646450',
         company: 'Leifheit AG',
@@ -112,7 +112,7 @@ describe('Broker: comdirect', () => {
       expect(result.activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
-        date: '2020-11-04',
+        date: '2020-11-02',
         isin: 'CNE100000296',
         wkn: 'A0M4W9',
         company: 'BYD Co. Ltd.',
@@ -131,7 +131,7 @@ describe('Broker: comdirect', () => {
       expect(result.activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
-        date: '2020-11-02',
+        date: '2020-10-29',
         isin: 'US54405Q1004',
         wkn: 'A2QGHG',
         company: 'Lordstown Motors Corp.',
@@ -152,7 +152,7 @@ describe('Broker: comdirect', () => {
       expect(result.activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
-        date: '2020-11-05',
+        date: '2020-11-03',
         isin: 'US01609W1027',
         wkn: 'A117ME',
         company: 'Alibaba Group Holding Ltd.',
