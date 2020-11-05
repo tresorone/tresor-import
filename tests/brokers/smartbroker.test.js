@@ -1,6 +1,10 @@
 import { findImplementation } from '../../src';
 import * as smartbroker from '../../src/brokers/smartbroker';
-import {buySamples, sellSamples, dividendSamples } from './__mocks__/smartbroker';
+import {
+  buySamples,
+  sellSamples,
+  dividendSamples,
+} from './__mocks__/smartbroker';
 
 describe('Smartbroker broker test', () => {
   let consoleErrorSpy;
@@ -10,9 +14,9 @@ describe('Smartbroker broker test', () => {
   describe('Check all documents', () => {
     test('Can the document parsed with smartbroker', () => {
       allSamples.forEach(sample => {
-        expect(sample.some(item => smartbroker.canParsePage(item, 'pdf'))).toEqual(
-          true
-        );
+        expect(
+          sample.some(item => smartbroker.canParsePage(item, 'pdf'))
+        ).toEqual(true);
       });
     });
 
@@ -56,7 +60,7 @@ describe('Smartbroker broker test', () => {
         company: 'Vanguard FTSE All-World U.ETF Registered Shares USD Dis.oN',
         shares: 26,
         price: 82.3,
-        amount: 2139.80,
+        amount: 2139.8,
         fee: 0,
         tax: 27.57,
       });

@@ -2,12 +2,12 @@ import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 import Big from 'big.js';
 
-
 import { parseGermanNum, validateActivity } from '@/helper';
 
 // Both banks use highly similar parsers. smartbroker includes the following string
 // which onvista does not include
-export const smartbrokerIdentificationString = 'BNP Paribas S.A. Niederlassung Deutschland';
+export const smartbrokerIdentificationString =
+  'BNP Paribas S.A. Niederlassung Deutschland';
 const onvistaIdentificationString = 'BELEGDRUCK=J';
 
 export const findISIN = text =>
@@ -25,25 +25,31 @@ export const findCompany = text => {
 export const findDateBuySell = text => {
   const lineNumber = text.findIndex(t => t.includes('Handelstag'));
 
-  let date
+  let date;
   if (text[lineNumber + 1].split('.').length === 3) {
     date = text[lineNumber + 1];
   } else if (text[lineNumber - 1].split('.').length === 3) {
     date = text[lineNumber - 1];
-  }
-  else {
+  } else {
     throw { text: 'Unknown date' };
   }
-  return format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd')
+  return format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd');
 };
 
 export const findDateDividend = text =>
-  format(parse(text[text.findIndex(t => t.includes('Zahltag')) + 1], 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd')
+  format(
+    parse(
+      text[text.findIndex(t => t.includes('Zahltag')) + 1],
+      'dd.MM.yyyy',
+      new Date()
+    ),
+    'yyyy-MM-dd'
+  );
 
 export const findShares = textArr => {
   const sharesLine = textArr[textArr.findIndex(t => t.includes('STK'))];
-  return parseGermanNum(sharesLine.split(' ')[1])
-}
+  return parseGermanNum(sharesLine.split(' ')[1]);
+};
 
 export const findPrice = text => {
   const priceLine = text[text.findIndex(t => t.includes('Kurs')) + 1];
@@ -139,7 +145,7 @@ const findTax = text => {
   }
   const sourceTaxIndex = text.findIndex(t => t.includes('davon anrechenbare'));
   if (sourceTaxIndex > -1) {
-    totalTax = totalTax.plus(parseGermanNum(text[sourceTaxIndex+2]));
+    totalTax = totalTax.plus(parseGermanNum(text[sourceTaxIndex + 2]));
   }
 
   return +totalTax;
@@ -152,13 +158,15 @@ const findPayout = text => {
 };
 
 export const canParsePage = (content, extension) =>
-  extension === 'pdf' && content.some(line => line.includes(onvistaIdentificationString)) && !content.some(line => line.includes(smartbrokerIdentificationString));
+  extension === 'pdf' &&
+  content.some(line => line.includes(onvistaIdentificationString)) &&
+  !content.some(line => line.includes(smartbrokerIdentificationString));
 
 export const isBuy = text =>
-  text.some(t => t.includes('Wir haben für Sie gekauft'))
+  text.some(t => t.includes('Wir haben für Sie gekauft'));
 
 export const isSell = text =>
-  text.some(t => t.includes('Wir haben für Sie verkauft'))
+  text.some(t => t.includes('Wir haben für Sie verkauft'));
 
 export const isDividend = text =>
   text.some(t => t.includes('Erträgnisgutschrift')) ||
@@ -204,7 +212,7 @@ const parseData = text => {
     amount: amount,
     tax: tax,
     fee: fee,
-  }
+  };
   return validateActivity(activity);
 };
 
