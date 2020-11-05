@@ -3,6 +3,7 @@ export const buySamples = [
 ]
 
 export const sellSamples = [
+  require('./sell/sell_comission_vanguard.json'),
 ]
 
 export const dividendSamples = [

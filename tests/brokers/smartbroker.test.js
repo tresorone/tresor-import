@@ -44,6 +44,25 @@ describe('Smartbroker broker test', () => {
     });
   });
 
+  describe('Sell', () => {
+    test('should map pdf data of sell comission vanguard correctly', () => {
+      const result = smartbroker.parsePages(sellSamples[0]);
+
+      expect(result.activities[0]).toEqual({
+        broker: 'smartbroker',
+        type: 'Sell',
+        date: '2020-11-05',
+        isin: 'IE00B3RBWM25',
+        company: 'Vanguard FTSE All-World U.ETF Registered Shares USD Dis.oN',
+        shares: 26,
+        price: 82.3,
+        amount: 2139.80,
+        fee: 0,
+        tax: 27.57,
+      });
+    });
+  });
+
   describe('Dividend', () => {
     test('should parse dividend_etf_usd correctly', () => {
       const result = smartbroker.parsePages(dividendSamples[0]);
