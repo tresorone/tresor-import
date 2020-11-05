@@ -86,7 +86,7 @@ export const findFee = text => {
   return +totalPrice.minus(totalTraded).abs();
 };
 
-export const findTax = text => {
+const findTax = text => {
   let totalTax = Big(0);
 
   let lastTaxIndex = undefined;
