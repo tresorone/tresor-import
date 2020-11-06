@@ -56,7 +56,7 @@ export const parseData = pdfPages => {
     let i = 0;
 
     while (i <= pdfPage.length) {
-      if (pdfPage[i] === 'Ansparplan') {
+      if (pdfPage[i] === 'Ansparplan' || pdfPage[i] === 'Kauf') {
         const action = parseBaseAction(pdfPage, i, 'Buy');
         if (action === undefined) {
           return undefined;

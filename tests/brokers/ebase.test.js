@@ -69,7 +69,7 @@ describe('Broker: ebase', () => {
   });
 
   describe('Validate buys', () => {
-    test('Can parse multiple buy orders from a document', () => {
+    test('Can parse multiple planned buy orders from a document', () => {
       const activities = ebase.parsePages(buySamples[0]);
       expect(activities.activities.length).toEqual(11);
       expect(activities.activities[0]).toEqual({
@@ -93,6 +93,35 @@ describe('Broker: ebase', () => {
         shares: 0.126761,
         price: 120.7,
         amount: 15.3,
+        tax: 0.0,
+        fee: 0.0,
+      });
+    });
+
+    test('Can parse multiple buy and planned buy orders from a document', () => {
+      const activities = ebase.parsePages(buySamples[2]);
+      expect(activities.activities.length).toEqual(5);
+      expect(activities.activities[3]).toEqual({
+        broker: 'ebase',
+        type: 'Buy',
+        date: '2020-07-24',
+        isin: 'DE000A2H7N24',
+        company: 'The Digital Leaders Fund R',
+        shares: 3.378835,
+        price: 147.98,
+        amount: 500.0,
+        tax: 0.0,
+        fee: 0.0,
+      });
+      expect(activities.activities[4]).toEqual({
+        broker: 'ebase',
+        type: 'Buy',
+        date: '2020-07-01',
+        isin: 'DE000A2H7N24',
+        company: 'The Digital Leaders Fund R',
+        shares: 0.339997,
+        price: 147.06,
+        amount: 50,
         tax: 0.0,
         fee: 0.0,
       });
