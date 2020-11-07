@@ -2,7 +2,6 @@ import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 import Big from 'big.js';
 
-
 import { parseGermanNum, validateActivity } from '@/helper';
 
 // Both smartbroker and onvista use highly similar parsers due to them both being

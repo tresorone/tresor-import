@@ -97,8 +97,14 @@ const parseData = textArr => {
 };
 
 export const parsePages = contents => {
-  // parse first page has activity data
-  const activities = [parseData(contents[0])];
+  const activities = [];
+  for (let c of contents) {
+    try {
+      activities.push(parseData(c));
+    } catch (e) {
+      console.error('Error while parsing page (smartbroker)', e, c);
+    }
+  }
 
   return {
     activities,
