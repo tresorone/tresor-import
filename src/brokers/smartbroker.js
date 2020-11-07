@@ -2,7 +2,6 @@ import { Big } from 'big.js';
 import { parseGermanNum, validateActivity } from '@/helper';
 import * as onvista from './onvista';
 
-export const smartbrokerIdentificationString = 'Landsberger Straße 300';
 
 const findTax = textArr => {
   let completeTax = Big(0);
@@ -47,7 +46,7 @@ const findPayout = textArr => {
 
 export const canParsePage = (content, extension) =>
   extension === 'pdf' &&
-  content.some(line => line.includes(smartbrokerIdentificationString)) &&
+  content.some(line => line.includes(onvista.smartbrokerIdentificationString)) &&
   (onvista.isBuy(content) ||
     onvista.isSell(content) ||
     onvista.isDividend(content));

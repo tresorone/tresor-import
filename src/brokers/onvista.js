@@ -2,13 +2,15 @@ import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 import Big from 'big.js';
 
+
 import { parseGermanNum, validateActivity } from '@/helper';
 
-// Both banks use highly similar parsers. smartbroker includes the following string
-// which onvista does not include
-export const smartbrokerIdentificationString =
-  'BNP Paribas S.A. Niederlassung Deutschland';
+// Both smartbroker and onvista use highly similar parsers due to them both being
+// daughter companies from BNP Paribas; a french bank. There is no string which
+// uniquely identifies onvista files so we have to construct a multistring
+// identifcation scheme.
 const onvistaIdentificationString = 'BELEGDRUCK=J';
+export const smartbrokerIdentificationString = 'Landsberger Straße 300';
 
 export const findISIN = text =>
   text[text.findIndex(t => t.includes('ISIN')) + 1];
