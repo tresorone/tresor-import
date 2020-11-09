@@ -9,7 +9,7 @@ export const buySamples = [
 ];
 
 export const sellSamples = [
-  // require('./sell/something.json'),
+  require('./sell/sell_eur_stock_biontech.json'),
 ];
 
 export const dividendSamples = [
