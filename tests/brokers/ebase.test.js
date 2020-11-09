@@ -126,6 +126,39 @@ describe('Broker: ebase', () => {
         fee: 0.0,
       });
     });
+
+    test('Can parse multiple buy orders from a finvesto document', () => {
+      const activities = ebase.parsePages(buySamples[3]);
+      expect(activities.activities.length).toEqual(21);
+      expect(activities.activities[0]).toEqual({
+        broker: 'ebase',
+        type: 'Buy',
+        date: '2020-10-30',
+        isin: 'IE00B4L5Y983',
+        company: 'iShares Core MSCI World UCITS ETF USD (Acc)',
+        shares: 0.747824,
+        price: 62.04,
+        amount: 40.0,
+        tax: 0.0,
+        fee: 0.0,
+        foreignCurrency: 'USD',
+        fxRate: 1.1622
+      });
+      expect(activities.activities[20]).toEqual({
+        broker: 'ebase',
+        type: 'Buy',
+        date: '2019-11-21',
+        isin: 'IE00B4L5Y983',
+        company: 'iShares Core MSCI World UCITS ETF USD (Acc)',
+        shares: 0.906280,
+        price: 60.76,
+        amount: 50,
+        tax: 0.0,
+        fee: 0.0,
+        foreignCurrency: 'USD',
+        fxRate: 1.1035
+      });
+    });
   });
 
   describe('Validate sells', () => {
