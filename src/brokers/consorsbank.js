@@ -165,6 +165,16 @@ const findDividendTax = (textArr, amount) => {
   }
 };
 
+const findForeignInformation = textArr => {
+  const foreignInfo = textArr.findIndex(line => line.includes('Devisenkurs'));
+  if (foreignInfo >= 0) {
+    const foreignInfoLine = textArr[foreignInfo+1].split(/\s+/)
+    return [parseGermanNum(foreignInfoLine[0]), foreignInfoLine[1]]
+  }
+  return [undefined, undefined]
+
+};
+
 const isBuy = textArr => {
   // Before 12/2015 the headline is 'Wertpapierabrechnung'
   const idx = textArr.findIndex(
@@ -207,7 +217,7 @@ export const canParsePage = (content, extension) => {
 };
 
 const parseData = textArr => {
-  let type, date, shares, price, amount, fee, tax;
+  let type, date, shares, price, amount, fee, tax, fxRate, foreignCurrency;
 
   const isin = findISIN(textArr);
   const company = findCompany(textArr);
@@ -233,6 +243,7 @@ const parseData = textArr => {
     amount = findAmount(textArr, 'Dividend');
     fee = 0;
     tax = findDividendTax(textArr, amount);
+    [fxRate, foreignCurrency] = findForeignInformation(textArr);
   }
   price = +Big(amount).div(Big(shares));
   let activity = {
@@ -251,6 +262,12 @@ const parseData = textArr => {
   }
   if (isin !== undefined) {
     activity.isin = isin;
+  }
+  if (fxRate !== undefined) {
+    activity.fxRate = fxRate;
+  }
+  if (foreignCurrency !== undefined) {
+    activity.foreignCurrency = foreignCurrency;
   }
   return validateActivity(activity);
 };

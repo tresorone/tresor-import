@@ -177,17 +177,19 @@ describe('Broker: Consorsbank', () => {
 
       expect(activity).toEqual([
         {
-          amount: 186.79,
+          type: 'Dividend',
           broker: 'consorsbank',
           company: 'Alerian MLP ETF Registered Shares o.N.',
           date: '2020-05-14',
-          fee: 0,
           isin: 'US00162Q8666',
           wkn: 'A1H99H',
+          amount: 186.79,
           price: 0.13836296296296297,
           shares: 1350,
           tax: 47.72,
-          type: 'Dividend',
+          fee: 0,
+          foreignCurrency: 'USD',
+          fxRate: 1.0841,
         },
       ]);
     });
@@ -208,6 +210,8 @@ describe('Broker: Consorsbank', () => {
           shares: 650,
           tax: 18.15,
           type: 'Dividend',
+          foreignCurrency: 'USD',
+          fxRate: 1.1184,
         },
       ]);
     });
@@ -228,6 +232,8 @@ describe('Broker: Consorsbank', () => {
           shares: 46,
           tax: 1.8,
           type: 'Dividend',
+          foreignCurrency: 'USD',
+          fxRate: 1.1604,
         },
       ]);
     });
@@ -246,6 +252,8 @@ describe('Broker: Consorsbank', () => {
           shares: 1350,
           tax: 60.48,
           type: 'Dividend',
+          foreignCurrency: 'USD',
+          fxRate: 1.0835,
         },
       ]);
     });
@@ -271,6 +279,7 @@ describe('Broker: Consorsbank', () => {
     test('should map pdf data of dividend_diageo.json', () => {
       expect(consorsbank.parsePages(dividendsSamples[5]).activities).toEqual([
         {
+          type: 'Dividend',
           amount: 1.53,
           broker: 'consorsbank',
           company: 'DIAGEO PLC Reg. Shares LS -,28935185',
@@ -281,7 +290,8 @@ describe('Broker: Consorsbank', () => {
           price: 0.4625640560518797,
           shares: 3.30765,
           tax: 0,
-          type: 'Dividend',
+          foreignCurrency: 'GBP',
+          fxRate: 0.9134,
         },
       ]);
     });
@@ -300,6 +310,8 @@ describe('Broker: Consorsbank', () => {
           shares: 0.7967,
           tax: 0.04,
           type: 'Dividend',
+          foreignCurrency: 'USD',
+          fxRate: 1.0814,
         },
       ]);
     });
@@ -318,6 +330,8 @@ describe('Broker: Consorsbank', () => {
           shares: 1.4443,
           tax: 0.19,
           type: 'Dividend',
+          foreignCurrency: 'USD',
+          fxRate: 1.1786,
         },
       ]);
     });
@@ -336,6 +350,8 @@ describe('Broker: Consorsbank', () => {
           shares: 24,
           tax: 5.95,
           type: 'Dividend',
+          foreignCurrency: 'USD',
+          fxRate: 1.1749,
         },
       ]);
     });
@@ -359,6 +375,8 @@ describe('Broker: Consorsbank', () => {
           shares: 0.68125,
           tax: 0.01,
           type: 'Dividend',
+          foreignCurrency: 'USD',
+          fxRate: 1.1174,
         },
       ]);
     });
@@ -377,6 +395,8 @@ describe('Broker: Consorsbank', () => {
           shares: 64,
           tax: 0.88,
           type: 'Dividend',
+          foreignCurrency: 'USD',
+          fxRate: 1.1263,
         },
       ]);
     });
