@@ -21,8 +21,10 @@ const findWKN = textArr => {
   // for newer dividend files
   const wknStringIndex = textArr.findIndex(line => line === 'WKN');
   if (wknStringIndex >= 0) {
-    const wknIndexOffset = findFirstIsinIndexInArray(textArr.slice(wknStringIndex));
-    return textArr[wknStringIndex+wknIndexOffset-1];
+    const wknIndexOffset = findFirstIsinIndexInArray(
+      textArr.slice(wknStringIndex)
+    );
+    return textArr[wknStringIndex + wknIndexOffset - 1];
   }
   return undefined;
 };
@@ -152,10 +154,13 @@ const findDividendTax = (textArr, amount) => {
   }
 
   // For newer dividend files
-  const netAmountIndexNew = textArr.findIndex(line => line ==='Netto zugunsten' || line === 'Netto zulasten');
+  const netAmountIndexNew = textArr.findIndex(
+    line => line === 'Netto zugunsten' || line === 'Netto zulasten'
+  );
   if (netAmountIndexNew >= 0) {
-    console.log(textArr[netAmountIndexNew+4]);
-    const netAmount = parseGermanNum(textArr[netAmountIndexNew+4].split(/\s+/)[0]);
+    const netAmount = parseGermanNum(
+      textArr[netAmountIndexNew + 4].split(/\s+/)[0]
+    );
     return +Big(amount).minus(netAmount);
   }
 };
@@ -202,40 +207,34 @@ export const canParsePage = (content, extension) => {
 };
 
 const parseData = textArr => {
-  let type, date, isin, wkn, company, shares, price, amount, fee, tax;
+  let type, date, shares, price, amount, fee, tax;
 
+  const isin = findISIN(textArr);
+  const company = findCompany(textArr);
+  const wkn = findWKN(textArr);
   if (isBuy(textArr)) {
     type = 'Buy';
-    isin = findISIN(textArr);
-    company = findCompany(textArr);
     date = findDateBuySell(textArr);
     shares = findShares(textArr);
     amount = findAmount(textArr, 'Buy');
-    price = +Big(amount).div(Big(shares));
     fee = findFee(textArr);
     tax = 0;
   } else if (isSell(textArr)) {
     type = 'Sell';
-    isin = findISIN(textArr);
-    company = findCompany(textArr);
     date = findDateBuySell(textArr);
     shares = findShares(textArr);
     amount = findAmount(textArr, 'Sell');
-    price = +Big(amount).div(Big(shares));
     fee = findFee(textArr);
     tax = findTax(textArr);
   } else if (isDividend(textArr)) {
     type = 'Dividend';
-    isin = findISIN(textArr);
-    wkn = findWKN(textArr);
-    company = findCompany(textArr);
     date = findDateDividend(textArr);
     shares = findDividendShares(textArr);
     amount = findAmount(textArr, 'Dividend');
-    price = +Big(amount).div(Big(shares));
     fee = 0;
     tax = findDividendTax(textArr, amount);
   }
+  price = +Big(amount).div(Big(shares));
   let activity = {
     broker: 'consorsbank',
     type,
