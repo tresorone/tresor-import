@@ -4,7 +4,6 @@ import {
   buySamples,
   sellSamples,
   dividendsSamples,
-  oldDividendsSamples,
 } from './__mocks__/consorsbank';
 console.error = jest.fn();
 
@@ -28,12 +27,6 @@ describe('Broker: Consorsbank', () => {
         expect(implementations[0]).toEqual(consorsbank);
       });
     });
-  });
-
-  test('PDFs with the old Consorsbank format should not be accepted', () => {
-    expect(consorsbank.canParsePage(oldDividendsSamples[0], 'pdf')).toEqual(
-      false
-    );
   });
 
   describe('Buy', () => {
@@ -360,6 +353,40 @@ describe('Broker: Consorsbank', () => {
           price: 0.09171875,
           shares: 64,
           tax: 0.88,
+          type: 'Dividend',
+        },
+      ]);
+    });
+
+    test('Can parse dividend from a 2015 total sa file', () => {
+      expect(consorsbank.parsePages(dividendsSamples[11]).activities).toEqual([
+        {
+          broker: 'consorsbank',
+          company: 'Total S.A.',
+          date: '2015-07-01',
+          wkn: 'A14UJS',
+          amount: 15.25,
+          fee: 0,
+          price: 0.61,
+          shares: 25,
+          tax: 4.58,
+          type: 'Dividend',
+        },
+      ]);
+    });
+
+    test('Can parse dividend from a 2016 bmw file', () => {
+      expect(consorsbank.parsePages(dividendsSamples[12]).activities).toEqual([
+        {
+          broker: 'consorsbank',
+          company: 'BAYERISCHE MOTOREN WERKE AG',
+          date: '2016-05-13',
+          wkn: '519000',
+          amount: 489.60,
+          fee: 0,
+          price: 3.2,
+          shares: 153,
+          tax: 136.2,
           type: 'Dividend',
         },
       ]);

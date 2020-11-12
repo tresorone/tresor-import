@@ -8,16 +8,30 @@ import {
   findFirstIsinIndexInArray,
 } from '@/helper';
 
-const findISIN = text => {
-  return text[findFirstIsinIndexInArray(text)];
+const findISIN = textArr => {
+  return textArr[findFirstIsinIndexInArray(textArr)];
 };
 
-const findCompany = text => {
-  // Sometimes a company name is split in two during JSONifying.
-  const indexIsinString = text.findIndex(t => t === 'ISIN');
-  const name_index_one = text[indexIsinString + 1];
-  if (findFirstIsinIndexInArray(text.slice(indexIsinString)) > 3) {
-    return name_index_one.concat(' ', text[indexIsinString + 2]);
+const findWKN = textArr => {
+  const wknIndex = textArr.findIndex(line => line.includes('WKN: '));
+  if (wknIndex >= 0) {
+    return textArr[wknIndex].split(/\s+/)[3];
+  }
+  return undefined;
+
+};
+
+const findCompany = textArr => {
+  let indexIsinWkn = textArr.findIndex(line => line === 'ISIN');
+  // For older documents there is only a wkn
+  if ( indexIsinWkn < 0) {
+    indexIsinWkn = textArr.findIndex(line => line.includes('WKN: '));
+  }
+  const name_index_one = textArr[indexIsinWkn + 1];
+  // Sometimes a company name is split in two during JSONifying. Only
+  // happens in newer documents that have an isin
+  if (findFirstIsinIndexInArray(textArr.slice(indexIsinWkn)) > 3) {
+    return name_index_one.concat(' ', textArr[indexIsinWkn + 2]);
   }
   return name_index_one;
 };
@@ -31,7 +45,15 @@ const findDateBuySell = textArr => {
 const findDateDividend = textArr => {
   const keyword = 'valuta';
   const dateLine = textArr.find(t => t.toLowerCase().includes(keyword));
-  return dateLine.substr(keyword.length).trim();
+  if ( dateLine !== undefined ) {
+    return dateLine.substr(keyword.length).trim();
+  }
+
+  const keywordOld = 'EX-TAG';
+  const dateLineOld = textArr.find(t => t.includes(keywordOld));
+  if ( dateLineOld !== undefined ) {
+    return dateLineOld.substr(keywordOld.length).trim();
+  }
 };
 
 const findShares = textArr => {
@@ -42,11 +64,18 @@ const findShares = textArr => {
 };
 
 const findDividendShares = textArr => {
-  const idx = textArr.findIndex(t => t.toLowerCase() === 'bestand');
-  const sharesLine = textArr[idx + 1];
-  const shares = sharesLine.split(' ')[0];
-
-  return parseGermanNum(shares);
+  const idx = textArr.findIndex(line => line.toLowerCase() === 'bestand');
+  // For newer files:
+  if ( idx >= 0 ) {
+    return parseGermanNum(textArr[idx + 1].split(' ')[0]);
+  }
+  // For older files:
+  else {
+    const idxOld = textArr.findIndex(line => line === 'DIVIDENDENGUTSCHRIFT');
+    if ( idxOld >= 0 ) {
+      return parseGermanNum(textArr[idxOld + 1].split(/\s+/)[1]);
+    }
+  }
 };
 
 const findAmount = (textArr, type) => {
@@ -55,15 +84,29 @@ const findAmount = (textArr, type) => {
   if (type === 'Buy' || type === 'Sell') {
     idx = textArr.indexOf('Kurswert');
     // Documents before 12/2015 have an empty line after 'Kurswert'
-    var hasEmptyLineAfterAmountLabel = textArr[idx + 1] == '';
+    const hasEmptyLineAfterAmountLabel = textArr[idx + 1] === '';
     amount = hasEmptyLineAfterAmountLabel ? textArr[idx + 3] : textArr[idx + 2];
   } else if (type === 'Dividend') {
-    // "Brutto in EUR" is only present if the dividend is paid in a foreign currency, otherwise its just "Brutto"
-    idx = textArr.indexOf('Brutto in EUR');
-    if (idx < 0) {
-      idx = textArr.indexOf('Brutto');
+    const oldDividendFile = textArr.some(
+      line => line.includes('IBAN') && line !== 'IBAN'
+    );
+    if ( !oldDividendFile ) {
+      // "Brutto in EUR" is only present if the dividend is paid in a foreign currency, otherwise its just "Brutto"
+      idx = textArr.indexOf('Brutto in EUR');
+      if (idx < 0) {
+        idx = textArr.indexOf('Brutto');
+      }
+      if ( idx >= 0) {
+        amount = textArr[idx + 1].split(' ')[0];
+      }
     }
-    amount = textArr[idx + 1].split(' ')[0];
+    else {
+      idx = textArr.findIndex( line => line.includes('BRUTTO'));
+      if ( idx >= 0 ) {
+        amount = textArr[idx].split(/\s+/)[2];
+      }
+    }
+
   }
   return parseGermanNum(amount);
 };
@@ -92,7 +135,16 @@ const findTax = textArr => {
   return Math.abs(sum);
 };
 
-const findDividendTax = textArr => {
+const findDividendTax = ( textArr, amount ) => {
+
+  // For older dividend files:
+  const netAmountIndex = textArr.findIndex(line => line.includes('WERT'));
+  if (netAmountIndex >= 0) {
+    const netAmount = parseGermanNum(textArr[netAmountIndex].split(/\s+/)[3]);
+    return +Big(amount).minus(netAmount);
+  }
+
+  // For newer dividend files
   const sum = textArr.reduce((totalTax, line, lineNumer) => {
     // is addition (Zuschlag)
     const isAddition = line.toLowerCase().includes('zuschlag');
@@ -162,18 +214,11 @@ export const canParsePage = (content, extension) => {
     return false;
   }
 
-  const isSupportedType =
-    isBuy(content) || isSell(content) || isDividend(content);
-
-  const isOldFormat = content.some(
-    line => line.includes('IBAN') && line !== 'IBAN'
-  );
-
-  return isSupportedType && !isOldFormat;
+  return isBuy(content) || isSell(content) || isDividend(content);
 };
 
 const parseData = textArr => {
-  let type, date, isin, company, shares, price, amount, fee, tax;
+  let type, date, isin, wkn, company, shares, price, amount, fee, tax;
 
   if (isBuy(textArr)) {
     type = 'Buy';
@@ -198,27 +243,33 @@ const parseData = textArr => {
   } else if (isDividend(textArr)) {
     type = 'Dividend';
     isin = findISIN(textArr);
+    wkn = findWKN(textArr);
     company = findCompany(textArr);
     date = findDateDividend(textArr);
     shares = findDividendShares(textArr);
     amount = findAmount(textArr, 'Dividend');
     price = +Big(amount).div(Big(shares));
     fee = 0;
-    tax = findDividendTax(textArr);
+    tax = findDividendTax(textArr, amount);
   }
-
-  return validateActivity({
+  let activity = {
     broker: 'consorsbank',
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
-    isin,
     company,
     shares,
     price,
     amount,
     fee,
     tax,
-  });
+  }
+  if ( wkn !== undefined ) {
+    activity.wkn = wkn;
+  }
+  if ( isin !== undefined ) {
+    activity.isin = isin;
+  }
+  return validateActivity(activity);
 };
 
 export const parsePages = contents => {
