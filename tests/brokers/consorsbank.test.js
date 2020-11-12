@@ -117,9 +117,9 @@ describe('Broker: Consorsbank', () => {
           date: '2015-08-06',
           fee: 13.9,
           isin: 'US70450Y1038',
-          price: 35.784000,
+          price: 35.784,
           shares: 100,
-          amount: 3578.40,
+          amount: 3578.4,
           tax: 0,
         },
       ]);
@@ -176,6 +176,7 @@ describe('Broker: Consorsbank', () => {
           date: '2020-05-14',
           fee: 0,
           isin: 'US00162Q8666',
+          wkn: "A1H99H",
           price: 0.13836296296296297,
           shares: 1350,
           tax: 47.72,
@@ -195,6 +196,7 @@ describe('Broker: Consorsbank', () => {
           date: '2020-03-12',
           fee: 0,
           isin: 'US37950E5490',
+          wkn: 'A1JJ54',
           price: 0.10926153846153847,
           shares: 650,
           tax: 18.15,
@@ -214,6 +216,7 @@ describe('Broker: Consorsbank', () => {
           date: '2018-10-10',
           fee: 0,
           isin: 'IE00B9F5YL18',
+          wkn: 'A1T8FT',
           price: 0.21195652173913043,
           shares: 46,
           tax: 1.8,
@@ -231,6 +234,7 @@ describe('Broker: Consorsbank', () => {
           date: '2020-02-20',
           fee: 0,
           isin: 'US00162Q8666',
+          wkn: 'A1H99H',
           price: 0.17535555555555554,
           shares: 1350,
           tax: 60.48,
@@ -248,6 +252,7 @@ describe('Broker: Consorsbank', () => {
           date: '2019-05-17',
           fee: 0,
           isin: 'DE0007664005',
+          wkn: '766400',
           price: 4.8,
           shares: 14,
           tax: 18.68,
@@ -265,6 +270,7 @@ describe('Broker: Consorsbank', () => {
           date: '2020-10-08',
           fee: 0,
           isin: 'GB0002374006',
+          wkn: '851247',
           price: 0.4625640560518797,
           shares: 3.30765,
           tax: 0,
@@ -282,6 +288,7 @@ describe('Broker: Consorsbank', () => {
           date: '2020-04-22',
           fee: 0,
           isin: 'US17275R1023',
+          wkn: '878841',
           price: 0.33889795406049955,
           shares: 0.7967,
           tax: 0.04,
@@ -299,6 +306,7 @@ describe('Broker: Consorsbank', () => {
           date: '2020-09-30',
           fee: 0,
           isin: 'US7134481081',
+          wkn: '851995',
           price: 0.8723949318008724,
           shares: 1.4443,
           tax: 0.19,
@@ -316,6 +324,7 @@ describe('Broker: Consorsbank', () => {
           date: '2020-10-14',
           fee: 0,
           isin: 'US4523081093',
+          wkn: '861219',
           price: 0.9704166666666667,
           shares: 24,
           tax: 5.95,
@@ -324,6 +333,11 @@ describe('Broker: Consorsbank', () => {
       ]);
     });
 
+    // This document is a funny one. First, there is a missmatch occuring during
+    // USD-> EUR calculation. It states a gross dividend of 0.13€ and a tax of
+    // 0.02€, however 0.12€ are payed out.
+    // Secondly, it seems to be a cancellation of an allready payed out dividend
+    // so the dividend is payed BACK to the Broker to recalculate something
     test('should map pdf data of realty income', () => {
       expect(consorsbank.parsePages(dividendsSamples[9]).activities).toEqual([
         {
@@ -331,11 +345,12 @@ describe('Broker: Consorsbank', () => {
           company: 'REALTY INCOME CORP. Registered Shares DL 1',
           date: '2020-02-19',
           isin: 'US7561091049',
+          wkn: '899744',
           amount: 0.13,
           fee: 0,
           price: 0.1908256880733945,
           shares: 0.68125,
-          tax: 0.02,
+          tax: 0.01,
           type: 'Dividend',
         },
       ]);
@@ -348,6 +363,7 @@ describe('Broker: Consorsbank', () => {
           company: 'AGNC Investment Corp. Registered Shares DL -,001',
           date: '2020-06-29',
           isin: 'US00123Q1040',
+          wkn: 'A2AR58',
           amount: 5.87,
           fee: 0,
           price: 0.09171875,
@@ -382,11 +398,29 @@ describe('Broker: Consorsbank', () => {
           company: 'BAYERISCHE MOTOREN WERKE AG',
           date: '2016-05-13',
           wkn: '519000',
-          amount: 489.60,
+          amount: 489.6,
           fee: 0,
           price: 3.2,
           shares: 153,
           tax: 136.2,
+          type: 'Dividend',
+        },
+      ]);
+    });
+
+    test('Can parse dividend from a 2018 total sa file', () => {
+      expect(consorsbank.parsePages(dividendsSamples[13]).activities).toEqual([
+        {
+          broker: 'consorsbank',
+          company: 'Total S.A. Anrechte',
+          date: '2018-06-28',
+          wkn: 'A2JNEW',
+          isin: 'FR0013333374',
+          amount: 15.5,
+          fee: 0,
+          price: 0.62,
+          shares: 25,
+          tax: 4.65,
           type: 'Dividend',
         },
       ]);

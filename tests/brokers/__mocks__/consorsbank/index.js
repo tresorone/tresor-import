@@ -6,7 +6,10 @@ export const buySamples = [
   require('./buy/buyOld.json'),
 ];
 
-export const sellSamples = [require('./sell/sell1.json'), require('./sell/sell2.json')];
+export const sellSamples = [
+  require('./sell/sell1.json'),
+  require('./sell/sell2.json'),
+];
 
 export const dividendsSamples = [
   require('./dividends/ertrag_alerian_mlp_etf_1.json'),
@@ -22,4 +25,5 @@ export const dividendsSamples = [
   require('./dividends/dividend_agnc_investment_corp.json'),
   require('./dividends/dividend_2015_total_sa.json'),
   require('./dividends/dividend_2016_bmw.json'),
+  require('./dividends/dividend_2018_total_sa.json'),
 ];

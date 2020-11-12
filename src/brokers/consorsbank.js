@@ -13,18 +13,24 @@ const findISIN = textArr => {
 };
 
 const findWKN = textArr => {
-  const wknIndex = textArr.findIndex(line => line.includes('WKN: '));
-  if (wknIndex >= 0) {
-    return textArr[wknIndex].split(/\s+/)[3];
+  // for older dividend files
+  const wknIndexOld = textArr.findIndex(line => line.includes('WKN: '));
+  if (wknIndexOld >= 0) {
+    return textArr[wknIndexOld].split(/\s+/)[3];
+  }
+  // for newer dividend files
+  const wknStringIndex = textArr.findIndex(line => line === 'WKN');
+  if (wknStringIndex >= 0) {
+    const wknIndexOffset = findFirstIsinIndexInArray(textArr.slice(wknStringIndex));
+    return textArr[wknStringIndex+wknIndexOffset-1];
   }
   return undefined;
-
 };
 
 const findCompany = textArr => {
   let indexIsinWkn = textArr.findIndex(line => line === 'ISIN');
   // For older documents there is only a wkn
-  if ( indexIsinWkn < 0) {
+  if (indexIsinWkn < 0) {
     indexIsinWkn = textArr.findIndex(line => line.includes('WKN: '));
   }
   const name_index_one = textArr[indexIsinWkn + 1];
@@ -38,20 +44,24 @@ const findCompany = textArr => {
 
 const findDateBuySell = textArr => {
   // Before 12/2015 the headline is 'Wertpapierabrechnung'
-  const idx = textArr.findIndex(t => t.toLowerCase() === 'orderabrechnung' || t.toLowerCase() === 'wertpapierabrechnung');
+  const idx = textArr.findIndex(
+    t =>
+      t.toLowerCase() === 'orderabrechnung' ||
+      t.toLowerCase() === 'wertpapierabrechnung'
+  );
   return textArr[idx + 2].substr(3, 10).trim();
 };
 
 const findDateDividend = textArr => {
   const keyword = 'valuta';
   const dateLine = textArr.find(t => t.toLowerCase().includes(keyword));
-  if ( dateLine !== undefined ) {
+  if (dateLine !== undefined) {
     return dateLine.substr(keyword.length).trim();
   }
 
   const keywordOld = 'EX-TAG';
   const dateLineOld = textArr.find(t => t.includes(keywordOld));
-  if ( dateLineOld !== undefined ) {
+  if (dateLineOld !== undefined) {
     return dateLineOld.substr(keywordOld.length).trim();
   }
 };
@@ -66,13 +76,13 @@ const findShares = textArr => {
 const findDividendShares = textArr => {
   const idx = textArr.findIndex(line => line.toLowerCase() === 'bestand');
   // For newer files:
-  if ( idx >= 0 ) {
+  if (idx >= 0) {
     return parseGermanNum(textArr[idx + 1].split(' ')[0]);
   }
   // For older files:
   else {
     const idxOld = textArr.findIndex(line => line === 'DIVIDENDENGUTSCHRIFT');
-    if ( idxOld >= 0 ) {
+    if (idxOld >= 0) {
       return parseGermanNum(textArr[idxOld + 1].split(/\s+/)[1]);
     }
   }
@@ -90,23 +100,21 @@ const findAmount = (textArr, type) => {
     const oldDividendFile = textArr.some(
       line => line.includes('IBAN') && line !== 'IBAN'
     );
-    if ( !oldDividendFile ) {
+    if (!oldDividendFile) {
       // "Brutto in EUR" is only present if the dividend is paid in a foreign currency, otherwise its just "Brutto"
       idx = textArr.indexOf('Brutto in EUR');
       if (idx < 0) {
         idx = textArr.indexOf('Brutto');
       }
-      if ( idx >= 0) {
+      if (idx >= 0) {
         amount = textArr[idx + 1].split(' ')[0];
       }
-    }
-    else {
-      idx = textArr.findIndex( line => line.includes('BRUTTO'));
-      if ( idx >= 0 ) {
+    } else {
+      idx = textArr.findIndex(line => line.includes('BRUTTO'));
+      if (idx >= 0) {
         amount = textArr[idx].split(/\s+/)[2];
       }
     }
-
   }
   return parseGermanNum(amount);
 };
@@ -135,8 +143,7 @@ const findTax = textArr => {
   return Math.abs(sum);
 };
 
-const findDividendTax = ( textArr, amount ) => {
-
+const findDividendTax = (textArr, amount) => {
   // For older dividend files:
   const netAmountIndex = textArr.findIndex(line => line.includes('WERT'));
   if (netAmountIndex >= 0) {
@@ -145,54 +152,31 @@ const findDividendTax = ( textArr, amount ) => {
   }
 
   // For newer dividend files
-  const sum = textArr.reduce((totalTax, line, lineNumer) => {
-    // is addition (Zuschlag)
-    const isAddition = line.toLowerCase().includes('zuschlag');
-
-    // is tax, excl. irrelevant withholding tax lines
-    const isTax =
-      line.toLowerCase().includes('steuer') &&
-      !line.toLowerCase().includes('anrechenbare quellensteuer') &&
-      !line.toLowerCase().includes('abzgl. quellensteuer') &&
-      !line.toLowerCase().includes('geänderter steuer');
-
-    if (!isTax && !isAddition) {
-      return totalTax;
-    }
-
-    // There are two different types of dividend tax declarations:
-    // 1)
-    //    "Quellensteuer in EUR",
-    //    "35,51 EUR",     <-- This is the current tax amount
-    // OR
-    //    "abzgl. Kapitalertragsteuer",
-    //    "2,34 EUR",     <-- This is the current tax amount
-    // 2)
-    //   "abzgl. Kapitalertragsteuer",
-    //   "24,51 % von",
-    //   "67,20 EUR",     <-- Assessment basis
-    //   "16,47 EUR",     <-- This is the current tax amount
-    let nextLineContent = textArr[lineNumer + 1];
-    if (nextLineContent.includes('%')) {
-      // The line after something with `steuer` contains a `%`. We have the second type of declaration and need to skip 2 more lines.
-      nextLineContent = textArr[lineNumer + 3];
-    }
-
-    return totalTax.plus(Big(parseGermanNum(nextLineContent.split(' ')[0])));
-  }, Big(0));
-
-  return Math.abs(+sum);
+  const netAmountIndexNew = textArr.findIndex(line => line ==='Netto zugunsten' || line === 'Netto zulasten');
+  if (netAmountIndexNew >= 0) {
+    console.log(textArr[netAmountIndexNew+4]);
+    const netAmount = parseGermanNum(textArr[netAmountIndexNew+4].split(/\s+/)[0]);
+    return +Big(amount).minus(netAmount);
+  }
 };
 
 const isBuy = textArr => {
   // Before 12/2015 the headline is 'Wertpapierabrechnung'
-  const idx = textArr.findIndex(t => t.toLowerCase() === 'orderabrechnung' || t.toLowerCase() === 'wertpapierabrechnung');
+  const idx = textArr.findIndex(
+    t =>
+      t.toLowerCase() === 'orderabrechnung' ||
+      t.toLowerCase() === 'wertpapierabrechnung'
+  );
   return idx >= 0 && textArr[idx + 1].toLowerCase() === 'kauf';
 };
 
 const isSell = textArr => {
   // Before 12/2015 the headline is 'Wertpapierabrechnung'
-  const idx = textArr.findIndex(t => t.toLowerCase() === 'orderabrechnung' || t.toLowerCase() === 'wertpapierabrechnung');
+  const idx = textArr.findIndex(
+    t =>
+      t.toLowerCase() === 'orderabrechnung' ||
+      t.toLowerCase() === 'wertpapierabrechnung'
+  );
   return idx >= 0 && textArr[idx + 1].toLowerCase() === 'verkauf';
 };
 
@@ -262,11 +246,11 @@ const parseData = textArr => {
     amount,
     fee,
     tax,
-  }
-  if ( wkn !== undefined ) {
+  };
+  if (wkn !== undefined) {
     activity.wkn = wkn;
   }
-  if ( isin !== undefined ) {
+  if (isin !== undefined) {
     activity.isin = isin;
   }
   return validateActivity(activity);
