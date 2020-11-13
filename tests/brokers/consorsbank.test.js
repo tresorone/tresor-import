@@ -452,5 +452,23 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('Can parse dividend from a 2018 DEUTSCHE POST AG file', () => {
+      expect(consorsbank.parsePages(dividendsSamples[14]).activities).toEqual([
+        {
+          broker: 'consorsbank',
+          company: 'DEUTSCHE POST AG NAMENS-AKTIEN O.N.',
+          date: '2018-04-27',
+          wkn: '555200',
+          isin: 'DE0005552004',
+          amount: 24.15,
+          fee: 0,
+          price: 1.15,
+          shares: 21,
+          tax: 0,
+          type: 'Dividend',
+        },
+      ]);
+    });
   });
 });

@@ -26,4 +26,5 @@ export const dividendsSamples = [
   require('./dividends/dividend_2015_total_sa.json'),
   require('./dividends/dividend_2016_bmw.json'),
   require('./dividends/dividend_2018_total_sa.json'),
+  require('./dividends/dividend_2018_deutsche_post.json'),
 ];
