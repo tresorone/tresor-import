@@ -217,7 +217,7 @@ export const canParsePage = (content, extension) => {
 };
 
 const parseData = textArr => {
-  let type, date, shares, price, amount, fee, tax, fxRate, foreignCurrency;
+  let type, date, shares, amount, fee, tax, fxRate, foreignCurrency;
 
   const isin = findISIN(textArr);
   const company = findCompany(textArr);
@@ -245,14 +245,13 @@ const parseData = textArr => {
     tax = findDividendTax(textArr, amount);
     [fxRate, foreignCurrency] = findForeignInformation(textArr);
   }
-  price = +Big(amount).div(Big(shares));
   let activity = {
     broker: 'consorsbank',
     type,
     date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
     company,
     shares,
-    price,
+    price: +Big(amount).div(Big(shares)),
     amount,
     fee,
     tax,

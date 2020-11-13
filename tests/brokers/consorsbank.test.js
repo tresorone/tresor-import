@@ -129,6 +129,26 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('should map pdf data of buy sample from 2015 (ISHS)', () => {
+      const activity = consorsbank.parsePages(buySamples[5]).activities;
+
+      expect(activity).toEqual([
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'ISHS-EO CO.BD LA.C.UTS DZ',
+          date: '2015-08-03',
+          isin: 'DE0002511243',
+          wkn: '251124',
+          price: 133.2393168997759,
+          shares: 0.51764,
+          amount: 68.97,
+          tax: 0,
+          fee: 1.03,
+        },
+      ]);
+    });
   });
 
   describe('Sell', () => {
