@@ -7,7 +7,7 @@ import { parseGermanNum, validateActivity } from '@/helper';
 export const canParsePage = content =>
   content.includes('www.degiro.de');
 
-export const parseActivity = (content, index) => {
+const parseActivity = (content, index) => {
   const foreignCurrencyOffset = content[index + 6] === 'EUR' ? 0 : 1;
   const date = format(parse(content[index], 'dd-MM-yyyy', new Date()), 'yyyy-MM-dd');
   const company = content[index+2];

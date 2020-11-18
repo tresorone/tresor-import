@@ -29,24 +29,7 @@ describe('Broker: ebase', () => {
   });
 
   test('should validate the result', () => {
-    const activity = parseData(invalidSamples[0]);
-
-    expect(activity).toEqual(undefined);
-    expect(console.error).toHaveBeenLastCalledWith(
-      'The activity for ebase has empty fields.',
-      {
-        type: 'Sell',
-        amount: 45,
-        broker: 'ebase',
-        company: 'DWS Top Dividende LD',
-        date: '2019-12-19',
-        isin: 'DE0009848119',
-        price: 130.93,
-        shares: undefined,
-        tax: 0.0,
-        fee: 0,
-      }
-    );
+    expect(ebase.parsePages(invalidSamples[0]).activities).toEqual(undefined);
   });
 
   describe('Check all documents', () => {

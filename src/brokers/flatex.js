@@ -180,11 +180,11 @@ export const canParsePage = (content, extension) =>
     content.some(line => line.includes('Dividendengutschrift')) ||
     content.some(line => line.includes('Ertragsmitteilung')));
 
-export const parseSinglePage = textArr => {
+const parseSinglePage = textArr => {
   return parsePage(textArr, findTableIndexes(textArr)[0]);
 };
 
-export const parsePage = (textArr, startLineNumer) => {
+const parsePage = (textArr, startLineNumer) => {
   let type, date, isin, company, shares, price, amount, fee, tax;
 
   if (lineContains(textArr, startLineNumer, 'Kauf')) {

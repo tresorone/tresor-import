@@ -4,23 +4,23 @@ import Big from 'big.js';
 
 import { parseGermanNum, validateActivity } from '@/helper';
 
-export const isPageTypeBuy = content =>
+const isPageTypeBuy = content =>
   content.some(
     line =>
       line.includes('Wertpapier Abrechnung Kauf') ||
       line.includes('Wertpapier Abrechnung Ausgabe Investmentfonds')
   );
 
-export const isPageTypeSell = content =>
+const isPageTypeSell = content =>
   content.some(line => line.includes('Wertpapier Abrechnung Verkauf'));
 
-export const isPageTypeDividend = content =>
+const isPageTypeDividend = content =>
   content.some(line => line.includes('Ausschüttung Investmentfonds'));
 
-export const findISIN = content =>
+const findISIN = content =>
   content[findLineNumberByContent(content, 'ISIN') + 5];
 
-export const findOrderDate = content => {
+const findOrderDate = content => {
   const value = content[findLineNumberByContent(content, 'Schlusstag') + 1];
   if (!value.includes(' ')) {
     return value;
@@ -29,18 +29,18 @@ export const findOrderDate = content => {
   return value.split(' ')[0];
 };
 
-export const findPayDate = content =>
+const findPayDate = content =>
   content[findLineNumberByContent(content, 'Zahlbarkeitstag') + 1];
 
-export const findCompany = content =>
+const findCompany = content =>
   content[findLineNumberByContent(content, 'Stück') + 1];
 
-export const findShares = content =>
+const findShares = content =>
   parseGermanNum(
     content[findLineNumberByContent(content, 'Stück')].split(' ')[1]
   );
 
-export const findAmount = (content, findTotalAmount) => {
+const findAmount = (content, findTotalAmount) => {
   return formatNumber(
     content[
       findLineNumberByContent(
@@ -51,7 +51,7 @@ export const findAmount = (content, findTotalAmount) => {
   );
 };
 
-export const findPayoutAmount = content => {
+const findPayoutAmount = content => {
   let currentLineNumber = findLineNumberByContent(content, 'Ausschüttung');
 
   while (!content[currentLineNumber + 2].includes('EUR')) {
@@ -61,7 +61,7 @@ export const findPayoutAmount = content => {
   return formatNumber(content[currentLineNumber + 1]);
 };
 
-export const formatNumber = value => {
+const formatNumber = value => {
   if (value.endsWith('-')) {
     value = value.slice(0, -1);
   }
@@ -69,7 +69,7 @@ export const formatNumber = value => {
   return parseGermanNum(value);
 };
 
-export const findLineNumberByContent = (content, term) =>
+const findLineNumberByContent = (content, term) =>
   content.findIndex(line => line.includes(term));
 
 export const canParsePage = (content, extension) =>
@@ -79,7 +79,7 @@ export const canParsePage = (content, extension) =>
     isPageTypeSell(content) ||
     isPageTypeDividend(content));
 
-export const parsePage = content => {
+const parsePage = content => {
   let type, date, isin, company, shares, price, amount, fee, tax;
 
   if (isPageTypeBuy(content)) {
