@@ -159,9 +159,19 @@ const findPayout = (textArr, startLineNumer) => {
     : 0; // Bemessungsgrundlage
 
   if (assessmentBasis <= 0) {
-    const payoutForeign = getTableValueByKey(textArr, startLineNumer, 'Bruttodividende').split(' ')[0];
-    const conversionRate = getTableValueByKey(textArr, startLineNumer, 'Devisenkurs').split(' ')[0];
-    return +(Big(parseGermanNum(payoutForeign)).div(parseGermanNum(conversionRate)));
+    const payoutForeign = getTableValueByKey(
+      textArr,
+      startLineNumer,
+      'Bruttodividende'
+    ).split(' ')[0];
+    const conversionRate = getTableValueByKey(
+      textArr,
+      startLineNumer,
+      'Devisenkurs'
+    ).split(' ')[0];
+    return +Big(parseGermanNum(payoutForeign)).div(
+      parseGermanNum(conversionRate)
+    );
   }
   return assessmentBasis;
 };
@@ -179,10 +189,6 @@ export const canParsePage = (content, extension) =>
     content.some(line => line.includes('Verkauf')) ||
     content.some(line => line.includes('Dividendengutschrift')) ||
     content.some(line => line.includes('Ertragsmitteilung')));
-
-const parseSinglePage = textArr => {
-  return parsePage(textArr, findTableIndexes(textArr)[0]);
-};
 
 const parsePage = (textArr, startLineNumer) => {
   let type, date, isin, company, shares, price, amount, fee, tax;

@@ -171,7 +171,10 @@ const findTax = textArr => {
   const withholdingTaxLine = textArr.findIndex(line =>
     line.includes(searchTermWithholdingTax)
   );
-  if (withholdingTaxLine > -1 && !textArr[withholdingTaxLine+1].includes('EUR')) {
+  if (
+    withholdingTaxLine > -1 &&
+    !textArr[withholdingTaxLine + 1].includes('EUR')
+  ) {
     const lineWithValue = textArr[withholdingTaxLine + 1];
     totalTax = totalTax.plus(findAndConvertNumber(lineWithValue, textArr));
   }
