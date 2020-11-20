@@ -4,9 +4,14 @@ import Big from 'big.js';
 
 import { validateActivity, parseGermanNum } from '../helper';
 
-export const canParsePage = ( pdfPage, extension ) => {
-  return extension === 'pdf' && pdfPage.some(line =>
-    line.includes('Union Investment Service Bank AG · 60621 Frankfurt am Main')
+export const canParsePage = (pdfPage, extension) => {
+  return (
+    extension === 'pdf' &&
+    pdfPage.some(line =>
+      line.includes(
+        'Union Investment Service Bank AG · 60621 Frankfurt am Main'
+      )
+    )
   );
 };
 
