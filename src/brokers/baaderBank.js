@@ -21,8 +21,10 @@ const isBrokerGratisbroker = content =>
   content.some(line => line.includes('GRATISBROKER GmbH'));
 
 const isBrokerScalableCapital = content =>
-  content.some(line =>
-    line.includes('Scalable Capital Vermögensverwaltung GmbH')
+  content.some(
+    line =>
+      line.includes('Scalable Capital Vermögensverwaltung GmbH') ||
+      content.some(line => line.includes('Scalable Capital Vermögensverw.GmbH'))
   );
 
 const isBrokerOskar = content =>
