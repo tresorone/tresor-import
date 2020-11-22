@@ -137,6 +137,24 @@ describe('Broker: scalable.capital', () => {
         tax: 0,
       });
     });
+
+    test('Can a market order made from Oskar be parsed from the document', () => {
+      const activities = baaderBank.parsePages(buySamples[6]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'scalablecapital',
+        type: 'Buy',
+        date: '2020-02-18',
+        isin: 'DE000EWG2LD7',
+        company: 'Boerse Stuttgart Securities Gold IHS 2017(17/Und)',
+        shares: 0.129,
+        price: 47.98,
+        amount: 6.19,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate sells', () => {

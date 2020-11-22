@@ -23,6 +23,7 @@ export const buySamples = [
   require('./buy/limit_order.json'),
   require('./buy/biontech_from_gratisbroker.json'),
   require('./buy/saving_plan_vanguard_from_Oskar.json'),
+  require('./buy/market_order_from_Oskar.json'),
 ];
 
 export const sellSamples = [require('./sell/market_order.json')];
