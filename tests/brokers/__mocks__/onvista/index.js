@@ -19,4 +19,5 @@ export const dividendsSamples = [
   require('./div-2.json'),
   require('./div-3.json'),
   require('./div-4.json'),
+  require('./dividend/2019_MetLife.json'),
 ];
