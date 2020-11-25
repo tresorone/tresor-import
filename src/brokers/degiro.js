@@ -4,7 +4,8 @@ import Big from 'big.js';
 
 import { parseGermanNum, validateActivity } from '@/helper';
 
-export const canParsePage = content => content.includes('www.degiro.de');
+export const canParsePage = (content, extension) =>
+  extension === 'pdf' && content.includes('www.degiro.de');
 
 const parseActivity = (content, index) => {
   const foreignCurrencyOffset = content[index + 6] === 'EUR' ? 0 : 1;
@@ -53,6 +54,7 @@ export const parsePages = contents => {
         transactionIndex += 1;
         continue;
       }
+
       try {
         // A normal activity w/o currency rates spans 16 lines from date to date
         activities.push(parseActivity(content, transactionIndex));
