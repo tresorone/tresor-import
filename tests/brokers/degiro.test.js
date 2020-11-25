@@ -1,10 +1,8 @@
 import { findImplementation } from '@/index';
 import * as degiro from '../../src/brokers/degiro';
-import {
-  transactionLog
-} from './__mocks__/degiro';
+import { transactionLog } from './__mocks__/degiro';
 
-const allSamples = transactionLog//.concat(futureSamples);
+const allSamples = transactionLog; //.concat(futureSamples);
 
 describe('Broker: DEGIRO', () => {
   let consoleErrorSpy;
@@ -12,9 +10,9 @@ describe('Broker: DEGIRO', () => {
   describe('Check all documents', () => {
     test('Can the document parsed with DEGIRO', () => {
       allSamples.forEach(samples => {
-        expect(
-          samples.some(item => degiro.canParsePage(item, 'pdf'))
-        ).toEqual(true);
+        expect(samples.some(item => degiro.canParsePage(item, 'pdf'))).toEqual(
+          true
+        );
       });
     });
 
@@ -29,8 +27,9 @@ describe('Broker: DEGIRO', () => {
   });
 
   describe('Validate transactionLog', () => {
-    test('Can the transactions be parsed from buy_only_transactions', () => {
+    test('Can the transactions be parsed from: buy_only_transactions', () => {
       const activities = degiro.parsePages(transactionLog[0]).activities;
+
       expect(activities.length).toEqual(7);
       expect(activities[0]).toEqual({
         broker: 'degiro',
@@ -43,6 +42,8 @@ describe('Broker: DEGIRO', () => {
         amount: 3993.19,
         fee: 0.54,
         tax: 0,
+        foreignCurrency: 'USD',
+        fxRate: 1.1024,
       });
       expect(activities[6]).toEqual({
         broker: 'degiro',
