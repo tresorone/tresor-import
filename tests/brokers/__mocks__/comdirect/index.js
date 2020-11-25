@@ -10,6 +10,7 @@ export const buySamples = [
 
 export const sellSamples = [
   require('./sell/sell_eur_stock_biontech.json'),
+  require('./sell/2020_usd_arcimoto.json'),
 ];
 
 export const dividendSamples = [
@@ -18,4 +19,4 @@ export const dividendSamples = [
   require('./dividend/dividend_usd_stryker_corp.json'),
 ];
 
-export const allSamples = buySamples.concat(sellSamples, dividendSamples)
+export const allSamples = buySamples.concat(sellSamples, dividendSamples);
