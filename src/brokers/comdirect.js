@@ -12,16 +12,22 @@ const findISINAndWKN = (text, spanISIN, spanWKN) => {
   return [isinLine[isinLine.length - 1], wknLine[wknLine.length - 1]];
 };
 
-const findCompany = (text, type) => {
+const findCompany = (text, type, formatId) => {
   const companyLineIndex = text.findIndex(t => t.includes('/ISIN'));
   // span = 2 means its a dividend PDF - dividends dont have the WKN in the same line
-  if ( type === 'Buy' ) {
+  if (type === 'Buy') {
     return text[companyLineIndex + 1].split(/\s+/).slice(0, -1).join(' ');
-  }
-  else if ( type === 'Sell' ) {
-    return text[companyLineIndex + 1].trim();
-  }
-  else if ( type === 'Dividend' ) {
+  } else if (type === 'Sell') {
+    const lineContent = text[companyLineIndex + 1].trim();
+
+    if (formatId === 0) {
+      // In this format, the name is one the same line as the WKN. We need only the first element before multiple spaces. Example:
+      // Arcimoto Inc.                                                            A2JN1H
+      return lineContent.split(/\s{2,}/)[0].trim();
+    }
+
+    return lineContent;
+  } else if (type === 'Dividend') {
     return text[companyLineIndex + 2].trim();
   }
 };
@@ -31,7 +37,9 @@ const findDateBuySell = textArr => {
   return format(
     parse(
       dateLine.match(/[0-9]{2}.[0-9]{2}.[1-2][0-9]{3}/)[0],
-      'dd.MM.yyyy', new Date()),
+      'dd.MM.yyyy',
+      new Date()
+    ),
     'yyyy-MM-dd'
   );
 };
@@ -49,11 +57,10 @@ const findShares = textArr => {
   // sell shares at once
 
   const splitSellAmountIndex = textArr.indexOf('(ggf. gerundet)');
-  if ( splitSellAmountIndex >= 0 ) {
-    const splitSellLine = textArr[splitSellAmountIndex-3].split(/\s+/);
-    return parseGermanNum(splitSellLine[splitSellLine.length - 1])
+  if (splitSellAmountIndex >= 0) {
+    const splitSellLine = textArr[splitSellAmountIndex - 3].split(/\s+/);
+    return parseGermanNum(splitSellLine[splitSellLine.length - 1]);
   }
-
 
   // Otherwise just search for the first occurance of 'St.'
   const sharesLine =
@@ -84,7 +91,6 @@ const findDividendShares = textArr => {
 };
 
 const findAmount = (textArr, fxRate, foreignCurrency) => {
-
   let isInForeignCurrency = false;
   let amount = 0;
   // SELL ONLY:
@@ -96,20 +102,23 @@ const findAmount = (textArr, fxRate, foreignCurrency) => {
   // Logic for normal Buy, Sell, and Dividend Operations:
   const amountIndex = textArr.findIndex(t => t.includes('Kurswert'));
 
-  if ( splitSellAmountIndex > 0 ) {
+  if (splitSellAmountIndex > 0) {
     amount = Big(parseGermanNum(textArr[splitSellAmountIndex - 1]));
-  }
-  else if ( amountIndex > 0 ){
+  } else if (amountIndex > 0) {
     const amountLine = textArr[amountIndex].split(/\s+/);
     amount = Big(parseGermanNum(amountLine[amountLine.length - 1]));
+
     if (amountLine[amountLine.length - 2] === foreignCurrency) {
       isInForeignCurrency = true;
     }
+
     // BUY ONLY:
     // If there is a currency-rate within the price line a foreign
     // reduction has not yet been factored in
     if (amountLine.includes('Devisenkurs')) {
-      return amount.plus(findPurchaseReduction(textArr, fxRate, foreignCurrency));
+      return amount.plus(
+        findPurchaseReduction(textArr, fxRate, foreignCurrency)
+      );
     }
   }
   return isInForeignCurrency ? amount.div(fxRate) : amount;
@@ -126,11 +135,17 @@ const findPayout = (textArr, fxRate) => {
   return amount;
 };
 
-const findFee = (textArr, amount, isSell = false) => {
-  const span = isSell ? 8 : 1;
-  const preTaxLine = textArr[textArr.findIndex(t => t.includes('vor Steuern')) + span].split(/\s+/);
-  const preTaxAmount = parseGermanNum(preTaxLine[preTaxLine.length - 1])
-  return isSell ? Big(amount).minus(preTaxAmount): Big(preTaxAmount).minus(amount);
+const findFee = (textArr, amount, isSell = false, formatId = undefined) => {
+  const span = formatId === undefined || formatId === 1 ? 8 : 1;
+
+  const preTaxLine = textArr[
+    textArr.findIndex(t => t.includes('vor Steuern')) + span
+  ].split(/\s+/);
+  const preTaxAmount = parseGermanNum(preTaxLine[preTaxLine.length - 1]);
+
+  return isSell
+    ? Big(amount).minus(preTaxAmount)
+    : Big(preTaxAmount).minus(amount);
 };
 
 const findTax = (textArr, fxRate) => {
@@ -151,8 +166,10 @@ const findTax = (textArr, fxRate) => {
 
   // Relevant for Sell Operations
   const payedTaxIndex = textArr.indexOf('abgeführte Steuern');
-  if ( payedTaxIndex >= 0 ) {
-    payoutTax = payoutTax.plus(Big(parseGermanNum(textArr[payedTaxIndex + 2])).abs());
+  if (payedTaxIndex >= 0) {
+    payoutTax = payoutTax.plus(
+      Big(parseGermanNum(textArr[payedTaxIndex + 2])).abs()
+    );
   }
 
   return +payoutTax;
@@ -211,6 +228,21 @@ const findBuyFxRateForeignCurrency = textArr => {
   return [fxRate, foreignCurrency];
 };
 
+// I'm not sure whats the best way to handle different types of document layouts AND if the reason
+// for this are different layouts or only minor document structure changes which will end up with
+// an other text format for us...
+const getDocumentFormatId = content => {
+  // There are currently two types of documents:
+
+  if (content.some(line => line.includes('Wertpapier-Bezeichnung '))) {
+    // One with: "Wertpapier-Bezeichnung                                               WPKNR/ISIN"
+    return 0;
+  }
+
+  // One with: "Wertpapier-Bezeichnung"
+  return 1;
+};
+
 const isBuy = textArr => textArr.some(t => t.includes('Wertpapierkauf'));
 
 const isSell = textArr => textArr.some(t => t.includes('Wertpapierverkauf'));
@@ -240,6 +272,8 @@ const parseData = textArr => {
     fxRate,
     foreignCurrency;
 
+  const formatId = getDocumentFormatId(textArr);
+
   if (isBuy(textArr)) {
     type = 'Buy';
     date = findDateBuySell(textArr);
@@ -249,17 +283,22 @@ const parseData = textArr => {
     amount = +findAmount(textArr, fxRate, foreignCurrency);
     shares = findShares(textArr);
     price = +Big(amount).div(shares);
-    fee = +findFee(textArr, amount);
+    fee = +findFee(textArr, amount, false, formatId);
     tax = 0;
   } else if (isSell(textArr)) {
     type = 'Sell';
-    [isin, wkn] = findISINAndWKN(textArr, 4, 2);
-    company = findCompany(textArr, type);
+    [isin, wkn] = findISINAndWKN(
+      textArr,
+      formatId == 1 ? 4 : 2,
+      formatId == 1 ? 2 : 1
+    );
+    company = findCompany(textArr, type, formatId);
     date = findDateBuySell(textArr);
+    [fxRate, foreignCurrency] = findBuyFxRateForeignCurrency(textArr);
     shares = findShares(textArr);
-    amount = +findAmount(textArr);
+    amount = +findAmount(textArr, fxRate, foreignCurrency);
     price = +Big(amount).div(shares);
-    fee = +findFee(textArr, amount, true);
+    fee = +findFee(textArr, amount, true, formatId);
     tax = findTax(textArr);
   } else if (isDividend(textArr)) {
     [fxRate, foreignCurrency] = findPayoutFxrateForeignCurrency(textArr);
@@ -273,6 +312,7 @@ const parseData = textArr => {
     fee = 0;
     tax = findTax(textArr, fxRate);
   }
+
   let activity = {
     broker: 'comdirect',
     type,
@@ -286,9 +326,11 @@ const parseData = textArr => {
     fee,
     tax,
   };
+
   if (fxRate !== undefined) {
     activity.fxRate = fxRate;
   }
+
   if (foreignCurrency !== undefined) {
     activity.foreignCurrency = foreignCurrency;
   }
