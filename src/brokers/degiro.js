@@ -2,43 +2,67 @@ import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 import Big from 'big.js';
 
-import { parseGermanNum, validateActivity } from '@/helper';
+import { parseGermanNum, validateActivity, isinRegex } from '@/helper';
 
-export const canParsePage = content => content.includes('www.degiro.de');
+export const canParsePage = (content, extension) =>
+  extension === 'pdf' && content.includes('www.degiro.de');
 
 const parseActivity = (content, index) => {
-  const foreignCurrencyOffset = content[index + 6] === 'EUR' ? 0 : 1;
   const date = format(
     parse(content[index], 'dd-MM-yyyy', new Date()),
     'yyyy-MM-dd'
   );
-  const company = content[index + 2];
-  const isin = content[index + 3];
-  const shares = parseGermanNum(content[index + 5]);
-  let amount = parseGermanNum(content[index + 11]);
 
-  // So far no testing for sell or dividend available
-  if (amount >= 0) {
-    console.error('Can not parse sell orders and dividends yet');
+  // Is it possible that the transaction logs contains dividends?
+
+  let span = 0;
+  let company = content[index + 2];
+  while (!isinRegex.test(content[index + 3 + span]) && span < 5) {
+    // It's possible that the name of a company use more than one line. To prevent
+    // an infinity loop, we break this after 5 lines we tested for an ISIN.
+    company += ' ' + content[index + 3 + span];
+    span++;
   }
-  const type = amount < 0 ? 'Buy' : undefined;
-  amount = Big(amount).abs();
-  const price = amount.div(shares);
-  const fee = Math.abs(
-    parseGermanNum(content[index + 13 + foreignCurrencyOffset])
-  );
+
+  const isin = content[index + 3 + span];
+  const shares = Big(parseGermanNum(content[index + 5 + span])).abs();
+  const amount = Big(parseGermanNum(content[index + 11 + span])).abs();
+
+  const currency = content[index + 6 + span];
+  const baseCurrency = content[index + 10 + span];
+
+  let fxRate = undefined;
+  if (currency !== baseCurrency) {
+    fxRate = parseGermanNum(content[index + 12 + span]);
+    // For foreign currency we need to go one line ahead for the following fields.
+    span++;
+  }
+
+  const type = shares > 0 ? 'Buy' : 'Sell';
+  const price = amount.div(shares.abs());
+  const fee = Math.abs(parseGermanNum(content[index + 13 + span]));
+
   const activity = {
     broker: 'degiro',
-    date: date,
-    company: company,
-    isin: isin,
-    shares: shares,
+    date,
+    company,
+    isin,
+    shares: +shares,
     amount: +amount,
-    type: type,
+    type,
     price: +price,
-    fee: fee,
+    fee,
     tax: 0,
   };
+
+  if (fxRate !== undefined) {
+    activity.fxRate = fxRate;
+  }
+
+  if (currency !== baseCurrency) {
+    activity.foreignCurrency = currency;
+  }
+
   return validateActivity(activity);
 };
 
@@ -53,13 +77,17 @@ export const parsePages = contents => {
         transactionIndex += 1;
         continue;
       }
+
       try {
-        // A normal activity w/o currency rates spans 16 lines from date to date
         activities.push(parseActivity(content, transactionIndex));
-        transactionIndex += 16;
       } catch (exception) {
         console.error('Error while parsing page (degiro)', exception, content);
       }
+
+      // Always go forward, not only in case of success, to prevent an infinity loop
+      // A normal activity w/o currency rates spans 16 lines from date to date, but some have missing
+      // lines for fxRate and fee. So we need to check 14 lines ahead (and more) for the next activity.
+      transactionIndex += 14;
     }
   }
 

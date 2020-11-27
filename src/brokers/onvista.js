@@ -8,7 +8,7 @@ import { parseGermanNum, validateActivity } from '@/helper';
 // daughter companies from BNP Paribas; a french bank. There is no string which
 // uniquely identifies onvista files so we have to construct a multistring
 // identifcation scheme.
-const onvistaIdentificationString = 'BELEGDRUCK=J';
+export const onvistaIdentificationString = 'BELEGDRUCK=J';
 export const smartbrokerIdentificationString = 'Landsberger Straße 300';
 
 export const findISIN = text =>

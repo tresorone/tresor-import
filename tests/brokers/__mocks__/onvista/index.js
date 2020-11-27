@@ -19,4 +19,5 @@ export const dividendsSamples = [
   require('./dividend/2019_iShare.NASDAQ-100.json'),
   require('./dividend/2019_ComSta._MSCI_Em.Mkts.json'),
   require('./dividend/2019_iSh.EO_ST.Sel.Div.30.json'),
+  require('./dividend/2019_MetLife.json'),
 ];

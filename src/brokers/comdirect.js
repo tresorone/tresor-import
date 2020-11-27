@@ -1,6 +1,7 @@
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 import Big from 'big.js';
+import { onvistaIdentificationString } from './onvista';
 
 import { parseGermanNum, validateActivity } from '@/helper';
 
@@ -288,6 +289,7 @@ export const canParsePage = (content, extension) =>
   // not present in every document; 'comdirect' is.
   extension === 'pdf' &&
   content.some(line => line.includes('comdirect')) &&
+  content.every(line => !line.includes(onvistaIdentificationString)) &&
   (isBuy(content) || isSell(content) || isDividend(content));
 
 const parseData = textArr => {
