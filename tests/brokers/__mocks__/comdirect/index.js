@@ -20,11 +20,15 @@ export const dividendSamples = [
   require('./dividend/currency_usd.json'),
   require('./dividend/currency_eur.json'),
   require('./dividend/dividend_usd_stryker_corp.json'),
+];
+
+export const taxInfoDividendSamples = [
+  require('./taxInfo/dividend/2020_eur_etf_ishsii_jpm.json'),
   require('./taxInfo/dividend/2020_eur_stock_basf.json'),
   require('./taxInfo/dividend/2020_eur_stock_bayer_ag.json'),
   require('./taxInfo/dividend/2020_eur_stock_daimler.json'),
   require('./taxInfo/dividend/2020_eur_stock_freenet_ag.json'),
   require('./taxInfo/dividend/2020_eur_stock_fresenius.json'),
-];
+]
 
-export const allSamples = buySamples.concat(sellSamples, dividendSamples);
+export const allSamples = buySamples.concat(sellSamples, dividendSamples, taxInfoDividendSamples);
