@@ -303,23 +303,28 @@ const isBuy = textArr => textArr.some(t => t.includes('Wertpapierkauf'));
 const isSell = textArr => textArr.some(t => t.includes('Wertpapierverkauf'));
 
 const isDividend = textArr => {
-  return textArr.some(t => t.includes('Ertragsgutschrift')) ||
-  textArr.some(t => t.includes('Dividendengutschrift'));
-}
+  return (
+    textArr.some(t => t.includes('Ertragsgutschrift')) ||
+    textArr.some(t => t.includes('Dividendengutschrift'))
+  );
+};
 
 const isTaxinfoDividend = textArr => {
   return textArr.some(
-    t => (t.includes('Steuerliche Behandlung:') && t.includes('Dividende'))
+    t => t.includes('Steuerliche Behandlung:') && t.includes('Dividende')
   );
-}
+};
 
 export const canParsePage = (content, extension) =>
   // The defining string used to be 'comdirect bank'. However, this string is
   // not present in every document; 'comdirect' is.
-  (extension === 'pdf' &&
-    content.some(line => line.includes('comdirect')) &&
-    content.every(line => !line.includes(onvistaIdentificationString)) &&
-    (isBuy(content) || isSell(content) || isDividend(content) || isTaxinfoDividend(content)));
+  extension === 'pdf' &&
+  content.some(line => line.includes('comdirect')) &&
+  content.every(line => !line.includes(onvistaIdentificationString)) &&
+  (isBuy(content) ||
+    isSell(content) ||
+    isDividend(content) ||
+    isTaxinfoDividend(content));
 
 const parseData = textArr => {
   let type,
