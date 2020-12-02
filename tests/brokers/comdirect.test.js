@@ -347,6 +347,103 @@ describe('Broker: comdirect', () => {
     });
   });
 
+  describe('Validate dividends from tax information', () => {
+    test('Can the dividend for be parsed from a tax information for BASF', () => {
+      const result = comdirect.parsePages(dividendSamples[3]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Dividend',
+        date: '2020-06-23',
+        isin: 'DE000BASF111',
+        wkn: 'BASF11',
+        company: 'BASF SE NA O.N.',
+        shares: 145.04,
+        price: 3.2999862107004962,
+        amount: 478.63,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can the dividend for be parsed from a tax information for Bayer', () => {
+      const result = comdirect.parsePages(dividendSamples[4]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Dividend',
+        date: '2020-05-04',
+        isin: 'DE000BAY0017',
+        wkn: 'BAY001',
+        company: 'BAYER AG NA O.N.',
+        shares: 41.711,
+        price: 2.799980820407087,
+        amount: 116.79,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can the dividend for be parsed from a tax information for Daimler', () => {
+      const result = comdirect.parsePages(dividendSamples[5]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Dividend',
+        date: '2020-07-13',
+        isin: 'DE0007100000',
+        wkn: '710000',
+        company: 'DAIMLER AG NA O.N.',
+        shares: 40,
+        price: 0.9,
+        amount: 36,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can the dividend for be parsed from a tax information for Freenet', () => {
+      const result = comdirect.parsePages(dividendSamples[6]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Dividend',
+        date: '2020-06-02',
+        isin: 'DE000A0Z2ZZ5',
+        wkn: 'A0Z2ZZ',
+        company: 'FREENET AG NA O.N.',
+        shares: 86.988,
+        price: 0.0400055180024831,
+        amount: 3.48,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can the dividend for be parsed from a tax information for Fresenius', () => {
+      const result = comdirect.parsePages(dividendSamples[7]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Dividend',
+        date: '2020-09-02',
+        isin: 'DE0005785604',
+        wkn: '578560',
+        company: 'FRESENIUS SE+CO.KGAA O.N.',
+        shares: 25,
+        price: 0.84,
+        amount: 21,
+        fee: 0,
+        tax: 0,
+      });
+    });
+  });
+
   beforeEach(() => {
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
   });
