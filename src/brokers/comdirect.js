@@ -311,7 +311,7 @@ const isDividend = textArr => {
 
 const isTaxinfoDividend = textArr => {
   return textArr.some(
-    t => t.includes('Steuerliche Behandlung:') && t.includes('Dividende')
+    t => t.includes('Steuerliche Behandlung:') && ( t.includes('Dividende') || t.includes('Investment-Ausschüttung'))
   );
 };
 
@@ -402,7 +402,6 @@ const parseData = textArr => {
     fee,
     tax,
   };
-
   if (fxRate !== undefined) {
     activity.fxRate = fxRate;
   }

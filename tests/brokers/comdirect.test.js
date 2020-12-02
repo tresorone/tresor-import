@@ -7,6 +7,7 @@ import {
   buySamples,
   sellSamples,
   dividendSamples,
+  taxInfoDividendSamples,
 } from './__mocks__/comdirect';
 
 describe('Broker: comdirect', () => {
@@ -335,8 +336,27 @@ describe('Broker: comdirect', () => {
   });
 
   describe('Validate dividends from tax information', () => {
+    test('Can the dividend for be parsed from a tax information for iShsii_jpm', () => {
+      const result = comdirect.parsePages(taxInfoDividendSamples[0]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Dividend',
+        date: '2020-06-23',
+        isin: 'IE00B2NPKV68',
+        wkn: 'A0NECU',
+        company: 'ISHSII-JPM DL EM BD DLDIS',
+        shares: 4.249,
+        price: 0.3224288067780654,
+        amount: 1.37,
+        fee: 0,
+        tax: 0.35,
+      });
+    });
+
     test('Can the dividend for be parsed from a tax information for BASF', () => {
-      const result = comdirect.parsePages(dividendSamples[3]);
+      const result = comdirect.parsePages(taxInfoDividendSamples[1]);
 
       expect(result.activities.length).toEqual(1);
       expect(result.activities[0]).toEqual({
@@ -355,7 +375,7 @@ describe('Broker: comdirect', () => {
     });
 
     test('Can the dividend for be parsed from a tax information for Bayer', () => {
-      const result = comdirect.parsePages(dividendSamples[4]);
+      const result = comdirect.parsePages(taxInfoDividendSamples[2]);
 
       expect(result.activities.length).toEqual(1);
       expect(result.activities[0]).toEqual({
@@ -374,7 +394,7 @@ describe('Broker: comdirect', () => {
     });
 
     test('Can the dividend for be parsed from a tax information for Daimler', () => {
-      const result = comdirect.parsePages(dividendSamples[5]);
+      const result = comdirect.parsePages(taxInfoDividendSamples[3]);
 
       expect(result.activities.length).toEqual(1);
       expect(result.activities[0]).toEqual({
@@ -393,7 +413,7 @@ describe('Broker: comdirect', () => {
     });
 
     test('Can the dividend for be parsed from a tax information for Freenet', () => {
-      const result = comdirect.parsePages(dividendSamples[6]);
+      const result = comdirect.parsePages(taxInfoDividendSamples[4]);
 
       expect(result.activities.length).toEqual(1);
       expect(result.activities[0]).toEqual({
@@ -412,7 +432,7 @@ describe('Broker: comdirect', () => {
     });
 
     test('Can the dividend for be parsed from a tax information for Fresenius', () => {
-      const result = comdirect.parsePages(dividendSamples[7]);
+      const result = comdirect.parsePages(taxInfoDividendSamples[5]);
 
       expect(result.activities.length).toEqual(1);
       expect(result.activities[0]).toEqual({
