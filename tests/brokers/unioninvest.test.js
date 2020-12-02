@@ -167,7 +167,7 @@ describe('Broker: Union Invest', () => {
         company: 'UniGlobal Vorsorge',
         shares: 0.07,
         price: 233.87,
-        amount: 16.30,
+        amount: 16.3,
         fee: 0,
         tax: 0,
       });

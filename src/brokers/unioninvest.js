@@ -18,90 +18,98 @@ export const canParsePage = (pdfPage, extension) => {
   );
 };
 
-
 // Find the first company that occurs BEFORE the id idx. Also requires the idx
 // of the date of a transaction
 const transactionFindCompany = (pdfPage, idx, dateIdx) => {
-  const companyIdx = findPriorRegexMatch(pdfPage, idx)+1;
+  const companyIdx = findPriorRegexMatch(pdfPage, idx) + 1;
   let company;
   // Either the company name is in the subdepot header. This is the case if
   // there is only one kind of stock in the same subdepot (my guess at least)
-  if (/,[0-9]{2,}/.test(pdfPage[dateIdx-1])) {
+  if (/,[0-9]{2,}/.test(pdfPage[dateIdx - 1])) {
     const isinIdx = findPriorIdx(pdfPage, idx, ['ISIN:']);
     const companyStartIdx = findPriorIdx(pdfPage, isinIdx, ['Unterdepot-Nr.:']);
-    const companyStartIdx2 = findPriorIdx(pdfPage, isinIdx,['a.']);
+    const companyStartIdx2 = findPriorIdx(pdfPage, isinIdx, ['a.']);
     // If multiple companies are listed, the first company is preceeded by
     // 'Unterdepot-Nr.:, otherwise 'a.'
     if (companyStartIdx > companyStartIdx2) {
-      company = pdfPage[companyStartIdx + 4] + pdfPage.slice(companyStartIdx + 5, isinIdx).join(' ');
-    }
-    else {
-      company = pdfPage[companyStartIdx2+1] + pdfPage.slice(companyStartIdx2 + 2, isinIdx).join(' ');
+      company =
+        pdfPage[companyStartIdx + 4] +
+        pdfPage.slice(companyStartIdx + 5, isinIdx).join(' ');
+    } else {
+      company =
+        pdfPage[companyStartIdx2 + 1] +
+        pdfPage.slice(companyStartIdx2 + 2, isinIdx).join(' ');
     }
   }
   // Or it part of the transaction (If the subdepot contains multiple stocks)
   else {
-    company = pdfPage[companyIdx] + pdfPage.slice(companyIdx + 1, dateIdx).join(' ')
+    company =
+      pdfPage[companyIdx] + pdfPage.slice(companyIdx + 1, dateIdx).join(' ');
   }
-  return company
-}
+  return company;
+};
 
 const findPriorIdx = (arr, idx, keyArr = ['STK', '/ Sperre']) => {
   let bckwrdIdx = 1;
-  while (idx-bckwrdIdx >= 0) {
-    if ( keyArr.includes(arr[idx-bckwrdIdx])) {
-      return idx-bckwrdIdx;
+  while (idx - bckwrdIdx >= 0) {
+    if (keyArr.includes(arr[idx - bckwrdIdx])) {
+      return idx - bckwrdIdx;
     }
-    bckwrdIdx+=1;
+    bckwrdIdx += 1;
   }
-  return -1
-}
+  return -1;
+};
 
 const findPriorRegexMatch = (arr, idx, regex = /,[0-9]{2,}/) => {
   let bckwrdIdx = 1;
-  while (idx-bckwrdIdx >= 0) {
-    if ( regex.test(arr[idx-bckwrdIdx])) {
-      return idx-bckwrdIdx;
+  while (idx - bckwrdIdx >= 0) {
+    if (regex.test(arr[idx - bckwrdIdx])) {
+      return idx - bckwrdIdx;
     }
-    bckwrdIdx+=1;
+    bckwrdIdx += 1;
   }
-  return -1
-}
+  return -1;
+};
 
 // Isins are only listed atop of the file for some unioninvest documents.
 // Later on, only the company/fond name is used. Thus we need to generate them first of all.
-const createCompanyIsinDict = ( pdfPage ) => {
-
+const createCompanyIsinDict = pdfPage => {
   let companyIsinDict = {};
   let isinIdx = pdfPage.indexOf('ISIN:');
   let lastIsinIdx = -1;
   // in all following cases the company name is preceeded by the a. from "p. a."
 
-  while ( isinIdx < pdfPage.length && isinIdx >= 0 ) {
+  while (isinIdx < pdfPage.length && isinIdx >= 0) {
     // In case its the first ISIN of a sub-depot
     let company;
     let companyStartIdx = findPriorIdx(pdfPage, isinIdx, ['Unterdepot-Nr.:']);
-    let companyStartIdx2 = findPriorIdx(pdfPage, isinIdx,['a.']);
+    let companyStartIdx2 = findPriorIdx(pdfPage, isinIdx, ['a.']);
     if (companyStartIdx >= lastIsinIdx) {
-      company = pdfPage[companyStartIdx + 4] + pdfPage.slice(companyStartIdx + 5, isinIdx).join(' ');
-    }
-    else if (companyStartIdx2 >= lastIsinIdx) {
-      company = pdfPage[companyStartIdx2+1] + pdfPage.slice(companyStartIdx2 + 2, isinIdx).join(' ');
-    }
-    else {
+      company =
+        pdfPage[companyStartIdx + 4] +
+        pdfPage.slice(companyStartIdx + 5, isinIdx).join(' ');
+    } else if (companyStartIdx2 >= lastIsinIdx) {
+      company =
+        pdfPage[companyStartIdx2 + 1] +
+        pdfPage.slice(companyStartIdx2 + 2, isinIdx).join(' ');
+    } else {
       // In this case another ISIN was found but no company name could be parsed
-      console.error('ISIN without company name found, bug in parsers encountered');
+      console.error(
+        'ISIN without company name found, bug in parsers encountered'
+      );
     }
-    companyIsinDict[company] = pdfPage[isinIdx+1];
+    companyIsinDict[company] = pdfPage[isinIdx + 1];
     lastIsinIdx = isinIdx;
     isinIdx += 1;
     isinIdx = pdfPage.indexOf('ISIN:', isinIdx);
   }
   return companyIsinDict;
-}
+};
 
 const parseBuy = (pdfPage, activityIdx, companyIsinDict) => {
-  const dateIdx = findPriorRegexMatch(pdfPage, activityIdx, /[0-9]{2}\.[0-9]{2}\.[0-9]{4}/)-1;
+  const dateIdx =
+    findPriorRegexMatch(pdfPage, activityIdx, /[0-9]{2}\.[0-9]{2}\.[0-9]{4}/) -
+    1;
   const company = transactionFindCompany(pdfPage, activityIdx, dateIdx);
 
   // The documents from unioninvest didn't contains any order time
@@ -128,10 +136,8 @@ const parseBuy = (pdfPage, activityIdx, companyIsinDict) => {
     ),
     tax: 0,
     fee: 0,
-  }
-  return [
-    validateActivity(activity),
-  ];
+  };
+  return [validateActivity(activity)];
 };
 
 const parseDividend = (pdfPage, activityIdx, companyIsinDict) => {
@@ -141,8 +147,8 @@ const parseDividend = (pdfPage, activityIdx, companyIsinDict) => {
   const dateIdx = pdfPage[churchTaxIdx + 2].includes(',')
     ? churchTaxIdx + 3
     : churchTaxIdx + 1;
-  const date = format(parse(pdfPage[dateIdx], 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd');
-  const company = transactionFindCompany(pdfPage, activityIdx, dateIdx)
+  const date = pdfPage[dateIdx];
+  const company = transactionFindCompany(pdfPage, activityIdx, dateIdx);
   const amount = parseGermanNum(
     pdfPage[activityIdx + 3] + pdfPage[activityIdx + 4]
   );
@@ -236,20 +242,30 @@ const findPayoutTax = (pdfPage, activityIdx, churchTaxIdx) => {
 };
 
 const parsePage = pdfPage => {
-  const possibleActivities = ['Anlage', 'Ausschüttung']
+  const possibleActivities = ['Anlage', 'Ausschüttung'];
   const companyIsinDict = createCompanyIsinDict(pdfPage);
   let activities = [];
   let slicedArray = pdfPage;
-  let activityIdx = slicedArray.findIndex(line => possibleActivities.includes(line));
+  let activityIdx = slicedArray.findIndex(line =>
+    possibleActivities.includes(line)
+  );
   while (activityIdx <= slicedArray.length && activityIdx > 0) {
-
-    if ( slicedArray[activityIdx] === 'Anlage') {
-      activities = activities.concat(parseBuy(slicedArray, activityIdx, companyIsinDict));
-    } else if (slicedArray[activityIdx] === 'Ausschüttung' && slicedArray[activityIdx+1] !== 'sind') {
-      activities = activities.concat(parseDividend(slicedArray, activityIdx, companyIsinDict));
+    if (slicedArray[activityIdx] === 'Anlage') {
+      activities = activities.concat(
+        parseBuy(slicedArray, activityIdx, companyIsinDict)
+      );
+    } else if (
+      slicedArray[activityIdx] === 'Ausschüttung' &&
+      slicedArray[activityIdx + 1] !== 'sind'
+    ) {
+      activities = activities.concat(
+        parseDividend(slicedArray, activityIdx, companyIsinDict)
+      );
     }
-    slicedArray = slicedArray.slice(activityIdx+1);
-    activityIdx = slicedArray.findIndex(line => possibleActivities.includes(line));
+    slicedArray = slicedArray.slice(activityIdx + 1);
+    activityIdx = slicedArray.findIndex(line =>
+      possibleActivities.includes(line)
+    );
   }
   return activities;
 };
