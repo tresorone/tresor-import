@@ -311,7 +311,9 @@ const isDividend = textArr => {
 
 const isTaxinfoDividend = textArr => {
   return textArr.some(
-    t => t.includes('Steuerliche Behandlung:') && ( t.includes('Dividende') || t.includes('Investment-Ausschüttung'))
+    t =>
+      t.includes('Steuerliche Behandlung:') &&
+      (t.includes('Dividende') || t.includes('Investment-Ausschüttung'))
   );
 };
 

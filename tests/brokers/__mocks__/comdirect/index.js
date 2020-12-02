@@ -29,6 +29,10 @@ export const taxInfoDividendSamples = [
   require('./taxInfo/dividend/2020_eur_stock_daimler.json'),
   require('./taxInfo/dividend/2020_eur_stock_freenet_ag.json'),
   require('./taxInfo/dividend/2020_eur_stock_fresenius.json'),
-]
+];
 
-export const allSamples = buySamples.concat(sellSamples, dividendSamples, taxInfoDividendSamples);
+export const allSamples = buySamples.concat(
+  sellSamples,
+  dividendSamples,
+  taxInfoDividendSamples
+);
