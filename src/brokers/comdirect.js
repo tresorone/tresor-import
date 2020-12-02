@@ -60,7 +60,7 @@ const findDateDividend = (textArr, isTaxinfo = false) => {
     const dateLine = textArr[valutaIdx + 1].split(/\s+/);
     date = dateLine[dateLine.length - 3];
   }
-  return format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd');
+  return date;
 };
 
 const findOrderTime = content => {
@@ -229,6 +229,7 @@ const findTax = (textArr, fxRate, formatId) => {
     } else {
       lineWithTaxValue = textArr[payedTaxIndex + 1].split(/\s+/)[1];
     }
+
     payoutTax = payoutTax.plus(Big(parseGermanNum(lineWithTaxValue)).abs());
   }
 
