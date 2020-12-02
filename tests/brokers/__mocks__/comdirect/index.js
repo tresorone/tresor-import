@@ -23,12 +23,15 @@ export const dividendSamples = [
 ];
 
 export const taxInfoDividendSamples = [
-  require('./taxInfo/dividend/2020_eur_etf_ishsii_jpm.json'),
-  require('./taxInfo/dividend/2020_eur_stock_basf.json'),
-  require('./taxInfo/dividend/2020_eur_stock_bayer_ag.json'),
-  require('./taxInfo/dividend/2020_eur_stock_daimler.json'),
-  require('./taxInfo/dividend/2020_eur_stock_freenet_ag.json'),
-  require('./taxInfo/dividend/2020_eur_stock_fresenius.json'),
+  require('./taxInfo/dividend/2020_eur_foreign_etf_payout_ishsii_jpm.json'),
+  require('./taxInfo/dividend/2020_eur_domestic_stock_dividend_basf.json'),
+  require('./taxInfo/dividend/2020_eur_domestic_stock_dividend_bayer_ag.json'),
+  require('./taxInfo/dividend/2020_eur_domestic_stock_dividend_daimler.json'),
+  require('./taxInfo/dividend/2020_eur_domestic_stock_dividend_freenet_ag.json'),
+  require('./taxInfo/dividend/2020_eur_domestic_stock_dividend_fresenius.json'),
+  require('./taxInfo/dividend/2013_eur_foreign_etf_payout_all_finanzplan.json'),
+  require('./taxInfo/dividend/2018_eur_foreign_stock_dividend_mondelez.json'),
+  require('./taxInfo/dividend/2019_eur_foreign_stock_dividend_garmin.json'),
 ];
 
 export const allSamples = buySamples.concat(

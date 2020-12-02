@@ -336,7 +336,7 @@ describe('Broker: comdirect', () => {
   });
 
   describe('Validate dividends from tax information', () => {
-    test('Can the dividend for be parsed from a tax information for iShsii_jpm', () => {
+    test('Can the payout for be parsed from a tax information for iShsii_jpm', () => {
       const result = comdirect.parsePages(taxInfoDividendSamples[0]);
 
       expect(result.activities.length).toEqual(1);
@@ -447,6 +447,63 @@ describe('Broker: comdirect', () => {
         amount: 21,
         fee: 0,
         tax: 0,
+      });
+    });
+
+    test('Can the payout for be parsed from a tax information for all finanzplan from 2013', () => {
+      const result = comdirect.parsePages(taxInfoDividendSamples[6]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Dividend',
+        date: '2013-07-17',
+        isin: 'LU0239364531',
+        wkn: 'A0H0SB',
+        company: 'ALL.FINANZPLAN 2020 A EO',
+        shares: 4.617,
+        price: 0.38336582196231317,
+        amount: 1.77,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can the dividend for be parsed from a tax information for mondelez from 2018', () => {
+      const result = comdirect.parsePages(taxInfoDividendSamples[7]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Dividend',
+        date: '2018-01-16',
+        isin: 'US6092071058',
+        wkn: 'A1J4U0',
+        company: 'MONDELEZ INTL INC. A',
+        shares: 35,
+        price: 0.156,
+        amount: 5.46,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can the dividend for be parsed from a tax information for garmin from 2019', () => {
+      const result = comdirect.parsePages(taxInfoDividendSamples[8]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Dividend',
+        date: '2019-12-31',
+        isin: 'CH0114405324',
+        wkn: 'A1C06B',
+        company: 'GARMIN LTD NAM.SF 0,10',
+        shares: 50,
+        price: 0.5064,
+        amount: 25.32,
+        fee: 0,
+        tax: 6.67,
       });
     });
   });
