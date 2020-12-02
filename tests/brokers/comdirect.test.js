@@ -250,6 +250,25 @@ describe('Broker: comdirect', () => {
         tax: 0,
       });
     });
+
+    test('Can parse the sell order: 2020_eur_sauren_global_balanced', () => {
+      const result = comdirect.parsePages(sellSamples[3]).activities;
+
+      expect(result.length).toEqual(1);
+      expect(result[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Sell',
+        date: '2020-11-30',
+        isin: 'LU0313462318',
+        wkn: 'A0MX7N',
+        company: 'Sauren Global Balanced Focus',
+        shares: 100,
+        price: 18.58,
+        amount: 1858,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate dividends', () => {
