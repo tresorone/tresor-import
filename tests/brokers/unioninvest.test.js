@@ -153,6 +153,38 @@ describe('Broker: Union Invest', () => {
         tax: 0,
       });
     });
+
+    test('Can parse a union invest buy from 2020 (1) ', () => {
+      const activities = unioninvest.parsePages(buySamples[4]).activities;
+
+      expect(activities.length).toEqual(2);
+      expect(activities[0]).toEqual({
+        broker: 'unioninvest',
+        type: 'Buy',
+        date: '2020-10-06',
+        datetime: '2020-10-06T' + activities[0].datetime.substring(11),
+        isin: 'DE000A1C81G1',
+        company: 'UniGlobal Vorsorge',
+        shares: 0.07,
+        price: 233.87,
+        amount: 16.30,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[1]).toEqual({
+        broker: 'unioninvest',
+        type: 'Buy',
+        date: '2020-10-06',
+        datetime: '2020-10-06T' + activities[0].datetime.substring(11),
+        isin: 'DE0008491069',
+        company: 'UniEuroRenta',
+        shares: 2.136,
+        price: 68.67,
+        amount: 146.7,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate Dividends', () => {

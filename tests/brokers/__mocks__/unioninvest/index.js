@@ -3,6 +3,7 @@ export const buySamples = [
   require('./buy/2019_multi_buy_single_page_2.json'),
   require('./buy/2019_multi_buy_single_page_3.json'),
   require('./buy/2019_multi_buy_single_page_4.json'),
+  require('./buy/2020_multi_buy_single_page_1.json'),
 ];
 
 export const dividendSamples = [
