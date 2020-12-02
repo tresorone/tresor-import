@@ -1,8 +1,10 @@
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
 import Big from 'big.js';
-
-import { parseGermanNum } from '@/helper';
+import {
+  parseGermanNum,
+  validateActivity,
+  createActivityDateTime,
+  timeRegex,
+} from '@/helper';
 
 const getValueByPreviousElement = (textArr, prev, range) => {
   const lineNumber = textArr.findIndex(t => t.includes(prev));
@@ -50,6 +52,16 @@ const findDate = textArr =>
   isBuy(textArr) || isSell(textArr)
     ? getValueByPreviousElement(textArr, 'Ausführungstag', 2).split(' ')[0]
     : getValueByPreviousElement(textArr, 'Zahltag', 1);
+
+const findOrderTime = content => {
+  // Extract the time after the line with order time which contains "um 17:22:22 Uhr"
+  const lineContent = getValueByPreviousElement(content, 'Ausführungstag', 3);
+  if (lineContent === undefined || !timeRegex(true).test(lineContent)) {
+    return undefined;
+  }
+
+  return lineContent.trim().split(' ')[1];
+};
 
 const findPrice = content => {
   if (isBuy(content) || isSell(content)) {
@@ -156,13 +168,14 @@ const findPayout = textArr => {
 };
 
 const parseData = textArr => {
-  let type, date, isin, company, shares, price, amount, fee, tax;
+  let type, date, time, isin, company, shares, price, amount, fee, tax;
 
   if (isBuy(textArr)) {
     type = 'Buy';
     isin = findISIN(textArr);
     company = findCompany(textArr);
     date = findDate(textArr);
+    time = findOrderTime(textArr);
     shares = findShares(textArr);
     amount = findAmount(textArr);
     price = findPrice(textArr);
@@ -173,6 +186,7 @@ const parseData = textArr => {
     isin = findISIN(textArr);
     company = findCompany(textArr);
     date = findDate(textArr);
+    time = findOrderTime(textArr);
     shares = findShares(textArr);
     amount = findAmount(textArr);
     price = findPrice(textArr);
@@ -190,10 +204,18 @@ const parseData = textArr => {
     tax = findTaxes(textArr);
   }
 
-  return {
+  const [parsedDate, parsedDateTime] = createActivityDateTime(
+    date,
+    time,
+    'dd.MM.yyyy',
+    'dd.MM.yyyy HH:mm:ss'
+  );
+
+  return validateActivity({
     broker: 'ing',
     type,
-    date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
+    date: parsedDate,
+    datetime: parsedDateTime,
     isin,
     company,
     shares,
@@ -201,7 +223,7 @@ const parseData = textArr => {
     amount,
     fee,
     tax,
-  };
+  });
 };
 
 export const parsePages = contents => {

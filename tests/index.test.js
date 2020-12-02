@@ -3,6 +3,7 @@ import {
   findImplementation,
   parseActivitiesFromPages,
 } from '../src';
+import * as onvista from '../src/brokers/onvista';
 
 describe('PDF bandler', () => {
   let consoleErrorSpy;
@@ -10,7 +11,11 @@ describe('PDF bandler', () => {
   describe('allImplementations', () => {
     test('All implementations must export (only) the functions canParsePage and parsePages', () => {
       allImplementations.forEach(implementation => {
-        expect(Object.keys(allImplementations[0]).length).toEqual(2);
+        if (implementation !== onvista) {
+          // The smartbroker implementation is extending onvista. So it's valid, that onvista exports more than two functions. No check required.
+          expect(Object.keys(implementation).length).toEqual(2);
+        }
+
         expect(typeof implementation.canParsePage).toEqual('function');
         expect(typeof implementation.parsePages).toEqual('function');
       });

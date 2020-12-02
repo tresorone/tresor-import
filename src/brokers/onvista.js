@@ -1,15 +1,22 @@
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
 import Big from 'big.js';
+import {
+  parseGermanNum,
+  validateActivity,
+  createActivityDateTime,
+  timeRegex,
+} from '@/helper';
 
-import { parseGermanNum, validateActivity } from '@/helper';
+// Both smartbroker and onvista use highly similar parsers due to them both being
+// daughter companies from BNP Paribas; a french bank. There is no string which
+// uniquely identifies onvista files so we have to construct a multistring
+// identifcation scheme.
+export const onvistaIdentificationString = 'BELEGDRUCK=J';
+export const smartbrokerIdentificationString = 'Landsberger Straße 300';
 
-const findISIN = text => {
-  const isin = text[text.findIndex(t => t.includes('ISIN')) + 1];
-  return isin;
-};
+export const findISIN = text =>
+  text[text.findIndex(t => t.includes('ISIN')) + 1];
 
-const findCompany = text => {
+export const findCompany = text => {
   let company = text[text.findIndex(t => t.includes('ISIN')) - 1];
   if (company === 'Gattungsbezeichnung') {
     company = text[text.findIndex(t => t.includes('ISIN')) - 2];
@@ -18,36 +25,57 @@ const findCompany = text => {
   return company;
 };
 
-const findDateBuySell = text => {
+export const findDateBuySell = text => {
   const lineNumber = text.findIndex(t => t.includes('Handelstag'));
 
+  let date;
   if (text[lineNumber + 1].split('.').length === 3) {
-    return text[lineNumber + 1];
+    date = text[lineNumber + 1];
   } else if (text[lineNumber - 1].split('.').length === 3) {
-    return text[lineNumber - 1];
+    date = text[lineNumber - 1];
+  } else {
+    throw { text: 'Unknown date' };
   }
-
-  throw { text: 'Unknown date' };
-};
-
-const findDateDividend = text => {
-  const date = text[text.findIndex(t => t.includes('Zahltag')) + 1];
   return date;
 };
 
-const findShares = text => {
-  const sharesLine = text[text.findIndex(t => t.includes('STK'))];
-  const shares = sharesLine.split(' ')[1];
-  return parseGermanNum(shares);
+export const findDateDividend = text =>
+  text[text.findIndex(t => t.includes('Zahltag')) + 1];
+
+const findOrderTime = content => {
+  // Extract the time after the line with Handelszeit which contains "17:33"
+  const searchTerm = 'Handelszeit';
+  const lineNumber = content.findIndex(t => t.includes(searchTerm));
+
+  if (lineNumber < 0) {
+    return undefined;
+  }
+
+  const lineContentFormatNew = content[lineNumber + 1].trim();
+  if (timeRegex(false).test(lineContentFormatNew)) {
+    return lineContentFormatNew;
+  }
+
+  const lineContentFormatOld = content[lineNumber - 1].trim();
+  if (timeRegex(false).test(lineContentFormatOld)) {
+    return lineContentFormatOld;
+  }
+
+  return undefined;
 };
 
-const findPrice = text => {
+export const findShares = textArr => {
+  const sharesLine = textArr[textArr.findIndex(t => t.includes('STK'))];
+  return parseGermanNum(sharesLine.split(' ')[1]);
+};
+
+export const findPrice = text => {
   const priceLine = text[text.findIndex(t => t.includes('Kurs')) + 1];
   const price = priceLine.split(' ')[1];
   return parseGermanNum(price);
 };
 
-const findAmount = text => {
+export const findAmount = text => {
   let amount = text[text.findIndex(t => t.includes('Kurswert')) + 2];
   return parseGermanNum(amount);
 };
@@ -58,7 +86,7 @@ const findPayout = text => {
   return Big(parseGermanNum(amount));
 };
 
-const findFee = text => {
+export const findFee = text => {
   const totalTradedLineNumber = text.findIndex(t => t.includes('Kurswert')) + 2;
   const totalTraded = parseGermanNum(text[totalTradedLineNumber]);
 
@@ -139,6 +167,10 @@ const findTax = text => {
       break;
     }
   }
+  const sourceTaxIndex = text.findIndex(t => t.includes('davon anrechenbare'));
+  if (sourceTaxIndex > -1) {
+    totalTax = totalTax.plus(parseGermanNum(text[sourceTaxIndex + 2]));
+  }
 
   return +totalTax;
 };
@@ -148,75 +180,71 @@ const isOverviewPage = content =>
 
 export const canParsePage = (content, extension) =>
   extension === 'pdf' &&
-  content.some(
-    line =>
-      line.includes('BELEGDRUCK=J') ||
-      line.includes('Depotübersicht Wertpapiere')
-  );
+  (content.some(line => line.includes(onvistaIdentificationString)) ||
+    isOverviewPage(content)) &&
+  !content.some(line => line.includes(smartbrokerIdentificationString));
+
+export const isBuy = text =>
+  text.some(t => t.includes('Wir haben für Sie gekauft'));
+
+export const isSell = text =>
+  text.some(t => t.includes('Wir haben für Sie verkauft'));
+
+export const isDividend = text =>
+  text.some(t => t.includes('Erträgnisgutschrift')) ||
+  text.some(t => t.includes('Dividendengutschrift'));
 
 const parsePage = text => {
-  const isBuy = text.some(line => line.includes('Wir haben für Sie gekauft'));
-  const isSell = text.some(line => line.includes('Wir haben für Sie verkauft'));
-  const isDividend =
-    text.some(line => line.includes('Erträgnisgutschrift')) ||
-    text.some(line => line.includes('Dividendengutschrift'));
+  let type, date, time, price, amount, fee, tax;
 
-  let type, date, isin, company, shares, price, amount, fee, tax;
+  const isin = findISIN(text);
+  const company = findCompany(text);
+  const shares = findShares(text);
 
-  if (isBuy) {
+  if (isBuy(text)) {
     type = 'Buy';
     date = findDateBuySell(text);
+    time = findOrderTime(text);
     amount = findAmount(text);
     fee = findFee(text);
-    shares = findShares(text);
     tax = 0.0;
     price = findPrice(text);
-  } else if (isSell) {
+  } else if (isSell(text)) {
     type = 'Sell';
     date = findDateBuySell(text);
+    time = findOrderTime(text);
     amount = findAmount(text);
     fee = findFee(text);
     tax = findTax(text);
-    shares = findShares(text);
     price = findPrice(text);
-  } else if (isDividend) {
+  } else if (isDividend(text)) {
     type = 'Dividend';
     date = findDateDividend(text);
     fee = 0;
     tax = findTax(text);
-    amount = +findPayout(text).plus(tax);
-    shares = findShares(text);
+    amount = +Big(findPayout(text)).plus(tax);
     price = +Big(amount).div(shares);
   }
 
-  isin = findISIN(text);
-  company = findCompany(text);
+  const [parsedDate, parsedDateTime] = createActivityDateTime(date, time);
 
   return validateActivity({
     broker: 'onvista',
-    type,
-    date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
-    isin,
-    company,
-    shares,
-    price,
-    amount,
-    fee,
-    tax,
+    type: type,
+    shares: shares,
+    date: parsedDate,
+    datetime: parsedDateTime,
+    isin: isin,
+    company: company,
+    price: price,
+    amount: amount,
+    tax: tax,
+    fee: fee,
   });
 };
 
 const parseOverview = content => {
   let activities = [];
-
-  const date = format(
-    parse(
-      content[content.findIndex(line => line.includes('Datum:')) + 1],
-      'dd.MM.yy HH:mm:ss',
-      new Date()
-    ),
-    'yyyy-MM-dd'
-  );
 
   for (
     let tableStartLine = content.findIndex(line =>
@@ -230,12 +258,20 @@ const parseOverview = content => {
       break;
     }
 
+    const [parsedDate, parsedDateTime] = createActivityDateTime(
+      content[tableStartLine + 5],
+      content[tableStartLine + 6],
+      'dd.MM.yyyy',
+      'dd.MM.yyyy HH:mm:ss'
+    );
+
     activities.push(
       validateActivity(
         {
           broker: 'onvista',
           type: 'TransferIn',
-          date,
+          date: parsedDate,
+          datetime: parsedDateTime,
           isin: content[tableStartLine + 3].split('/')[1].trim(),
           company: content[tableStartLine + 2],
           shares: parseGermanNum(shares),

@@ -13,6 +13,7 @@
     "fee": 1,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-09-10T13:32:00.000Z",
     "price": 54
   },
   {
@@ -29,6 +30,7 @@
     "fee": 1,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-06-17T07:38:00.000Z",
     "price": 56.8
   }
 ]

@@ -1,27 +1,34 @@
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
 import Big from 'big.js';
+import {
+  parseGermanNum,
+  validateActivity,
+  createActivityDateTime,
+  timeRegex,
+} from '@/helper';
 
-import { parseGermanNum, validateActivity } from '@/helper';
-
-export const isPageTypeBuy = content =>
+const isPageTypeBuy = content =>
   content.some(
     line =>
       line.includes('Wertpapier Abrechnung Kauf') ||
       line.includes('Wertpapier Abrechnung Ausgabe Investmentfonds')
   );
 
-export const isPageTypeSell = content =>
+const isPageTypeSell = content =>
   content.some(line => line.includes('Wertpapier Abrechnung Verkauf'));
 
-export const isPageTypeDividend = content =>
+const isPageTypeDividend = content =>
   content.some(line => line.includes('Ausschüttung Investmentfonds'));
 
-export const findISIN = content =>
+const findISIN = content =>
   content[findLineNumberByContent(content, 'ISIN') + 5];
 
-export const findOrderDate = content => {
-  const value = content[findLineNumberByContent(content, 'Schlusstag') + 1];
+const findOrderDate = content => {
+  const lineNumber = findLineNumberByContent(content, 'Schlusstag');
+  if (lineNumber <= 0) {
+    return undefined;
+  }
+
+  const value = content[lineNumber + 1];
   if (!value.includes(' ')) {
     return value;
   }
@@ -29,18 +36,32 @@ export const findOrderDate = content => {
   return value.split(' ')[0];
 };
 
-export const findPayDate = content =>
+const findOrderTime = content => {
+  const lineNumber = findLineNumberByContent(content, 'Schlusstag/-Zeit');
+  if (lineNumber <= 0) {
+    return undefined;
+  }
+
+  const lineValue = content[lineNumber + 1];
+  if (!lineValue.includes(' ') || !timeRegex(true).test(lineValue)) {
+    return undefined;
+  }
+
+  return lineValue.split(' ')[1];
+};
+
+const findPayDate = content =>
   content[findLineNumberByContent(content, 'Zahlbarkeitstag') + 1];
 
-export const findCompany = content =>
+const findCompany = content =>
   content[findLineNumberByContent(content, 'Stück') + 1];
 
-export const findShares = content =>
+const findShares = content =>
   parseGermanNum(
     content[findLineNumberByContent(content, 'Stück')].split(' ')[1]
   );
 
-export const findAmount = (content, findTotalAmount) => {
+const findAmount = (content, findTotalAmount) => {
   return formatNumber(
     content[
       findLineNumberByContent(
@@ -51,7 +72,7 @@ export const findAmount = (content, findTotalAmount) => {
   );
 };
 
-export const findPayoutAmount = content => {
+const findPayoutAmount = content => {
   let currentLineNumber = findLineNumberByContent(content, 'Ausschüttung');
 
   while (!content[currentLineNumber + 2].includes('EUR')) {
@@ -61,7 +82,7 @@ export const findPayoutAmount = content => {
   return formatNumber(content[currentLineNumber + 1]);
 };
 
-export const formatNumber = value => {
+const formatNumber = value => {
   if (value.endsWith('-')) {
     value = value.slice(0, -1);
   }
@@ -69,7 +90,7 @@ export const formatNumber = value => {
   return parseGermanNum(value);
 };
 
-export const findLineNumberByContent = (content, term) =>
+const findLineNumberByContent = (content, term) =>
   content.findIndex(line => line.includes(term));
 
 export const canParsePage = (content, extension) =>
@@ -79,8 +100,8 @@ export const canParsePage = (content, extension) =>
     isPageTypeSell(content) ||
     isPageTypeDividend(content));
 
-export const parsePage = content => {
-  let type, date, isin, company, shares, price, amount, fee, tax;
+const parsePage = content => {
+  let type, date, time, isin, company, shares, price, amount, fee, tax;
 
   if (isPageTypeBuy(content)) {
     const amountWithoutFees = Big(findAmount(content, false));
@@ -88,6 +109,7 @@ export const parsePage = content => {
     isin = findISIN(content);
     company = findCompany(content);
     date = findOrderDate(content);
+    time = findOrderTime(content);
     shares = findShares(content);
     amount = +amountWithoutFees;
     price = +amountWithoutFees.div(Big(shares));
@@ -99,6 +121,7 @@ export const parsePage = content => {
     isin = findISIN(content);
     company = findCompany(content, false);
     date = findOrderDate(content);
+    time = findOrderTime(content);
     shares = findShares(content, false);
     amount = +amountWithoutFees;
     price = +amountWithoutFees.div(Big(shares));
@@ -117,12 +140,21 @@ export const parsePage = content => {
     tax = +Big(amountWithoutTaxes).minus(findAmount(content, true));
   } else {
     console.error('Unknown page type for 1822direkt');
+    return undefined;
   }
+
+  const [parsedDate, parsedDateTime] = createActivityDateTime(
+    date,
+    time,
+    'dd.MM.yyyy',
+    'dd.MM.yyyy HH:mm:ss'
+  );
 
   return validateActivity({
     broker: '1822direkt',
     type,
-    date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
+    date: parsedDate,
+    datetime: parsedDateTime,
     isin,
     company,
     shares,
@@ -138,7 +170,12 @@ export const parsePages = contents => {
 
   for (let content of contents) {
     try {
-      activities.push(parsePage(content));
+      const activity = parsePage(content);
+      if (activity === undefined) {
+        continue;
+      }
+
+      activities.push(activity);
     } catch (exception) {
       console.error(
         'Error while parsing page (1822direkt)',

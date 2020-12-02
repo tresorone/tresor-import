@@ -9,6 +9,7 @@ describe('Helper functions', () => {
         broker: 'traderepublic',
         type: 'Sell',
         date: new Date(2000, 1, 1),
+        datetime: new Date(),
         isin: 'DETRESOR1042',
         company: 'Tresor 1 Inc.',
         shares: 42,
@@ -26,6 +27,7 @@ describe('Helper functions', () => {
         broker: 'traderepublic',
         type: 'Sell',
         date: new Date(2000, 1, 1),
+        datetime: new Date(),
         wkn: 'T10000',
         company: 'Tresor 1 Inc.',
         shares: 42,
@@ -43,6 +45,7 @@ describe('Helper functions', () => {
         broker: 'traderepublic',
         type: 'Sell',
         date: new Date(2000, 1, 1),
+        datetime: new Date(),
         isin: 'DETRESOR1042',
         wkn: 'T10000',
         company: 'Tresor 1 Inc.',
@@ -61,6 +64,7 @@ describe('Helper functions', () => {
         broker: 'traderepublic',
         type: 'Sell',
         date: new Date(2000, 1, 1),
+        datetime: new Date(),
         isin: 'DETRESOR1042',
         wkn: 'T10000',
         company: 'Tresor 1 Inc.',
@@ -79,6 +83,7 @@ describe('Helper functions', () => {
         broker: 'traderepublic',
         type: 'Sell',
         date: new Date(2000, 1, 1),
+        datetime: new Date(),
         isin: 'DETRESOR1042',
         wkn: 'T10000',
         company: 'Tresor 1 Inc.',
@@ -97,6 +102,7 @@ describe('Helper functions', () => {
         broker: undefined,
         type: 'Sell',
         date: new Date(2000, 1, 1),
+        datetime: new Date(),
         isin: 'DETRESOR1042',
         company: 'Tresor 1 Inc.',
         shares: 42,
@@ -118,6 +124,7 @@ describe('Helper functions', () => {
         broker: 'traderepublic',
         type: undefined,
         date: new Date(2000, 1, 1),
+        datetime: new Date(),
         isin: 'DETRESOR1042',
         company: 'Tresor 1 Inc.',
         shares: 42,
@@ -141,6 +148,7 @@ describe('Helper functions', () => {
         broker: 'comdirect',
         type: 'Sell',
         date: today.setDate(today.getDate() + 1),
+        datetime: new Date(),
         isin: 'DETRESOR1042',
         company: 'Tresor 1 Inc.',
         shares: 42,
@@ -152,16 +160,19 @@ describe('Helper functions', () => {
 
       expect(helper.validateActivity(activity)).toEqual(undefined);
       expect(console.error).toHaveBeenLastCalledWith(
-        'The activity for comdirect has to be in the past.',
+        'The activity date for comdirect has to be in the past.',
         activity
       );
     });
 
     test('Activity with a date older than 1990-01-01 should be invalid', () => {
+      var now = new Date();
+
       const activity = {
         broker: 'comdirect',
         type: 'Sell',
         date: new Date(1989, 12, 31),
+        datetime: now,
         isin: 'DETRESOR1042',
         company: 'Tresor 1 Inc.',
         shares: 42,
@@ -173,7 +184,53 @@ describe('Helper functions', () => {
 
       expect(helper.validateActivity(activity)).toEqual(undefined);
       expect(console.error).toHaveBeenLastCalledWith(
-        'The activity for comdirect is older than 1990-01-01.',
+        'The activity date for comdirect is older than 1990-01-01.',
+        activity
+      );
+    });
+
+    test('Activity with a datetime newer than today should be invalid', () => {
+      var today = new Date();
+
+      const activity = {
+        broker: 'comdirect',
+        type: 'Sell',
+        date: new Date(),
+        datetime: today.setDate(today.getDate() + 1),
+        isin: 'DETRESOR1042',
+        company: 'Tresor 1 Inc.',
+        shares: 42,
+        price: 42,
+        amount: 1764,
+        fee: 1,
+        tax: 0,
+      };
+
+      expect(helper.validateActivity(activity)).toEqual(undefined);
+      expect(console.error).toHaveBeenLastCalledWith(
+        'The activity datetime for comdirect has to be in the past.',
+        activity
+      );
+    });
+
+    test('Activity with a datetime older than 1990-01-01 should be invalid', () => {
+      const activity = {
+        broker: 'comdirect',
+        type: 'Sell',
+        date: new Date(),
+        datetime: new Date(1989, 1, 1),
+        isin: 'DETRESOR1042',
+        company: 'Tresor 1 Inc.',
+        shares: 42,
+        price: 42,
+        amount: 1764,
+        fee: 1,
+        tax: 0,
+      };
+
+      expect(helper.validateActivity(activity)).toEqual(undefined);
+      expect(console.error).toHaveBeenLastCalledWith(
+        'The activity datetime for comdirect is older than 1990-01-01.',
         activity
       );
     });
@@ -183,6 +240,7 @@ describe('Helper functions', () => {
         broker: 'comdirect',
         type: 'Sell',
         date: new Date(),
+        datetime: new Date(),
         isin: 'DETRESOR1042',
         company: 'Tresor 1 Inc.',
         shares: -42,
@@ -204,6 +262,7 @@ describe('Helper functions', () => {
         broker: 'comdirect',
         type: 'Sell',
         date: new Date(),
+        datetime: new Date(),
         isin: 'DETRESOR1042',
         company: 'Tresor 1 Inc.',
         shares: '42',
@@ -225,6 +284,7 @@ describe('Helper functions', () => {
         broker: 'comdirect',
         type: 'Sell',
         date: new Date(),
+        datetime: new Date(),
         isin: 'DETRESOR1042',
         company: 'Tresor 1 Inc.',
         shares: 42,
@@ -246,6 +306,7 @@ describe('Helper functions', () => {
         broker: 'comdirect',
         type: 'Sell',
         date: new Date(),
+        datetime: new Date(),
         isin: 'DETRESOR1042',
         company: 'Tresor 1 Inc.',
         shares: 42,
@@ -267,6 +328,7 @@ describe('Helper functions', () => {
         broker: 'comdirect',
         type: 'Sell',
         date: new Date(),
+        datetime: new Date(),
         isin: 'DETRESOR1042',
         company: 'Tresor 1 Inc.',
         shares: 42,
@@ -288,6 +350,7 @@ describe('Helper functions', () => {
         broker: 'comdirect',
         type: 'Sell',
         date: new Date(),
+        datetime: new Date(),
         isin: 'DETRESOR1042',
         company: 'Tresor 1 Inc.',
         shares: 42,
@@ -309,6 +372,7 @@ describe('Helper functions', () => {
         broker: 'comdirect',
         type: 'Dividend',
         date: new Date(),
+        datetime: new Date(),
         isin: 'DE123456789',
         company: 'Tresor 1 Inc.',
         shares: 42,
@@ -330,6 +394,7 @@ describe('Helper functions', () => {
         broker: 'comdirect',
         type: 'WaynTrain',
         date: new Date(),
+        datetime: new Date(),
         isin: 'DETRESOR1042',
         company: 'Tresor 1 Inc.',
         shares: 42,
@@ -351,6 +416,7 @@ describe('Helper functions', () => {
         broker: 'comdirect',
         type: 'Buy',
         date: new Date(),
+        datetime: new Date(),
         wkn: 'TRESOR1',
         company: 'Tresor 1 Inc.',
         shares: 42,
@@ -372,6 +438,7 @@ describe('Helper functions', () => {
         broker: 'comdirect',
         type: 'Buy',
         date: new Date(),
+        datetime: new Date(),
         shares: 42,
         price: 42,
         amount: 1764,
@@ -391,6 +458,7 @@ describe('Helper functions', () => {
         broker: 'comdirect',
         type: 'Buy',
         date: new Date(),
+        datetime: new Date(),
         shares: 42,
         price: 42,
         amount: 1764,
@@ -426,14 +494,19 @@ describe('Helper functions', () => {
   describe('Regex: isinRegex works as expected', () => {
     test('Matches for valid ISINs', () => {
       const validIsinValues = ['US0005141111', 'DE0005140008', 'GB0011140008'];
-      validIsinValues.forEach(
-        isin => expect(helper.isinRegex.test(isin)).toEqual(true)
+      validIsinValues.forEach(isin =>
+        expect(helper.isinRegex.test(isin)).toEqual(true)
       );
     });
     test('Does not match for invalid ISINs', () => {
-      const invalidIsinValues = ['XX023440008', '120005140008', '023456708GB', '0011140008'];
-      invalidIsinValues.forEach(
-        isin => expect(helper.isinRegex.test(isin)).toEqual(false)
+      const invalidIsinValues = [
+        'XX023440008',
+        '120005140008',
+        '023456708GB',
+        '0011140008',
+      ];
+      invalidIsinValues.forEach(isin =>
+        expect(helper.isinRegex.test(isin)).toEqual(false)
       );
     });
   });

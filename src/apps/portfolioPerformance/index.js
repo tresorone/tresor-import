@@ -1,7 +1,9 @@
-import format from 'date-fns/format';
 import Big from 'big.js';
-
-import { parseGermanNum, validateActivity } from '@/helper';
+import {
+  parseGermanNum,
+  validateActivity,
+  createActivityDateTime,
+} from '@/helper';
 import { detectLocale, getKeyMap, getTypeMap, keyNormalizer } from './utils';
 
 const activityNormalizer = typeKeyMap => activity => {
@@ -23,11 +25,19 @@ const activityNormalizer = typeKeyMap => activity => {
     {}
   );
 
+  const [parsedDate, parsedDateTime] = createActivityDateTime(
+    activity.date.substring(0, 10),
+    activity.date.substring(11, 16),
+    'yyyy-MM-dd',
+    'yyyy-MM-dd HH:mm'
+  );
+
   activity = {
     ...activity,
     type,
     ...normalizedNumericFields,
-    date: format(new Date(activity.date), 'yyyy-MM-dd'),
+    date: parsedDate,
+    datetime: parsedDateTime,
   };
 
   // The following fields can have empty or undefined values. All of these fields (with empty or undefined values) should

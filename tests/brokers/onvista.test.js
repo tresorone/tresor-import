@@ -54,6 +54,7 @@ describe('Broker: onvista', () => {
           broker: 'onvista',
           type: 'Buy',
           date: '2019-12-16',
+          datetime: '2019-12-16T08:04:00.000Z',
           isin: 'LU0635178014',
           company: 'ComSta.-MSCI Em.Mkts.TRN U.ETF Inhaber-Anteile I o.N.',
           shares: 6.9666,
@@ -73,6 +74,7 @@ describe('Broker: onvista', () => {
           broker: 'onvista',
           type: 'Buy',
           date: '2020-04-15',
+          datetime: '2020-04-15T07:04:00.000Z',
           isin: 'IE00B3RBWM25',
           company: 'Vanguard FTSE All-World U.ETF Registered Shares USD Dis.oN',
           shares: 13.9369,
@@ -92,6 +94,7 @@ describe('Broker: onvista', () => {
           broker: 'onvista',
           type: 'Buy',
           date: '2018-11-09',
+          datetime: '2018-11-09T09:35:00.000Z',
           isin: 'LU0392494562',
           company: 'ComStage-MSCI World TRN U.ETF Inhaber-Anteile I o.N.',
           shares: 19,
@@ -111,6 +114,7 @@ describe('Broker: onvista', () => {
           broker: 'onvista',
           type: 'Buy',
           date: '2010-02-18',
+          datetime: '2010-02-18T15:58:00.000Z',
           isin: 'DE0008430026',
           company: 'Münchener Rückvers.-Ges. AG vink.Namens-Aktien o.N.',
           shares: 13,
@@ -127,6 +131,7 @@ describe('Broker: onvista', () => {
         broker: 'onvista',
         type: 'Buy',
         date: '2019-12-27',
+        datetime: '2019-12-27T09:35:00.000Z',
         isin: 'IE00B3RBWM25',
         company: 'Vanguard FTSE All-World U.ETF Registered Shares USD Dis.oN',
         shares: 27,
@@ -144,6 +149,7 @@ describe('Broker: onvista', () => {
         broker: 'onvista',
         type: 'Sell',
         date: '2019-12-27',
+        datetime: '2019-12-27T09:28:00.000Z',
         isin: 'IE00B4L5Y983',
         company: 'iShsIII-Core MSCI World U.ETF Registered Shs USD (Acc) o.N.',
         shares: 38,
@@ -162,6 +168,7 @@ describe('Broker: onvista', () => {
           broker: 'onvista',
           type: 'Sell',
           date: '2020-02-27',
+          datetime: '2020-02-27T07:52:00.000Z',
           isin: 'CA0585861085',
           company: 'Ballard Power Systems Inc. Registered Shares o.N.',
           shares: 60,
@@ -174,6 +181,7 @@ describe('Broker: onvista', () => {
           broker: 'onvista',
           type: 'Sell',
           date: '2020-02-27',
+          datetime: '2020-02-27T11:42:00.000Z',
           isin: 'DE000A0F5UF5',
           company: 'iShare.NASDAQ-100 UCITS ETF DE Inhaber-Anteile',
           shares: 7,
@@ -186,6 +194,7 @@ describe('Broker: onvista', () => {
           broker: 'onvista',
           type: 'Sell',
           date: '2020-02-27',
+          datetime: '2020-02-27T11:43:00.000Z',
           isin: 'IE00B52VJ196',
           company: 'iShsII-MSCI Europe SRI U.ETF Registered Shs EUR (Acc) o.N.',
           shares: 10,
@@ -198,6 +207,7 @@ describe('Broker: onvista', () => {
           broker: 'onvista',
           type: 'Sell',
           date: '2020-02-27',
+          datetime: '2020-02-27T11:40:00.000Z',
           isin: 'NO0010081235',
           company: 'NEL ASA Navne-Aksjer NK -,20',
           shares: 500,
@@ -210,6 +220,7 @@ describe('Broker: onvista', () => {
           broker: 'onvista',
           type: 'Sell',
           date: '2020-02-27',
+          datetime: '2020-02-27T07:59:00.000Z',
           isin: 'SE0006425815',
           company: 'PowerCell Sweden AB (publ) Namn-Aktier SK-,022',
           shares: 95,
@@ -222,6 +233,7 @@ describe('Broker: onvista', () => {
           broker: 'onvista',
           type: 'Sell',
           date: '2020-02-27',
+          datetime: '2020-02-27T11:44:00.000Z',
           isin: 'US55087P1049',
           company: 'Lyft Inc. Registered Shares Cl.A o.N.',
           shares: 10,
@@ -239,6 +251,7 @@ describe('Broker: onvista', () => {
           broker: 'onvista',
           type: 'Sell',
           date: '2018-08-08',
+          datetime: '2018-08-08T10:03:00.000Z',
           isin: 'DE000A1TNUT7',
           company: 'Deutsche Beteiligungs AG Namens-Aktien o.N.',
           shares: 72,
@@ -256,6 +269,7 @@ describe('Broker: onvista', () => {
           broker: 'onvista',
           type: 'Sell',
           date: '2018-09-27',
+          datetime: '2018-09-27T07:42:00.000Z',
           isin: 'IE00B2NPKV68',
           company: 'iShsII-J.P.M.$ EM Bond U.ETF Registered Shares o.N.',
           shares: 57,
@@ -274,6 +288,7 @@ describe('Broker: onvista', () => {
         broker: 'onvista',
         type: 'Sell',
         date: '2018-11-27',
+        datetime: '2018-11-27T16:22:00.000Z',
         isin: 'DE0007480204',
         company: 'Deutsche EuroShop AG Namens-Aktien o.N.',
         shares: 84,
@@ -287,13 +302,14 @@ describe('Broker: onvista', () => {
 
   describe('Dividend', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const result = onvista.parsePages(dividendsSamples[0]);
+      const activities = onvista.parsePages(dividendsSamples[0]).activities;
 
-      expect(result.activities).toEqual([
+      expect(activities).toEqual([
         {
           broker: 'onvista',
           type: 'Dividend',
           date: '2020-04-08',
+          datetime: '2020-04-08T' + activities[0].datetime.substring(11),
           isin: 'IE00B3RBWM25',
           company: 'Vanguard FTSE All-World U.ETF Registered Shares USD Dis.oN',
           shares: 222.9756,
@@ -306,13 +322,14 @@ describe('Broker: onvista', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const result = onvista.parsePages(dividendsSamples[1]);
+      const activities = onvista.parsePages(dividendsSamples[1]).activities;
 
-      expect(result.activities).toEqual([
+      expect(activities).toEqual([
         {
           broker: 'onvista',
           type: 'Dividend',
           date: '2019-09-16',
+          datetime: '2019-09-16T' + activities[0].datetime.substring(11),
           isin: 'DE000A0F5UF5',
           company: 'iShare.NASDAQ-100 UCITS ETF DE Inhaber-Anteile',
           shares: 4.9438,
@@ -325,13 +342,14 @@ describe('Broker: onvista', () => {
     });
 
     test('should map pdf data of sample 3 correctly', () => {
-      const result = onvista.parsePages(dividendsSamples[2]);
+      const activities = onvista.parsePages(dividendsSamples[2]).activities;
 
-      expect(result.activities).toEqual([
+      expect(activities).toEqual([
         {
           broker: 'onvista',
           type: 'Dividend',
           date: '2019-08-22',
+          datetime: '2019-08-22T' + activities[0].datetime.substring(11),
           isin: 'LU0635178014',
           company: 'ComSta.-MSCI Em.Mkts.TRN U.ETF Inhaber-Anteile I o.N.',
           shares: 55.7157,
@@ -344,11 +362,14 @@ describe('Broker: onvista', () => {
     });
 
     test('should map pdf data of sample 4 correctly', () => {
-      expect(onvista.parsePages(dividendsSamples[3]).activities).toEqual([
+      const activities = onvista.parsePages(dividendsSamples[3]).activities;
+
+      expect(activities).toEqual([
         {
           broker: 'onvista',
           type: 'Dividend',
           date: '2019-10-15',
+          datetime: '2019-10-15T' + activities[0].datetime.substring(11),
           isin: 'DE0002635281',
           company: 'iSh.EO ST.Sel.Div.30 U.ETF DE Inhaber-Anteile',
           shares: 245.3939,
@@ -361,6 +382,7 @@ describe('Broker: onvista', () => {
           broker: 'onvista',
           type: 'Dividend',
           date: '2019-10-15',
+          datetime: '2019-10-15T' + activities[0].datetime.substring(11),
           isin: 'DE0002635299',
           company: 'iSh.ST.Eur.Sel.Div.30 U.ETF DE Inhaber-Anteile',
           shares: 270.787,
@@ -368,6 +390,26 @@ describe('Broker: onvista', () => {
           amount: 34.23,
           fee: 0,
           tax: 6.32,
+        },
+      ]);
+    });
+
+    test('Can map the dividend file correctly: 2019_MetLife', () => {
+      const activities = onvista.parsePages(dividendsSamples[4]).activities;
+
+      expect(activities).toEqual([
+        {
+          broker: 'onvista',
+          type: 'Dividend',
+          date: '2019-06-13',
+          datetime: '2019-06-13T' + activities[0].datetime.substring(11),
+          isin: 'US59156R1086',
+          company: 'MetLife Inc. Registered Shares DL -,01',
+          shares: 6,
+          price: 0.38666666666666666,
+          amount: 2.32,
+          fee: 0,
+          tax: 0.38,
         },
       ]);
     });
@@ -383,7 +425,8 @@ describe('Broker: onvista', () => {
         {
           broker: 'onvista',
           type: 'TransferIn',
-          date: '2020-10-11',
+          date: '2020-10-09',
+          datetime: '2020-10-09T17:50:24.000Z',
           isin: 'US88579Y1010',
           company: '3M RG',
           shares: 3,
@@ -393,7 +436,8 @@ describe('Broker: onvista', () => {
         {
           broker: 'onvista',
           type: 'TransferIn',
-          date: '2020-10-11',
+          date: '2020-10-09',
+          datetime: '2020-10-09T14:00:49.000Z',
           isin: 'KYG017191142',
           company: 'ALIBABA GRP RG',
           shares: 30,
@@ -404,7 +448,8 @@ describe('Broker: onvista', () => {
       expect(activities[activities.length - 1]).toEqual({
         broker: 'onvista',
         type: 'TransferIn',
-        date: '2020-10-11',
+        date: '2020-10-09',
+        datetime: '2020-10-09T19:55:19.000Z',
         isin: 'IE00B1FZS467',
         company: 'ISHS GLB INFRA USD',
         shares: 4.1283,

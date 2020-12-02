@@ -1,7 +1,9 @@
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
 import Big from 'big.js';
-import { parseGermanNum, validateActivity } from '@/helper';
+import {
+  parseGermanNum,
+  validateActivity,
+  createActivityDateTime,
+} from '@/helper';
 
 const parseShare = shareString => {
   try {
@@ -31,32 +33,48 @@ const parseNumberBeforeSpace = input => {
 };
 
 function parseBaseAction(pdfArray, pdfOffset, actionType) {
+  let foreignCurrencyOffset = 0;
+  // In this case there is a foreign currency involved and the amount will be
+  // at another offset
+  const [parsedDate, parsedDateTime] = createActivityDateTime(
+    pdfArray[pdfOffset + 6],
+    undefined
+  );
+
   const activity = {
     broker: 'ebase',
     type: actionType,
-    date: format(
-      parse(pdfArray[pdfOffset + 6], 'dd.MM.yyyy', new Date()),
-      'yyyy-MM-dd'
-    ),
+    date: parsedDate,
+    datetime: parsedDateTime,
     isin: pdfArray[pdfOffset + 2],
     company: pdfArray[pdfOffset + 1],
     shares: parseShare(pdfArray[pdfOffset + 4]),
-    price: parseNumberBeforeSpace(pdfArray[pdfOffset + 5]),
-    amount: parseNumberBeforeSpace(pdfArray[pdfOffset + 7]),
     tax: 0,
     fee: 0,
   };
+
+  activity.price = parseNumberBeforeSpace(pdfArray[pdfOffset + 5]);
+  if (pdfArray[pdfOffset + 8].includes('/')) {
+    foreignCurrencyOffset = 2;
+    activity.fxRate = parseGermanNum(pdfArray[pdfOffset + 7]);
+    activity.foreignCurrency = pdfArray[pdfOffset + 8].split('/')[1];
+    activity.price = +Big(activity.price).div(activity.fxRate);
+  }
+  activity.amount = parseNumberBeforeSpace(
+    pdfArray[pdfOffset + 7 + foreignCurrencyOffset]
+  );
+
   return validateActivity(activity);
 }
 
-export const parseData = pdfPages => {
+const parseData = pdfPages => {
   // Action can be: Fondsertrag (Ausschüttung), Ansparplan, Wiederanlage Fondsertrag, Entgelt Verkauf
   let actions = [];
   for (const pdfPage of pdfPages) {
     let i = 0;
 
     while (i <= pdfPage.length) {
-      if (pdfPage[i] === 'Ansparplan') {
+      if (pdfPage[i] === 'Ansparplan' || pdfPage[i] === 'Kauf') {
         const action = parseBaseAction(pdfPage, i, 'Buy');
         if (action === undefined) {
           return undefined;
@@ -101,7 +119,8 @@ export const parseData = pdfPages => {
 
 export const canParsePage = (content, extension) =>
   extension === 'pdf' &&
-  content.some(line => line.includes('ebase Depot')) &&
+  (content.some(line => line.includes('ebase Depot')) ||
+    content.some(line => line.includes('finvesto Depot'))) &&
   content.some(line => line.includes('Fondsertrag / Vorabpauschale'));
 
 export const parsePages = contents => {

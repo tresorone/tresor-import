@@ -41,13 +41,14 @@ describe('Broker: ING', () => {
 
   describe('Buy', () => {
     test('Test if buy1 is mapped correctly', () => {
-      const result = ing.parsePages(buySamples[0]);
+      const activities = ing.parsePages(buySamples[0]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Buy',
         date: '2020-03-03',
+        datetime: '2020-03-03T16:22:22.000Z',
         isin: 'US5949181045',
         company: 'Microsoft Corp.',
         shares: 10,
@@ -59,13 +60,14 @@ describe('Broker: ING', () => {
     });
 
     test('Test if buy2 is mapped correctly', () => {
-      const result = ing.parsePages(buySamples[1]);
+      const activities = ing.parsePages(buySamples[1]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Buy',
         date: '2017-01-10',
+        datetime: '2017-01-10T18:54:00.000Z',
         isin: 'US0846707026',
         company: 'Berkshire Hathaway Inc.',
         shares: 5,
@@ -77,13 +79,14 @@ describe('Broker: ING', () => {
     });
 
     test('Test if provision-free buy is mapped correctly', () => {
-      const result = ing.parsePages(buySamples[2]);
+      const activities = ing.parsePages(buySamples[2]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Buy',
         date: '2016-01-22',
+        datetime: '2016-01-22T16:47:56.000Z',
         isin: 'US64110L1061',
         company: 'Netflix Inc.',
         shares: 11,
@@ -95,13 +98,14 @@ describe('Broker: ING', () => {
     });
 
     test('Test if investment plan is mapped correctly', () => {
-      const result = ing.parsePages(buySamples[3]);
+      const activities = ing.parsePages(buySamples[3]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Buy',
         date: '2019-04-15',
+        datetime: '2019-04-15T07:04:16.000Z',
         isin: 'LU0274208692',
         company: 'Xtrackers MSCI World Swap',
         shares: 4.51124,
@@ -115,13 +119,14 @@ describe('Broker: ING', () => {
 
   describe('Sell', () => {
     test('Test if sell1 is mapped correctly', () => {
-      const result = ing.parsePages(sellSamples[0]);
+      const activities = ing.parsePages(sellSamples[0]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Sell',
         date: '2020-01-14',
+        datetime: '2020-01-14T08:03:52.000Z',
         isin: 'FR0010790980',
         company: 'Amundi ETF STOXX Europe 50',
         shares: 8,
@@ -133,13 +138,14 @@ describe('Broker: ING', () => {
     });
 
     test('Test if sell2 is mapped correctly', () => {
-      const result = ing.parsePages(sellSamples[1]);
+      const activities = ing.parsePages(sellSamples[1]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Sell',
         date: '2019-03-06',
+        datetime: '2019-03-06T16:21:18.000Z',
         isin: 'US0079031078',
         company: 'Advanced Micro Devices Inc.',
         shares: 20,
@@ -151,13 +157,14 @@ describe('Broker: ING', () => {
     });
 
     test('Test if sell with taxes is mapped correctly', () => {
-      const result = ing.parsePages(sellSamples[2]);
+      const activities = ing.parsePages(sellSamples[2]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Sell',
         date: '2020-07-21',
+        datetime: '2020-07-21T13:59:31.000Z',
         isin: 'US09075V1026',
         company: 'BioNTech SE Nam.-Akt.(sp.ADRs)1/o.N.',
         shares: 100,
@@ -171,13 +178,14 @@ describe('Broker: ING', () => {
 
   describe('Dividend', () => {
     test('Test if dividend1 is mapped correctly', () => {
-      const result = ing.parsePages(dividendsSamples[0]);
+      const activities = ing.parsePages(dividendsSamples[0]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Dividend',
         date: '2020-03-12',
+        datetime: '2020-03-12T' + activities[0].datetime.substring(11),
         isin: 'US5949181045',
         company: 'Microsoft Corp.',
         shares: 32,
@@ -189,13 +197,14 @@ describe('Broker: ING', () => {
     });
 
     test('Test if dividend2 is mapped correctly', () => {
-      const result = ing.parsePages(dividendsSamples[1]);
+      const activities = ing.parsePages(dividendsSamples[1]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Dividend',
         date: '2020-03-18',
+        datetime: '2020-03-18T' + activities[0].datetime.substring(11),
         isin: 'NL0000388619',
         company: 'Unilever N.V.',
         shares: 8,
@@ -207,13 +216,14 @@ describe('Broker: ING', () => {
     });
 
     test('Test if dividend3 is mapped correctly', () => {
-      const result = ing.parsePages(dividendsSamples[2]);
+      const activities = ing.parsePages(dividendsSamples[2]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Dividend',
         date: '2020-05-04',
+        datetime: '2020-05-04T' + activities[0].datetime.substring(11),
         isin: 'IE00BZ163G84',
         company: 'Vanguard EUR Corp.Bond U.ETF',
         shares: 29,
@@ -225,13 +235,14 @@ describe('Broker: ING', () => {
     });
 
     test('Test if dividend4 is mapped correctly', () => {
-      const result = ing.parsePages(dividendsSamples[3]);
+      const activities = ing.parsePages(dividendsSamples[3]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Dividend',
         date: '2020-04-15',
+        datetime: '2020-04-15T' + activities[0].datetime.substring(11),
         isin: 'DE000A0F5UH1',
         company: 'iSh.ST.Gl.Sel.Div.100 U.ETF DE',
         shares: 34,
@@ -243,13 +254,14 @@ describe('Broker: ING', () => {
     });
 
     test('Test if dividend5 is mapped correctly', () => {
-      const result = ing.parsePages(dividendsSamples[4]);
+      const activities = ing.parsePages(dividendsSamples[4]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Dividend',
         date: '2020-04-08',
+        datetime: '2020-04-08T' + activities[0].datetime.substring(11),
         isin: 'IE00B3RBWM25',
         company: 'Vanguard FTSE All-World U.ETF',
         shares: 270,
@@ -261,13 +273,14 @@ describe('Broker: ING', () => {
     });
 
     test('Test if dividend_etf is mapped correctly', () => {
-      const result = ing.parsePages(dividendsSamples[5]);
+      const activities = ing.parsePages(dividendsSamples[5]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Dividend',
         date: '2018-08-23',
+        datetime: '2018-08-23T' + activities[0].datetime.substring(11),
         isin: 'LU0392494562',
         company: 'ComStage-MSCI World TRN U.ETF',
         shares: 12,
@@ -279,13 +292,14 @@ describe('Broker: ING', () => {
     });
 
     test('Test if dividend with taxes from a ETF is mapped correctly', () => {
-      const activity = ing.parsePages(dividendsSamples[6]).activities;
+      const activities = ing.parsePages(dividendsSamples[6]).activities;
 
-      expect(activity.length).toEqual(1);
-      expect(activity[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Dividend',
         date: '2020-09-15',
+        datetime: '2020-09-15T' + activities[0].datetime.substring(11),
         isin: 'DE0006289382',
         company: 'iSh.DJ Glob.Titans 50 U.ETF DE',
         shares: 53,
@@ -297,13 +311,14 @@ describe('Broker: ING', () => {
     });
 
     test('Test if dividend with taxes from a stock is mapped correctly', () => {
-      const activity = ing.parsePages(dividendsSamples[7]).activities;
+      const activities = ing.parsePages(dividendsSamples[7]).activities;
 
-      expect(activity.length).toEqual(1);
-      expect(activity[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'ing',
         type: 'Dividend',
         date: '2020-09-18',
+        datetime: '2020-09-18T' + activities[0].datetime.substring(11),
         isin: 'US94106L1098',
         company: 'Waste Management Inc. (Del.)',
         shares: 6,

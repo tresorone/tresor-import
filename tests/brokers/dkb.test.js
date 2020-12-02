@@ -28,12 +28,13 @@ describe('DKB broker', () => {
 
   describe('Buy', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const result = dkb.parsePages(buySamples[0]);
+      const activities = dkb.parsePages(buySamples[0]).activities;
 
-      expect(result.activities[0]).toEqual({
+      expect(activities[0]).toEqual({
         broker: 'dkb',
         type: 'Buy',
         date: '2019-01-25',
+        datetime: '2019-01-25T20:34:28.000Z',
         isin: 'US0378331005',
         company: 'APPLE INC.',
         shares: 36,
@@ -45,12 +46,13 @@ describe('DKB broker', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const result = dkb.parsePages(buySamples[1]);
+      const activities = dkb.parsePages(buySamples[1]).activities;
 
-      expect(result.activities[0]).toEqual({
+      expect(activities[0]).toEqual({
         broker: 'dkb',
         type: 'Buy',
         date: '2016-10-10',
+        datetime: '2016-10-10T06:00:02.000Z',
         isin: 'US88160R1014',
         company: 'TESLA MOTORS INC.',
         shares: 1,
@@ -62,12 +64,13 @@ describe('DKB broker', () => {
     });
 
     test('should map pdf data of sample 3 correctly', () => {
-      const result = dkb.parsePages(buySamples[2]);
+      const activities = dkb.parsePages(buySamples[2]).activities;
 
-      expect(result.activities[0]).toEqual({
+      expect(activities[0]).toEqual({
         broker: 'dkb',
         type: 'Buy',
         date: '2016-10-18',
+        datetime: '2016-10-18T' + activities[0].datetime.substring(11),
         isin: 'LU0302296495',
         company: 'DNB FD-DNB TECHNOLOGY',
         shares: 0.7419,
@@ -81,12 +84,13 @@ describe('DKB broker', () => {
 
   describe('Sell', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const result = dkb.parsePages(sellSamples[0]);
+      const activities = dkb.parsePages(sellSamples[0]).activities;
 
-      expect(result.activities[0]).toEqual({
+      expect(activities[0]).toEqual({
         broker: 'dkb',
         type: 'Sell',
         date: '2020-01-27',
+        datetime: '2020-01-27T07:00:01.000Z',
         isin: 'LU1861132840',
         company: 'AIS - AMUNDI STOXX GL.ART.INT.',
         shares: 36,
@@ -98,12 +102,13 @@ describe('DKB broker', () => {
     });
 
     test('Can parse invesco_msci_world buy action', () => {
-      const result = dkb.parsePages(sellSamples[1]);
+      const activities = dkb.parsePages(sellSamples[1]).activities;
 
-      expect(result.activities[0]).toEqual({
+      expect(activities[0]).toEqual({
         broker: 'dkb',
         type: 'Sell',
         date: '2020-09-10',
+        datetime: '2020-09-10T13:39:56.000Z',
         isin: 'IE00B60SX394',
         company: 'I.M.-I.MSCI WORLD UETF',
         shares: 92,
@@ -115,12 +120,13 @@ describe('DKB broker', () => {
     });
 
     test('Can parse IE00B4L5Y983 regular buys', () => {
-      const result = dkb.parsePages(sellSamples[2]);
+      const activities = dkb.parsePages(sellSamples[2]).activities;
 
-      expect(result.activities[0]).toEqual({
+      expect(activities[0]).toEqual({
         broker: 'dkb',
         type: 'Sell',
         date: '2020-10-14',
+        datetime: '2020-10-14T07:04:03.000Z',
         isin: 'IE00B4L5Y983',
         company: 'ISHSIII-CORE MSCI WORLD U.ETF',
         shares: 60,
@@ -130,16 +136,35 @@ describe('DKB broker', () => {
         tax: 0,
       });
     });
+
+    test('Can parse a redemption of ETF fragments', () => {
+      const activities = dkb.parsePages(sellSamples[3]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Sell',
+        date: '2020-10-28',
+        datetime: '2020-10-28T' + activities[0].datetime.substring(11),
+        isin: 'IE00B3RBWM25',
+        company: 'VANGUARD FTSE ALL-WORLD U.ETF',
+        shares: 0.3807,
+        price: 78.82,
+        amount: 30.01,
+        fee: 0,
+        tax: 0.37,
+      });
+    });
   });
 
   describe('Dividend', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const result = dkb.parsePages(dividendsSamples[0]);
+      const activities = dkb.parsePages(dividendsSamples[0]).activities;
 
-      expect(result.activities[0]).toEqual({
+      expect(activities[0]).toEqual({
         broker: 'dkb',
         type: 'Dividend',
         date: '2020-02-13',
+        datetime: '2020-02-13T' + activities[0].datetime.substring(11),
         isin: 'US0378331005',
         company: 'APPLE INC.',
         shares: 36,
@@ -151,12 +176,13 @@ describe('DKB broker', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const result = dkb.parsePages(dividendsSamples[1]);
+      const activities = dkb.parsePages(dividendsSamples[1]).activities;
 
-      expect(result.activities[0]).toEqual({
+      expect(activities[0]).toEqual({
         broker: 'dkb',
         type: 'Dividend',
         date: '2016-03-10',
+        datetime: '2016-03-10T' + activities[0].datetime.substring(11),
         isin: 'US5949181045',
         company: 'MICROSOFT CORP.',
         shares: 5,
@@ -167,12 +193,13 @@ describe('DKB broker', () => {
       });
     });
     test('should map pdf data of sample 3 correctly', () => {
-      const result = dkb.parsePages(dividendsSamples[2]);
+      const activities = dkb.parsePages(dividendsSamples[2]).activities;
 
-      expect(result.activities[0]).toEqual({
+      expect(activities[0]).toEqual({
         broker: 'dkb',
         type: 'Dividend',
         date: '2020-04-08',
+        datetime: '2020-04-08T' + activities[0].datetime.substring(11),
         isin: 'IE00B3RBWM25',
         company: 'VANGUARD FTSE ALL-WORLD U.ETF',
         shares: 12,
@@ -183,12 +210,13 @@ describe('DKB broker', () => {
       });
     });
     test('should map pdf data of sample 4 correctly', () => {
-      const result = dkb.parsePages(dividendsSamples[3]);
+      const activities = dkb.parsePages(dividendsSamples[3]).activities;
 
-      expect(result.activities[0]).toEqual({
+      expect(activities[0]).toEqual({
         broker: 'dkb',
         type: 'Dividend',
         date: '2020-04-08',
+        datetime: '2020-04-08T' + activities[0].datetime.substring(11),
         isin: 'IE00B3RBWM25',
         company: 'VANGUARD FTSE ALL-WORLD U.ETF',
         shares: 12,

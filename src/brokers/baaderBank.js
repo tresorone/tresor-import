@@ -1,8 +1,10 @@
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
 import Big from 'big.js';
-
-import { parseGermanNum, validateActivity } from '@/helper';
+import {
+  parseGermanNum,
+  validateActivity,
+  createActivityDateTime,
+  timeRegex,
+} from '@/helper';
 
 const isPageTypeBuy = content =>
   content.some(line => line.includes('Wertpapierabrechnung: Kauf'));
@@ -21,8 +23,10 @@ const isBrokerGratisbroker = content =>
   content.some(line => line.includes('GRATISBROKER GmbH'));
 
 const isBrokerScalableCapital = content =>
-  content.some(line =>
-    line.includes('Scalable Capital Vermögensverwaltung GmbH')
+  content.some(
+    line =>
+      line.includes('Scalable Capital Vermögensverwaltung GmbH') ||
+      content.some(line => line.includes('Scalable Capital Vermögensverw.GmbH'))
   );
 
 const isBrokerOskar = content =>
@@ -45,6 +49,34 @@ const findOrderDate = content => {
 
   // For a saving plan, the order date is on another location
   return content[findLineNumberByContent(content, 'Handelsdatum') + 2];
+};
+
+const findOrderTime = content => {
+  // Extract the time after the line with order time which contains "06:24:26:12". The
+  // time must match the format `HH:mm:ss`.
+  let orderTime =
+    content[
+      findLineNumberByCurrentAndPreviousLineContent(
+        content,
+        'Handels-',
+        'uhrzeit'
+      ) + 4
+    ];
+
+  if (orderTime !== undefined && timeRegex(true).test(orderTime)) {
+    // The document is a normal market order
+    return orderTime.substring(0, 8);
+  }
+
+  // For a saving plan, the order date is on another location
+  orderTime = content[findLineNumberByContent(content, 'Handelsuhrzeit') + 2];
+
+  if (orderTime !== undefined && timeRegex(true).test(orderTime)) {
+    // The document is a normal market order
+    return orderTime.substring(0, 8);
+  }
+
+  return undefined;
 };
 
 const findPayDate = content => {
@@ -81,10 +113,23 @@ const findLineNumberByCurrentAndPreviousLineContent = (
 
 const findISIN = content => findByStartingTerm(content, 'ISIN: ');
 
-const findCompany = (content, isDividend) =>
-  isDividend
-    ? content[findLineNumberByContent(content, 'p.STK') + 1]
-    : content[findLineNumberByContent(content, 'Auftragszeit:') + 5];
+const findCompany = (content, isDividend) => {
+  let startLineNumber = undefined;
+  let endLineNumber = undefined;
+  if (isDividend) {
+    startLineNumber = findLineNumberByContent(content, 'p.STK') + 1;
+    endLineNumber = findLineNumberByContent(content, 'Zahlungszeitraum:') - 1;
+  } else {
+    startLineNumber = findLineNumberByContent(content, 'Auftragszeit:') + 5;
+    endLineNumber = findLineNumberByContent(content, 'Orderroutingssystem') - 2;
+  }
+
+  if (startLineNumber + 1 <= endLineNumber) {
+    return content[startLineNumber] + ' ' + content[startLineNumber + 1];
+  }
+
+  return content[startLineNumber];
+};
 
 const findShares = (content, isDividend) => {
   const line = isDividend
@@ -193,13 +238,14 @@ export const canParsePage = (content, extension) =>
     isPageTypeDividend(content));
 
 const parsePage = content => {
-  let type, date, isin, company, shares, price, amount, fee, tax;
+  let type, date, time, isin, company, shares, price, amount, fee, tax;
 
   if (isPageTypeBuy(content)) {
     type = 'Buy';
     isin = findISIN(content);
     company = findCompany(content, false);
     date = findOrderDate(content);
+    time = findOrderTime(content);
     shares = findShares(content, false);
     amount = findAmount(content, 'Buy');
     price = findPricePerShare(content, false);
@@ -210,6 +256,7 @@ const parsePage = content => {
     isin = findISIN(content);
     company = findCompany(content, false);
     date = findOrderDate(content);
+    time = findOrderTime(content);
     shares = findShares(content, false);
     amount = findAmount(content, 'Sell');
     price = findPricePerShare(content, false);
@@ -236,10 +283,18 @@ const parsePage = content => {
     broker = 'oskar';
   }
 
+  const [parsedDate, parsedDateTime] = createActivityDateTime(
+    date,
+    time,
+    'dd.MM.yyyy',
+    'dd.MM.yyyy HH:mm:ss'
+  );
+
   return validateActivity({
     broker,
     type,
-    date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
+    date: parsedDate,
+    datetime: parsedDateTime,
     isin,
     company,
     shares,
