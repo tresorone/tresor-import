@@ -359,7 +359,7 @@ describe('Broker: ebase', () => {
         shares: 0.635652,
         price: 62.80016970725499,
         amount: 40.0,
-        fxRate: 1.178500,
+        fxRate: 1.1785,
         foreignCurrency: 'USD',
         tax: 0.0,
         fee: 0.0,
@@ -402,7 +402,7 @@ describe('Broker: ebase', () => {
         shares: 0.671205,
         price: 59.474260679079954,
         amount: 40,
-        fxRate: 1.186900,
+        fxRate: 1.1869,
         foreignCurrency: 'USD',
         tax: 0.0,
         fee: 0.0,
@@ -417,13 +417,12 @@ describe('Broker: ebase', () => {
         shares: 0.515934,
         price: 59.92898808014203,
         amount: 30.98,
-        fxRate: 1.182900,
+        fxRate: 1.1829,
         foreignCurrency: 'USD',
         tax: 0.0,
         fee: 0.0,
       });
     });
-
   });
 
   beforeEach(() => {

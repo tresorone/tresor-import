@@ -37,14 +37,13 @@ const isBuy = txString => {
     txString === 'Ansparplan' ||
     txString === 'Kauf' ||
     txString === 'Wiederanlage Fondsertrag' ||
-    txString === 'Fondsumschichtung (Zugang)');
-}
+    txString === 'Fondsumschichtung (Zugang)'
+  );
+};
 
 const isSell = txString => {
-  return (
-    txString === 'Entgelt Verkauf' ||
-    txString === 'Verkauf');
-}
+  return txString === 'Entgelt Verkauf' || txString === 'Verkauf';
+};
 
 function parseBaseAction(pdfArray, pdfOffset, actionType) {
   let foreignCurrencyOffset = 0;
