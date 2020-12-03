@@ -32,6 +32,20 @@ const parseNumberBeforeSpace = input => {
   }
 };
 
+const isBuy = txString => {
+  return (
+    txString === 'Ansparplan' ||
+    txString === 'Kauf' ||
+    txString === 'Wiederanlage Fondsertrag' ||
+    txString === 'Fondsumschichtung (Zugang)');
+}
+
+const isSell = txString => {
+  return (
+    txString === 'Entgelt Verkauf' ||
+    txString === 'Verkauf');
+}
+
 function parseBaseAction(pdfArray, pdfOffset, actionType) {
   let foreignCurrencyOffset = 0;
   // In this case there is a foreign currency involved and the amount will be
@@ -52,7 +66,7 @@ function parseBaseAction(pdfArray, pdfOffset, actionType) {
     tax: 0,
     fee: 0,
   };
-  console.log
+  console.log;
   activity.price = parseNumberBeforeSpace(pdfArray[pdfOffset + 5]);
   if (pdfArray[pdfOffset + 8].includes('/')) {
     foreignCurrencyOffset = 2;
@@ -74,31 +88,24 @@ const parseData = pdfPages => {
     let i = 0;
 
     while (i <= pdfPage.length) {
-      if (pdfPage[i] === 'Ansparplan' || pdfPage[i] === 'Kauf' || pdfPage[i] === 'Wiederanlage Fondsertrag') {
+      if (isBuy(pdfPage[i])) {
         const action = parseBaseAction(pdfPage, i, 'Buy');
         if (action === undefined) {
           return undefined;
         }
         actions.push(action);
-        // An 'Ansparplan'/'Wiederanlage Fondsertrag' entry occupies 7 array entries.
+        // Any buy transaction entry occupies at least 7 array entries.
         i += 6;
       } else if (pdfPage[i] === 'Fondsertrag (Ausschüttung)') {
         // This was always blank in the example files I had -> So no parsing could be done.
         i += 3;
-      } else if (pdfPage[i] === 'Entgelt Verkauf') {
+      } else if (isSell(pdfPage[i])) {
         const action = parseBaseAction(pdfPage, i, 'Sell');
         if (action === undefined) {
           return undefined;
-        } // An 'Entgelt Verkauf' entry occupies 9 array entries.
+        } // An Sell operations occupy 9 array entries.
         actions.push(action);
         i += 8;
-      } else if (pdfPage[i] === 'Verkauf') {
-        const action = parseBaseAction(pdfPage, i, 'Sell');
-        if (action === undefined) {
-          return undefined;
-        }
-        actions.push(action);
-        i += 8; // A basic 'Verkauf' entry occupies 9 array entries in total
       } else if (pdfPage[i] === 'Vorabpauschale') {
         // This was always blank in the example files I had -> So no parsing could be done.
         i += 3;

@@ -193,7 +193,7 @@ describe('Broker: ebase', () => {
         isin: 'FR0010527275',
         company: 'LYXOR World Water (DR) UCITS ETF - Dist',
         shares: 0.924609,
-        price: 43.18 ,
+        price: 43.18,
         amount: 40.0,
         tax: 0.0,
         fee: 0.0,
@@ -219,7 +219,7 @@ describe('Broker: ebase', () => {
         isin: 'FR0010527275',
         company: 'LYXOR World Water (DR) UCITS ETF - Dist',
         shares: 0.889077,
-        price: 44.90  ,
+        price: 44.9,
         amount: 40.0,
         tax: 0.0,
         fee: 0.0,
@@ -292,7 +292,7 @@ describe('Broker: ebase', () => {
   });
 
   describe('Mixed Sells, buys and everything in between', () => {
-    test('Can parse multiple sell orders from a ebase file', () => {
+    test('Can parse an ebase multi-page pdf with mixed transactions', () => {
       const activities = ebase.parsePages(mixedSamples[0]).activities;
       expect(activities.length).toEqual(327);
       expect(activities[11]).toEqual({
@@ -345,6 +345,85 @@ describe('Broker: ebase', () => {
         foreignCurrency: 'USD',
       });
     });
+
+    test('Can parse an ebase single-page pdf with mixed transactions', () => {
+      const activities = ebase.parsePages(mixedSamples[2]).activities;
+      expect(activities.length).toEqual(5);
+      expect(activities[0]).toEqual({
+        broker: 'ebase',
+        type: 'Buy',
+        date: '2020-11-12',
+        datetime: '2020-11-12T' + activities[0].datetime.substring(11),
+        isin: 'IE00BKX55T58',
+        company: 'Vanguard FTSE Developed World UCITS ETF',
+        shares: 0.635652,
+        price: 62.80016970725499,
+        amount: 40.0,
+        fxRate: 1.178500,
+        foreignCurrency: 'USD',
+        tax: 0.0,
+        fee: 0.0,
+      });
+      expect(activities[1]).toEqual({
+        broker: 'ebase',
+        type: 'Buy',
+        date: '2020-10-14',
+        datetime: '2020-10-14T' + activities[1].datetime.substring(11),
+        isin: 'IE00BKX55T58',
+        company: 'Vanguard FTSE Developed World UCITS ETF',
+        shares: 0.644632,
+        price: 61.926762491444215,
+        amount: 40.0,
+        fxRate: 1.1688,
+        foreignCurrency: 'USD',
+        tax: 0.0,
+        fee: 0.0,
+      });
+      expect(activities[2]).toEqual({
+        broker: 'ebase',
+        type: 'Buy',
+        date: '2020-10-09',
+        datetime: '2020-10-09T' + activities[2].datetime.substring(11),
+        isin: 'IE00BKX55T58',
+        company: 'Vanguard FTSE Developed World UCITS ETF',
+        shares: 0.039737,
+        price: 71.47,
+        amount: 2.84,
+        tax: 0.0,
+        fee: 0.0,
+      });
+      expect(activities[3]).toEqual({
+        broker: 'ebase',
+        type: 'Buy',
+        date: '2020-09-14',
+        datetime: '2020-09-14T' + activities[3].datetime.substring(11),
+        isin: 'IE00BKX55T58',
+        company: 'Vanguard FTSE Developed World UCITS ETF',
+        shares: 0.671205,
+        price: 59.474260679079954,
+        amount: 40,
+        fxRate: 1.186900,
+        foreignCurrency: 'USD',
+        tax: 0.0,
+        fee: 0.0,
+      });
+      expect(activities[4]).toEqual({
+        broker: 'ebase',
+        type: 'Buy',
+        date: '2020-09-10',
+        datetime: '2020-09-10T' + activities[4].datetime.substring(11),
+        isin: 'IE00BKX55T58',
+        company: 'Vanguard FTSE Developed World UCITS ETF',
+        shares: 0.515934,
+        price: 59.92898808014203,
+        amount: 30.98,
+        fxRate: 1.182900,
+        foreignCurrency: 'USD',
+        tax: 0.0,
+        fee: 0.0,
+      });
+    });
+
   });
 
   beforeEach(() => {
