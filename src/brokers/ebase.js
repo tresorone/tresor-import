@@ -52,7 +52,7 @@ function parseBaseAction(pdfArray, pdfOffset, actionType) {
     tax: 0,
     fee: 0,
   };
-
+  console.log
   activity.price = parseNumberBeforeSpace(pdfArray[pdfOffset + 5]);
   if (pdfArray[pdfOffset + 8].includes('/')) {
     foreignCurrencyOffset = 2;
@@ -74,16 +74,8 @@ const parseData = pdfPages => {
     let i = 0;
 
     while (i <= pdfPage.length) {
-      if (pdfPage[i] === 'Ansparplan' || pdfPage[i] === 'Kauf') {
+      if (pdfPage[i] === 'Ansparplan' || pdfPage[i] === 'Kauf' || pdfPage[i] === 'Wiederanlage Fondsertrag') {
         const action = parseBaseAction(pdfPage, i, 'Buy');
-        if (action === undefined) {
-          return undefined;
-        }
-        actions.push(action);
-        // An 'Ansparplan'/'Wiederanlage Fondsertrag' entry occupies 7 array entries.
-        i += 6;
-      } else if (pdfPage[i] === 'Wiederanlage Fondsertrag') {
-        const action = parseBaseAction(pdfPage, i, 'Sell');
         if (action === undefined) {
           return undefined;
         }
