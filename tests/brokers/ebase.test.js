@@ -53,7 +53,7 @@ describe('Broker: ebase', () => {
   });
 
   describe('Validate buys', () => {
-    test('Can parse multiple planned buy orders from a document', () => {
+    test('Can parse multiple planned buys from a single page pdf', () => {
       const activities = ebase.parsePages(buySamples[0]).activities;
       expect(activities.length).toEqual(11);
       expect(activities[0]).toEqual({
@@ -79,6 +79,37 @@ describe('Broker: ebase', () => {
         shares: 0.126761,
         price: 120.7,
         amount: 15.3,
+        tax: 0.0,
+        fee: 0.0,
+      });
+    });
+
+    test('Can parse multiple planned buys from a multi page pdf', () => {
+      const activities = ebase.parsePages(buySamples[1]).activities;
+      expect(activities.length).toEqual(113);
+      expect(activities[0]).toEqual({
+        broker: 'ebase',
+        type: 'Buy',
+        date: '2020-07-01',
+        datetime: '2020-07-01T' + activities[0].datetime.substring(11),
+        isin: 'DE000A0X7541',
+        company: 'ACATIS GANÉ VALUE EVENT FONDS A',
+        shares: 0.054571,
+        price: 311.52,
+        amount: 17,
+        tax: 0.0,
+        fee: 0.0,
+      });
+      expect(activities[66]).toEqual({
+        broker: 'ebase',
+        type: 'Buy',
+        date: '2020-01-17',
+        datetime: '2020-01-17T' + activities[66].datetime.substring(11),
+        isin: 'DE000A1W9A28',
+        company: 'ProfitlichSchmidlin Fonds UI R',
+        shares: 0.009734,
+        price: 125.34,
+        amount: 1.22,
         tax: 0.0,
         fee: 0.0,
       });
@@ -148,6 +179,50 @@ describe('Broker: ebase', () => {
         fee: 0.0,
         foreignCurrency: 'USD',
         fxRate: 1.1035,
+      });
+    });
+
+    test('Can parse multiple buy and reinvests from an ebase document', () => {
+      const activities = ebase.parsePages(buySamples[4]).activities;
+      expect(activities.length).toEqual(12);
+      expect(activities[0]).toEqual({
+        broker: 'ebase',
+        type: 'Buy',
+        date: '2020-10-27',
+        datetime: '2020-10-27T' + activities[0].datetime.substring(11),
+        isin: 'FR0010527275',
+        company: 'LYXOR World Water (DR) UCITS ETF - Dist',
+        shares: 0.924609,
+        price: 43.18 ,
+        amount: 40.0,
+        tax: 0.0,
+        fee: 0.0,
+      });
+      expect(activities[4]).toEqual({
+        broker: 'ebase',
+        type: 'Buy',
+        date: '2020-07-14',
+        datetime: '2020-07-14T' + activities[4].datetime.substring(11),
+        isin: 'FR0010527275',
+        company: 'LYXOR World Water (DR) UCITS ETF - Dist',
+        shares: 0.400721,
+        price: 38.83,
+        amount: 15.56,
+        tax: 0.0,
+        fee: 0.0,
+      });
+      expect(activities[11]).toEqual({
+        broker: 'ebase',
+        type: 'Buy',
+        date: '2020-01-30',
+        datetime: '2020-01-30T' + activities[11].datetime.substring(11),
+        isin: 'FR0010527275',
+        company: 'LYXOR World Water (DR) UCITS ETF - Dist',
+        shares: 0.889077,
+        price: 44.90  ,
+        amount: 40.0,
+        tax: 0.0,
+        fee: 0.0,
       });
     });
   });
