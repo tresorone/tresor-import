@@ -3,6 +3,7 @@ export const buySamples = [
   require('./buy/ansparplan_multi_pdfpage.json'),
   require('./buy/buy_single_pdfpage.json'),
   require('./buy/finvesto_buy_multi_pdfpage.json'),
+  require('./buy/buy_reinvest_multi_pdfpage.json'),
 ];
 
 export const sellSamples = [
