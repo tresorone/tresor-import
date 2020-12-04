@@ -458,6 +458,41 @@ describe('Broker: ebase', () => {
         fee: 0.0,
       });
     });
+
+    test('Can parse an ebase buy recalculation transactions', () => {
+      const activities = ebase.parsePages(mixedSamples[4]).activities;
+      expect(activities.length).toEqual(46);
+      expect(activities[38]).toEqual({
+        broker: 'ebase',
+        type: 'Buy',
+        date: '2020-04-06',
+        datetime: '2020-04-06T' + activities[38].datetime.substring(11),
+        isin: 'IE00B4L5Y983',
+        company: 'iShares Core MSCI World UCITS ETF USD (Acc)',
+        shares: 1.081765,
+        price: 46.1283185840708,
+        amount: 50,
+        fxRate: 1.0848,
+        foreignCurrency: 'USD',
+        tax: 0.0,
+        fee: 0.0,
+      });
+      expect(activities[39]).toEqual({
+        broker: 'ebase',
+        type: 'Buy',
+        date: '2020-04-06',
+        datetime: '2020-04-06T' + activities[39].datetime.substring(11),
+        isin: 'IE00B48X4842',
+        company: 'SPDR MSCI Emerging Markets Small Cap UCITS ETF',
+        shares: 0.963138,
+        price: 51.806784660766965,
+        amount: 50,
+        fxRate: 1.0848,
+        foreignCurrency: 'USD',
+        tax: 0.0,
+        fee: 0.0,
+      });
+    });
   });
 
   beforeEach(() => {

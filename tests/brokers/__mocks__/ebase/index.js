@@ -16,6 +16,7 @@ export const mixedSamples = [
   require('./mixed_transactions/finvesto_mixed_transactions_multi_pdfpage.json'),
   require('./mixed_transactions/ebase_multiple_transactions_single_pdfpage.json'),
   require('./mixed_transactions/ebase_fond_redeployment.json'),
+  require('./mixed_transactions/ebase_recalculation_of_buy_multi_pdfpage.json'),
 ];
 
 export const invalidSamples = [
