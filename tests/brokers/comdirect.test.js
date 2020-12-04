@@ -609,7 +609,6 @@ describe('Broker: comdirect', () => {
         tax: 0.39,
       });
     });
-
   });
 
   beforeEach(() => {

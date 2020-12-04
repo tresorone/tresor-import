@@ -206,7 +206,7 @@ const findFee = (textArr, amount, isSell = false, formatId = undefined) => {
 
 const findTax = (textArr, fxRate, formatId) => {
   let withholdingTax = 0;
-  if ( formatId === 0 || formatId === 2 ) {
+  if (formatId === 0 || formatId === 2) {
     const withholdingTaxIndex = textArr.findIndex(line =>
       line.includes(' Quellensteuer')
     );
@@ -314,10 +314,11 @@ const getDocumentFormatId = content => {
   } else if (content.some(line => line === 'Wertpapier-Bezeichnung')) {
     // One with: "Wertpapier-Bezeichnung"
     return 1;
-  }
-  else if (content.some(line => line.startsWith('Steuerliche Behandlung: '))) {
+  } else if (
+    content.some(line => line.startsWith('Steuerliche Behandlung: '))
+  ) {
     // This is the case for tax information files
-    return 2
+    return 2;
   }
   console.error('Unknown Document Type, can not parse');
 };
@@ -412,7 +413,7 @@ const parseData = textArr => {
     type = 'Dividend';
     [isin, wkn, company, shares] = findISINAndWKN(textArr, 0, 0);
     date = findDateDividend(textArr, formatId);
-    [tax , witholdingTax] = findTax(textArr, undefined, formatId);
+    [tax, witholdingTax] = findTax(textArr, undefined, formatId);
     amount = +Big(findPayout(textArr)).plus(witholdingTax);
     price = +Big(amount).div(shares);
   }
