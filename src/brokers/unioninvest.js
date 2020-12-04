@@ -153,15 +153,9 @@ const parseBuy = (pdfPage, activityIdx, companyIsinDict) => {
     isin: companyIsinDict[company],
     date: parsedDate,
     datetime: parsedDateTime,
-    amount: parseGermanNum(
-      pdfPage[activityIdx + 1] + pdfPage[activityIdx + 2]
-    ),
-    price: parseGermanNum(
-      pdfPage[activityIdx + 5] + pdfPage[activityIdx + 6]
-    ),
-    shares: parseGermanNum(
-      pdfPage[activityIdx + 7] + pdfPage[activityIdx + 8]
-    ),
+    amount: parseGermanNum(pdfPage[activityIdx + 1] + pdfPage[activityIdx + 2]),
+    price: parseGermanNum(pdfPage[activityIdx + 5] + pdfPage[activityIdx + 6]),
+    shares: parseGermanNum(pdfPage[activityIdx + 7] + pdfPage[activityIdx + 8]),
     tax: 0,
     fee: 0,
   };

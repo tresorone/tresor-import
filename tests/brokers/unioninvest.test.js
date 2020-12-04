@@ -203,7 +203,7 @@ describe('Broker: Union Invest', () => {
         price: 0.9011469142545058,
         amount: 1.65,
         fee: 0,
-        tax: 0.31
+        tax: 0.31,
       });
       expect(activities[1]).toEqual({
         broker: 'unioninvest',
@@ -216,7 +216,7 @@ describe('Broker: Union Invest', () => {
         price: 98.57,
         amount: 1.34,
         fee: 0,
-        tax: 0
+        tax: 0,
       });
     });
   });
