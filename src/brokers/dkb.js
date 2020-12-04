@@ -7,7 +7,6 @@ import {
   validateActivity,
 } from '@/helper';
 
-
 const getValueByPreviousElement = (textArr, prev) => {
   const index = textArr.findIndex(t => t.includes(prev));
   if (index < 0) {
@@ -17,18 +16,19 @@ const getValueByPreviousElement = (textArr, prev) => {
   return textArr[index + 1];
 };
 
-const findShares = ( textArr, stueckIdx ) => {
-  return parseGermanNum(
-    textArr[stueckIdx].split(' ')[1]
-  );
-}
+const findShares = (textArr, stueckIdx) => {
+  return parseGermanNum(textArr[stueckIdx].split(' ')[1]);
+};
 
-const findISINIdx = ( textArr, stueckIdx ) => {
+const findISINIdx = (textArr, stueckIdx) => {
   return stueckIdx + findFirstIsinIndexInArray(textArr.slice(stueckIdx));
 };
 
-const findCompany = ( textArr, stueckIdx, isinIdx) =>
-  textArr.slice(stueckIdx + 1, isinIdx).join(' ').trim();
+const findCompany = (textArr, stueckIdx, isinIdx) =>
+  textArr
+    .slice(stueckIdx + 1, isinIdx)
+    .join(' ')
+    .trim();
 
 const findDateBuySell = textArr =>
   getValueByPreviousElement(textArr, 'Schlusstag').split(' ')[0];
@@ -173,7 +173,6 @@ export const parsePages = pages => {
   const fee = findFee(pages);
   const tax = findTax(pages);
 
-
   if (isBuy(firstPage)) {
     type = 'Buy';
     amount = findAmount(firstPage);
@@ -212,12 +211,10 @@ export const parsePages = pages => {
     amount,
     fee,
     tax,
-  }
+  };
 
   return {
-    activities: [
-      validateActivity(activity),
-    ],
+    activities: [validateActivity(activity)],
     status: 0,
   };
 };
