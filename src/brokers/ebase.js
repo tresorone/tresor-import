@@ -37,7 +37,8 @@ const isBuy = txString => {
     txString === 'Ansparplan' ||
     txString === 'Kauf' ||
     txString === 'Wiederanlage Fondsertrag' ||
-    txString === 'Fondsumschichtung (Zugang)'
+    txString === 'Fondsumschichtung (Zugang)' ||
+    txString === 'Neuabrechnung Kauf'
   );
 };
 
