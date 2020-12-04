@@ -32,6 +32,10 @@ export const taxInfoDividendSamples = [
   require('./taxInfo/dividend/2013_eur_foreign_etf_payout_all_finanzplan.json'),
   require('./taxInfo/dividend/2018_eur_foreign_stock_dividend_mondelez.json'),
   require('./taxInfo/dividend/2019_eur_foreign_stock_dividend_garmin.json'),
+  require('./taxInfo/dividend/2020_foreign_dividend_church_dwight.json'),
+  require('./taxInfo/dividend/2020_foreign_dividend_starbucks.json'),
+  require('./taxInfo/dividend/2020_foreign_dividend_visa.json'),
+  require('./taxInfo/dividend/2020_foreign_payout_ishsii_jpm.json'),
 ];
 
 export const allSamples = buySamples.concat(

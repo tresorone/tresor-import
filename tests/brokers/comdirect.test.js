@@ -529,6 +529,87 @@ describe('Broker: comdirect', () => {
         tax: 6.67,
       });
     });
+
+    test('Can parse dividend from a tax information for chruch_dwight (2020)', () => {
+      const result = comdirect.parsePages(taxInfoDividendSamples[9]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Dividend',
+        date: '2020-12-03',
+        datetime: '2020-12-03T' + result.activities[0].datetime.substring(11),
+        isin: 'US1713401024',
+        wkn: '864371',
+        company: 'CHURCH + DWIGHT CO. DL 1',
+        shares: 0.61,
+        price: 0.22950819672131148,
+        amount: 0.14,
+        fee: 0,
+        tax: 0.03,
+      });
+    });
+
+    test('Can parse dividend from a tax information for STARBUCKS CORP (2020)', () => {
+      const result = comdirect.parsePages(taxInfoDividendSamples[10]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Dividend',
+        date: '2020-12-01',
+        datetime: '2020-12-01T' + result.activities[0].datetime.substring(11),
+        isin: 'US8552441094',
+        wkn: '884437',
+        company: 'STARBUCKS CORP.',
+        shares: 1.378,
+        price: 0.41364296081277213,
+        amount: 0.57,
+        fee: 0,
+        tax: 0.13,
+      });
+    });
+
+    test('Can parse dividend from a tax information for VISA (2020)', () => {
+      const result = comdirect.parsePages(taxInfoDividendSamples[11]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Dividend',
+        date: '2020-12-03',
+        datetime: '2020-12-03T' + result.activities[0].datetime.substring(11),
+        isin: 'US92826C8394',
+        wkn: 'A0NC7B',
+        company: 'VISA INC. CL. A DL -,0001',
+        shares: 0.15,
+        price: 0.26666666666666666,
+        amount: 0.04,
+        fee: 0,
+        tax: 0.01,
+      });
+    });
+
+    test('Can parse dividend from a tax information for ISHSII-JPM (2020)', () => {
+      const result = comdirect.parsePages(taxInfoDividendSamples[12]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Dividend',
+        date: '2020-11-27',
+        datetime: '2020-11-27T' + result.activities[0].datetime.substring(11),
+        isin: 'IE00B2NPKV68',
+        wkn: 'A0NECU',
+        company: 'ISHSII-JPM DL EM BD DLDIS',
+        shares: 4.773,
+        price: 0.40435784621831133,
+        amount: 1.93,
+        fee: 0,
+        tax: 0.39,
+      });
+    });
+
   });
 
   beforeEach(() => {

@@ -51,10 +51,10 @@ const findDateBuySell = textArr => {
   return dateLine.match(/[0-9]{2}.[0-9]{2}.[1-2][0-9]{3}/)[0];
 };
 
-const findDateDividend = (textArr, isTaxinfo = false) => {
+const findDateDividend = (textArr, formatId = false) => {
   let date;
   const valutaIdx = textArr.findIndex(t => t.includes('Valuta'));
-  if (isTaxinfo) {
+  if (formatId === 2) {
     date = textArr[valutaIdx].split(/\s+/)[5];
   } else {
     const dateLine = textArr[valutaIdx + 1].split(/\s+/);
@@ -205,22 +205,23 @@ const findFee = (textArr, amount, isSell = false, formatId = undefined) => {
 };
 
 const findTax = (textArr, fxRate, formatId) => {
-  let payoutTax = Big(0);
-  const withholdingTaxIndex = textArr.findIndex(line =>
-    line.includes('Quellensteuer')
-  );
-  if (withholdingTaxIndex > 0) {
-    const withholdingTax = parseGermanNum(
-      textArr[withholdingTaxIndex].split(/\s+/)[4]
+  let withholdingTax = 0;
+  if ( formatId === 0 || formatId === 2 ) {
+    const withholdingTaxIndex = textArr.findIndex(line =>
+      line.includes(' Quellensteuer')
     );
-    if (fxRate !== undefined && fxRate > 0) {
-      payoutTax = payoutTax.plus(withholdingTax).div(fxRate);
-    } else {
-      payoutTax = payoutTax.plus(withholdingTax);
+    if (withholdingTaxIndex > 0) {
+      withholdingTax = parseGermanNum(
+        textArr[withholdingTaxIndex].split(/\s+/)[4]
+      );
+      if (fxRate !== undefined && fxRate > 0) {
+        withholdingTax = +Big(withholdingTax).div(fxRate);
+      }
     }
   }
 
-  // Relevant for Sell Operations and TaxInfo Dividens
+  // Relevant for Sell Operations and TaxInfo Dividends
+  let localTax = 0;
   const payedTaxIndex = textArr.indexOf('abgeführte Steuern');
   if (payedTaxIndex >= 0) {
     let lineWithTaxValue;
@@ -230,10 +231,10 @@ const findTax = (textArr, fxRate, formatId) => {
       lineWithTaxValue = textArr[payedTaxIndex + 1].split(/\s+/)[1];
     }
 
-    payoutTax = payoutTax.plus(Big(parseGermanNum(lineWithTaxValue)).abs());
+    localTax = Math.abs(parseGermanNum(lineWithTaxValue));
   }
 
-  return +payoutTax;
+  return [+Big(withholdingTax).plus(localTax), withholdingTax];
 };
 
 const findPurchaseReduction = (textArr, fxRate, foreignCurrency) => {
@@ -305,15 +306,20 @@ const findBuyFxRateForeignCurrency = textArr => {
 // for this are different layouts or only minor document structure changes which will end up with
 // an other text format for us...
 const getDocumentFormatId = content => {
-  // There are currently two types of documents:
+  // There are currently three types of documents:
 
   if (content.some(line => line.includes('Wertpapier-Bezeichnung '))) {
     // One with: "Wertpapier-Bezeichnung                                               WPKNR/ISIN"
     return 0;
+  } else if (content.some(line => line === 'Wertpapier-Bezeichnung')) {
+    // One with: "Wertpapier-Bezeichnung"
+    return 1;
   }
-
-  // One with: "Wertpapier-Bezeichnung"
-  return 1;
+  else if (content.some(line => line.startsWith('Steuerliche Behandlung: '))) {
+    // This is the case for tax information files
+    return 2
+  }
+  console.error('Unknown Document Type, can not parse');
 };
 
 const isBuy = textArr => textArr.some(t => t.includes('Wertpapierkauf'));
@@ -356,8 +362,8 @@ const parseData = textArr => {
     shares,
     price,
     amount,
-    fee,
-    tax,
+    fee = 0,
+    tax = 0,
     fxRate,
     foreignCurrency;
 
@@ -374,7 +380,6 @@ const parseData = textArr => {
     shares = findShares(textArr, formatId);
     price = +Big(amount).div(shares);
     fee = +findFee(textArr, amount, false, formatId);
-    tax = 0;
   } else if (isSell(textArr)) {
     type = 'Sell';
     [isin, wkn] = findISINAndWKN(
@@ -390,7 +395,7 @@ const parseData = textArr => {
     amount = +findAmount(textArr, fxRate, foreignCurrency, formatId);
     price = +Big(amount).div(shares);
     fee = +findFee(textArr, amount, true, formatId);
-    tax = findTax(textArr, fxRate, formatId);
+    tax = findTax(textArr, fxRate, formatId)[0];
   } else if (isDividend(textArr)) {
     [fxRate, foreignCurrency] = findPayoutFxrateForeignCurrency(textArr);
     type = 'Dividend';
@@ -400,19 +405,17 @@ const parseData = textArr => {
     shares = findDividendShares(textArr);
     amount = findPayout(textArr, fxRate);
     price = +Big(amount).div(shares);
-    fee = 0;
-    tax = findTax(textArr, fxRate, formatId);
+    tax = findTax(textArr, fxRate, formatId)[0];
   } else if (isTaxinfoDividend(textArr)) {
     // Still needs handling of Foreign  Rates
+    let witholdingTax;
     type = 'Dividend';
     [isin, wkn, company, shares] = findISINAndWKN(textArr, 0, 0);
-    amount = findPayout(textArr);
-    date = findDateDividend(textArr, true);
+    date = findDateDividend(textArr, formatId);
+    [tax , witholdingTax] = findTax(textArr, undefined, formatId);
+    amount = +Big(findPayout(textArr)).plus(witholdingTax);
     price = +Big(amount).div(shares);
-    fee = 0;
-    tax = findTax(textArr, undefined, 0);
   }
-
   const [parsedDate, parsedDateTime] = createActivityDateTime(date, time);
 
   let activity = {
@@ -429,6 +432,7 @@ const parseData = textArr => {
     fee,
     tax,
   };
+
   if (fxRate !== undefined) {
     activity.fxRate = fxRate;
   }
