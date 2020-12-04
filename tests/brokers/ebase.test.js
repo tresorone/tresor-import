@@ -423,6 +423,41 @@ describe('Broker: ebase', () => {
         fee: 0.0,
       });
     });
+
+    test('Can parse an ebase fond redeployment transactions', () => {
+      const activities = ebase.parsePages(mixedSamples[3]).activities;
+      expect(activities.length).toEqual(7);
+      expect(activities[5]).toEqual({
+        broker: 'ebase',
+        type: 'Sell',
+        date: '2020-09-10',
+        datetime: '2020-09-10T' + activities[6].datetime.substring(11),
+        isin: 'LU0392494562',
+        company: 'ComStage MSCI World TRN UCITS ETF I',
+        shares: 0.545977,
+        price: 56.84245941626714,
+        amount: 30.98,
+        fxRate: 1.1889,
+        foreignCurrency: 'USD',
+        tax: 0.0,
+        fee: 0.0,
+      });
+      expect(activities[6]).toEqual({
+        broker: 'ebase',
+        type: 'Buy',
+        date: '2020-09-10',
+        datetime: '2020-09-10T' + activities[6].datetime.substring(11),
+        isin: 'IE00BKX55T58',
+        company: 'Vanguard FTSE Developed World UCITS ETF',
+        shares: 0.515934,
+        price: 59.92898808014203,
+        amount: 30.98,
+        fxRate: 1.1829,
+        foreignCurrency: 'USD',
+        tax: 0.0,
+        fee: 0.0,
+      });
+    });
   });
 
   beforeEach(() => {

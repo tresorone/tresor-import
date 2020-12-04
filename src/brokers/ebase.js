@@ -42,7 +42,11 @@ const isBuy = txString => {
 };
 
 const isSell = txString => {
-  return txString === 'Entgelt Verkauf' || txString === 'Verkauf';
+  return (
+    txString === 'Entgelt Verkauf' ||
+    txString === 'Verkauf' ||
+    txString === 'Fondsumschichtung (Abgang)'
+  );
 };
 
 function parseBaseAction(pdfArray, pdfOffset, actionType) {
@@ -65,7 +69,6 @@ function parseBaseAction(pdfArray, pdfOffset, actionType) {
     tax: 0,
     fee: 0,
   };
-  console.log;
   activity.price = parseNumberBeforeSpace(pdfArray[pdfOffset + 5]);
   if (pdfArray[pdfOffset + 8].includes('/')) {
     foreignCurrencyOffset = 2;
