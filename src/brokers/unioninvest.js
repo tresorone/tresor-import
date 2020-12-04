@@ -1,5 +1,3 @@
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
 import Big from 'big.js';
 import {
   validateActivity,
@@ -106,6 +104,36 @@ const createCompanyIsinDict = pdfPage => {
   return companyIsinDict;
 };
 
+const findPayoutTax = (pdfPage, activityIdx, churchTaxIdx) => {
+  let tax = Big(0);
+  const capitalTaxIdx = pdfPage.indexOf(
+    'abgeführte Kapitalertragsteuer',
+    activityIdx
+  );
+  if (pdfPage[capitalTaxIdx + 2].includes(',')) {
+    tax = tax.plus(
+      parseGermanNum(pdfPage[capitalTaxIdx + 1] + pdfPage[capitalTaxIdx + 2])
+    );
+  }
+  const solidarityTaxIdx = pdfPage.indexOf(
+    'inklusive Solidaritätszuschlag',
+    activityIdx
+  );
+  if (pdfPage[solidarityTaxIdx + 2].includes(',')) {
+    tax = tax.plus(
+      parseGermanNum(
+        pdfPage[solidarityTaxIdx + 1] + pdfPage[solidarityTaxIdx + 2]
+      )
+    );
+  }
+  if (pdfPage[churchTaxIdx + 2].includes(',')) {
+    tax = tax.plus(
+      parseGermanNum(pdfPage[churchTaxIdx + 1] + pdfPage[churchTaxIdx + 2])
+    );
+  }
+  return +tax.abs();
+};
+
 const parseBuy = (pdfPage, activityIdx, companyIsinDict) => {
   const dateIdx =
     findPriorRegexMatch(pdfPage, activityIdx, /[0-9]{2}\.[0-9]{2}\.[0-9]{4}/) -
@@ -203,42 +231,6 @@ const parseDividend = (pdfPage, activityIdx, companyIsinDict) => {
     );
   }
   return activities;
-};
-
-const findPayoutDate = (pdfPage, churchTaxIdx) => {
-  return pdfPage[churchTaxIdx + 2].includes(',')
-    ? pdfPage[churchTaxIdx + 4]
-    : pdfPage[churchTaxIdx + 2];
-};
-
-const findPayoutTax = (pdfPage, activityIdx, churchTaxIdx) => {
-  let tax = Big(0);
-  const capitalTaxIdx = pdfPage.indexOf(
-    'abgeführte Kapitalertragsteuer',
-    activityIdx
-  );
-  if (pdfPage[capitalTaxIdx + 2].includes(',')) {
-    tax = tax.plus(
-      parseGermanNum(pdfPage[capitalTaxIdx + 1] + pdfPage[capitalTaxIdx + 2])
-    );
-  }
-  const solidarityTaxIdx = pdfPage.indexOf(
-    'inklusive Solidaritätszuschlag',
-    activityIdx
-  );
-  if (pdfPage[solidarityTaxIdx + 2].includes(',')) {
-    tax = tax.plus(
-      parseGermanNum(
-        pdfPage[solidarityTaxIdx + 1] + pdfPage[solidarityTaxIdx + 2]
-      )
-    );
-  }
-  if (pdfPage[churchTaxIdx + 2].includes(',')) {
-    tax = tax.plus(
-      parseGermanNum(pdfPage[churchTaxIdx + 1] + pdfPage[churchTaxIdx + 2])
-    );
-  }
-  return +tax.abs();
 };
 
 const parsePage = pdfPage => {

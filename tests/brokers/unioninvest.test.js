@@ -195,28 +195,28 @@ describe('Broker: Union Invest', () => {
       expect(activities[0]).toEqual({
         broker: 'unioninvest',
         type: 'Dividend',
-        date: '2019-11-14',
-        datetime: '2019-11-14T' + activities[0].datetime.substring(11),
+        date: '2019-11-15',
+        datetime: '2019-11-15T' + activities[0].datetime.substring(11),
         isin: 'DE0008007519',
         company: 'UniFavorit: Aktien -net-',
         shares: 1.831,
         price: 0.9011469142545058,
         amount: 1.65,
         fee: 0,
-        tax: 0.31,
+        tax: 0.31
       });
       expect(activities[1]).toEqual({
         broker: 'unioninvest',
         type: 'Buy',
-        date: '2019-11-14',
-        datetime: '2019-11-14T' + activities[1].datetime.substring(11),
+        date: '2019-11-15',
+        datetime: '2019-11-15T' + activities[1].datetime.substring(11),
         isin: 'DE0008007519',
         company: 'UniFavorit: Aktien -net-',
         shares: 0.014,
         price: 98.57,
         amount: 1.34,
         fee: 0,
-        tax: 0,
+        tax: 0
       });
     });
   });
