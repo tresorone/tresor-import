@@ -16,17 +16,17 @@ const getValueByPreviousElement = (textArr, prev) => {
   return textArr[index + 1];
 };
 
-const findShares = (textArr, stueckIdx) => {
-  return parseGermanNum(textArr[stueckIdx].split(' ')[1]);
+const findShares = (textArr, pieceIdx) => {
+  return parseGermanNum(textArr[pieceIdx].split(' ')[1]);
 };
 
-const findISINIdx = (textArr, stueckIdx) => {
-  return stueckIdx + findFirstIsinIndexInArray(textArr.slice(stueckIdx));
+const findISINIdx = (textArr, pieceIdx) => {
+  return pieceIdx + findFirstIsinIndexInArray(textArr.slice(pieceIdx));
 };
 
-const findCompany = (textArr, stueckIdx, isinIdx) =>
+const findCompany = (textArr, pieceIdx, isinIdx) =>
   textArr
-    .slice(stueckIdx + 1, isinIdx)
+    .slice(pieceIdx + 1, isinIdx)
     .join(' ')
     .trim();
 
@@ -165,11 +165,11 @@ export const parsePages = pages => {
   const firstPage = pages[0];
 
   let type, amount, price, date, time;
-  const stueckIdx = firstPage.findIndex(t => t.includes('Stück'));
-  const isinIdx = findISINIdx(firstPage, stueckIdx);
+  const pieceIdx = firstPage.findIndex(t => t.includes('Stück'));
+  const isinIdx = findISINIdx(firstPage, pieceIdx);
   const isin = firstPage[isinIdx];
-  const company = findCompany(firstPage, stueckIdx, isinIdx);
-  const shares = findShares(firstPage, stueckIdx);
+  const company = findCompany(firstPage, pieceIdx, isinIdx);
+  const shares = findShares(firstPage, pieceIdx);
   const fee = findFee(pages);
   const tax = findTax(pages);
 
