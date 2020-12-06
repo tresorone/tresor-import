@@ -8,6 +8,7 @@ export const buySamples = [
 
 export const dividendSamples = [
   require('./dividend/2019_payout_reinvest_1.json'),
+  require('./dividend/2020_payout_reinvest_1.json'),
 ];
 
 export const allSamples = buySamples; //.concat(sellSamples, dividendSamples);

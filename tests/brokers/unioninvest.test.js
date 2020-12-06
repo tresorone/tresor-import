@@ -219,6 +219,38 @@ describe('Broker: Union Invest', () => {
         tax: 0,
       });
     });
+
+    test('Can parse a union invest reinvest from 2020 (1) ', () => {
+      const activities = unioninvest.parsePages(dividendSamples[1]).activities;
+
+      expect(activities.length).toEqual(2);
+      expect(activities[0]).toEqual({
+        broker: 'unioninvest',
+        type: 'Dividend',
+        date: '2020-11-13',
+        datetime: '2020-11-13T' + activities[0].datetime.substring(11),
+        isin: 'DE0008491069',
+        company: 'UniEuroRenta',
+        shares: 66.255,
+        price: 0.14006490076220662,
+        amount: 9.28,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[1]).toEqual({
+        broker: 'unioninvest',
+        type: 'Buy',
+        date: '2020-11-13',
+        datetime: '2020-11-13T' + activities[0].datetime.substring(11),
+        isin: 'DE0008491069',
+        company: 'UniEuroRenta',
+        shares: 0.139,
+        price: 66.71,
+        amount: 9.28,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   beforeEach(() => {

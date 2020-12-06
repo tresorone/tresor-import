@@ -4,48 +4,7 @@ import {
   parseGermanNum,
   createActivityDateTime,
 } from '../helper';
-
-export const canParsePage = (pdfPage, extension) => {
-  return (
-    extension === 'pdf' &&
-    pdfPage.some(line =>
-      line.includes(
-        'Union Investment Service Bank AG · 60621 Frankfurt am Main'
-      )
-    )
-  );
-};
-
-// Find the first company that occurs BEFORE the id idx. Also requires the idx
-// of the date of a transaction
-const transactionFindCompany = (pdfPage, idx, dateIdx) => {
-  const companyIdx = findPriorRegexMatch(pdfPage, idx) + 1;
-  let company;
-  // Either the company name is in the subdepot header. This is the case if
-  // there is only one kind of stock in the same subdepot (my guess at least)
-  if (/,[0-9]{2,}/.test(pdfPage[dateIdx - 1])) {
-    const isinIdx = findPriorIdx(pdfPage, idx, ['ISIN:']);
-    const companyStartIdx = findPriorIdx(pdfPage, isinIdx, ['Unterdepot-Nr.:']);
-    const companyStartIdx2 = findPriorIdx(pdfPage, isinIdx, ['a.']);
-    // If multiple companies are listed, the first company is preceeded by
-    // 'Unterdepot-Nr.:, otherwise 'a.'
-    if (companyStartIdx > companyStartIdx2) {
-      company =
-        pdfPage[companyStartIdx + 4] +
-        pdfPage.slice(companyStartIdx + 5, isinIdx).join(' ');
-    } else {
-      company =
-        pdfPage[companyStartIdx2 + 1] +
-        pdfPage.slice(companyStartIdx2 + 2, isinIdx).join(' ');
-    }
-  }
-  // Or it part of the transaction (If the subdepot contains multiple stocks)
-  else {
-    company =
-      pdfPage[companyIdx] + pdfPage.slice(companyIdx + 1, dateIdx).join(' ');
-  }
-  return company;
-};
+const dateRegex = /[0-9]{2}\.[0-9]{2}\.[0-9]{4}/
 
 const findPriorIdx = (arr, idx, keyArr = ['STK', '/ Sperre']) => {
   let bckwrdIdx = 1;
@@ -67,6 +26,42 @@ const findPriorRegexMatch = (arr, idx, regex = /,[0-9]{2,}/) => {
     bckwrdIdx += 1;
   }
   return -1;
+};
+
+// Find the first company that occurs BEFORE the id idx. Also requires the idx
+// of the date of a transaction
+const findCompany = (pdfPage, idx, dateIdx) => {
+  const companyIdx = findPriorRegexMatch(pdfPage, idx) + 1;
+  // Its certainly a payout; payouts have to be treated differently sometimes
+  if ( dateIdx > idx && !/,[0-9]{2,}/.test(pdfPage[idx - 1])) {
+    return pdfPage[companyIdx]+pdfPage.slice(companyIdx+1, idx).join(' ');
+  }
+  let company;
+  // Either the company name is in the subdepot header. This is the case if
+  // there is only one kind of stock in the same subdepot (my guess at least)
+  if (/,[0-9]{2,}/.test(pdfPage[dateIdx - 1])) {
+    const isinIdx = findPriorIdx(pdfPage, idx, ['ISIN:']);
+    const companyStartIdx = findPriorIdx(pdfPage, isinIdx, ['Unterdepot-Nr.:']);
+    const companyStartIdx2 = findPriorIdx(pdfPage, isinIdx, ['a.']);
+    // If multiple companies are listed, the first company is preceeded by
+    // 'Unterdepot-Nr.:, otherwise 'a.'
+    if (companyStartIdx > companyStartIdx2) {
+      company =
+        pdfPage[companyStartIdx + 4] +
+        pdfPage.slice(companyStartIdx + 5, isinIdx).join(' ');
+    } else {
+      company =
+        pdfPage[companyStartIdx2 + 1] +
+        pdfPage.slice(companyStartIdx2 + 2, isinIdx).join(' ');
+    }
+  }
+  // Or it part of the transaction (If the subdepot contains multiple stocks)
+  //
+  else {
+    company =
+      pdfPage[companyIdx] + pdfPage.slice(companyIdx + 1, dateIdx).join(' ');
+  }
+  return company;
 };
 
 // Isins are only listed atop of the file for some unioninvest documents.
@@ -104,13 +99,13 @@ const createCompanyIsinDict = pdfPage => {
   return companyIsinDict;
 };
 
-const findPayoutTax = (pdfPage, activityIdx, churchTaxIdx) => {
+const findPayoutTax = (pdfPage, activityIdx) => {
   let tax = Big(0);
   const capitalTaxIdx = pdfPage.indexOf(
     'abgeführte Kapitalertragsteuer',
     activityIdx
   );
-  if (pdfPage[capitalTaxIdx + 2].includes(',')) {
+  if (capitalTaxIdx > -1 && pdfPage[capitalTaxIdx + 2].includes(',')) {
     tax = tax.plus(
       parseGermanNum(pdfPage[capitalTaxIdx + 1] + pdfPage[capitalTaxIdx + 2])
     );
@@ -119,14 +114,17 @@ const findPayoutTax = (pdfPage, activityIdx, churchTaxIdx) => {
     'inklusive Solidaritätszuschlag',
     activityIdx
   );
-  if (pdfPage[solidarityTaxIdx + 2].includes(',')) {
+  if (solidarityTaxIdx > -1 && pdfPage[solidarityTaxIdx + 2].includes(',')) {
     tax = tax.plus(
       parseGermanNum(
         pdfPage[solidarityTaxIdx + 1] + pdfPage[solidarityTaxIdx + 2]
       )
     );
-  }
-  if (pdfPage[churchTaxIdx + 2].includes(',')) {
+  }const churchTaxIdx = pdfPage.indexOf(
+    'abgeführte Kirchensteuer',
+    activityIdx
+  );
+  if (churchTaxIdx > -1 && pdfPage[churchTaxIdx + 2].includes(',')) {
     tax = tax.plus(
       parseGermanNum(pdfPage[churchTaxIdx + 1] + pdfPage[churchTaxIdx + 2])
     );
@@ -138,7 +136,7 @@ const parseBuy = (pdfPage, activityIdx, companyIsinDict) => {
   const dateIdx =
     findPriorRegexMatch(pdfPage, activityIdx, /[0-9]{2}\.[0-9]{2}\.[0-9]{4}/) -
     1;
-  const company = transactionFindCompany(pdfPage, activityIdx, dateIdx);
+  const company = findCompany(pdfPage, activityIdx, dateIdx);
 
   // The documents from unioninvest didn't contains any order time
   const [parsedDate, parsedDateTime] = createActivityDateTime(
@@ -165,17 +163,17 @@ const parseBuy = (pdfPage, activityIdx, companyIsinDict) => {
 const parseDividend = (pdfPage, activityIdx, companyIsinDict) => {
   let activities = [];
   // The curchTaxIdx is an important index to parse information
-  const churchTaxIdx = pdfPage.indexOf('abgeführte Kirchensteuer', activityIdx);
-  const dateIdx = pdfPage[churchTaxIdx + 2].includes(',')
-    ? churchTaxIdx + 3
-    : churchTaxIdx + 1;
+  const dateIdx = pdfPage.slice(activityIdx)
+    .findIndex(t => dateRegex.test(t))+activityIdx;
+
   const date = pdfPage[dateIdx];
-  const company = transactionFindCompany(pdfPage, activityIdx, dateIdx);
+  const company = findCompany(pdfPage, activityIdx, dateIdx);
   const amount = parseGermanNum(
     pdfPage[activityIdx + 3] + pdfPage[activityIdx + 4]
   );
+  const sharesIdx  = findPriorRegexMatch(pdfPage, activityIdx)-1;
   const shares = parseGermanNum(
-    pdfPage[activityIdx - 2] + pdfPage[activityIdx - 1]
+    pdfPage[sharesIdx] + pdfPage[sharesIdx + 1]
   );
 
   // The documents from unioninvest didn't contains any order time
@@ -192,39 +190,49 @@ const parseDividend = (pdfPage, activityIdx, companyIsinDict) => {
     amount,
     shares,
     price: +Big(amount).div(shares),
-    tax: findPayoutTax(pdfPage, activityIdx, churchTaxIdx),
+    tax: findPayoutTax(pdfPage, activityIdx),
     fee: 0,
   };
   activities.push(validateActivity(activity));
 
   // The dividend was automatically reinvested, thus we need another buy
-  // operation.
-
-  const reinvestIdx = pdfPage.indexOf('Wiederanlage', churchTaxIdx);
-  if (reinvestIdx - churchTaxIdx < 6) {
+  const reinvestIdx = pdfPage.indexOf('Wiederanlage');
+  if (dateIdx + 2 === reinvestIdx) {
+    const activity = {
+      broker: 'unioninvest',
+      type: 'Buy',
+      company,
+      isin: companyIsinDict[company],
+      date: parsedDate,
+      datetime: parsedDateTime,
+      amount: parseGermanNum(
+        pdfPage[reinvestIdx + 1] + pdfPage[reinvestIdx + 2]
+      ),
+      price: parseGermanNum(
+        pdfPage[reinvestIdx + 5] + pdfPage[reinvestIdx + 6]
+      ),
+      shares: parseGermanNum(
+        pdfPage[reinvestIdx + 7] + pdfPage[reinvestIdx + 8]
+      ),
+      tax: 0,
+      fee: 0,
+    }
     activities.push(
-      validateActivity({
-        broker: 'unioninvest',
-        type: 'Buy',
-        company,
-        isin: companyIsinDict[company],
-        date: parsedDate,
-        datetime: parsedDateTime,
-        amount: parseGermanNum(
-          pdfPage[reinvestIdx + 1] + pdfPage[reinvestIdx + 2]
-        ),
-        price: parseGermanNum(
-          pdfPage[reinvestIdx + 5] + pdfPage[reinvestIdx + 6]
-        ),
-        shares: parseGermanNum(
-          pdfPage[reinvestIdx + 7] + pdfPage[reinvestIdx + 8]
-        ),
-        tax: 0,
-        fee: 0,
-      })
+      validateActivity(activity)
     );
   }
   return activities;
+};
+
+export const canParsePage = (pdfPage, extension) => {
+  return (
+    extension === 'pdf' &&
+    pdfPage.some(line =>
+      line.includes(
+        'Union Investment Service Bank AG · 60621 Frankfurt am Main'
+      )
+    )
+  );
 };
 
 const parsePage = pdfPage => {
