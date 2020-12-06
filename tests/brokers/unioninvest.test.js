@@ -5,6 +5,7 @@ import {
   buySamples,
   sellSamples,
   dividendSamples,
+  redistribution,
 } from './__mocks__/unioninvest';
 
 describe('Broker: Union Invest', () => {
@@ -317,6 +318,39 @@ describe('Broker: Union Invest', () => {
         shares: 0.139,
         price: 66.71,
         amount: 9.28,
+        fee: 0,
+        tax: 0,
+      });
+    });
+  });
+
+  describe('Validate Redistributions', () => {
+    test('Can parse a redistribution from 2016', () => {
+      const activities = unioninvest.parsePages(redistribution[0]).activities;
+      expect(activities.length).toEqual(2);
+      expect(activities[0]).toEqual({
+        broker: 'unioninvest',
+        type: 'Buy',
+        date: '2020-02-03',
+        datetime: '2020-02-03T' + activities[0].datetime.substring(11),
+        isin: 'DE0008491069',
+        company: 'UniEuroRenta',
+        shares: 10.267,
+        amount: 687.99,
+        price: 67.01,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[1]).toEqual({
+        broker: 'unioninvest',
+        type: 'Sell',
+        date: '2020-02-03',
+        datetime: '2020-02-03T' + activities[1].datetime.substring(11),
+        isin: 'DE000A1C81G1',
+        company: 'UniGlobal Vorsorge',
+        shares: 2.964,
+        amount: 687.99,
+        price: 232.15,
         fee: 0,
         tax: 0,
       });

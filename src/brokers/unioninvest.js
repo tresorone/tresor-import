@@ -5,6 +5,7 @@ import {
   createActivityDateTime,
 } from '../helper';
 const dateRegex = /[0-9]{2}\.[0-9]{2}\.[0-9]{4}/;
+const commaNumberRegex = /,[0-9]{2,}/
 
 const findPriorIdx = (arr, idx, keyArr = ['STK', '/ Sperre']) => {
   let bckwrdIdx = 1;
@@ -17,7 +18,7 @@ const findPriorIdx = (arr, idx, keyArr = ['STK', '/ Sperre']) => {
   return -1;
 };
 
-const findPriorRegexMatch = (arr, idx, regex = /,[0-9]{2,}/) => {
+const findPriorRegexMatch = (arr, idx, regex = commaNumberRegex) => {
   let bckwrdIdx = 1;
   while (idx - bckwrdIdx >= 0) {
     if (regex.test(arr[idx - bckwrdIdx])) {
@@ -38,22 +39,34 @@ const findCompany = (pdfPage, idx, dateIdx) => {
   }
   // Either the company name is in the subdepot header. This is the case if
   // there is only one kind of stock in the same subdepot (my guess at least)
-  else if (/,[0-9]{2,}/.test(pdfPage[dateIdx - 1])) {
+  else if (/(,[0-9]{2,})/.test(pdfPage[dateIdx - 1])) {
     const isinIdx = findPriorIdx(pdfPage, idx, ['ISIN:']);
     const companyStartIdx = findPriorIdx(pdfPage, isinIdx, ['Unterdepot-Nr.:']);
     const companyStartIdx2 = findPriorIdx(pdfPage, isinIdx, ['a.']);
     // If multiple companies are listed, the first company is preceeded by
     // 'Unterdepot-Nr.:, otherwise 'a.'
     if (companyStartIdx > companyStartIdx2) {
-      return pdfPage[companyStartIdx + 4] + pdfPage.slice(companyStartIdx + 5, isinIdx).join(' ');
+      return (
+        pdfPage[companyStartIdx + 4] +
+        pdfPage.slice(companyStartIdx + 5, isinIdx).join(' ')
+      );
     } else {
-      return pdfPage[companyStartIdx2 + 1] + pdfPage.slice(companyStartIdx2 + 2, isinIdx).join(' ');
+      return (
+        pdfPage[companyStartIdx2 + 1] +
+        pdfPage.slice(companyStartIdx2 + 2, isinIdx).join(' ')
+      );
     }
   }
   // Or it part of the transaction (If the subdepot contains multiple stocks)
   else {
-    const companyIdx = findPriorRegexMatch(pdfPage, dateIdx, /,[0-9]{2,}|Mehrwertsteuer/);
-    return pdfPage[companyIdx +1 ] + pdfPage.slice(companyIdx + 2, dateIdx).join(' ');
+    const companyIdx = findPriorRegexMatch(
+      pdfPage,
+      dateIdx,
+      /^(,[0-9]{2,}|Mehrwertsteuer|\*1)$/
+    );
+    return (
+      pdfPage[companyIdx + 1] + pdfPage.slice(companyIdx + 2, dateIdx).join(' ')
+    );
   }
 };
 
@@ -123,7 +136,7 @@ const findPayoutTax = (pdfPage, activityIdx) => {
   return +tax.abs();
 };
 
-const parseBuySell = (pdfPage, activityIdx, companyIsinDict, type) => {
+const parseBuySell = (pdfPage, activityIdx, companyIsinDict, type, isRedistribution = false) => {
   const dateIdx =
     findPriorRegexMatch(pdfPage, activityIdx, /[0-9]{2}\.[0-9]{2}\.[0-9]{4}/) -
     1;
@@ -134,7 +147,11 @@ const parseBuySell = (pdfPage, activityIdx, companyIsinDict, type) => {
     undefined
   );
 
-  const infoOffset = type === 'Buy' ? 5 : -4 ;
+  let infoOffset = type === 'Buy' ? 5 : -4;
+  let amountOffset =  isRedistribution ? -8 : 1;
+  if ( isRedistribution ) {
+    infoOffset = -4;
+  }
   const activity = {
     broker: 'unioninvest',
     type: type,
@@ -142,9 +159,18 @@ const parseBuySell = (pdfPage, activityIdx, companyIsinDict, type) => {
     isin: companyIsinDict[company],
     date: parsedDate,
     datetime: parsedDateTime,
-    amount: Math.abs(parseGermanNum(pdfPage[activityIdx + 1] + pdfPage[activityIdx + 2])),
-    price: parseGermanNum(pdfPage[activityIdx + infoOffset] + pdfPage[activityIdx + infoOffset + 1]),
-    shares: Math.abs(parseGermanNum(pdfPage[activityIdx + infoOffset + 2] + pdfPage[activityIdx + infoOffset + 3])),
+    amount: Math.abs(
+      parseGermanNum(pdfPage[activityIdx + amountOffset] + pdfPage[activityIdx + amountOffset + 1])
+    ),
+    price: parseGermanNum(
+      pdfPage[activityIdx + infoOffset] + pdfPage[activityIdx + infoOffset + 1]
+    ),
+    shares: Math.abs(
+      parseGermanNum(
+        pdfPage[activityIdx + infoOffset + 2] +
+          pdfPage[activityIdx + infoOffset + 3]
+      )
+    ),
     tax: 0,
     fee: 0,
   };
@@ -223,7 +249,7 @@ export const canParsePage = (pdfPage, extension) => {
 };
 
 const parsePage = pdfPage => {
-  const possibleActivities = ['Anlage', 'Ausschüttung', 'Verkauf'];
+  const possibleActivities = ['Anlage', 'Ausschüttung', 'Verkauf', 'Umschichtung'];
   const companyIsinDict = createCompanyIsinDict(pdfPage);
   let activities = [];
   let slicedArray = pdfPage;
@@ -235,19 +261,28 @@ const parsePage = pdfPage => {
       activities = activities.concat(
         parseBuySell(slicedArray, activityIdx, companyIsinDict, 'Buy')
       );
-    }
-    else if (slicedArray[activityIdx] === 'Verkauf') {
+    } else if (slicedArray[activityIdx] === 'Verkauf') {
       activities = activities.concat(
         parseBuySell(slicedArray, activityIdx, companyIsinDict, 'Sell')
       );
-    }
-    else if (
+    } else if (
       slicedArray[activityIdx] === 'Ausschüttung' &&
       slicedArray[activityIdx + 1] !== 'sind'
     ) {
       activities = activities.concat(
         parseDividend(slicedArray, activityIdx, companyIsinDict)
       );
+    } else if (slicedArray[activityIdx] === 'Umschichtung' && commaNumberRegex.test(slicedArray[activityIdx - 1])) {
+      // Check if the number of shares is negative (Sell) or positive (Buy)
+      if ( parseGermanNum(slicedArray[activityIdx - 2]) < 0 ) {
+        activities = activities.concat(
+          parseBuySell(slicedArray, activityIdx, companyIsinDict, 'Sell', true)
+        );
+      } else {
+        activities = activities.concat(
+          parseBuySell(slicedArray, activityIdx, companyIsinDict, 'Buy', true)
+        );
+      }
     }
     slicedArray = slicedArray.slice(activityIdx + 1);
     activityIdx = slicedArray.findIndex(line =>
@@ -262,11 +297,14 @@ export const parsePages = pdfPages => {
   for (const pdfPage of pdfPages) {
     // This is an explanatory pdf page which guides through the nomenclature
     // and contains no transactions.
-    if (pdfPage[0].startsWith('Sämtliche Umsätze in Ihrem UnionDepot dokumentieren')) {
+    if (
+      pdfPage[0].startsWith(
+        'Sämtliche Umsätze in Ihrem UnionDepot dokumentieren'
+      )
+    ) {
       continue;
     }
     activities = activities.concat(parsePage(pdfPage));
-
   }
 
   return {
