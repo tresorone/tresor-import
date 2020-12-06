@@ -4,7 +4,7 @@ import {
   parseGermanNum,
   createActivityDateTime,
 } from '../helper';
-const dateRegex = /[0-9]{2}\.[0-9]{2}\.[0-9]{4}/
+const dateRegex = /[0-9]{2}\.[0-9]{2}\.[0-9]{4}/;
 
 const findPriorIdx = (arr, idx, keyArr = ['STK', '/ Sperre']) => {
   let bckwrdIdx = 1;
@@ -31,37 +31,30 @@ const findPriorRegexMatch = (arr, idx, regex = /,[0-9]{2,}/) => {
 // Find the first company that occurs BEFORE the id idx. Also requires the idx
 // of the date of a transaction
 const findCompany = (pdfPage, idx, dateIdx) => {
-  const companyIdx = findPriorRegexMatch(pdfPage, idx) + 1;
   // Its certainly a payout; payouts have to be treated differently sometimes
-  if ( dateIdx > idx && !/,[0-9]{2,}/.test(pdfPage[idx - 1])) {
-    return pdfPage[companyIdx]+pdfPage.slice(companyIdx+1, idx).join(' ');
+  if (dateIdx > idx && !/,[0-9]{2,}/.test(pdfPage[idx - 1])) {
+    const companyIdx = findPriorRegexMatch(pdfPage, idx) + 1;
+    return pdfPage[companyIdx] + pdfPage.slice(companyIdx + 1, idx).join(' ');
   }
-  let company;
   // Either the company name is in the subdepot header. This is the case if
   // there is only one kind of stock in the same subdepot (my guess at least)
-  if (/,[0-9]{2,}/.test(pdfPage[dateIdx - 1])) {
+  else if (/,[0-9]{2,}/.test(pdfPage[dateIdx - 1])) {
     const isinIdx = findPriorIdx(pdfPage, idx, ['ISIN:']);
     const companyStartIdx = findPriorIdx(pdfPage, isinIdx, ['Unterdepot-Nr.:']);
     const companyStartIdx2 = findPriorIdx(pdfPage, isinIdx, ['a.']);
     // If multiple companies are listed, the first company is preceeded by
     // 'Unterdepot-Nr.:, otherwise 'a.'
     if (companyStartIdx > companyStartIdx2) {
-      company =
-        pdfPage[companyStartIdx + 4] +
-        pdfPage.slice(companyStartIdx + 5, isinIdx).join(' ');
+      return pdfPage[companyStartIdx + 4] + pdfPage.slice(companyStartIdx + 5, isinIdx).join(' ');
     } else {
-      company =
-        pdfPage[companyStartIdx2 + 1] +
-        pdfPage.slice(companyStartIdx2 + 2, isinIdx).join(' ');
+      return pdfPage[companyStartIdx2 + 1] + pdfPage.slice(companyStartIdx2 + 2, isinIdx).join(' ');
     }
   }
   // Or it part of the transaction (If the subdepot contains multiple stocks)
-  //
   else {
-    company =
-      pdfPage[companyIdx] + pdfPage.slice(companyIdx + 1, dateIdx).join(' ');
+    const companyIdx = findPriorRegexMatch(pdfPage, dateIdx, /,[0-9]{2,}|Mehrwertsteuer/);
+    return pdfPage[companyIdx +1 ] + pdfPage.slice(companyIdx + 2, dateIdx).join(' ');
   }
-  return company;
 };
 
 // Isins are only listed atop of the file for some unioninvest documents.
@@ -120,10 +113,8 @@ const findPayoutTax = (pdfPage, activityIdx) => {
         pdfPage[solidarityTaxIdx + 1] + pdfPage[solidarityTaxIdx + 2]
       )
     );
-  }const churchTaxIdx = pdfPage.indexOf(
-    'abgeführte Kirchensteuer',
-    activityIdx
-  );
+  }
+  const churchTaxIdx = pdfPage.indexOf('abgeführte Kirchensteuer', activityIdx);
   if (churchTaxIdx > -1 && pdfPage[churchTaxIdx + 2].includes(',')) {
     tax = tax.plus(
       parseGermanNum(pdfPage[churchTaxIdx + 1] + pdfPage[churchTaxIdx + 2])
@@ -132,28 +123,28 @@ const findPayoutTax = (pdfPage, activityIdx) => {
   return +tax.abs();
 };
 
-const parseBuy = (pdfPage, activityIdx, companyIsinDict) => {
+const parseBuySell = (pdfPage, activityIdx, companyIsinDict, type) => {
   const dateIdx =
     findPriorRegexMatch(pdfPage, activityIdx, /[0-9]{2}\.[0-9]{2}\.[0-9]{4}/) -
     1;
   const company = findCompany(pdfPage, activityIdx, dateIdx);
-
   // The documents from unioninvest didn't contains any order time
   const [parsedDate, parsedDateTime] = createActivityDateTime(
     pdfPage[dateIdx],
     undefined
   );
 
+  const infoOffset = type === 'Buy' ? 5 : -4 ;
   const activity = {
     broker: 'unioninvest',
-    type: 'Buy',
+    type: type,
     company,
     isin: companyIsinDict[company],
     date: parsedDate,
     datetime: parsedDateTime,
-    amount: parseGermanNum(pdfPage[activityIdx + 1] + pdfPage[activityIdx + 2]),
-    price: parseGermanNum(pdfPage[activityIdx + 5] + pdfPage[activityIdx + 6]),
-    shares: parseGermanNum(pdfPage[activityIdx + 7] + pdfPage[activityIdx + 8]),
+    amount: Math.abs(parseGermanNum(pdfPage[activityIdx + 1] + pdfPage[activityIdx + 2])),
+    price: parseGermanNum(pdfPage[activityIdx + infoOffset] + pdfPage[activityIdx + infoOffset + 1]),
+    shares: Math.abs(parseGermanNum(pdfPage[activityIdx + infoOffset + 2] + pdfPage[activityIdx + infoOffset + 3])),
     tax: 0,
     fee: 0,
   };
@@ -163,18 +154,16 @@ const parseBuy = (pdfPage, activityIdx, companyIsinDict) => {
 const parseDividend = (pdfPage, activityIdx, companyIsinDict) => {
   let activities = [];
   // The curchTaxIdx is an important index to parse information
-  const dateIdx = pdfPage.slice(activityIdx)
-    .findIndex(t => dateRegex.test(t))+activityIdx;
+  const dateIdx =
+    pdfPage.slice(activityIdx).findIndex(t => dateRegex.test(t)) + activityIdx;
 
   const date = pdfPage[dateIdx];
   const company = findCompany(pdfPage, activityIdx, dateIdx);
   const amount = parseGermanNum(
     pdfPage[activityIdx + 3] + pdfPage[activityIdx + 4]
   );
-  const sharesIdx  = findPriorRegexMatch(pdfPage, activityIdx)-1;
-  const shares = parseGermanNum(
-    pdfPage[sharesIdx] + pdfPage[sharesIdx + 1]
-  );
+  const sharesIdx = findPriorRegexMatch(pdfPage, activityIdx) - 1;
+  const shares = parseGermanNum(pdfPage[sharesIdx] + pdfPage[sharesIdx + 1]);
 
   // The documents from unioninvest didn't contains any order time
   const [parsedDate, parsedDateTime] = createActivityDateTime(date, undefined);
@@ -216,10 +205,8 @@ const parseDividend = (pdfPage, activityIdx, companyIsinDict) => {
       ),
       tax: 0,
       fee: 0,
-    }
-    activities.push(
-      validateActivity(activity)
-    );
+    };
+    activities.push(validateActivity(activity));
   }
   return activities;
 };
@@ -236,7 +223,7 @@ export const canParsePage = (pdfPage, extension) => {
 };
 
 const parsePage = pdfPage => {
-  const possibleActivities = ['Anlage', 'Ausschüttung'];
+  const possibleActivities = ['Anlage', 'Ausschüttung', 'Verkauf'];
   const companyIsinDict = createCompanyIsinDict(pdfPage);
   let activities = [];
   let slicedArray = pdfPage;
@@ -246,9 +233,15 @@ const parsePage = pdfPage => {
   while (activityIdx <= slicedArray.length && activityIdx > 0) {
     if (slicedArray[activityIdx] === 'Anlage') {
       activities = activities.concat(
-        parseBuy(slicedArray, activityIdx, companyIsinDict)
+        parseBuySell(slicedArray, activityIdx, companyIsinDict, 'Buy')
       );
-    } else if (
+    }
+    else if (slicedArray[activityIdx] === 'Verkauf') {
+      activities = activities.concat(
+        parseBuySell(slicedArray, activityIdx, companyIsinDict, 'Sell')
+      );
+    }
+    else if (
       slicedArray[activityIdx] === 'Ausschüttung' &&
       slicedArray[activityIdx + 1] !== 'sind'
     ) {
@@ -267,7 +260,13 @@ const parsePage = pdfPage => {
 export const parsePages = pdfPages => {
   let activities = [];
   for (const pdfPage of pdfPages) {
+    // This is an explanatory pdf page which guides through the nomenclature
+    // and contains no transactions.
+    if (pdfPage[0].startsWith('Sämtliche Umsätze in Ihrem UnionDepot dokumentieren')) {
+      continue;
+    }
     activities = activities.concat(parsePage(pdfPage));
+
   }
 
   return {

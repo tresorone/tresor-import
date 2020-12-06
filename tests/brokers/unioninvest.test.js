@@ -3,6 +3,7 @@ import * as unioninvest from '../../src/brokers/unioninvest';
 import {
   allSamples,
   buySamples,
+  sellSamples,
   dividendSamples,
 } from './__mocks__/unioninvest';
 
@@ -181,6 +182,75 @@ describe('Broker: Union Invest', () => {
         shares: 2.136,
         price: 68.67,
         amount: 146.7,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can parse a union invest buy from 2016 (1) ', () => {
+      const activities = unioninvest.parsePages(buySamples[5]).activities;
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'unioninvest',
+        type: 'Buy',
+        date: '2016-06-21',
+        datetime: '2016-06-21T' + activities[0].datetime.substring(11),
+        isin: 'DE000A1C81G1',
+        company: 'UniGlobal Vorsorge',
+        shares: 0.366,
+        price: 180.41,
+        amount: 66,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can parse a single union invest buy from 2020 (1) ', () => {
+      const activities = unioninvest.parsePages(buySamples[6]).activities;
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'unioninvest',
+        type: 'Buy',
+        date: '2020-01-21',
+        datetime: '2020-01-21T' + activities[0].datetime.substring(11),
+        isin: 'DE000A1C81G1',
+        company: 'UniGlobal Vorsorge',
+        shares: 0.315,
+        price: 254.19,
+        amount: 80,
+        fee: 0,
+        tax: 0,
+      });
+    });
+  });
+
+  describe('Validate Sells', () => {
+    test('Can parse two sells from 2016', () => {
+      const activities = unioninvest.parsePages(sellSamples[0]).activities;
+      expect(activities.length).toEqual(2);
+      expect(activities[0]).toEqual({
+        broker: 'unioninvest',
+        type: 'Sell',
+        date: '2016-12-24',
+        datetime: '2016-12-24T' + activities[0].datetime.substring(11),
+        isin: 'DE000A1C81G1',
+        company: 'UniGlobal Vorsorge',
+        shares: 0.041,
+        amount: 7.78,
+        price: 191.02,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[1]).toEqual({
+        broker: 'unioninvest',
+        type: 'Sell',
+        date: '2016-12-24',
+        datetime: '2016-12-24T' + activities[1].datetime.substring(11),
+        isin: 'DE0008491069',
+        company: 'UniEuroRenta',
+        shares: 0.018,
+        amount: 1.22,
+        price: 66.92,
         fee: 0,
         tax: 0,
       });
