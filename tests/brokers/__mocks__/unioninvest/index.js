@@ -16,7 +16,11 @@ export const dividendSamples = [
 ];
 
 export const redistribution = [
-  require('./redistribute/2020_single_redistribution.json')
-]
+  require('./redistribute/2020_single_redistribution.json'),
+];
 
-export const allSamples = buySamples.concat(sellSamples, dividendSamples, redistribution);
+export const allSamples = buySamples.concat(
+  sellSamples,
+  dividendSamples,
+  redistribution
+);

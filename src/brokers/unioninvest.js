@@ -5,7 +5,7 @@ import {
   createActivityDateTime,
 } from '../helper';
 const dateRegex = /[0-9]{2}\.[0-9]{2}\.[0-9]{4}/;
-const commaNumberRegex = /,[0-9]{2,}/
+const commaNumberRegex = /,[0-9]{2,}/;
 
 const findPriorIdx = (arr, idx, keyArr = ['STK', '/ Sperre']) => {
   let bckwrdIdx = 1;
@@ -136,7 +136,13 @@ const findPayoutTax = (pdfPage, activityIdx) => {
   return +tax.abs();
 };
 
-const parseBuySell = (pdfPage, activityIdx, companyIsinDict, type, isRedistribution = false) => {
+const parseBuySell = (
+  pdfPage,
+  activityIdx,
+  companyIsinDict,
+  type,
+  isRedistribution = false
+) => {
   const dateIdx =
     findPriorRegexMatch(pdfPage, activityIdx, /[0-9]{2}\.[0-9]{2}\.[0-9]{4}/) -
     1;
@@ -148,8 +154,8 @@ const parseBuySell = (pdfPage, activityIdx, companyIsinDict, type, isRedistribut
   );
 
   let infoOffset = type === 'Buy' ? 5 : -4;
-  let amountOffset =  isRedistribution ? -8 : 1;
-  if ( isRedistribution ) {
+  let amountOffset = isRedistribution ? -8 : 1;
+  if (isRedistribution) {
     infoOffset = -4;
   }
   const activity = {
@@ -160,7 +166,10 @@ const parseBuySell = (pdfPage, activityIdx, companyIsinDict, type, isRedistribut
     date: parsedDate,
     datetime: parsedDateTime,
     amount: Math.abs(
-      parseGermanNum(pdfPage[activityIdx + amountOffset] + pdfPage[activityIdx + amountOffset + 1])
+      parseGermanNum(
+        pdfPage[activityIdx + amountOffset] +
+          pdfPage[activityIdx + amountOffset + 1]
+      )
     ),
     price: parseGermanNum(
       pdfPage[activityIdx + infoOffset] + pdfPage[activityIdx + infoOffset + 1]
@@ -249,7 +258,12 @@ export const canParsePage = (pdfPage, extension) => {
 };
 
 const parsePage = pdfPage => {
-  const possibleActivities = ['Anlage', 'Ausschüttung', 'Verkauf', 'Umschichtung'];
+  const possibleActivities = [
+    'Anlage',
+    'Ausschüttung',
+    'Verkauf',
+    'Umschichtung',
+  ];
   const companyIsinDict = createCompanyIsinDict(pdfPage);
   let activities = [];
   let slicedArray = pdfPage;
@@ -272,9 +286,12 @@ const parsePage = pdfPage => {
       activities = activities.concat(
         parseDividend(slicedArray, activityIdx, companyIsinDict)
       );
-    } else if (slicedArray[activityIdx] === 'Umschichtung' && commaNumberRegex.test(slicedArray[activityIdx - 1])) {
+    } else if (
+      slicedArray[activityIdx] === 'Umschichtung' &&
+      commaNumberRegex.test(slicedArray[activityIdx - 1])
+    ) {
       // Check if the number of shares is negative (Sell) or positive (Buy)
-      if ( parseGermanNum(slicedArray[activityIdx - 2]) < 0 ) {
+      if (parseGermanNum(slicedArray[activityIdx - 2]) < 0) {
         activities = activities.concat(
           parseBuySell(slicedArray, activityIdx, companyIsinDict, 'Sell', true)
         );
