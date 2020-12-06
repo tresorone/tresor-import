@@ -1,4 +1,3 @@
-
 export const buySamples = [
   require('./buy/limit_order.json'),
   require('./buy/market_order.json'),
@@ -28,4 +27,8 @@ export const quarterSamples = [
   require('./quarter_statement/with_stocks.json'),
 ];
 
-export const allSamples = buySamples.concat(sellSamples, dividendSamples, quarterSamples);
+export const allSamples = buySamples.concat(
+  sellSamples,
+  dividendSamples,
+  quarterSamples
+);

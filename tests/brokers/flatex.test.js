@@ -68,6 +68,7 @@ describe('Broker: Flatex', () => {
         broker: 'flatex',
         type: 'Buy',
         date: '2019-05-16',
+        datetime: '2019-05-16T06:00:00.000Z',
         isin: 'US0378331005',
         company: 'APPLE INC.',
         shares: 4,
@@ -86,6 +87,7 @@ describe('Broker: Flatex', () => {
         broker: 'flatex',
         type: 'Buy',
         date: '2020-03-05',
+        datetime: '2020-03-05T14:55:00.000Z',
         isin: 'US4642863926',
         company: 'ISHS-ISHARES MSCI WLD ETF',
         shares: 20,
@@ -104,6 +106,7 @@ describe('Broker: Flatex', () => {
         broker: 'flatex',
         type: 'Buy',
         date: '2019-10-17',
+        datetime: '2019-10-17T14:52:00.000Z',
         isin: 'US5949181045',
         company: 'MICROSOFT',
         shares: 12,
@@ -122,6 +125,7 @@ describe('Broker: Flatex', () => {
         broker: 'flatex',
         type: 'Buy',
         date: '2018-04-03',
+        datetime: '2018-04-03T09:29:00.000Z',
         isin: 'US88160R1014',
         company: 'TESLA INC.',
         shares: 1,
@@ -142,6 +146,7 @@ describe('Broker: Flatex', () => {
         broker: 'flatex',
         type: 'Sell',
         date: '2019-05-20',
+        datetime: '2019-05-20T09:16:00.000Z',
         isin: 'US30303M1027',
         company: 'FACEBOOK INC.A',
         shares: 4,
@@ -160,6 +165,7 @@ describe('Broker: Flatex', () => {
         broker: 'flatex',
         type: 'Sell',
         date: '2019-05-20',
+        datetime: '2019-05-20T09:21:00.000Z',
         isin: 'DE000A1C9KL8',
         company: 'HSBC MSCI WORLD UC.ETF DZ',
         shares: 36,
@@ -173,14 +179,15 @@ describe('Broker: Flatex', () => {
 
   describe('Dividend', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const result = flatex.parsePages(dividendsSamples[0]);
+      const activities = flatex.parsePages(dividendsSamples[0]).activities;
 
       // stock
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'flatex',
         type: 'Dividend',
         date: '2020-02-13',
+        datetime: '2020-02-13T' + activities[0].datetime.substring(11),
         isin: 'US0378331005',
         company: 'APPLE INC.',
         shares: 7,
@@ -192,14 +199,15 @@ describe('Broker: Flatex', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const result = flatex.parsePages(dividendsSamples[1]);
+      const activities = flatex.parsePages(dividendsSamples[1]).activities;
 
       // stock
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'flatex',
         type: 'Dividend',
         date: '2019-12-12',
+        datetime: '2019-12-12T' + activities[0].datetime.substring(11),
         isin: 'US5949181045',
         company: 'MICROSOFT',
         shares: 16,
@@ -211,14 +219,15 @@ describe('Broker: Flatex', () => {
     });
 
     test('should map pdf data of sample 3 correctly', () => {
-      const result = flatex.parsePages(dividendsSamples[2]);
+      const activities = flatex.parsePages(dividendsSamples[2]).activities;
 
       // index fund
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'flatex',
         type: 'Dividend',
         date: '2018-11-09',
+        datetime: '2018-11-09T' + activities[0].datetime.substring(11),
         isin: 'DE000A1C9KL8',
         company: 'HSBC MSCI WORLD UC.ETF DZ',
         shares: 36,
@@ -240,6 +249,7 @@ describe('Broker: Flatex', () => {
         broker: 'flatex',
         company: 'ADIDAS AG NA O.N.',
         date: '2020-06-18',
+        datetime: '2020-06-18T10:53:00.000Z',
         fee: 4.65,
         isin: 'DE000A1EWWW0',
         price: 240.7,
@@ -252,6 +262,7 @@ describe('Broker: Flatex', () => {
         broker: 'flatex',
         company: 'WIRECARD AG',
         date: '2020-06-18',
+        datetime: '2020-06-18T11:20:00.000Z',
         fee: 4.84,
         isin: 'DE0007472060',
         price: 48.44,
@@ -264,6 +275,7 @@ describe('Broker: Flatex', () => {
         broker: 'flatex',
         company: 'WIRECARD AG',
         date: '2020-06-18',
+        datetime: '2020-06-18T13:33:00.000Z',
         fee: 6.07,
         isin: 'DE0007472060',
         price: 32.915,

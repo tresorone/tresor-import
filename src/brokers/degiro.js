@@ -1,18 +1,15 @@
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
 import Big from 'big.js';
-
-import { parseGermanNum, validateActivity, isinRegex } from '@/helper';
+import {
+  parseGermanNum,
+  validateActivity,
+  createActivityDateTime,
+  isinRegex,
+} from '@/helper';
 
 export const canParsePage = (content, extension) =>
   extension === 'pdf' && content.includes('www.degiro.de');
 
 const parseActivity = (content, index) => {
-  const date = format(
-    parse(content[index], 'dd-MM-yyyy', new Date()),
-    'yyyy-MM-dd'
-  );
-
   // Is it possible that the transaction logs contains dividends?
 
   let span = 0;
@@ -42,9 +39,17 @@ const parseActivity = (content, index) => {
   const price = amount.div(shares.abs());
   const fee = Math.abs(parseGermanNum(content[index + 13 + span]));
 
+  const [parsedDate, parsedDateTime] = createActivityDateTime(
+    content[index],
+    content[index + 1],
+    'dd-MM-yyyy',
+    'dd-MM-yyyy HH:mm'
+  );
+
   const activity = {
     broker: 'degiro',
-    date,
+    date: parsedDate,
+    datetime: parsedDateTime,
     company,
     isin,
     shares: +shares,

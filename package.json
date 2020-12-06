@@ -1,6 +1,6 @@
 {
   "name": "@tresor.one/import",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "Creates Tresor One activities from PDF statements of brokers",
   "files": [
     "dist"
@@ -27,8 +27,8 @@
   "license": "MIT",
   "dependencies": {
     "big.js": "^5.2.2",
-    "date-fns": "^2.12.0",
     "lodash": "^4.17.19",
+    "luxon": "^1.25.0",
     "pdfjs-dist": "^2.3.200"
   },
   "devDependencies": {
@@ -38,6 +38,7 @@
     "before-build-webpack": "^0.2.9",
     "concurrently": "^5.3.0",
     "copy-webpack-plugin": "^6.0.4",
+    "date-fns": "^2.16.1",
     "eslint": "^6.8.0",
     "eslint-plugin-jest": "^23.8.2",
     "eslint-plugin-vue": "^6.2.2",

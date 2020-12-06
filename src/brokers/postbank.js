@@ -1,7 +1,8 @@
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
-
-import { parseGermanNum } from '@/helper';
+import {
+  parseGermanNum,
+  validateActivity,
+  createActivityDateTime,
+} from '@/helper';
 
 const offsets = {
   shares: 0,
@@ -47,9 +48,7 @@ const findDateDividend = textArr =>
   getValueByPreviousElement(textArr, 'Zahlbarkeitstag').split(' ')[0];
 
 const findPayout = textArr =>
-  parseGermanNum(
-    textArr[textArr.indexOf('Ausschüttung')+3]
-  );
+  parseGermanNum(textArr[textArr.indexOf('Ausschüttung') + 3]);
 
 const isBuy = textArr =>
   textArr.some(
@@ -87,8 +86,7 @@ const parseData = textArr => {
     price = findPrice(textArr);
     fee = findFee(textArr);
     tax = 0;
-  }
-  else if (isSell(textArr)) {
+  } else if (isSell(textArr)) {
     type = 'Sell';
     isin = findISIN(textArr);
     company = findCompany(textArr);
@@ -98,8 +96,7 @@ const parseData = textArr => {
     price = findPrice(textArr);
     fee = findFee(textArr);
     tax = 0;
-  }
-  else if (isDividend(textArr)) {
+  } else if (isDividend(textArr)) {
     type = 'Dividend';
     isin = findISIN(textArr);
     company = findCompany(textArr);
@@ -111,10 +108,14 @@ const parseData = textArr => {
     tax = 0;
   }
 
-  return {
+  // For postbank, all our mock documents did not contains an order execution time.
+  const [parsedDate, parsedDateTime] = createActivityDateTime(date, undefined);
+
+  return validateActivity({
     broker: 'postbank',
     type,
-    date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
+    date: parsedDate,
+    datetime: parsedDateTime,
     isin,
     company,
     shares,
@@ -122,7 +123,7 @@ const parseData = textArr => {
     amount,
     fee,
     tax,
-  };
+  });
 };
 
 export const parsePages = contents => {

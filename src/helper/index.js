@@ -1,8 +1,13 @@
 import every from 'lodash/every';
 import values from 'lodash/values';
+import { DateTime } from 'luxon';
 
 //regex to match an ISIN-only string, taken from https://www.iban.com/country-codes
 export const isinRegex = /^(AF|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH|BD|BB|BY|BE|BZ|BJ|BM|BT|BO|BQ|BA|BW|BV|BR|IO|BN|BG|BF|BI|CV|KH|CM|CA|KY|CF|TD|CL|CN|CX|CC|CO|KM|CD|CG|CK|CR|HR|CU|CW|CY|CZ|CI|DK|DJ|DM|DO|EC|EG|SV|GQ|ER|EE|SZ|ET|FK|FO|FJ|FI|FR|GF|PF|TF|GA|GM|GE|DE|GH|GI|GR|GL|GD|GP|GU|GT|GG|GN|GW|GY|HT|HM|VA|HN|HK|HU|IS|IN|ID|IR|IQ|IE|IM|IL|IT|JM|JP|JE|JO|KZ|KE|KI|KP|KR|KW|KG|LA|LV|LB|LS|LR|LY|LI|LT|LU|MO|MG|MW|MY|MV|ML|MT|MH|MQ|MR|MU|YT|MX|FM|MD|MC|MN|ME|MS|MA|MZ|MM|NA|NR|NP|NL|NC|NZ|NI|NE|NG|NU|NF|MP|NO|OM|PK|PW|PS|PA|PG|PY|PE|PH|PN|PL|PT|PR|QA|MK|RO|RU|RW|RE|BL|SH|KN|LC|MF|PM|VC|WS|SM|ST|SA|SN|RS|SC|SL|SG|SX|SK|SI|SB|SO|ZA|GS|SS|ES|LK|SD|SR|SJ|SE|CH|SY|TW|TJ|TZ|TH|TL|TG|TK|TO|TT|TN|TR|TM|TC|TV|UG|UA|AE|GB|UM|US|UY|UZ|VU|VE|VN|VG|VI|WF|EH|YE|ZM|ZW|AX)([0-9A-Z]{9})([0-9])$/;
+
+export const timeRegex = withSeconds => {
+  return withSeconds ? /[0-2][0-9]:[0-9]{2}:[0-9]{2}/ : /[0-2][0-9]:[0-9]{2}/;
+};
 
 export function csvLinesToJSON(content, trimAndSplit = false) {
   let result = [];
@@ -58,19 +63,66 @@ export function validateActivity(activity, findSecurityAlsoByCompany = false) {
     return undefined;
   }
 
-  // The date must be in the past.
-  if (activity.date > new Date()) {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setUTCHours(0, 0, 0, 0);
+
+  const oldestDate = new Date(1990, 1, 1);
+  oldestDate.setUTCHours(0, 0, 0, 0);
+
+  // The date property must be present.
+  if (activity.date === undefined) {
     console.error(
-      'The activity for ' + activity.broker + ' has to be in the past.',
+      'The activity date for ' + activity.broker + ' must be present.',
+      activity
+    );
+    return undefined;
+  }
+
+  // The datetime property must be present.
+  if (activity.datetime === undefined) {
+    console.error(
+      'The activity datetime for ' + activity.broker + ' must be present.',
+      activity
+    );
+    return undefined;
+  }
+
+  // The date must be in the past.
+  if (activity.date > tomorrow) {
+    console.error(
+      'The activity date for ' + activity.broker + ' has to be in the past.',
       activity
     );
     return undefined;
   }
 
   // The date must be not older than 1990-01-01
-  if (activity.date < new Date(1990, 1, 1)) {
+  if (activity.date < oldestDate) {
     console.error(
-      'The activity for ' + activity.broker + ' is older than 1990-01-01.',
+      'The activity date for ' + activity.broker + ' is older than 1990-01-01.',
+      activity
+    );
+    return undefined;
+  }
+
+  // The datetime must be in the past.
+  if (activity.datetime > tomorrow) {
+    console.error(
+      'The activity datetime for ' +
+        activity.broker +
+        ' has to be in the past.',
+      activity
+    );
+    return undefined;
+  }
+
+  // The datetime must be not older than 1990-01-01
+  if (activity.datetime < oldestDate) {
+    console.error(
+      'The activity datetime for ' +
+        activity.broker +
+        ' is older than 1990-01-01.',
       activity
     );
     return undefined;
@@ -181,4 +233,43 @@ export function validateActivity(activity, findSecurityAlsoByCompany = false) {
 export function findFirstIsinIndexInArray(array) {
   const isinIndex = array.findIndex(element => isinRegex.test(element));
   return isinIndex === -1 ? undefined : isinIndex;
+}
+
+// This function will convert a date (reuqired) and a time (can be undefined) to a formatted date and datetime.
+// When no time is present, the current time will be used to ensure the right order of activities after an import
+// was processed.
+export function createActivityDateTime(
+  date,
+  time,
+  dateFormat = 'dd.MM.yyyy',
+  dateTimeFormat = 'dd.MM.yyyy HH:mm',
+  zone = 'Europe/Berlin'
+) {
+  date = date.trim();
+  if (time !== undefined) {
+    time = time.trim();
+  }
+  zone = zone.trim();
+
+  let dateTime;
+  if (time === undefined || !/[0-2][0-9]:[0-9]{2}(:[0-9]{2}|)/.test(time)) {
+    // Append the current local time when to the date that was given from the implementation. The date must match the
+    // format in `dateFormat`.
+    const currentTime = DateTime.fromObject({ zone: zone });
+    time =
+      String(currentTime.hour).padStart(2, '0') +
+      ':' +
+      String(currentTime.minute).padStart(2, '0');
+    dateTime = DateTime.fromFormat(date + ' ' + time, dateFormat + ' HH:mm', {
+      zone: zone,
+    });
+  } else {
+    // Convert the date and time from the implementation to a datetime value. The values of date and time must match
+    // the given format in `dateTimeFormat` concat with an space between.
+    dateTime = DateTime.fromFormat(date + ' ' + time, dateTimeFormat, {
+      zone: zone,
+    });
+  }
+
+  return [dateTime.toFormat('yyyy-MM-dd'), dateTime.toUTC().toISO()];
 }

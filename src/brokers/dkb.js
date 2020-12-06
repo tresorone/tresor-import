@@ -1,14 +1,11 @@
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
-
 import { Big } from 'big.js';
-import { parseGermanNum, validateActivity } from '@/helper';
-
-const offsets = {
-  shares: 0,
-  companyName: 1,
-  isin: 3,
-};
+import {
+  createActivityDateTime,
+  findFirstIsinIndexInArray,
+  parseGermanNum,
+  timeRegex,
+  validateActivity,
+} from '@/helper';
 
 const getValueByPreviousElement = (textArr, prev) => {
   const index = textArr.findIndex(t => t.includes(prev));
@@ -19,23 +16,31 @@ const getValueByPreviousElement = (textArr, prev) => {
   return textArr[index + 1];
 };
 
-const findTableIndex = textArr => textArr.findIndex(t => t.includes('Stück'));
-
-const findShares = textArr =>
-  parseGermanNum(
-    textArr[findTableIndex(textArr) + offsets.shares].split(' ')[1]
-  );
-
-const findISIN = textArr => {
-  const isin = textArr[findTableIndex(textArr) + offsets.isin].trim();
-  return /^([A-Z]{2})((?![A-Z]{10})[A-Z0-9]{10})$/.test(isin) ? isin : null;
+const findShares = (textArr, pieceIdx) => {
+  return parseGermanNum(textArr[pieceIdx].split(' ')[1]);
 };
 
-const findCompany = textArr =>
-  textArr[findTableIndex(textArr) + offsets.companyName].trim();
+const findISINIdx = (textArr, pieceIdx) => {
+  return pieceIdx + findFirstIsinIndexInArray(textArr.slice(pieceIdx));
+};
+
+const findCompany = (textArr, pieceIdx, isinIdx) =>
+  textArr
+    .slice(pieceIdx + 1, isinIdx)
+    .join(' ')
+    .trim();
 
 const findDateBuySell = textArr =>
   getValueByPreviousElement(textArr, 'Schlusstag').split(' ')[0];
+
+const findTimeBuySell = content => {
+  const lineContent = getValueByPreviousElement(content, '-Zeit');
+  if (lineContent === '' || !timeRegex(true).test(lineContent)) {
+    return undefined;
+  }
+
+  return lineContent.split(' ')[1].trim();
+};
 
 const findPrice = textArr =>
   parseGermanNum(
@@ -157,56 +162,59 @@ export const canParsePage = (content, extension) =>
   (isBuy(content) || isSell(content) || isDividend(content));
 
 export const parsePages = pages => {
-  let type, date, isin, company, shares, price, amount, fee, tax;
   const firstPage = pages[0];
+
+  let type, amount, price, date, time;
+  const pieceIdx = firstPage.findIndex(t => t.includes('Stück'));
+  const isinIdx = findISINIdx(firstPage, pieceIdx);
+  const isin = firstPage[isinIdx];
+  const company = findCompany(firstPage, pieceIdx, isinIdx);
+  const shares = findShares(firstPage, pieceIdx);
+  const fee = findFee(pages);
+  const tax = findTax(pages);
 
   if (isBuy(firstPage)) {
     type = 'Buy';
-    isin = findISIN(firstPage);
-    company = findCompany(firstPage);
-    date = findDateBuySell(firstPage);
-    shares = findShares(firstPage);
     amount = findAmount(firstPage);
     price = findPrice(firstPage);
-    fee = findFee(pages);
-    tax = findTax(pages);
+    date = findDateBuySell(firstPage);
+    time = findTimeBuySell(firstPage);
   } else if (isSell(firstPage)) {
     type = 'Sell';
-    isin = findISIN(firstPage);
-    company = findCompany(firstPage);
-    date = findDateBuySell(firstPage);
-    shares = findShares(firstPage);
     amount = findAmount(firstPage);
     price = findPrice(firstPage);
-    fee = findFee(pages);
-    tax = findTax(pages);
+    date = findDateBuySell(firstPage);
+    time = findTimeBuySell(firstPage);
   } else if (isDividend(firstPage)) {
     type = 'Dividend';
-    isin = findISIN(firstPage);
-    company = findCompany(firstPage);
-    date = findDateDividend(firstPage);
-    shares = findShares(firstPage);
     amount = findPayout(firstPage);
     price = amount / shares;
-    fee = findFee(pages);
-    tax = findTax(pages);
+    date = findDateDividend(firstPage);
   }
 
+  const [parsedDate, parsedDateTime] = createActivityDateTime(
+    date,
+    time,
+    'dd.MM.yyyy',
+    'dd.MM.yyyy HH:mm:ss'
+  );
+
+  const activity = {
+    broker: 'dkb',
+    type,
+    date: parsedDate,
+    datetime: parsedDateTime,
+    isin,
+    company,
+    shares,
+    price,
+    amount,
+    fee,
+    tax,
+  };
+
   return {
-    activities: [
-      validateActivity({
-        broker: 'dkb',
-        type,
-        date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
-        isin,
-        company,
-        shares,
-        price,
-        amount,
-        fee,
-        tax,
-      }),
-    ],
+    activities: [validateActivity(activity)],
     status: 0,
   };
 };

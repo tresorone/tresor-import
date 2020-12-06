@@ -40,6 +40,7 @@ describe('Broker: Consorsbank', () => {
           tax: 0,
           company: 'ALERIAN MLP ETF',
           date: '2020-02-12',
+          datetime: '2020-02-12T14:57:49.000Z',
           fee: 17.46,
           isin: 'US00162Q8666',
           wkn: 'A1H99H',
@@ -59,6 +60,7 @@ describe('Broker: Consorsbank', () => {
           type: 'Buy',
           company: 'GLOB.X SUPERDIVIDEND ETF',
           date: '2019-06-24',
+          datetime: '2019-06-24T12:17:34.000Z',
           fee: 19.86,
           isin: 'US37950E5490',
           wkn: 'A1JJ54',
@@ -80,6 +82,7 @@ describe('Broker: Consorsbank', () => {
           amount: 5044.28,
           company: 'ALERIAN MLP ETF',
           date: '2020-01-27',
+          datetime: '2020-01-27T15:15:47.000Z',
           fee: 17.56,
           isin: 'US00162Q8666',
           wkn: 'A1H99H',
@@ -99,6 +102,7 @@ describe('Broker: Consorsbank', () => {
           type: 'Buy',
           company: 'GLOB.X SUPERDIVIDEND ETF',
           date: '2019-04-29',
+          datetime: '2019-04-29T15:07:48.000Z',
           fee: 14.95,
           isin: 'US37950E5490',
           wkn: 'A1JJ54',
@@ -119,6 +123,7 @@ describe('Broker: Consorsbank', () => {
           type: 'Buy',
           company: 'PAYPAL HDGS INC.DL-,0001',
           date: '2015-08-06',
+          datetime: '2015-08-06T15:01:20.000Z',
           fee: 13.9,
           isin: 'US70450Y1038',
           wkn: 'A14R7U',
@@ -139,6 +144,7 @@ describe('Broker: Consorsbank', () => {
           type: 'Buy',
           company: 'ISHS-EO CO.BD LA.C.UTS DZ',
           date: '2015-08-03',
+          datetime: '2015-08-03T06:00:48.000Z',
           isin: 'DE0002511243',
           wkn: '251124',
           price: 133.2393168997759,
@@ -161,6 +167,7 @@ describe('Broker: Consorsbank', () => {
           broker: 'consorsbank',
           company: 'JOHNSON + JOHNSON    DL 1',
           date: '2019-10-24',
+          datetime: '2019-10-24T16:31:22.000Z',
           fee: 0,
           isin: 'US4781601046',
           wkn: '853260',
@@ -179,6 +186,7 @@ describe('Broker: Consorsbank', () => {
           broker: 'consorsbank',
           company: 'JOHNSON + JOHNSON    DL 1',
           date: '2019-10-24',
+          datetime: '2019-10-24T16:31:22.000Z',
           fee: 0,
           isin: 'US4781601046',
           wkn: '853260',
@@ -193,14 +201,15 @@ describe('Broker: Consorsbank', () => {
 
   describe('Dividend', () => {
     test('should map pdf data of ertrag_alerian_mlp_etf_1.json correctly', () => {
-      const activity = consorsbank.parsePages(dividendsSamples[0]).activities;
+      const activities = consorsbank.parsePages(dividendsSamples[0]).activities;
 
-      expect(activity).toEqual([
+      expect(activities).toEqual([
         {
           type: 'Dividend',
           broker: 'consorsbank',
           company: 'Alerian MLP ETF Registered Shares o.N.',
           date: '2020-05-14',
+          datetime: '2020-05-14T' + activities[0].datetime.substring(11),
           isin: 'US00162Q8666',
           wkn: 'A1H99H',
           amount: 186.79,
@@ -215,14 +224,15 @@ describe('Broker: Consorsbank', () => {
     });
 
     test('should map pdf data of ertrag_global_x_superdividend_etf correctly', () => {
-      const activity = consorsbank.parsePages(dividendsSamples[1]).activities;
+      const activities = consorsbank.parsePages(dividendsSamples[1]).activities;
 
-      expect(activity).toEqual([
+      expect(activities).toEqual([
         {
           amount: 71.02,
           broker: 'consorsbank',
           company: 'Global X SuperDividend ETF Registered Shares o.N.',
           date: '2020-03-12',
+          datetime: '2020-03-12T' + activities[0].datetime.substring(11),
           fee: 0,
           isin: 'US37950E5490',
           wkn: 'A1JJ54',
@@ -237,14 +247,15 @@ describe('Broker: Consorsbank', () => {
     });
 
     test('should map pdf data of dividend_vanguard ftse_etf.json correctly', () => {
-      const activity = consorsbank.parsePages(dividendsSamples[2]).activities;
+      const activities = consorsbank.parsePages(dividendsSamples[2]).activities;
 
-      expect(activity).toEqual([
+      expect(activities).toEqual([
         {
           amount: 9.75,
           broker: 'consorsbank',
           company: 'Vanguard FTSE D.A.P.x.J.U.ETF Registered Shares o.N.',
           date: '2018-10-10',
+          datetime: '2018-10-10T' + activities[0].datetime.substring(11),
           fee: 0,
           isin: 'IE00B9F5YL18',
           wkn: 'A1T8FT',
@@ -259,12 +270,15 @@ describe('Broker: Consorsbank', () => {
     });
 
     test('should map pdf data of ertrag_alerian_mlp_etf_2.json', () => {
-      expect(consorsbank.parsePages(dividendsSamples[3]).activities).toEqual([
+      const activities = consorsbank.parsePages(dividendsSamples[3]).activities;
+
+      expect(activities).toEqual([
         {
           amount: 236.73,
           broker: 'consorsbank',
           company: 'Alerian MLP ETF Registered Shares o.N.',
           date: '2020-02-20',
+          datetime: '2020-02-20T' + activities[0].datetime.substring(11),
           fee: 0,
           isin: 'US00162Q8666',
           wkn: 'A1H99H',
@@ -279,12 +293,15 @@ describe('Broker: Consorsbank', () => {
     });
 
     test('should map pdf data of dividend_volkswagen_ag.json', () => {
-      expect(consorsbank.parsePages(dividendsSamples[4]).activities).toEqual([
+      const activities = consorsbank.parsePages(dividendsSamples[4]).activities;
+
+      expect(activities).toEqual([
         {
           amount: 67.2,
           broker: 'consorsbank',
           company: 'VOLKSWAGEN AG Inhaber-Stammaktien o.N.',
           date: '2019-05-17',
+          datetime: '2019-05-17T' + activities[0].datetime.substring(11),
           fee: 0,
           isin: 'DE0007664005',
           wkn: '766400',
@@ -297,13 +314,16 @@ describe('Broker: Consorsbank', () => {
     });
 
     test('should map pdf data of dividend_diageo.json', () => {
-      expect(consorsbank.parsePages(dividendsSamples[5]).activities).toEqual([
+      const activities = consorsbank.parsePages(dividendsSamples[5]).activities;
+
+      expect(activities).toEqual([
         {
           type: 'Dividend',
           amount: 1.53,
           broker: 'consorsbank',
           company: 'DIAGEO PLC Reg. Shares LS -,28935185',
           date: '2020-10-08',
+          datetime: '2020-10-08T' + activities[0].datetime.substring(11),
           fee: 0,
           isin: 'GB0002374006',
           wkn: '851247',
@@ -317,12 +337,15 @@ describe('Broker: Consorsbank', () => {
     });
 
     test('should map pdf data of dividend_cisco_system_inc.json', () => {
-      expect(consorsbank.parsePages(dividendsSamples[6]).activities).toEqual([
+      const activities = consorsbank.parsePages(dividendsSamples[6]).activities;
+
+      expect(activities).toEqual([
         {
           amount: 0.27,
           broker: 'consorsbank',
           company: 'CISCO SYSTEMS INC. Registered Shares DL-,001',
           date: '2020-04-22',
+          datetime: '2020-04-22T' + activities[0].datetime.substring(11),
           fee: 0,
           isin: 'US17275R1023',
           wkn: '878841',
@@ -337,12 +360,15 @@ describe('Broker: Consorsbank', () => {
     });
 
     test('should map pdf data of dividend_pepsico.json', () => {
-      expect(consorsbank.parsePages(dividendsSamples[7]).activities).toEqual([
+      const activities = consorsbank.parsePages(dividendsSamples[7]).activities;
+
+      expect(activities).toEqual([
         {
           amount: 1.26,
           broker: 'consorsbank',
           company: 'PEPSICO INC. Registered Shares DL -,0166',
           date: '2020-09-30',
+          datetime: '2020-09-30T' + activities[0].datetime.substring(11),
           fee: 0,
           isin: 'US7134481081',
           wkn: '851995',
@@ -357,12 +383,15 @@ describe('Broker: Consorsbank', () => {
     });
 
     test('should map pdf data of illinois tool works', () => {
-      expect(consorsbank.parsePages(dividendsSamples[8]).activities).toEqual([
+      const activities = consorsbank.parsePages(dividendsSamples[8]).activities;
+
+      expect(activities).toEqual([
         {
           amount: 23.29,
           broker: 'consorsbank',
           company: 'ILLINOIS TOOL WORKS INC. Registered Shares o.N.',
           date: '2020-10-14',
+          datetime: '2020-10-14T' + activities[0].datetime.substring(11),
           fee: 0,
           isin: 'US4523081093',
           wkn: '861219',
@@ -382,11 +411,14 @@ describe('Broker: Consorsbank', () => {
     // Secondly, it seems to be a cancellation of an allready payed out dividend
     // so the dividend is payed BACK to the Broker to recalculate something
     test('should map pdf data of realty income', () => {
-      expect(consorsbank.parsePages(dividendsSamples[9]).activities).toEqual([
+      const activities = consorsbank.parsePages(dividendsSamples[9]).activities;
+
+      expect(activities).toEqual([
         {
           broker: 'consorsbank',
           company: 'REALTY INCOME CORP. Registered Shares DL 1',
           date: '2020-02-19',
+          datetime: '2020-02-19T' + activities[0].datetime.substring(11),
           isin: 'US7561091049',
           wkn: '899744',
           amount: 0.13,
@@ -402,11 +434,15 @@ describe('Broker: Consorsbank', () => {
     });
 
     test('should map pdf data of agnc investment corp', () => {
-      expect(consorsbank.parsePages(dividendsSamples[10]).activities).toEqual([
+      const activities = consorsbank.parsePages(dividendsSamples[10])
+        .activities;
+
+      expect(activities).toEqual([
         {
           broker: 'consorsbank',
           company: 'AGNC Investment Corp. Registered Shares DL -,001',
           date: '2020-06-29',
+          datetime: '2020-06-29T' + activities[0].datetime.substring(11),
           isin: 'US00123Q1040',
           wkn: 'A2AR58',
           amount: 5.87,
@@ -422,11 +458,15 @@ describe('Broker: Consorsbank', () => {
     });
 
     test('Can parse dividend from a 2015 total sa file', () => {
-      expect(consorsbank.parsePages(dividendsSamples[11]).activities).toEqual([
+      const activities = consorsbank.parsePages(dividendsSamples[11])
+        .activities;
+
+      expect(activities).toEqual([
         {
           broker: 'consorsbank',
           company: 'Total S.A.',
           date: '2015-07-01',
+          datetime: '2015-07-01T' + activities[0].datetime.substring(11),
           wkn: 'A14UJS',
           amount: 15.25,
           fee: 0,
@@ -439,11 +479,15 @@ describe('Broker: Consorsbank', () => {
     });
 
     test('Can parse dividend from a 2016 bmw file', () => {
-      expect(consorsbank.parsePages(dividendsSamples[12]).activities).toEqual([
+      const activities = consorsbank.parsePages(dividendsSamples[12])
+        .activities;
+
+      expect(activities).toEqual([
         {
           broker: 'consorsbank',
           company: 'BAYERISCHE MOTOREN WERKE AG',
           date: '2016-05-13',
+          datetime: '2016-05-13T' + activities[0].datetime.substring(11),
           wkn: '519000',
           amount: 489.6,
           fee: 0,
@@ -456,11 +500,15 @@ describe('Broker: Consorsbank', () => {
     });
 
     test('Can parse dividend from a 2018 total sa file', () => {
-      expect(consorsbank.parsePages(dividendsSamples[13]).activities).toEqual([
+      const activities = consorsbank.parsePages(dividendsSamples[13])
+        .activities;
+
+      expect(activities).toEqual([
         {
           broker: 'consorsbank',
           company: 'Total S.A. Anrechte',
           date: '2018-06-28',
+          datetime: '2018-06-28T' + activities[0].datetime.substring(11),
           wkn: 'A2JNEW',
           isin: 'FR0013333374',
           amount: 15.5,
@@ -474,11 +522,15 @@ describe('Broker: Consorsbank', () => {
     });
 
     test('Can parse dividend from a 2018 DEUTSCHE POST AG file', () => {
-      expect(consorsbank.parsePages(dividendsSamples[14]).activities).toEqual([
+      const activities = consorsbank.parsePages(dividendsSamples[14])
+        .activities;
+
+      expect(activities).toEqual([
         {
           broker: 'consorsbank',
           company: 'DEUTSCHE POST AG NAMENS-AKTIEN O.N.',
           date: '2018-04-27',
+          datetime: '2018-04-27T' + activities[0].datetime.substring(11),
           wkn: '555200',
           isin: 'DE0005552004',
           amount: 24.15,

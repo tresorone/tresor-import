@@ -13,6 +13,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-06-30T22:00:00.000Z",
     "price": 37.425
   },
   {
@@ -29,6 +30,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-07-31T22:00:00.000Z",
     "price": 71.34
   },
   {
@@ -45,6 +47,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-08-31T22:00:00.000Z",
     "price": 71.34
   },
   {
@@ -59,6 +62,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-09-30T22:00:00.000Z",
     "price": 71.34
   }
 ]

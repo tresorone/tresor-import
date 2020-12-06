@@ -1,9 +1,11 @@
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
 import Big from 'big.js';
 import { onvistaIdentificationString } from './onvista';
-
-import { parseGermanNum, validateActivity } from '@/helper';
+import {
+  parseGermanNum,
+  validateActivity,
+  createActivityDateTime,
+  timeRegex,
+} from '@/helper';
 
 const findISINAndWKN = (text, spanISIN, spanWKN) => {
   // The line contains either WPKNR/ISIN or WKN/ISIN, depending on the document
@@ -35,22 +37,37 @@ const findCompany = (text, type, formatId) => {
 
 const findDateBuySell = textArr => {
   const dateLine = textArr[textArr.findIndex(t => t.includes('Geschäftstag'))];
-  return format(
-    parse(
-      dateLine.match(/[0-9]{2}.[0-9]{2}.[1-2][0-9]{3}/)[0],
-      'dd.MM.yyyy',
-      new Date()
-    ),
-    'yyyy-MM-dd'
-  );
+  return dateLine.match(/[0-9]{2}.[0-9]{2}.[1-2][0-9]{3}/)[0];
 };
 
 const findDateDividend = textArr => {
   const dateLine = textArr[
     textArr.findIndex(t => t.includes('Valuta')) + 1
   ].split(/\s+/);
-  const date = dateLine[dateLine.length - 3];
-  return format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd');
+
+  return dateLine[dateLine.length - 3];
+};
+
+const findOrderTime = content => {
+  // Extract the time from a string like this: "Handelszeit       : 15:30 Uhr (MEZ/MESZ)                  (Kommissionsgeschäft)"
+  const searchTerm = 'Handelszeit';
+  const lineNumber = content.findIndex(t => t.includes(searchTerm));
+
+  // Some documents have the time on the same line as `Handelszeit`
+  if (lineNumber >= 0 && timeRegex(false).test(content[lineNumber])) {
+    return (
+      content[lineNumber].split(':')[1].trim() +
+      ':' +
+      content[lineNumber].split(':')[2].trim().substring(0, 2)
+    );
+  }
+
+  // and some on two lines after `Handelszeit`
+  if (lineNumber >= 0 && timeRegex(false).test(content[lineNumber + 2])) {
+    return content[lineNumber + 2].split(' ')[0];
+  }
+
+  return undefined;
 };
 
 const findShares = (textArr, formatId) => {
@@ -295,6 +312,7 @@ export const canParsePage = (content, extension) =>
 const parseData = textArr => {
   let type,
     date,
+    time,
     isin,
     wkn,
     company,
@@ -311,6 +329,7 @@ const parseData = textArr => {
   if (isBuy(textArr)) {
     type = 'Buy';
     date = findDateBuySell(textArr);
+    time = findOrderTime(textArr);
     [fxRate, foreignCurrency] = findBuyFxRateForeignCurrency(textArr);
     [isin, wkn] = findISINAndWKN(textArr, 2, 1);
     company = findCompany(textArr, type, formatId);
@@ -328,6 +347,7 @@ const parseData = textArr => {
     );
     company = findCompany(textArr, type, formatId);
     date = findDateBuySell(textArr);
+    time = findOrderTime(textArr);
     [fxRate, foreignCurrency] = findBuyFxRateForeignCurrency(textArr);
     shares = findShares(textArr, formatId);
     amount = +findAmount(textArr, fxRate, foreignCurrency, formatId);
@@ -347,10 +367,13 @@ const parseData = textArr => {
     tax = findTax(textArr, fxRate, formatId);
   }
 
+  const [parsedDate, parsedDateTime] = createActivityDateTime(date, time);
+
   let activity = {
     broker: 'comdirect',
     type,
-    date,
+    date: parsedDate,
+    datetime: parsedDateTime,
     isin,
     wkn,
     company,

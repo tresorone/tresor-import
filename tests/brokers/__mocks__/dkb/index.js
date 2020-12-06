@@ -2,6 +2,7 @@ export const buySamples = [
   require('./buy/buy_stock_eur_provision_1.json'),
   require('./buy/buy_stock_eur_provision_2.json'),
   require('./buy/buy_stock_eur_provision_bonification.json'),
+  require('./buy/limit_market_order_eur_mcdonalds.json'),
 ];
 
 export const sellSamples = [

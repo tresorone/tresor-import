@@ -1,8 +1,10 @@
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
 import Big from 'big.js';
-
-import { parseGermanNum, validateActivity } from '@/helper';
+import {
+  parseGermanNum,
+  validateActivity,
+  createActivityDateTime,
+  timeRegex,
+} from '@/helper';
 
 // Both smartbroker and onvista use highly similar parsers due to them both being
 // daughter companies from BNP Paribas; a french bank. There is no string which
@@ -34,18 +36,33 @@ export const findDateBuySell = text => {
   } else {
     throw { text: 'Unknown date' };
   }
-  return format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd');
+  return date;
 };
 
 export const findDateDividend = text =>
-  format(
-    parse(
-      text[text.findIndex(t => t.includes('Zahltag')) + 1],
-      'dd.MM.yyyy',
-      new Date()
-    ),
-    'yyyy-MM-dd'
-  );
+  text[text.findIndex(t => t.includes('Zahltag')) + 1];
+
+const findOrderTime = content => {
+  // Extract the time after the line with Handelszeit which contains "17:33"
+  const searchTerm = 'Handelszeit';
+  const lineNumber = content.findIndex(t => t.includes(searchTerm));
+
+  if (lineNumber < 0) {
+    return undefined;
+  }
+
+  const lineContentFormatNew = content[lineNumber + 1].trim();
+  if (timeRegex(false).test(lineContentFormatNew)) {
+    return lineContentFormatNew;
+  }
+
+  const lineContentFormatOld = content[lineNumber - 1].trim();
+  if (timeRegex(false).test(lineContentFormatOld)) {
+    return lineContentFormatOld;
+  }
+
+  return undefined;
+};
 
 export const findShares = textArr => {
   const sharesLine = textArr[textArr.findIndex(t => t.includes('STK'))];
@@ -174,7 +191,7 @@ export const isDividend = text =>
   text.some(t => t.includes('Dividendengutschrift'));
 
 const parseData = text => {
-  let type, date, price, amount, fee, tax;
+  let type, date, time, price, amount, fee, tax;
 
   const isin = findISIN(text);
   const company = findCompany(text);
@@ -183,6 +200,7 @@ const parseData = text => {
   if (isBuy(text)) {
     type = 'Buy';
     date = findDateBuySell(text);
+    time = findOrderTime(text);
     amount = findAmount(text);
     fee = findFee(text);
     tax = 0.0;
@@ -190,6 +208,7 @@ const parseData = text => {
   } else if (isSell(text)) {
     type = 'Sell';
     date = findDateBuySell(text);
+    time = findOrderTime(text);
     amount = findAmount(text);
     fee = findFee(text);
     tax = findTax(text);
@@ -202,19 +221,22 @@ const parseData = text => {
     amount = +Big(findPayout(text)).plus(tax);
     price = +Big(amount).div(shares);
   }
-  const activity = {
+
+  const [parsedDate, parsedDateTime] = createActivityDateTime(date, time);
+
+  return validateActivity({
     broker: 'onvista',
     type: type,
     shares: shares,
-    date: date,
+    date: parsedDate,
+    datetime: parsedDateTime,
     isin: isin,
     company: company,
     price: price,
     amount: amount,
     tax: tax,
     fee: fee,
-  };
-  return validateActivity(activity);
+  });
 };
 
 export const parsePages = contents => {

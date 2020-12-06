@@ -1,11 +1,10 @@
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
 import Big from 'big.js';
-
 import {
   parseGermanNum,
   validateActivity,
   findFirstIsinIndexInArray,
+  createActivityDateTime,
+  timeRegex,
 } from '@/helper';
 
 const findISIN = textArr => {
@@ -44,14 +43,32 @@ const findCompany = textArr => {
   return name_index_one;
 };
 
-const findDateBuySell = textArr => {
-  // Before 12/2015 the headline is 'Wertpapierabrechnung'
-  const idx = textArr.findIndex(
-    t =>
-      t.toLowerCase() === 'orderabrechnung' ||
-      t.toLowerCase() === 'wertpapierabrechnung'
+const findBuySellLineNumber = content => {
+  return content.findIndex(
+    line =>
+      line.toLowerCase() === 'orderabrechnung' ||
+      line.toLowerCase() === 'wertpapierabrechnung'
   );
-  return textArr[idx + 2].substr(3, 10).trim();
+};
+
+const findDateBuySell = content => {
+  // Before 12/2015 the headline is 'Wertpapierabrechnung'
+  return content[findBuySellLineNumber(content) + 2].substr(3, 10).trim();
+};
+
+const findOrderTime = content => {
+  // Extract the time after the line with order time which contains "15:57:49"
+  const lineNumber = findBuySellLineNumber(content);
+  if (lineNumber <= 0) {
+    return undefined;
+  }
+
+  const lineContent = content[lineNumber + 4];
+  if (lineContent === undefined || !timeRegex(true).test(lineContent)) {
+    return undefined;
+  }
+
+  return lineContent.trim();
 };
 
 const findDateDividend = textArr => {
@@ -168,31 +185,22 @@ const findDividendTax = (textArr, amount) => {
 const findForeignInformation = textArr => {
   const foreignInfo = textArr.findIndex(line => line.includes('Devisenkurs'));
   if (foreignInfo >= 0) {
-    const foreignInfoLine = textArr[foreignInfo+1].split(/\s+/)
-    return [parseGermanNum(foreignInfoLine[0]), foreignInfoLine[1]]
+    const foreignInfoLine = textArr[foreignInfo + 1].split(/\s+/);
+    return [parseGermanNum(foreignInfoLine[0]), foreignInfoLine[1]];
   }
-  return [undefined, undefined]
-
+  return [undefined, undefined];
 };
 
 const isBuy = textArr => {
   // Before 12/2015 the headline is 'Wertpapierabrechnung'
-  const idx = textArr.findIndex(
-    t =>
-      t.toLowerCase() === 'orderabrechnung' ||
-      t.toLowerCase() === 'wertpapierabrechnung'
-  );
-  return idx >= 0 && textArr[idx + 1].toLowerCase() === 'kauf';
+  const lineNumber = findBuySellLineNumber(textArr);
+  return lineNumber >= 0 && textArr[lineNumber + 1].toLowerCase() === 'kauf';
 };
 
 const isSell = textArr => {
   // Before 12/2015 the headline is 'Wertpapierabrechnung'
-  const idx = textArr.findIndex(
-    t =>
-      t.toLowerCase() === 'orderabrechnung' ||
-      t.toLowerCase() === 'wertpapierabrechnung'
-  );
-  return idx >= 0 && textArr[idx + 1].toLowerCase() === 'verkauf';
+  const lineNumber = findBuySellLineNumber(textArr);
+  return lineNumber >= 0 && textArr[lineNumber + 1].toLowerCase() === 'verkauf';
 };
 
 const isDividend = textArr =>
@@ -217,14 +225,16 @@ export const canParsePage = (content, extension) => {
 };
 
 const parseData = textArr => {
-  let type, date, shares, amount, fee, tax, fxRate, foreignCurrency;
+  let type, date, time, shares, amount, fee, tax, fxRate, foreignCurrency;
 
   const isin = findISIN(textArr);
   const company = findCompany(textArr);
   const wkn = findWKN(textArr);
+
   if (isBuy(textArr)) {
     type = 'Buy';
     date = findDateBuySell(textArr);
+    time = findOrderTime(textArr);
     shares = findShares(textArr);
     amount = findAmount(textArr, 'Buy');
     fee = findFee(textArr);
@@ -232,6 +242,7 @@ const parseData = textArr => {
   } else if (isSell(textArr)) {
     type = 'Sell';
     date = findDateBuySell(textArr);
+    time = findOrderTime(textArr);
     shares = findShares(textArr);
     amount = findAmount(textArr, 'Sell');
     fee = findFee(textArr);
@@ -245,10 +256,19 @@ const parseData = textArr => {
     tax = findDividendTax(textArr, amount);
     [fxRate, foreignCurrency] = findForeignInformation(textArr);
   }
-  let activity = {
+
+  const [parsedDate, parsedDateTime] = createActivityDateTime(
+    date,
+    time,
+    'dd.MM.yyyy',
+    'dd.MM.yyyy HH:mm:ss'
+  );
+
+  const activity = {
     broker: 'consorsbank',
     type,
-    date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
+    date: parsedDate,
+    datetime: parsedDateTime,
     company,
     shares,
     price: +Big(amount).div(Big(shares)),
@@ -256,6 +276,7 @@ const parseData = textArr => {
     fee,
     tax,
   };
+
   if (wkn !== undefined) {
     activity.wkn = wkn;
   }
@@ -268,6 +289,7 @@ const parseData = textArr => {
   if (foreignCurrency !== undefined) {
     activity.foreignCurrency = foreignCurrency;
   }
+
   return validateActivity(activity);
 };
 

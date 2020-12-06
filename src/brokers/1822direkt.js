@@ -1,8 +1,10 @@
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
 import Big from 'big.js';
-
-import { parseGermanNum, validateActivity } from '@/helper';
+import {
+  parseGermanNum,
+  validateActivity,
+  createActivityDateTime,
+  timeRegex,
+} from '@/helper';
 
 const isPageTypeBuy = content =>
   content.some(
@@ -21,12 +23,31 @@ const findISIN = content =>
   content[findLineNumberByContent(content, 'ISIN') + 5];
 
 const findOrderDate = content => {
-  const value = content[findLineNumberByContent(content, 'Schlusstag') + 1];
+  const lineNumber = findLineNumberByContent(content, 'Schlusstag');
+  if (lineNumber <= 0) {
+    return undefined;
+  }
+
+  const value = content[lineNumber + 1];
   if (!value.includes(' ')) {
     return value;
   }
 
   return value.split(' ')[0];
+};
+
+const findOrderTime = content => {
+  const lineNumber = findLineNumberByContent(content, 'Schlusstag/-Zeit');
+  if (lineNumber <= 0) {
+    return undefined;
+  }
+
+  const lineValue = content[lineNumber + 1];
+  if (!lineValue.includes(' ') || !timeRegex(true).test(lineValue)) {
+    return undefined;
+  }
+
+  return lineValue.split(' ')[1];
 };
 
 const findPayDate = content =>
@@ -80,7 +101,7 @@ export const canParsePage = (content, extension) =>
     isPageTypeDividend(content));
 
 const parsePage = content => {
-  let type, date, isin, company, shares, price, amount, fee, tax;
+  let type, date, time, isin, company, shares, price, amount, fee, tax;
 
   if (isPageTypeBuy(content)) {
     const amountWithoutFees = Big(findAmount(content, false));
@@ -88,6 +109,7 @@ const parsePage = content => {
     isin = findISIN(content);
     company = findCompany(content);
     date = findOrderDate(content);
+    time = findOrderTime(content);
     shares = findShares(content);
     amount = +amountWithoutFees;
     price = +amountWithoutFees.div(Big(shares));
@@ -99,6 +121,7 @@ const parsePage = content => {
     isin = findISIN(content);
     company = findCompany(content, false);
     date = findOrderDate(content);
+    time = findOrderTime(content);
     shares = findShares(content, false);
     amount = +amountWithoutFees;
     price = +amountWithoutFees.div(Big(shares));
@@ -117,12 +140,21 @@ const parsePage = content => {
     tax = +Big(amountWithoutTaxes).minus(findAmount(content, true));
   } else {
     console.error('Unknown page type for 1822direkt');
+    return undefined;
   }
+
+  const [parsedDate, parsedDateTime] = createActivityDateTime(
+    date,
+    time,
+    'dd.MM.yyyy',
+    'dd.MM.yyyy HH:mm:ss'
+  );
 
   return validateActivity({
     broker: '1822direkt',
     type,
-    date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
+    date: parsedDate,
+    datetime: parsedDateTime,
     isin,
     company,
     shares,
@@ -138,7 +170,12 @@ export const parsePages = contents => {
 
   for (let content of contents) {
     try {
-      activities.push(parsePage(content));
+      const activity = parsePage(content);
+      if (activity === undefined) {
+        continue;
+      }
+
+      activities.push(activity);
     } catch (exception) {
       console.error(
         'Error while parsing page (1822direkt)',

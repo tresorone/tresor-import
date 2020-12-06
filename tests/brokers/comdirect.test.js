@@ -1,5 +1,4 @@
 import Big from 'big.js';
-
 import { findImplementation } from '@/index';
 import * as comdirect from '../../src/brokers/comdirect';
 import {
@@ -33,13 +32,14 @@ describe('Broker: comdirect', () => {
 
   describe('Validate buys', () => {
     test('Can the order parsed from saving_plan', () => {
-      const result = comdirect.parsePages(buySamples[0]);
+      const activities = comdirect.parsePages(buySamples[0]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
         date: '2020-08-07',
+        datetime: '2020-08-07T' + activities[0].datetime.substring(11),
         isin: 'DE0007231334',
         wkn: '723133',
         company: 'Sixt SE',
@@ -52,13 +52,14 @@ describe('Broker: comdirect', () => {
     });
 
     test('Can the order with purchase reduction be parsed from purchase_eur_reduction', () => {
-      const result = comdirect.parsePages(buySamples[1]);
+      const activities = comdirect.parsePages(buySamples[1]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
         date: '2020-04-01',
+        datetime: '2020-04-01T' + activities[0].datetime.substring(11),
         isin: 'LU0187079347',
         wkn: 'A0CA0W',
         company: 'Robeco Global Consumer Trends',
@@ -71,13 +72,14 @@ describe('Broker: comdirect', () => {
     });
 
     test('Can the buy order with purchase reduction be parsed from purchase_usd_reduction', () => {
-      const result = comdirect.parsePages(buySamples[2]);
+      const activities = comdirect.parsePages(buySamples[2]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
         date: '2020-10-07',
+        datetime: '2020-10-07T' + activities[0].datetime.substring(11),
         isin: 'LU0079474960',
         wkn: '986838',
         company: 'AB SICAV I-American Growth Ptf',
@@ -92,13 +94,14 @@ describe('Broker: comdirect', () => {
     });
 
     test('Can the buy order be parsed from purchase_leifheit_ag', () => {
-      const result = comdirect.parsePages(buySamples[3]);
+      const activities = comdirect.parsePages(buySamples[3]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
         date: '2020-11-02',
+        datetime: '2020-11-02T10:41:00.000Z',
         isin: 'DE0006464506',
         wkn: '646450',
         company: 'Leifheit AG',
@@ -111,13 +114,14 @@ describe('Broker: comdirect', () => {
     });
 
     test('Can the buy order for BYD Co. Ltd. be parsed ', () => {
-      const result = comdirect.parsePages(buySamples[4]);
+      const activities = comdirect.parsePages(buySamples[4]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
         date: '2020-11-02',
+        datetime: '2020-11-02T08:28:00.000Z',
         isin: 'CNE100000296',
         wkn: 'A0M4W9',
         company: 'BYD Co. Ltd.',
@@ -130,13 +134,14 @@ describe('Broker: comdirect', () => {
     });
 
     test('Can the buy order for Lordstown Motors, traded at NASDAQ, be parsed', () => {
-      const result = comdirect.parsePages(buySamples[5]);
+      const activities = comdirect.parsePages(buySamples[5]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
         date: '2020-10-29',
+        datetime: '2020-10-29T14:34:00.000Z',
         isin: 'US54405Q1004',
         wkn: 'A2QGHG',
         company: 'Lordstown Motors Corp.',
@@ -151,13 +156,14 @@ describe('Broker: comdirect', () => {
     });
 
     test('Can the buy order for Alibaba Group Holding be parsed', () => {
-      const result = comdirect.parsePages(buySamples[6]);
+      const activities = comdirect.parsePages(buySamples[6]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Buy',
         date: '2020-11-03',
+        datetime: '2020-11-03T14:30:00.000Z',
         isin: 'US01609W1027',
         wkn: 'A117ME',
         company: 'Alibaba Group Holding Ltd.',
@@ -177,6 +183,7 @@ describe('Broker: comdirect', () => {
         broker: 'comdirect',
         type: 'Buy',
         date: '2019-01-30',
+        datetime: '2019-01-30T14:30:00.000Z',
         isin: 'US26884U1097',
         wkn: 'A1J78V',
         company: 'EPR Properties',
@@ -193,13 +200,14 @@ describe('Broker: comdirect', () => {
 
   describe('Validate Sells', () => {
     test('Can parse the sell order: 2020_eur_stock_biontech', () => {
-      const result = comdirect.parsePages(sellSamples[0]);
+      const activities = comdirect.parsePages(sellSamples[0]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Sell',
         date: '2020-03-18',
+        datetime: '2020-03-18T09:08:00.000Z',
         isin: 'US09075V1026',
         wkn: 'A2PSR2',
         company: 'BioNTech SE',
@@ -219,6 +227,7 @@ describe('Broker: comdirect', () => {
         broker: 'comdirect',
         type: 'Sell',
         date: '2020-11-20',
+        datetime: '2020-11-20T15:35:00.000Z',
         isin: 'US0395871009',
         wkn: 'A2JN1H',
         company: 'Arcimoto Inc.',
@@ -240,6 +249,7 @@ describe('Broker: comdirect', () => {
         broker: 'comdirect',
         type: 'Sell',
         date: '2020-03-18',
+        datetime: '2020-03-18T09:20:00.000Z',
         isin: 'DE0007472060',
         wkn: '747206',
         company: 'Wirecard AG',
@@ -254,13 +264,14 @@ describe('Broker: comdirect', () => {
 
   describe('Validate dividends', () => {
     test('Can the dividend in USD parsed from the document', () => {
-      const result = comdirect.parsePages(dividendSamples[0]);
+      const activities = comdirect.parsePages(dividendSamples[0]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Dividend',
         date: '2020-07-29',
+        datetime: '2020-07-29T' + activities[0].datetime.substring(11),
         isin: 'US3696041033',
         wkn: '851144',
         company: 'General Electric Co.',
@@ -275,13 +286,14 @@ describe('Broker: comdirect', () => {
     });
 
     test('Can the dividend in EUR parsed from the document', () => {
-      const result = comdirect.parsePages(dividendSamples[1]);
+      const activities = comdirect.parsePages(dividendSamples[1]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Dividend',
         date: '2020-05-08',
+        datetime: '2020-05-08T' + activities[0].datetime.substring(11),
         isin: 'DE0005790430',
         wkn: '579043',
         company: 'FUCHS PETROLUB SE',
@@ -294,13 +306,14 @@ describe('Broker: comdirect', () => {
     });
 
     test('Can the dividend in USD for Stryker Corp. be parsed from the document', () => {
-      const result = comdirect.parsePages(dividendSamples[2]);
+      const activities = comdirect.parsePages(dividendSamples[2]).activities;
 
-      expect(result.activities.length).toEqual(1);
-      expect(result.activities[0]).toEqual({
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
         broker: 'comdirect',
         type: 'Dividend',
         date: '2020-11-03',
+        datetime: '2020-11-03T' + activities[0].datetime.substring(11),
         isin: 'US8636671013',
         wkn: '864952',
         company: 'Stryker Corp.',

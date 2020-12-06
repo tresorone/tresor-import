@@ -1,12 +1,11 @@
 import { findImplementation } from '@/index';
-import * as ebase from '../../src/brokers/ebase';
+import * as ebase from '@/brokers/ebase';
 import {
   buySamples,
   invalidSamples,
   mixedSamples,
   sellSamples,
 } from './__mocks__/ebase';
-import { canParsePage } from '@/brokers/ebase';
 import { allValidSamples } from './__mocks__/ebase';
 
 // David Holin: No dividend samples test yet, as no example document is available
@@ -15,7 +14,7 @@ describe('Broker: ebase', () => {
 
   test('should only accept revenue-summary reports', () => {
     expect(
-      canParsePage(
+      ebase.canParsePage(
         ['Fondsertrag / Vorabpauschale', 'ebase Depot flex standard'],
         'pdf'
       )
@@ -24,7 +23,9 @@ describe('Broker: ebase', () => {
 
   test('should reject unknown PDF files', () => {
     expect(
-      canParsePage(['This String should never occur in a legitimate document'])
+      ebase.canParsePage([
+        'This String should never occur in a legitimate document',
+      ])
     ).toEqual(false);
   });
 
@@ -53,12 +54,13 @@ describe('Broker: ebase', () => {
 
   describe('Validate buys', () => {
     test('Can parse multiple planned buy orders from a document', () => {
-      const activities = ebase.parsePages(buySamples[0]);
-      expect(activities.activities.length).toEqual(11);
-      expect(activities.activities[0]).toEqual({
+      const activities = ebase.parsePages(buySamples[0]).activities;
+      expect(activities.length).toEqual(11);
+      expect(activities[0]).toEqual({
         broker: 'ebase',
         type: 'Buy',
         date: '2020-07-01',
+        datetime: '2020-07-01T' + activities[0].datetime.substring(11),
         isin: 'DE000A0X7541',
         company: 'ACATIS GANÉ VALUE EVENT FONDS A',
         shares: 0.054571,
@@ -67,10 +69,11 @@ describe('Broker: ebase', () => {
         tax: 0.0,
         fee: 0.0,
       });
-      expect(activities.activities[10]).toEqual({
+      expect(activities[10]).toEqual({
         broker: 'ebase',
         type: 'Buy',
         date: '2020-07-01',
+        datetime: '2020-07-01T' + activities[10].datetime.substring(11),
         isin: 'DE0009848119',
         company: 'DWS Top Dividende LD',
         shares: 0.126761,
@@ -82,12 +85,13 @@ describe('Broker: ebase', () => {
     });
 
     test('Can parse multiple buy and planned buy orders from a document', () => {
-      const activities = ebase.parsePages(buySamples[2]);
-      expect(activities.activities.length).toEqual(5);
-      expect(activities.activities[3]).toEqual({
+      const activities = ebase.parsePages(buySamples[2]).activities;
+      expect(activities.length).toEqual(5);
+      expect(activities[3]).toEqual({
         broker: 'ebase',
         type: 'Buy',
         date: '2020-07-24',
+        datetime: '2020-07-24T' + activities[3].datetime.substring(11),
         isin: 'DE000A2H7N24',
         company: 'The Digital Leaders Fund R',
         shares: 3.378835,
@@ -96,10 +100,11 @@ describe('Broker: ebase', () => {
         tax: 0.0,
         fee: 0.0,
       });
-      expect(activities.activities[4]).toEqual({
+      expect(activities[4]).toEqual({
         broker: 'ebase',
         type: 'Buy',
         date: '2020-07-01',
+        datetime: '2020-07-01T' + activities[4].datetime.substring(11),
         isin: 'DE000A2H7N24',
         company: 'The Digital Leaders Fund R',
         shares: 0.339997,
@@ -111,12 +116,14 @@ describe('Broker: ebase', () => {
     });
 
     test('Can parse multiple buy orders from a finvesto document', () => {
-      const activities = ebase.parsePages(buySamples[3]);
-      expect(activities.activities.length).toEqual(21);
-      expect(activities.activities[0]).toEqual({
+      const activities = ebase.parsePages(buySamples[3]).activities;
+
+      expect(activities.length).toEqual(21);
+      expect(activities[0]).toEqual({
         broker: 'ebase',
         type: 'Buy',
         date: '2020-10-30',
+        datetime: '2020-10-30T' + activities[0].datetime.substring(11),
         isin: 'IE00B4L5Y983',
         company: 'iShares Core MSCI World UCITS ETF USD (Acc)',
         shares: 0.747824,
@@ -127,10 +134,11 @@ describe('Broker: ebase', () => {
         foreignCurrency: 'USD',
         fxRate: 1.1622,
       });
-      expect(activities.activities[20]).toEqual({
+      expect(activities[20]).toEqual({
         broker: 'ebase',
         type: 'Buy',
         date: '2019-11-21',
+        datetime: '2019-11-21T' + activities[20].datetime.substring(11),
         isin: 'IE00B4L5Y983',
         company: 'iShares Core MSCI World UCITS ETF USD (Acc)',
         shares: 0.90628,
@@ -146,12 +154,13 @@ describe('Broker: ebase', () => {
 
   describe('Validate sells', () => {
     test('Can parse multiple eremuneration sell orders from a document', () => {
-      const activities = ebase.parsePages(sellSamples[0]);
-      expect(activities.activities.length).toEqual(2);
-      expect(activities.activities[0]).toEqual({
+      const activities = ebase.parsePages(sellSamples[0]).activities;
+      expect(activities.length).toEqual(2);
+      expect(activities[0]).toEqual({
         broker: 'ebase',
         type: 'Sell',
         date: '2019-12-19',
+        datetime: '2019-12-19T' + activities[0].datetime.substring(11),
         isin: 'DE0009848119',
         company: 'DWS Top Dividende LD',
         shares: 0.343695,
@@ -160,10 +169,11 @@ describe('Broker: ebase', () => {
         tax: 0.0,
         fee: 0.0,
       });
-      expect(activities.activities[1]).toEqual({
+      expect(activities[1]).toEqual({
         broker: 'ebase',
         type: 'Sell',
         date: '2018-12-19',
+        datetime: '2018-12-19T' + activities[1].datetime.substring(11),
         isin: 'DE0009848119',
         company: 'DWS Top Dividende LD',
         shares: 0.394046,
@@ -175,12 +185,13 @@ describe('Broker: ebase', () => {
     });
 
     test('Can parse multiple ordinary sell orders from a document', () => {
-      const activities = ebase.parsePages(sellSamples[1]);
-      expect(activities.activities.length).toEqual(11);
-      expect(activities.activities[0]).toEqual({
+      const activities = ebase.parsePages(sellSamples[1]).activities;
+      expect(activities.length).toEqual(11);
+      expect(activities[0]).toEqual({
         broker: 'ebase',
         type: 'Sell',
         date: '2020-09-23',
+        datetime: '2020-09-23T' + activities[0].datetime.substring(11),
         isin: 'FR0000292278',
         company: 'Magellan C',
         shares: 18.014988,
@@ -189,10 +200,11 @@ describe('Broker: ebase', () => {
         tax: 0.0,
         fee: 0.0,
       });
-      expect(activities.activities[10]).toEqual({
+      expect(activities[10]).toEqual({
         broker: 'ebase',
         type: 'Sell',
         date: '2020-09-22',
+        datetime: '2020-09-22T' + activities[10].datetime.substring(11),
         isin: 'DE0009848119',
         company: 'DWS Top Dividende LD',
         shares: 2.752834,
@@ -206,12 +218,13 @@ describe('Broker: ebase', () => {
 
   describe('Mixed Sells, buys and everything in between', () => {
     test('Can parse multiple sell orders from a ebase file', () => {
-      const activities = ebase.parsePages(mixedSamples[0]);
-      expect(activities.activities.length).toEqual(327);
-      expect(activities.activities[11]).toEqual({
+      const activities = ebase.parsePages(mixedSamples[0]).activities;
+      expect(activities.length).toEqual(327);
+      expect(activities[11]).toEqual({
         broker: 'ebase',
         type: 'Buy',
         date: '2020-07-01',
+        datetime: '2020-07-01T' + activities[11].datetime.substring(11),
         isin: 'DE000A0X7541',
         company: 'ACATIS GANÉ VALUE EVENT FONDS A',
         shares: 0.054571,
@@ -223,12 +236,13 @@ describe('Broker: ebase', () => {
     });
 
     test('Can parse buy and sell orders from a finvesto file', () => {
-      const activities = ebase.parsePages(mixedSamples[1]);
-      expect(activities.activities.length).toEqual(34);
-      expect(activities.activities[33]).toEqual({
+      const activities = ebase.parsePages(mixedSamples[1]).activities;
+      expect(activities.length).toEqual(34);
+      expect(activities[33]).toEqual({
         broker: 'ebase',
         type: 'Buy',
         date: '2018-03-27',
+        datetime: '2018-03-27T' + activities[33].datetime.substring(11),
         isin: 'LU0274208692',
         company: 'Xtrackers MSCI World Swap UCITS ETF 1C',
         shares: 0.863757,
@@ -240,10 +254,11 @@ describe('Broker: ebase', () => {
         foreignCurrency: 'USD',
       });
 
-      expect(activities.activities[11]).toEqual({
+      expect(activities[11]).toEqual({
         broker: 'ebase',
         type: 'Sell',
         date: '2019-12-19',
+        datetime: '2019-12-19T' + activities[11].datetime.substring(11),
         isin: 'LU0274208692',
         company: 'Xtrackers MSCI World Swap UCITS ETF 1C',
         shares: 0.164912,

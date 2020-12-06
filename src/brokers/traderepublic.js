@@ -1,8 +1,9 @@
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
 import Big from 'big.js';
-
-import { parseGermanNum, validateActivity } from '@/helper';
+import {
+  parseGermanNum,
+  validateActivity,
+  createActivityDateTime,
+} from '@/helper';
 
 const findISIN = text => {
   if (text.some(t => t.includes('ISIN:'))) {
@@ -25,6 +26,18 @@ const findDateSingleBuy = textArr => {
   const searchTerm = 'Kauf am ';
   const dateLine = textArr[textArr.findIndex(t => t.includes(searchTerm))];
   return dateLine.split(searchTerm)[1].trim().substr(0, 10);
+};
+
+const findOrderTime = content => {
+  // Extract the time from a string like this: "Market-Order Kauf am 04.02.2020, um 14:02 Uhr an der Lang & Schwarz Exchange."
+  const searchTerm = ', um ';
+  const lineNumber = content.findIndex(t => t.includes(searchTerm));
+
+  if (lineNumber < 0) {
+    return undefined;
+  }
+
+  return content[lineNumber].split(searchTerm)[1].trim().substr(0, 5);
 };
 
 const findDateBuySavingsPlan = textArr => {
@@ -228,13 +241,16 @@ const parsePositionAsActivity = (content, startLineNumber) => {
   const numberOfShares = parseGermanNum(content[startLineNumber].split(' ')[0]);
   const toalAmount = parseGermanNum(content[lineOfDate + 1]);
 
+  const [parsedDate, parsedDateTime] = createActivityDateTime(
+    content[lineOfDate],
+    undefined
+  );
+
   return {
     broker: 'traderepublic',
     type: 'Buy',
-    date: format(
-      parse(content[lineOfDate], 'dd.MM.yyyy', new Date()),
-      'yyyy-MM-dd'
-    ),
+    date: parsedDate,
+    datetime: parsedDateTime,
     isin: content[lineNumberOfISIN].split(' ')[1],
     company: content[startLineNumber + 1],
     shares: numberOfShares,
@@ -247,7 +263,7 @@ const parsePositionAsActivity = (content, startLineNumber) => {
 };
 
 const parseOrderOrDividend = textArr => {
-  let type, date, isin, company, shares, price, amount, tax, fee;
+  let type, date, time, isin, company, shares, price, amount, tax, fee;
 
   if (isBuySingle(textArr) || isBuySavingsPlan(textArr)) {
     type = 'Buy';
@@ -255,6 +271,7 @@ const parseOrderOrDividend = textArr => {
     date = isBuySavingsPlan(textArr)
       ? findDateBuySavingsPlan(textArr)
       : findDateSingleBuy(textArr);
+    time = findOrderTime(textArr);
     amount = +findAmount(textArr);
     fee = +findFee(textArr);
     tax = +findTax(textArr);
@@ -262,6 +279,7 @@ const parseOrderOrDividend = textArr => {
     type = 'Sell';
     company = findCompany(textArr);
     date = findDateSell(textArr);
+    time = findOrderTime(textArr);
     amount = +findAmount(textArr);
     fee = +findFee(textArr);
     tax = +findTax(textArr);
@@ -273,14 +291,18 @@ const parseOrderOrDividend = textArr => {
     fee = +findFee(textArr);
     amount = +findDividendNetPayout(textArr).plus(tax).plus(fee);
   }
+
   isin = findISIN(textArr);
   shares = findShares(textArr);
   price = findPriceOfShare(textArr);
 
+  const [parsedDate, parsedDateTime] = createActivityDateTime(date, time);
+
   return {
     broker: 'traderepublic',
     type,
-    date: format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd'),
+    date: parsedDate,
+    datetime: parsedDateTime,
     isin,
     company,
     shares,

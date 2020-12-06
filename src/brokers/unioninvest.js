@@ -1,8 +1,9 @@
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
 import Big from 'big.js';
-
-import { validateActivity, parseGermanNum } from '../helper';
+import {
+  validateActivity,
+  parseGermanNum,
+  createActivityDateTime,
+} from '../helper';
 
 export const canParsePage = (pdfPage, extension) => {
   return (
@@ -18,6 +19,13 @@ export const canParsePage = (pdfPage, extension) => {
 const parseBuy = (pdfPage, activityIdx, vortragIdx) => {
   const isinIdx = pdfPage.indexOf('ISIN:', activityIdx);
   const companyIdx = pdfPage.indexOf('Fonds:', activityIdx) + 1;
+
+  // The documents from unioninvest didn't contains any order time
+  const [parsedDate, parsedDateTime] = createActivityDateTime(
+    pdfPage[vortragIdx + 4],
+    undefined
+  );
+
   return [
     validateActivity({
       broker: 'unioninvest',
@@ -25,10 +33,8 @@ const parseBuy = (pdfPage, activityIdx, vortragIdx) => {
       company:
         pdfPage[companyIdx] + pdfPage.slice(companyIdx + 1, isinIdx).join(' '),
       isin: pdfPage[isinIdx + 1],
-      date: format(
-        parse(pdfPage[vortragIdx + 4], 'dd.MM.yyyy', new Date()),
-        'yyyy-MM-dd'
-      ),
+      date: parsedDate,
+      datetime: parsedDateTime,
       amount: parseGermanNum(
         pdfPage[vortragIdx + 10] + pdfPage[vortragIdx + 11]
       ),
@@ -60,20 +66,26 @@ const parseDividend = (pdfPage, activityIdx, vortragIdx) => {
   const shares = parseGermanNum(
     pdfPage[vortragIdx + 2] + pdfPage[vortragIdx + 3]
   );
-  const activity = {
-    broker: 'unioninvest',
-    type: 'Dividend',
-    company,
-    isin,
-    date,
-    // Thee amount of the payout per share is not explicitely given, thus it has to be calculated
-    amount,
-    shares,
-    price: +Big(amount).div(shares),
-    tax: findPayoutTax(pdfPage, activityIdx, churchTaxIdx),
-    fee: 0,
-  };
-  activities.push(validateActivity(activity));
+
+  // The documents from unioninvest didn't contains any order time
+  const [parsedDate, parsedDateTime] = createActivityDateTime(date, undefined);
+
+  activities.push(
+    validateActivity({
+      broker: 'unioninvest',
+      type: 'Dividend',
+      company,
+      isin,
+      date: parsedDate,
+      datetime: parsedDateTime,
+      // Thee amount of the payout per share is not explicitely given, thus it has to be calculated
+      amount,
+      shares,
+      price: +Big(amount).div(shares),
+      tax: findPayoutTax(pdfPage, activityIdx, churchTaxIdx),
+      fee: 0,
+    })
+  );
 
   // The dividend was automatically reinvested, thus we need another buy
   // operation.
@@ -86,7 +98,8 @@ const parseDividend = (pdfPage, activityIdx, vortragIdx) => {
         type: 'Buy',
         company,
         isin,
-        date,
+        date: parsedDate,
+        datetime: parsedDateTime,
         amount: parseGermanNum(
           pdfPage[reinvestIdx + 1] + pdfPage[reinvestIdx + 2]
         ),
@@ -105,10 +118,9 @@ const parseDividend = (pdfPage, activityIdx, vortragIdx) => {
 };
 
 const findPayoutDate = (pdfPage, churchTaxIdx) => {
-  const date = pdfPage[churchTaxIdx + 2].includes(',')
+  return pdfPage[churchTaxIdx + 2].includes(',')
     ? pdfPage[churchTaxIdx + 4]
     : pdfPage[churchTaxIdx + 2];
-  return format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd');
 };
 
 const findPayoutTax = (pdfPage, activityIdx, churchTaxIdx) => {

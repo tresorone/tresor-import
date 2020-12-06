@@ -12,6 +12,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2018-11-18T23:00:00.000Z",
     "price": 0.5466666666666666
   },
   {
@@ -27,6 +28,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2018-12-16T23:00:00.000Z",
     "price": 0.3426315789473684
   },
   {
@@ -42,6 +44,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-01-13T23:00:00.000Z",
     "price": 0.6475
   },
   {
@@ -57,6 +60,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-02-17T23:00:00.000Z",
     "price": 0.5483704086911536
   },
   {
@@ -73,6 +77,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-02-25T23:00:00.000Z",
     "price": 0.26877470355731226
   },
   {
@@ -89,6 +94,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-03-06T23:00:00.000Z",
     "price": 0.18666666666666668
   },
   {
@@ -105,6 +111,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-03-13T23:00:00.000Z",
     "price": 0.6787175989085948
   },
   {
@@ -120,6 +127,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-03-17T23:00:00.000Z",
     "price": 0.34515728081078495
   },
   {
@@ -136,6 +144,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-03-18T23:00:00.000Z",
     "price": 0.8704883227176221
   },
   {
@@ -152,6 +161,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-04-11T22:00:00.000Z",
     "price": 0.20456707897240722
   },
   {
@@ -168,6 +178,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-04-23T22:00:00.000Z",
     "price": 1.1364815775817332
   },
   {
@@ -183,6 +194,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-05-13T22:00:00.000Z",
     "price": 3.35
   },
   {
@@ -198,6 +210,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-05-19T22:00:00.000Z",
     "price": 0.5825761624799572
   },
   {
@@ -213,6 +226,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-05-26T22:00:00.000Z",
     "price": 3.25
   },
   {
@@ -229,6 +243,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-05-27T22:00:00.000Z",
     "price": 0.2711961176134742
   },
   {
@@ -245,6 +260,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-06-03T22:00:00.000Z",
     "price": 0.17147026632615833
   },
   {
@@ -261,6 +277,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-06-03T22:00:00.000Z",
     "price": 0.19723865877712032
   },
   {
@@ -277,6 +294,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-06-04T22:00:00.000Z",
     "price": 0.238
   },
   {
@@ -293,6 +311,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-06-05T22:00:00.000Z",
     "price": 0.19
   },
   {
@@ -309,6 +328,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-06-12T22:00:00.000Z",
     "price": 0.7115520907158044
   },
   {
@@ -325,6 +345,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-06-13T22:00:00.000Z",
     "price": 1.0766666666666667
   },
   {
@@ -340,6 +361,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-06-16T22:00:00.000Z",
     "price": 0.34542387178405737
   },
   {
@@ -356,6 +378,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-06-18T22:00:00.000Z",
     "price": 0.8766716196136701
   },
   {
@@ -372,6 +395,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-06-25T22:00:00.000Z",
     "price": 0.8930286153255234
   },
   {
@@ -388,6 +412,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-06-30T22:00:00.000Z",
     "price": 0.4625
   },
   {
@@ -403,6 +428,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-07-01T22:00:00.000Z",
     "price": 4.415
   },
   {
@@ -419,6 +445,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-07-11T22:00:00.000Z",
     "price": 0.19919834811125955
   },
   {
@@ -435,6 +462,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-07-11T22:00:00.000Z",
     "price": 0.2
   },
   {
@@ -450,6 +478,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-07-28T22:00:00.000Z",
     "price": 0.67
   },
   {
@@ -466,6 +495,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-08-13T22:00:00.000Z",
     "price": 0.585
   },
   {
@@ -481,6 +511,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-08-18T22:00:00.000Z",
     "price": 0.5849621914681125
   },
   {
@@ -497,6 +528,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-08-21T22:00:00.000Z",
     "price": 0.3227699530516432
   },
   {
@@ -513,6 +545,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-08-26T22:00:00.000Z",
     "price": 0.27582376897445393
   },
   {
@@ -529,6 +562,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-09-02T22:00:00.000Z",
     "price": 0.22458116695551705
   },
   {
@@ -545,6 +579,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-09-02T22:00:00.000Z",
     "price": 0.21909744931327665
   },
   {
@@ -561,6 +596,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-09-03T22:00:00.000Z",
     "price": 0.244
   },
   {
@@ -577,6 +613,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-09-04T22:00:00.000Z",
     "price": 0.1968503937007874
   },
   {
@@ -593,6 +630,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-09-10T22:00:00.000Z",
     "price": 0.3426124197002141
   },
   {
@@ -609,6 +647,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-09-11T22:00:00.000Z",
     "price": 0.7287009063444109
   },
   {
@@ -625,6 +664,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-09-15T22:00:00.000Z",
     "price": 1.105740181268882
   },
   {
@@ -640,6 +680,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-09-15T22:00:00.000Z",
     "price": 0.35374888483767114
   },
   {
@@ -656,6 +697,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-09-18T22:00:00.000Z",
     "price": 0.8959402706486235
   },
   {
@@ -672,6 +714,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-09-24T22:00:00.000Z",
     "price": 0.3890312173830534
   },
   {
@@ -688,6 +731,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-09-29T22:00:00.000Z",
     "price": 0.4825
   },
   {
@@ -704,6 +748,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-10-10T22:00:00.000Z",
     "price": 0.5830164765525983
   },
   {
@@ -720,6 +765,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-10-10T22:00:00.000Z",
     "price": 0.24456202233980012
   },
   {
@@ -736,6 +782,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-10-10T22:00:00.000Z",
     "price": 0.20774938169826876
   },
   {
@@ -751,6 +798,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-11-17T23:00:00.000Z",
     "price": 0.594482579976687
   },
   {
@@ -767,6 +815,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-11-19T23:00:00.000Z",
     "price": 0.69
   },
   {
@@ -783,6 +832,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-11-19T23:00:00.000Z",
     "price": 0.69
   },
   {
@@ -799,6 +849,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-11-28T23:00:00.000Z",
     "price": 0.17250747079597936
   },
   {
@@ -815,6 +866,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-11-28T23:00:00.000Z",
     "price": 0.1527702618324106
   },
   {
@@ -831,6 +883,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-12-02T23:00:00.000Z",
     "price": 0.3169550173010381
   },
   {
@@ -846,6 +899,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-12-03T23:00:00.000Z",
     "price": 1.89
   },
   {
@@ -862,6 +916,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-12-03T23:00:00.000Z",
     "price": 0.242
   },
   {
@@ -878,6 +933,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-12-03T23:00:00.000Z",
     "price": 0.3461109043542985
   },
   {
@@ -894,6 +950,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-12-04T23:00:00.000Z",
     "price": 0.22792022792022792
   },
   {
@@ -910,6 +967,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-12-11T23:00:00.000Z",
     "price": 0.7267380802352447
   },
   {
@@ -926,6 +984,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-12-15T23:00:00.000Z",
     "price": 1.0948054973212207
   },
   {
@@ -941,6 +1000,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-12-15T23:00:00.000Z",
     "price": 0.38831347217581763
   },
   {
@@ -957,6 +1017,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-12-17T23:00:00.000Z",
     "price": 0.9501025290498974
   },
   {
@@ -973,6 +1034,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-12-22T23:00:00.000Z",
     "price": 0.4725
   },
   {
@@ -989,6 +1051,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-12-26T23:00:00.000Z",
     "price": 0.06363285769379097
   },
   {
@@ -1005,6 +1068,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-12-30T23:00:00.000Z",
     "price": 0.18136850783182193
   },
   {
@@ -1021,6 +1085,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-12-30T23:00:00.000Z",
     "price": 0.1340724506896996
   },
   {
@@ -1037,6 +1102,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2019-12-30T23:00:00.000Z",
     "price": 0.2108171416559056
   },
   {
@@ -1052,6 +1118,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-01-19T23:00:00.000Z",
     "price": 0.669124218051832
   },
   {
@@ -1068,6 +1135,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-02-11T23:00:00.000Z",
     "price": 0.695
   },
   {
@@ -1084,6 +1152,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-02-11T23:00:00.000Z",
     "price": 0.6966666666666667
   },
   {
@@ -1100,6 +1169,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-02-12T23:00:00.000Z",
     "price": 0.10228586676154051
   },
   {
@@ -1115,6 +1185,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-02-16T23:00:00.000Z",
     "price": 0.601158860453887
   },
   {
@@ -1131,6 +1202,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-02-24T23:00:00.000Z",
     "price": 0.3213776461555336
   },
   {
@@ -1147,6 +1219,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-02-27T23:00:00.000Z",
     "price": 0.2327265545277988
   },
   {
@@ -1163,6 +1236,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-02-27T23:00:00.000Z",
     "price": 0.17144952782616668
   },
   {
@@ -1179,6 +1253,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-03-03T23:00:00.000Z",
     "price": 0.252
   },
   {
@@ -1195,6 +1270,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-03-04T23:00:00.000Z",
     "price": 0.2289774970390841
   },
   {
@@ -1211,6 +1287,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-03-11T23:00:00.000Z",
     "price": 0.7084545369240874
   },
   {
@@ -1227,6 +1304,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-03-15T23:00:00.000Z",
     "price": 1.108365019011407
   },
   {
@@ -1242,6 +1320,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-03-15T23:00:00.000Z",
     "price": 0.3848492435351765
   },
   {
@@ -1258,6 +1337,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-03-17T23:00:00.000Z",
     "price": 0.9482989552638629
   },
   {
@@ -1274,6 +1354,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-03-17T23:00:00.000Z",
     "price": 0.34907277544023685
   },
   {
@@ -1290,6 +1371,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-03-29T22:00:00.000Z",
     "price": 0.48
   },
   {
@@ -1306,6 +1388,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-04-13T22:00:00.000Z",
     "price": 0.2654575432811212
   },
   {
@@ -1322,6 +1405,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-04-13T22:00:00.000Z",
     "price": 0.1803719471207708
   },
   {
@@ -1338,6 +1422,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-04-13T22:00:00.000Z",
     "price": 0.3043779200553729
   },
   {
@@ -1353,6 +1438,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-05-17T22:00:00.000Z",
     "price": 0.6448051231091974
   },
   {
@@ -1369,6 +1455,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-05-19T22:00:00.000Z",
     "price": 0.7058333333333333
   },
   {
@@ -1385,6 +1472,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-05-19T22:00:00.000Z",
     "price": 1.1559585040537006
   },
   {
@@ -1401,6 +1489,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-05-25T22:00:00.000Z",
     "price": 0.3190743338008415
   },
   {
@@ -1417,6 +1506,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-05-28T22:00:00.000Z",
     "price": 0.18790555155010816
   },
   {
@@ -1433,6 +1523,7 @@
     "fee": 0,
     "currency": "EUR",
     "exchangeRate": 0,
+    "datetime": "2020-05-28T22:00:00.000Z",
     "price": 0.1904841297959694
   }
 ]

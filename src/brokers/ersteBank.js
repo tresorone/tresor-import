@@ -1,14 +1,17 @@
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
 import Big from 'big.js';
-
-import { parseGermanNum, validateActivity } from '@/helper';
+import {
+  parseGermanNum,
+  validateActivity,
+  createActivityDateTime,
+} from '@/helper';
 
 const findForeignCurrencyFxRate = pageArray => {
   const foreignIndex = pageArray.findIndex(line =>
     line.includes('-Kurs Mitte')
   );
-  if (foreignIndex <= 0) {return [undefined, undefined]; }
+  if (foreignIndex <= 0) {
+    return [undefined, undefined];
+  }
   const foreignIndexLine = pageArray[foreignIndex].split(' ');
   const fxRate = parseGermanNum(foreignIndexLine[2]);
   const foreignCurrency = foreignIndexLine[0].split('-')[0];
@@ -24,7 +27,7 @@ const findIsinBuy = pageArray => {
   return pageArray[isinIndex].split(/\s/)[0];
 };
 
-const findIsinPayout = ( pageArray ) => {
+const findIsinPayout = pageArray => {
   const lineIndex = pageArray.indexOf('Ausschüttung') + 2;
   if (lineIndex >= 0) {
     return pageArray[lineIndex].split(/\s+/)[0];
@@ -46,20 +49,34 @@ const findCompanyDividend = pageArray => {
   }
 };
 
-const findDateBuy = ( pageArray, legacyDocument = false ) => {
-  const dateIndex = legacyDocument ?
-    pageArray.findIndex(line => line.includes('Kauf aus Wertpapierliste vom')) :
-    pageArray.findIndex(line => line.includes('uf Marktplatz vom'))
+const findDateBuy = (pageArray, legacyDocument = false) => {
+  const dateIndex = legacyDocument
+    ? pageArray.findIndex(line => line.includes('Kauf aus Wertpapierliste vom'))
+    : pageArray.findIndex(line => line.includes('uf Marktplatz vom'));
 
   const dateLine = pageArray[dateIndex].split(/(\s+)/);
-  const date = dateLine[dateLine.length-1];
-  return format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd');
+  return dateLine[dateLine.length - 1];
+};
+
+const findOrderTime = content => {
+  const lineNumber = content.findIndex(line => line.includes('hrungszeit'));
+  if (lineNumber > 0) {
+    const elements = content[lineNumber].split(/\s+/);
+    const elementIndex = elements.findIndex(element =>
+      element.includes('hrungszeit')
+    );
+
+    if (elementIndex >= 0) {
+      return elements[elementIndex + 1].trim();
+    }
+  }
+
+  return undefined;
 };
 
 const findDateDividend = pageArray => {
   const dateIndex = pageArray.findIndex(line => line.includes('mit Valuta'));
-  const date = pageArray[dateIndex].split(/(\s+)/)[22];
-  return format(parse(date, 'dd.MM.yyyy', new Date()), 'yyyy-MM-dd');
+  return pageArray[dateIndex].split(/(\s+)/)[22];
 };
 
 const findAmountBuy = (pageArray, legacyDocument = false) => {
@@ -204,13 +221,14 @@ export const parsePages = content => {
   // Flatten every incomming array
   const pdfPagesConcat = [].concat.apply([], content);
   const broker = 'ersteBank';
-  let type, amount, shares, isin, company, date, price, tax, fee;
+  let type, amount, shares, isin, company, date, time, price, tax, fee;
 
   if (isBuy(pdfPagesConcat)) {
     type = 'Buy';
     isin = findIsinBuy(pdfPagesConcat);
     company = findCompanyBuy(pdfPagesConcat);
     date = findDateBuy(pdfPagesConcat);
+    time = findOrderTime(pdfPagesConcat);
     amount = findAmountBuy(pdfPagesConcat);
     shares = findSharesBuy(pdfPagesConcat);
     price = +Big(amount).div(shares);
@@ -221,6 +239,7 @@ export const parsePages = content => {
     isin = findIsinBuy(pdfPagesConcat);
     company = findCompanyBuy(pdfPagesConcat);
     date = findDateBuy(pdfPagesConcat, true);
+    time = findOrderTime(pdfPagesConcat);
     fee = +findFeeBuy(pdfPagesConcat, true);
     amount = +Big(findAmountBuy(pdfPagesConcat, true)).minus(fee);
     shares = findSharesBuy(pdfPagesConcat);
@@ -238,14 +257,21 @@ export const parsePages = content => {
     tax = +findTaxPayout(pdfPagesConcat);
   }
 
-  let activity;
   const [fxRate, foreignCurrency] = findForeignCurrencyFxRate(pdfPagesConcat);
-  activity = {
+  const [parsedDate, parsedDateTime] = createActivityDateTime(
+    date,
+    time,
+    'dd.MM.yyyy',
+    'dd.MM.yyyy HH:mm:ss'
+  );
+
+  let activity = {
     broker: broker,
     type: type,
     isin: isin,
     company: company,
-    date: date,
+    date: parsedDate,
+    datetime: parsedDateTime,
     amount: amount,
     shares: shares,
     price: price,
@@ -256,15 +282,13 @@ export const parsePages = content => {
   if (fxRate !== undefined) {
     activity.fxRate = fxRate;
   }
+
   if (foreignCurrency !== undefined) {
     activity.foreignCurrency = foreignCurrency;
   }
 
-  const activities = [validateActivity(activity)];
-
   return {
-    //Has to be an array
-    activities,
+    activities: [validateActivity(activity)],
     status: 0,
   };
 };
