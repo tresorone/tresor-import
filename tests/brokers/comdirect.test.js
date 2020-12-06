@@ -483,10 +483,10 @@ describe('Broker: comdirect', () => {
         wkn: 'A0H0SB',
         company: 'ALL.FINANZPLAN 2020 A EO',
         shares: 4.617,
-        price: 0.38336582196231317,
-        amount: 1.77,
+        price: 0.43318171973142733,
+        amount: 2,
         fee: 0,
-        tax: 0,
+        tax: 0.23,
       });
     });
 
@@ -503,10 +503,10 @@ describe('Broker: comdirect', () => {
         wkn: 'A1J4U0',
         company: 'MONDELEZ INTL INC. A',
         shares: 35,
-        price: 0.156,
-        amount: 5.46,
+        price: 0.18371428571428572,
+        amount: 6.43,
         fee: 0,
-        tax: 0,
+        tax: 0.97,
       });
     });
 

@@ -173,22 +173,39 @@ const findAmount = (textArr, fxRate, foreignCurrency, formatId) => {
 };
 
 const findPayout = (textArr, fxRate) => {
-  const amountIdx = textArr.findIndex(t => t.includes('Bruttobetrag'));
-  const amountIdxTaxInfo = textArr.findIndex(t =>
-    t.includes('Zu Ihren Gunsten vor Steuern:')
+  // In some documents the witholding tax is not listed explicitely but instead
+  // can be calculated as the difference between 'Steuerbemessungsgrundlage[...]'
+  // and the Pre Tax Payout ('Zu Ihren Gunsten')
+
+  let amount, includedWithholdingTax;
+
+  // This is the case for simple dividend files
+  const grossAmountIdx = textArr.findIndex(t => t.includes('Bruttobetrag'));
+  if (grossAmountIdx >= 0) {
+    amount = Big(parseGermanNum(textArr[grossAmountIdx].split(/\s+/)[2]));
+    if (fxRate !== undefined) {
+      amount = amount.div(fxRate);
+    }
+    return [+amount, undefined];
+  }
+
+  const preTaxAmountIdx = textArr.findIndex(
+    t => t === 'Zu Ihren Gunsten vor Steuern:'
   );
-  let amount;
-  if (amountIdx >= 0) {
-    amount = parseGermanNum(textArr[amountIdx].split(/\s+/)[2]);
-  } else if (amountIdxTaxInfo >= 0) {
-    amount = parseGermanNum(textArr[amountIdxTaxInfo + 1].split(/\s+/)[1]);
-  } else {
-    return undefined;
+  if (preTaxAmountIdx >= 0) {
+    amount = Big(parseGermanNum(textArr[preTaxAmountIdx + 1].split(/\s+/)[1]));
   }
-  if (fxRate !== undefined) {
-    return +Big(amount).div(fxRate);
+
+  const taxBasePreLossAmountIdx = textArr.findIndex(
+    t => t === 'Steuerbemessungsgrundlage vor Verlustverrechnung'
+  );
+  if (taxBasePreLossAmountIdx >= 0) {
+    const taxBasePreLossAmount = Big(
+      parseGermanNum(textArr[taxBasePreLossAmountIdx + 1].split(/\s+/)[1])
+    );
+    includedWithholdingTax = +taxBasePreLossAmount.minus(amount);
   }
-  return amount;
+  return [+amount, includedWithholdingTax];
 };
 
 const findFee = (textArr, amount, isSell = false, formatId = undefined) => {
@@ -404,17 +421,22 @@ const parseData = textArr => {
     company = findCompany(textArr, type, formatId);
     date = findDateDividend(textArr);
     shares = findDividendShares(textArr);
-    amount = findPayout(textArr, fxRate);
+    amount = findPayout(textArr, fxRate)[0];
     price = +Big(amount).div(shares);
     tax = findTax(textArr, fxRate, formatId)[0];
   } else if (isTaxinfoDividend(textArr)) {
     // Still needs handling of Foreign  Rates
-    let witholdingTax;
+    let payout, withholdingTax, integratedWithholdingTax;
     type = 'Dividend';
     [isin, wkn, company, shares] = findISINAndWKN(textArr, 0, 0);
     date = findDateDividend(textArr, formatId);
-    [tax, witholdingTax] = findTax(textArr, undefined, formatId);
-    amount = +Big(findPayout(textArr)).plus(witholdingTax);
+    [tax, withholdingTax] = findTax(textArr, undefined, formatId);
+    [payout, integratedWithholdingTax] = findPayout(textArr);
+    if (integratedWithholdingTax > withholdingTax) {
+      withholdingTax = integratedWithholdingTax;
+      tax = +Big(tax).plus(integratedWithholdingTax);
+    }
+    amount = +Big(payout).plus(withholdingTax);
     price = +Big(amount).div(shares);
   }
   const [parsedDate, parsedDateTime] = createActivityDateTime(date, time);
