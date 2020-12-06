@@ -6,10 +6,11 @@ In T1 dreht sich alles um die Wertpapiere. Die Liste der Aktivitäten soll somit
 Deshalb gilt:
 `price * shares === amount` // true
 
-Bei einem Kauf, zahlt man Gebühren _vor dem Kauf_.
-Bei einem Verkauf, zahlt man Gebühren _nach dem Verkauf_.
+Bei einem Kauf, zahlt man Gebühren und Steuern _vor dem Kauf_.
+Bei einem Verkauf, zahlt man Gebühren und Steuern _nach dem Verkauf_.
+Bei einer Dividende, zahlt man Gebühren und Steuern _nach der Gutschrift_.
 
-Und das wiederum bedeutet, dass bei einem Kauf der `amount` Betrag _ohne_ Gebühren ist - also Netto. Während der Betrag bei einem Verkauf Brutto ist, da die Gebühren erst danach abgezogen werden.
+Und das wiederum bedeutet, dass bei einem Kauf der `amount` Betrag _ohne_ Gebühren und Steuern ist - also Netto. Während der Betrag bei einem Verkauf und von Dividenden Brutto ist, da die Gebühren erst danach abgezogen werden.
 
 Beispiel:
 comdirect Verkauf
