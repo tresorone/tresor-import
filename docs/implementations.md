@@ -1,6 +1,6 @@
 For the following brokers and apps we are ready to parse the following documents:
 
-| Broker / App           | Type of documents)                       | Remarks                                                                          |
+| Broker / App           | Type of documents                        | Remark                                                                           |
 | ---------------------- | ---------------------------------------- | -------------------------------------------------------------------------------- |
 | 1822direkt             | Buy, Sell, Dividend                      |                                                                                  |
 | comdirect              | Buy, Sell, Dividend, Tax statements      |                                                                                  |
