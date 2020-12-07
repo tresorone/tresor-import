@@ -26,7 +26,7 @@ The function `getActivities` returns an objects with the following fields:
 | Name       | Description                                                                                                                    |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | file       | The file name of the input file.                                                                                               |
-| activities | All activity which was parsed from the input file.                                                                             |
+| activities | List of activities which was parsed from the input file. The activity object is broken down [here](docs/activity.md).          |
 | status     | The status code which contains the information about the reason why no activities was found. For Details see the status table. |
 | successful | The simple way to check if at least one activity was found and the status code is equals zero.                                 |
 
