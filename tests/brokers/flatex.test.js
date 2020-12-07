@@ -108,7 +108,7 @@ describe('Broker: Flatex', () => {
         date: '2019-10-17',
         datetime: '2019-10-17T14:52:00.000Z',
         isin: 'US5949181045',
-        company: 'MICROSOFT',
+        company: 'MICROSOFT DL-,00000625',
         shares: 12,
         price: 125.5,
         amount: 1506,
@@ -127,11 +127,49 @@ describe('Broker: Flatex', () => {
         date: '2018-04-03',
         datetime: '2018-04-03T09:29:00.000Z',
         isin: 'US88160R1014',
-        company: 'TESLA INC.',
+        company: 'TESLA INC. DL -,001',
         shares: 1,
         price: 207.83,
         amount: 207.83,
         fee: +Big(5.9).plus(Big(0.71)),
+        tax: 0,
+      });
+    });
+
+    test('Can parse buy of chinese stock BYD Co Ltd', () => {
+      const result = flatex.parsePages(buySamples[5]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2020-11-05',
+        datetime: '2020-11-05T13:18:00.000Z',
+        isin: 'CNE100000296',
+        company: 'BYD CO. LTD H YC 1',
+        shares: 25,
+        price: 21.25,
+        amount: 531.25,
+        fee: 8.41,
+        tax: 0,
+      });
+    });
+
+    test('Can parse three buys across two pdf pages', () => {
+      const result = flatex.parsePages(buySamples[6]);
+
+      expect(result.activities.length).toEqual(3);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2020-10-13',
+        datetime: '2020-10-13T13:55:00.000Z',
+        isin: 'LU2237380790',
+        company: 'ALLEGRO.EU ZY -,01',
+        shares: 30,
+        price: 17.7,
+        amount: 531,
+        fee: 6.75,
         tax: 0,
       });
     });
@@ -148,7 +186,7 @@ describe('Broker: Flatex', () => {
         date: '2019-05-20',
         datetime: '2019-05-20T09:16:00.000Z',
         isin: 'US30303M1027',
-        company: 'FACEBOOK INC.A',
+        company: 'FACEBOOK INC.A DL-,000006',
         shares: 4,
         price: 164.5,
         amount: 658,
@@ -209,7 +247,7 @@ describe('Broker: Flatex', () => {
         date: '2019-12-12',
         datetime: '2019-12-12T' + activities[0].datetime.substring(11),
         isin: 'US5949181045',
-        company: 'MICROSOFT',
+        company: 'MICROSOFT DL-,00000625',
         shares: 16,
         amount: 7.326928257160815, // only available in USD, thus using net dividend in EUR
         price: 7.326928257160815 / 16,

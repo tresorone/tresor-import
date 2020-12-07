@@ -31,7 +31,6 @@ const findTableIndexes = textArr => {
     if (!/Nr.\d+(\/\d)?/.test(line)) {
       return;
     }
-
     lineNumbers.push(lineNumber);
   });
 
@@ -47,9 +46,11 @@ const findISIN = (textArr, tableIndex) => {
 const findCompany = (textArr, tableIndex) => {
   const companyStr = textArr[tableIndex].trim();
   const companyMatch = companyStr.match(
-    /Nr.\d+(\/\d)?\s+(Kauf|Verkauf)?\s+((\S+\s?\S*)+)\s+(\(|DL)/
+    /Nr.\d+(\/\d)?\s+(Kauf|Verkauf)?(.*)\s+\(/
   );
-  return companyMatch ? companyMatch[3].trim() : null;
+  return companyMatch
+    ? companyMatch[3].trim().replace(/ +(?= )/g, '')
+    : undefined;
 };
 
 const findDateBuySell = (textArr, startLineNumber) =>
@@ -220,7 +221,17 @@ export const canParsePage = (content, extension) =>
     content.some(line => line.includes('Ertragsmitteilung')));
 
 const parsePage = (textArr, startLineNumber) => {
-  let type, date, time, isin, company, shares, price, amount, fee, tax;
+  let type,
+    date,
+    datetime,
+    time,
+    isin,
+    company,
+    shares,
+    price,
+    amount,
+    fee,
+    tax;
 
   if (lineContains(textArr, startLineNumber, 'Kauf')) {
     type = 'Buy';
@@ -259,13 +270,13 @@ const parsePage = (textArr, startLineNumber) => {
     tax = findDividendTax(textArr, startLineNumber);
   }
 
-  const [parsedDate, parsedDateTime] = createActivityDateTime(date, time);
+  [date, datetime] = createActivityDateTime(date, time);
 
-  return validateActivity({
+  const activity = {
     broker: 'flatex',
     type,
-    date: parsedDate,
-    datetime: parsedDateTime,
+    date,
+    datetime,
     isin,
     company,
     shares,
@@ -273,12 +284,12 @@ const parsePage = (textArr, startLineNumber) => {
     amount,
     fee,
     tax,
-  });
+  };
+  return validateActivity(activity);
 };
 
 export const parsePages = contents => {
   let activities = [];
-
   for (let content of contents) {
     try {
       findTableIndexes(content).forEach(index => {
@@ -286,7 +297,6 @@ export const parsePages = contents => {
         if (activity === undefined) {
           return;
         }
-
         activities.push(activity);
       });
     } catch (exception) {
