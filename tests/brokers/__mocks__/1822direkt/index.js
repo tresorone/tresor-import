@@ -19,7 +19,7 @@ export const buySamples = [
 
 export const sellSamples = [
   require('./sell/market_order.json'),
-  require('./sell/funds_redemption.json')
+  require('./sell/funds_redemption.json'),
 ];
 
 export const dividendSamples = [

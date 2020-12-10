@@ -89,7 +89,7 @@ describe('Broker: 1822direkt', () => {
   });
 
   describe('Validate sells', () => {
-    test('Can the order parsed from the document', () => {
+    test('Can the markets order be parsed from the document', () => {
       const activities = _1822direkt.parsePages(sellSamples[0]).activities;
 
       expect(activities.length).toEqual(1);
@@ -104,6 +104,24 @@ describe('Broker: 1822direkt', () => {
         price: 55.25,
         amount: 55.25,
         fee: 2.95,
+        tax: 0,
+      });
+    });
+
+    test('Can the funds redemption order be parsed from the document', () => {
+      const activities = _1822direkt.parsePages(sellSamples[1]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: '1822direkt',
+        type: 'Sell',
+        date: '2020-11-24',
+        isin: 'LU0392494562',
+        company: 'COMSTAGE-MSCI WORLD TRN U.ETF',
+        shares: 0.8793,
+        price: 60.87797111338565,
+        amount: 53.53,
+        fee: 0,
         tax: 0,
       });
     });

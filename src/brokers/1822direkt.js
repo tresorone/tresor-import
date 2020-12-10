@@ -14,7 +14,11 @@ const isPageTypeBuy = content =>
   );
 
 const isPageTypeSell = content =>
-  content.some(line => line.includes('Wertpapier Abrechnung Verkauf'));
+  content.some(
+    line =>
+      line.includes('Wertpapier Abrechnung Verkauf') ||
+      line.includes('Wertpapier Abrechnung Rücknahme Investmentfonds')
+  );
 
 const isPageTypeDividend = content =>
   content.some(line => line.includes('Ausschüttung Investmentfonds'));
@@ -64,10 +68,10 @@ const findShares = content =>
 const findAmount = (content, findTotalAmount) => {
   return formatNumber(
     content[
-      findLineNumberByContent(
-        content,
-        findTotalAmount ? 'Ausmachender Betrag' : 'Kurswert'
-      ) + 1
+    findLineNumberByContent(
+      content,
+      findTotalAmount ? 'Ausmachender Betrag' : 'Kurswert'
+    ) + 1
     ]
   );
 };
