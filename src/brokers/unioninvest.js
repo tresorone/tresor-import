@@ -34,11 +34,15 @@ const findPriorRegexMatch = (arr, idx, regex = commaNumberRegex) => {
 const findCompany = (pdfPage, idx, dateIdx) => {
   // Its certainly a payout; payouts have to be treated differently sometimes
   if (dateIdx > idx && !/,[0-9]{2,}/.test(pdfPage[idx - 1])) {
-    const companyIdx = findPriorRegexMatch(pdfPage, idx) + 1;
+    const companyIdx =
+      findPriorRegexMatch(
+        pdfPage,
+        idx,
+        /,[0-9]{2,}|Kauf ohne Ausgabeaufschlag/
+      ) + 1;
     return pdfPage[companyIdx] + pdfPage.slice(companyIdx + 1, idx).join(' ');
   }
-  // Either the company name is in the subdepot header. This is the case if
-  // there is only one kind of stock in the same subdepot (my guess at least)
+  //  The company name is in the subdepot header:
   else if (/(,[0-9]{2,})/.test(pdfPage[dateIdx - 1])) {
     const isinIdx = findPriorIdx(pdfPage, idx, ['ISIN:']);
     const companyStartIdx = findPriorIdx(pdfPage, isinIdx, ['Unterdepot-Nr.:']);
@@ -192,43 +196,35 @@ const parseDividend = (pdfPage, activityIdx, companyIsinDict) => {
   const dateIdx =
     pdfPage.slice(activityIdx).findIndex(t => dateRegex.test(t)) + activityIdx;
 
-  const date = pdfPage[dateIdx];
-  const company = findCompany(pdfPage, activityIdx, dateIdx);
-  const amount = parseGermanNum(
-    pdfPage[activityIdx + 3] + pdfPage[activityIdx + 4]
-  );
   const sharesIdx = findPriorRegexMatch(pdfPage, activityIdx) - 1;
-  const shares = parseGermanNum(pdfPage[sharesIdx] + pdfPage[sharesIdx + 1]);
 
   // The documents from unioninvest didn't contains any order time
-  const [parsedDate, parsedDateTime] = createActivityDateTime(date, undefined);
+  const [date, datetime] = createActivityDateTime(pdfPage[dateIdx], undefined);
 
-  const activity = {
+  let activity = {
     broker: 'unioninvest',
     type: 'Dividend',
-    company,
-    isin: companyIsinDict[company],
-    date: parsedDate,
-    datetime: parsedDateTime,
-    // Thee amount of the payout per share is not explicitely given, thus it has to be calculated
-    amount,
-    shares,
-    price: +Big(amount).div(shares),
+    company: findCompany(pdfPage, activityIdx, dateIdx),
+    date,
+    datetime,
+    amount: parseGermanNum(pdfPage[activityIdx + 3] + pdfPage[activityIdx + 4]),
+    shares: parseGermanNum(pdfPage[sharesIdx] + pdfPage[sharesIdx + 1]),
     tax: findPayoutTax(pdfPage, activityIdx),
     fee: 0,
   };
+  activity.isin = companyIsinDict[activity.company];
+  activity.price = +Big(activity.amount).div(activity.shares);
   activities.push(validateActivity(activity));
-
   // The dividend was automatically reinvested, thus we need another buy
   const reinvestIdx = pdfPage.indexOf('Wiederanlage');
   if (dateIdx + 2 === reinvestIdx) {
-    const activity = {
+    const reinvestActivity = {
       broker: 'unioninvest',
       type: 'Buy',
-      company,
-      isin: companyIsinDict[company],
-      date: parsedDate,
-      datetime: parsedDateTime,
+      company: activity.company,
+      isin: companyIsinDict[activity.company],
+      date: activity.date,
+      datetime: activity.datetime,
       amount: parseGermanNum(
         pdfPage[reinvestIdx + 1] + pdfPage[reinvestIdx + 2]
       ),
@@ -241,7 +237,7 @@ const parseDividend = (pdfPage, activityIdx, companyIsinDict) => {
       tax: 0,
       fee: 0,
     };
-    activities.push(validateActivity(activity));
+    activities.push(validateActivity(reinvestActivity));
   }
   return activities;
 };
@@ -258,12 +254,11 @@ export const canParsePage = (pdfPage, extension) => {
 };
 
 const parsePage = pdfPage => {
-  const possibleActivities = [
-    'Anlage',
-    'Ausschüttung',
-    'Verkauf',
-    'Umschichtung',
-  ];
+  const buyId = ['Anlage'];
+  const sellId = ['Verkauf'];
+  const dividendId = ['Gesamtausschüttung', 'Ausschüttung'];
+  const redistributionId = ['Umschichtung'];
+  const possibleActivities = buyId.concat(sellId, dividendId, redistributionId);
   const companyIsinDict = createCompanyIsinDict(pdfPage);
   let activities = [];
   let slicedArray = pdfPage;
@@ -271,23 +266,30 @@ const parsePage = pdfPage => {
     possibleActivities.includes(line)
   );
   while (activityIdx <= slicedArray.length && activityIdx > 0) {
-    if (slicedArray[activityIdx] === 'Anlage') {
+    // Buy Operation
+    if (buyId.includes(slicedArray[activityIdx])) {
       activities = activities.concat(
         parseBuySell(slicedArray, activityIdx, companyIsinDict, 'Buy')
       );
-    } else if (slicedArray[activityIdx] === 'Verkauf') {
+    }
+    // Sell Operation
+    else if (sellId.includes(slicedArray[activityIdx])) {
       activities = activities.concat(
         parseBuySell(slicedArray, activityIdx, companyIsinDict, 'Sell')
       );
-    } else if (
-      slicedArray[activityIdx] === 'Ausschüttung' &&
+    }
+    // Dividend Transaction
+    else if (
+      dividendId.includes(slicedArray[activityIdx]) &&
       slicedArray[activityIdx + 1] !== 'sind'
     ) {
       activities = activities.concat(
         parseDividend(slicedArray, activityIdx, companyIsinDict)
       );
-    } else if (
-      slicedArray[activityIdx] === 'Umschichtung' &&
+    }
+    // Redistribution Transaction
+    else if (
+      redistributionId.includes(slicedArray[activityIdx]) &&
       commaNumberRegex.test(slicedArray[activityIdx - 1])
     ) {
       // Check if the number of shares is negative (Sell) or positive (Buy)
@@ -323,7 +325,6 @@ export const parsePages = pdfPages => {
     }
     activities = activities.concat(parsePage(pdfPage));
   }
-
   return {
     activities,
     status: 0,

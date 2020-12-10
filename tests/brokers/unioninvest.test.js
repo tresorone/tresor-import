@@ -6,7 +6,7 @@ import {
   sellSamples,
   dividendSamples,
   redistribution,
-} from './__mocks__/unioninvest';
+  } from './__mocks__/unioninvest';
 
 describe('Broker: Union Invest', () => {
   let consoleErrorSpy;

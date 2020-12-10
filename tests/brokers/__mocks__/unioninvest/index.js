@@ -19,6 +19,10 @@ export const redistribution = [
   require('./redistribute/2020_single_redistribution.json'),
 ];
 
+export const mixedTransactions = [
+  require('./mixed/2016_multi_buy_no_charge.json'),
+];
+
 export const allSamples = buySamples.concat(
   sellSamples,
   dividendSamples,
