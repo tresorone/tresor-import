@@ -116,6 +116,7 @@ describe('Broker: 1822direkt', () => {
         broker: '1822direkt',
         type: 'Sell',
         date: '2020-11-24',
+        datetime: '2020-11-24T' + activities[0].datetime.substring(11),
         isin: 'LU0392494562',
         company: 'COMSTAGE-MSCI WORLD TRN U.ETF',
         shares: 0.8793,
