@@ -120,7 +120,7 @@ const findTaxes = content => {
   for (let lineNumber = 0; lineNumber < content.length; lineNumber++) {
     const line = content[lineNumber].toLowerCase();
 
-    if (line.includes('qust')) {
+    if (line.startsWith('qust')) {
       // Special case:
       // The withholding tax is payed in origin currency but ING write the amount in EUR to the QuST line: `QuSt 15,00 % (EUR 0,41)`
       // For withholding tax in EUR, we need to check the line with offset of 2.
@@ -131,7 +131,7 @@ const findTaxes = content => {
         totalTax = totalTax.plus(Big(parseGermanNum(regexMatch[1])));
         continue;
       }
-
+      console.log(lineNumber + 2);
       totalTax = totalTax.plus(Big(parseGermanNum(content[lineNumber + 2])));
       lineNumber += 2;
       continue;
@@ -164,42 +164,54 @@ const findPayout = textArr => {
   }
 };
 
-const parseData = pdfPage => {
+const findForeignInfoPayout = textArr => {
+  const fxRateIdx = textArr.indexOf('Umg. z. Dev.-Kurs');
+  const fxRate = textArr[fxRateIdx+1].substr(1, textArr[fxRateIdx].length-1);
+
+  return [textArr[fxRateIdx-2], parseGermanNum(fxRate)]
+} 
+
+const parseData = textArr => {
   let activity = {
     broker: 'ing',
-    isin: findISIN(pdfPage),
-    company: findCompany(pdfPage),
-    shares: findShares(pdfPage),
-    price: findPrice(pdfPage),
+    isin: findISIN(textArr),
+    company: findCompany(textArr),
+    shares: findShares(textArr),
+    price: findPrice(textArr),
     fee: 0,
     tax: 0,
   };
-  const [date, datetime] = findDateTime(pdfPage);
+  const [date, datetime] = findDateTime(textArr);
   [activity.date, activity.datetime] = createActivityDateTime(
     date,
     datetime,
     'dd.MM.yyyy',
     'dd.MM.yyyy HH:mm:ss'
   );
-  if (isBuy(pdfPage)) {
+  if (isBuy(textArr)) {
     activity.type = 'Buy';
-    activity.amount = findAmount(pdfPage);
-    activity.fee = findFee(pdfPage);
-  } else if (isSell(pdfPage)) {
+    activity.amount = findAmount(textArr);
+    activity.fee = findFee(textArr);
+  } else if (isSell(textArr)) {
     activity.type = 'Sell';
-    activity.amount = findAmount(pdfPage);
-    activity.fee = findFee(pdfPage);
-    activity.tax = findTaxes(pdfPage);
-  } else if (isDividend(pdfPage)) {
+    activity.amount = findAmount(textArr);
+    activity.fee = findFee(textArr);
+    activity.tax = findTaxes(textArr);
+  } else if (isDividend(textArr)) {
     activity.type = 'Dividend';
-    activity.tax = findTaxes(pdfPage);
-    activity.amount = findPayout(pdfPage);
+    activity.tax = findTaxes(textArr);
+    activity.amount = findPayout(textArr);
+    if ( textArr.includes('Umg. z. Dev.-Kurs')) {
+      [activity.foreignCurrency, activity.fxRate] =
+        findForeignInfoPayout(textArr);
+    }
   }
   return validateActivity(activity);
 };
 
 export const parsePages = contents => {
-  const activities = [parseData(contents[0])];
+  // Information regarding dividends can be split across multiple pdf pages
+  const activities = [parseData(contents.flat())];
 
   return {
     activities,

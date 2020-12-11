@@ -212,6 +212,8 @@ describe('Broker: ING', () => {
         amount: 14.524716047141247,
         fee: 0,
         tax: 2.18,
+        foreignCurrency: 'USD',
+        fxRate: 1.123602,
       });
     });
 
@@ -288,6 +290,8 @@ describe('Broker: ING', () => {
         amount: 101.31291390424165,
         fee: 0,
         tax: 18.7,
+        foreignCurrency: 'USD',
+        fxRate: 1.088114,
       });
     });
 
@@ -307,6 +311,8 @@ describe('Broker: ING', () => {
         amount: 11.28907259106174,
         fee: 0,
         tax: 0,
+        foreignCurrency: 'USD',
+        fxRate: 1.1613,
       });
     });
 
@@ -345,6 +351,29 @@ describe('Broker: ING', () => {
         amount: 2.764967606755653,
         fee: 0,
         tax: 0.7,
+        foreignCurrency: 'USD',
+        fxRate: 1.182654,
+      });
+    });
+
+    test('Can parse dividend in HKD from BYD Co Ltd', () => {
+      const activities = ing.parsePages(dividendsSamples[8]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ing',
+        type: 'Dividend',
+        date: '2016-12-30',
+        datetime: '2016-12-30T' + activities[0].datetime.substring(11),
+        isin: 'CNE100000296',
+        company: 'BYD Co. Ltd.',
+        shares: 130,
+        price: 0.0508580526359423,
+        amount: 6.611716280761334,
+        fee: 0,
+        tax: 1.7,
+        fxRate: 8.262605,
+        foreignCurrency: 'HKD'
       });
     });
   });
