@@ -108,10 +108,16 @@ const findAmount = textArr =>
   parseGermanNum(getValueByPreviousElement(textArr, 'Kurswert', 2));
 
 const findFee = textArr => {
+  let totalFee = Big(0);
   const fee = parseGermanNum(
     getValueByPreviousElement(textArr, 'Provision', 2)
   );
-  return fee && /([0-9]*)/.test(fee) ? fee : 0;
+  totalFee = totalFee.plus(fee && fee > 0 ? fee : 0);
+  const discount = getValueByPreviousElement(textArr, 'Rabatt', 2);
+  if ( discount &&  parseGermanNum(discount.replace(' ', ''))) {
+    totalFee = totalFee.plus(parseGermanNum(discount.replace(' ', '')));
+  }
+  return +totalFee;
 };
 
 const findTaxes = content => {

@@ -134,6 +134,25 @@ describe('Broker: ING', () => {
         tax: 0,
       });
     });
+
+    test('Can parse savings plan from 2017 of M&G Invest', () => {
+      const activities = ing.parsePages(buySamples[5]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ing',
+        type: 'Buy',
+        date: '2017-12-15',
+        datetime: '2017-12-15T' + activities[0].datetime.substring(11),
+        isin: 'GB0030932676',
+        company: 'M&G Inv.(1)-M&G Global Themes',
+        shares: 2.31594,
+        price: 34.178576,
+        amount: 79.16,
+        fee: -4.16,
+        tax: 0,
+      });
+    });
   });
 
   describe('Sell', () => {
