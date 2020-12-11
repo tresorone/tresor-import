@@ -105,13 +105,23 @@ const findTax = pages => {
   let totalTax = Big(0);
 
   pages.forEach(page => {
-    const withholdingTaxIndex = page.findIndex(
-      t => t.startsWith('Anrechenbare Quellensteuer') && t.endsWith('EUR')
+    let withholdingTaxIndex = page.findIndex(
+      line =>
+        line.startsWith('Anrechenbare Quellensteuer') && line.endsWith('EUR')
     );
-    const withholdingTax =
-      withholdingTaxIndex >= 0
-        ? parseGermanNum(page[withholdingTaxIndex + 1])
-        : 0;
+
+    let withholdingTax = 0;
+    if (page[withholdingTaxIndex + 2] === 'EUR') {
+      // Its possible that there is a withholding tax but this has no effect to this statement. Se the following example:
+      // Anrechenbare Quellensteuer 4,29- EUR
+      // Verrechnete anrechenbare Quellensteuer
+      // 17,16-
+      // EUR
+      withholdingTax =
+        withholdingTaxIndex >= 0
+          ? parseGermanNum(page[withholdingTaxIndex + 1])
+          : 0;
+    }
 
     const kap = parseGermanNum(
       // We want to geht the line `Kapitalertragsteuer 25 % auf 3,15 EUR` and not `Berechnungsgrundlage für
