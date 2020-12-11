@@ -6,6 +6,15 @@ import {
 } from '../helper';
 const dateRegex = /[0-9]{2}\.[0-9]{2}\.[0-9]{4}/;
 const commaNumberRegex = /,[0-9]{2,}/;
+const possibleActivities = [
+  'Anlage',
+  'Verkauf',
+  'Ausschüttung',
+  'Gesamtausschüttung',
+  'Umschichtung',
+  'Rückumschichtung',
+  'Steuererstattung',
+];
 
 const findPriorIdx = (arr, idx, keyArr = ['STK', '/ Sperre']) => {
   let bckwrdIdx = 1;
@@ -66,7 +75,7 @@ const findCompany = (pdfPage, idx, dateIdx) => {
     const companyIdx = findPriorRegexMatch(
       pdfPage,
       dateIdx,
-      /^(,[0-9]{2,}|Mehrwertsteuer|\*1)$/
+      /^(,[0-9]{2,}|Mehrwertsteuer|UPR|\*1)$/
     );
     return (
       pdfPage[companyIdx + 1] + pdfPage.slice(companyIdx + 2, dateIdx).join(' ')
@@ -75,7 +84,8 @@ const findCompany = (pdfPage, idx, dateIdx) => {
 };
 
 // Isins are only listed atop of the file for some unioninvest documents.
-// Later on, only the company/fond name is used. Thus we need to generate them first of all.
+// Later on, only the company/fond name is used. Thus we need to create a dict
+// storing these information
 const createCompanyIsinDict = pdfPage => {
   let companyIsinDict = {};
   let isinIdx = pdfPage.indexOf('ISIN:');
@@ -107,6 +117,36 @@ const createCompanyIsinDict = pdfPage => {
     isinIdx = pdfPage.indexOf('ISIN:', isinIdx);
   }
   return companyIsinDict;
+};
+
+// For some dividends, the amount of shares in the depot for the company
+// is only listed in the header above. So we have to make another dict, similar
+// to the ISIN case
+const createCompanySharesDict = (pdfPage, activityIdx) => {
+  let companyAmountDict = {};
+  let companyIdx = findPriorIdx(pdfPage, activityIdx, ['aufschlag %']) + 2;
+  while (companyIdx > 0) {
+    const companyEndIdx =
+      pdfPage
+        .slice(companyIdx)
+        .findIndex(l => /vom [0-9]{2}\.[0-9]{2}\.[0-9]{4}/.test(l)) +
+      companyIdx;
+    const company =
+      pdfPage[companyIdx] +
+      pdfPage.slice(companyIdx + 1, companyEndIdx).join(' ');
+    companyAmountDict[company] = parseGermanNum(
+      pdfPage[companyEndIdx + 1] + pdfPage[companyEndIdx + 2]
+    );
+    const newCompanyIdx = pdfPage
+      .slice(companyIdx)
+      .findIndex(l => l === 'Vortrag');
+    if (newCompanyIdx === -1 || newCompanyIdx - companyIdx > 10) {
+      companyIdx = -1;
+    } else {
+      companyIdx = companyIdx + newCompanyIdx + 1;
+    }
+  }
+  return companyAmountDict;
 };
 
 const findPayoutTax = (pdfPage, activityIdx) => {
@@ -143,30 +183,28 @@ const findPayoutTax = (pdfPage, activityIdx) => {
 const parseBuySell = (
   pdfPage,
   activityIdx,
-  companyIsinDict,
   type,
-  isRedistribution = false
+  isRedistribution = false,
+  taxReinvest = false
 ) => {
   const dateIdx =
     findPriorRegexMatch(pdfPage, activityIdx, /[0-9]{2}\.[0-9]{2}\.[0-9]{4}/) -
     1;
-  const company = findCompany(pdfPage, activityIdx, dateIdx);
-  // The documents from unioninvest didn't contains any order time
+  const companyIsinDict = createCompanyIsinDict(pdfPage);
+
   const [parsedDate, parsedDateTime] = createActivityDateTime(
     pdfPage[dateIdx],
     undefined
   );
-
   let infoOffset = type === 'Buy' ? 5 : -4;
   let amountOffset = isRedistribution ? -8 : 1;
   if (isRedistribution) {
     infoOffset = -4;
   }
-  const activity = {
+  let activity = {
     broker: 'unioninvest',
     type: type,
-    company,
-    isin: companyIsinDict[company],
+    company: findCompany(pdfPage, activityIdx, dateIdx),
     date: parsedDate,
     datetime: parsedDateTime,
     amount: Math.abs(
@@ -187,16 +225,17 @@ const parseBuySell = (
     tax: 0,
     fee: 0,
   };
+
+  if (taxReinvest) {
+    activity.tax = +Big(activity.amount).times(-1);
+  }
+  activity.isin = companyIsinDict[activity.company];
   return [validateActivity(activity)];
 };
 
-const parseDividend = (pdfPage, activityIdx, companyIsinDict) => {
-  let activities = [];
-  // The curchTaxIdx is an important index to parse information
-  const dateIdx =
-    pdfPage.slice(activityIdx).findIndex(t => dateRegex.test(t)) + activityIdx;
-
-  const sharesIdx = findPriorRegexMatch(pdfPage, activityIdx) - 1;
+const parseDiv = (pdfPage, activityIdx, dateIdx) => {
+  const companySharesDict = createCompanySharesDict(pdfPage, activityIdx);
+  const companyIsinDict = createCompanyIsinDict(pdfPage);
 
   // The documents from unioninvest didn't contains any order time
   const [date, datetime] = createActivityDateTime(pdfPage[dateIdx], undefined);
@@ -208,36 +247,121 @@ const parseDividend = (pdfPage, activityIdx, companyIsinDict) => {
     date,
     datetime,
     amount: parseGermanNum(pdfPage[activityIdx + 3] + pdfPage[activityIdx + 4]),
-    shares: parseGermanNum(pdfPage[sharesIdx] + pdfPage[sharesIdx + 1]),
     tax: findPayoutTax(pdfPage, activityIdx),
     fee: 0,
   };
+  activity.shares = companySharesDict[activity.company];
+  // Sometimes the #shares is handled differently for no apparent reason
+  if (activity.shares === undefined) {
+    activity.shares = parseGermanNum(
+      pdfPage[activityIdx - 2] + pdfPage[activityIdx - 1]
+    );
+  }
   activity.isin = companyIsinDict[activity.company];
   activity.price = +Big(activity.amount).div(activity.shares);
-  activities.push(validateActivity(activity));
+  return activity;
+};
+
+const parseDivRebuy = (pdfPage, reinvestIdx, dividend) => {
+  // We do this because otherwise the object would not be deep copied.
+  let rebuy = JSON.parse(JSON.stringify(dividend));
+  rebuy.type = 'Buy';
+  rebuy.tax = 0;
+  rebuy.fee = 0;
+  rebuy.amount = parseGermanNum(
+    pdfPage[reinvestIdx + 1] + pdfPage[reinvestIdx + 2]
+  );
+  rebuy.price = parseGermanNum(
+    pdfPage[reinvestIdx + 5] + pdfPage[reinvestIdx + 6]
+  );
+  rebuy.shares = parseGermanNum(
+    pdfPage[reinvestIdx + 7] + pdfPage[reinvestIdx + 8]
+  );
+  return rebuy;
+};
+
+const parseDividend = (pdfPage, activityIdx) => {
+  let activities = [];
+  const companyIsinDict = createCompanyIsinDict(pdfPage);
+  const dateIdx =
+    pdfPage.slice(activityIdx).findIndex(t => dateRegex.test(t)) + activityIdx;
+  const dividend = parseDiv(pdfPage, activityIdx, dateIdx, companyIsinDict);
+  activities.push(validateActivity(dividend));
+
   // The dividend was automatically reinvested, thus we need another buy
-  const reinvestIdx = pdfPage.indexOf('Wiederanlage');
-  if (dateIdx + 2 === reinvestIdx) {
-    const reinvestActivity = {
-      broker: 'unioninvest',
-      type: 'Buy',
-      company: activity.company,
-      isin: companyIsinDict[activity.company],
-      date: activity.date,
-      datetime: activity.datetime,
-      amount: parseGermanNum(
-        pdfPage[reinvestIdx + 1] + pdfPage[reinvestIdx + 2]
-      ),
-      price: parseGermanNum(
-        pdfPage[reinvestIdx + 5] + pdfPage[reinvestIdx + 6]
-      ),
-      shares: parseGermanNum(
-        pdfPage[reinvestIdx + 7] + pdfPage[reinvestIdx + 8]
-      ),
-      tax: 0,
-      fee: 0,
-    };
-    activities.push(validateActivity(reinvestActivity));
+  if (pdfPage[dateIdx + 2] === 'Wiederanlage') {
+    const rebuy = parseDivRebuy(pdfPage, dateIdx + 2, dividend);
+    activities.push(validateActivity(rebuy));
+  }
+  return activities;
+};
+
+const parsePage = pdfPage => {
+  let activities = [];
+  let activityIdx = pdfPage.findIndex(line =>
+    possibleActivities.includes(line)
+  );
+  let offsetNextActivity = 0;
+
+  while (offsetNextActivity >= 0) {
+    switch (pdfPage[activityIdx]) {
+      // Buy Operation
+      case possibleActivities[0]:
+        activities = activities.concat(
+          parseBuySell(pdfPage, activityIdx, 'Buy')
+        );
+        break;
+
+      // Sell Operation
+      case possibleActivities[1]:
+        activities = activities.concat(
+          parseBuySell(pdfPage, activityIdx, 'Sell')
+        );
+        break;
+
+      // Dividend Transaction
+      case possibleActivities[2]:
+      case possibleActivities[3]:
+        if (pdfPage[activityIdx + 1] !== 'sind') {
+          activities = activities.concat(parseDividend(pdfPage, activityIdx));
+        }
+        break;
+
+      // Redeployment Transaction
+      case possibleActivities[4]:
+      // Reverse redeployment with exactly the same logic as above
+      // eslint-disable-next-line no-fallthrough
+      case possibleActivities[5]:
+        if (commaNumberRegex.test(pdfPage[activityIdx - 1])) {
+          // Check if the number of shares is negative (Sell) or positive (Buy).
+          // cant use parseGermanNum due to '-0'
+          if (pdfPage[activityIdx - 2].startsWith('-')) {
+            activities = activities.concat(
+              parseBuySell(pdfPage, activityIdx, 'Sell', true)
+            );
+          } else {
+            activities = activities.concat(
+              parseBuySell(pdfPage, activityIdx, 'Buy', true)
+            );
+          }
+        } else {
+          console.error('(Reverse) Reeployment but no parsing was possible');
+        }
+        break;
+
+      // Automatic Reinvest of a Tax Refund
+      case possibleActivities[6]:
+        if (pdfPage[activityIdx - 1] === 'Wiederanlage') {
+          activities = activities.concat(
+            parseBuySell(pdfPage, activityIdx, 'Buy', false, true)
+          );
+        }
+        break;
+    }
+    offsetNextActivity = pdfPage
+      .slice(activityIdx + 1)
+      .findIndex(line => possibleActivities.includes(line));
+    activityIdx = offsetNextActivity + activityIdx + 1;
   }
   return activities;
 };
@@ -251,64 +375,6 @@ export const canParsePage = (pdfPage, extension) => {
       )
     )
   );
-};
-
-const parsePage = pdfPage => {
-  const buyId = ['Anlage'];
-  const sellId = ['Verkauf'];
-  const dividendId = ['Gesamtausschüttung', 'Ausschüttung'];
-  const redistributionId = ['Umschichtung'];
-  const possibleActivities = buyId.concat(sellId, dividendId, redistributionId);
-  const companyIsinDict = createCompanyIsinDict(pdfPage);
-  let activities = [];
-  let slicedArray = pdfPage;
-  let activityIdx = slicedArray.findIndex(line =>
-    possibleActivities.includes(line)
-  );
-  while (activityIdx <= slicedArray.length && activityIdx > 0) {
-    // Buy Operation
-    if (buyId.includes(slicedArray[activityIdx])) {
-      activities = activities.concat(
-        parseBuySell(slicedArray, activityIdx, companyIsinDict, 'Buy')
-      );
-    }
-    // Sell Operation
-    else if (sellId.includes(slicedArray[activityIdx])) {
-      activities = activities.concat(
-        parseBuySell(slicedArray, activityIdx, companyIsinDict, 'Sell')
-      );
-    }
-    // Dividend Transaction
-    else if (
-      dividendId.includes(slicedArray[activityIdx]) &&
-      slicedArray[activityIdx + 1] !== 'sind'
-    ) {
-      activities = activities.concat(
-        parseDividend(slicedArray, activityIdx, companyIsinDict)
-      );
-    }
-    // Redistribution Transaction
-    else if (
-      redistributionId.includes(slicedArray[activityIdx]) &&
-      commaNumberRegex.test(slicedArray[activityIdx - 1])
-    ) {
-      // Check if the number of shares is negative (Sell) or positive (Buy)
-      if (parseGermanNum(slicedArray[activityIdx - 2]) < 0) {
-        activities = activities.concat(
-          parseBuySell(slicedArray, activityIdx, companyIsinDict, 'Sell', true)
-        );
-      } else {
-        activities = activities.concat(
-          parseBuySell(slicedArray, activityIdx, companyIsinDict, 'Buy', true)
-        );
-      }
-    }
-    slicedArray = slicedArray.slice(activityIdx + 1);
-    activityIdx = slicedArray.findIndex(line =>
-      possibleActivities.includes(line)
-    );
-  }
-  return activities;
 };
 
 export const parsePages = pdfPages => {

@@ -6,7 +6,7 @@ import {
   sellSamples,
   dividendSamples,
   redistribution,
-  } from './__mocks__/unioninvest';
+} from './__mocks__/unioninvest';
 
 describe('Broker: Union Invest', () => {
   let consoleErrorSpy;
@@ -223,6 +223,24 @@ describe('Broker: Union Invest', () => {
         tax: 0,
       });
     });
+
+    test('Can parse a buy, funded by a tax reinvest from 2018 (1) ', () => {
+      const activities = unioninvest.parsePages(buySamples[7]).activities;
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'unioninvest',
+        type: 'Buy',
+        date: '2018-01-12',
+        datetime: '2018-01-12T' + activities[0].datetime.substring(11),
+        isin: 'DE0008491069',
+        company: 'UniEuroRenta',
+        shares: 0.004,
+        price: 203.36,
+        amount: 0.76,
+        fee: 0,
+        tax: -0.76,
+      });
+    });
   });
 
   describe('Validate Sells', () => {
@@ -291,7 +309,7 @@ describe('Broker: Union Invest', () => {
       });
     });
 
-    test('Can parse a union invest reinvest from 2020 (1) ', () => {
+    test('Can parse a dividend+reinvest from 2020 (1) ', () => {
       const activities = unioninvest.parsePages(dividendSamples[1]).activities;
 
       expect(activities.length).toEqual(2);
@@ -309,15 +327,191 @@ describe('Broker: Union Invest', () => {
         tax: 0,
       });
       expect(activities[1]).toEqual({
-        broker: 'unioninvest',
         type: 'Buy',
+        broker: 'unioninvest',
         date: '2020-11-13',
         datetime: '2020-11-13T' + activities[0].datetime.substring(11),
         isin: 'DE0008491069',
         company: 'UniEuroRenta',
         shares: 0.139,
-        price: 66.71,
         amount: 9.28,
+        price: 66.71,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can parse multiple reinvests from 2016 (1) ', () => {
+      const activities = unioninvest.parsePages(dividendSamples[2]).activities;
+      expect(activities.length).toEqual(4);
+      expect(activities[0]).toEqual({
+        broker: 'unioninvest',
+        type: 'Dividend',
+        date: '2016-11-11',
+        datetime: '2016-11-11T' + activities[0].datetime.substring(11),
+        isin: 'DE0008491069',
+        company: 'UniEuroRenta',
+        shares: 0.932,
+        price: 0.8047210300429185,
+        amount: 0.75,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[1]).toEqual({
+        broker: 'unioninvest',
+        type: 'Buy',
+        date: '2016-11-11',
+        datetime: '2016-11-11T' + activities[0].datetime.substring(11),
+        isin: 'DE0008491069',
+        company: 'UniEuroRenta',
+        shares: 0.011,
+        price: 67.03,
+        amount: 0.75,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[2]).toEqual({
+        broker: 'unioninvest',
+        type: 'Dividend',
+        date: '2016-11-11',
+        datetime: '2016-11-11T' + activities[0].datetime.substring(11),
+        isin: 'DE000A1C81G1',
+        company: 'UniGlobal Vorsorge',
+        shares: 1.419,
+        price: 2.1000704721634955,
+        amount: 2.98,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[3]).toEqual({
+        broker: 'unioninvest',
+        type: 'Buy',
+        date: '2016-11-11',
+        datetime: '2016-11-11T' + activities[0].datetime.substring(11),
+        isin: 'DE000A1C81G1',
+        company: 'UniGlobal Vorsorge',
+        shares: 0.017,
+        price: 177.06,
+        amount: 2.98,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can parse multiple reinvests from 2017 (1) ', () => {
+      const activities = unioninvest.parsePages(dividendSamples[3]).activities;
+      expect(activities.length).toEqual(2);
+      expect(activities[0]).toEqual({
+        broker: 'unioninvest',
+        type: 'Dividend',
+        date: '2017-11-17',
+        datetime: '2017-11-17T' + activities[0].datetime.substring(11),
+        isin: 'DE000A1C81G1',
+        company: 'UniGlobal Vorsorge',
+        shares: 7.627,
+        price: 2.9002228923561035,
+        amount: 22.12,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[1]).toEqual({
+        broker: 'unioninvest',
+        type: 'Buy',
+        date: '2017-11-17',
+        datetime: '2017-11-17T' + activities[0].datetime.substring(11),
+        isin: 'DE000A1C81G1',
+        company: 'UniGlobal Vorsorge',
+        shares: 0.113,
+        price: 195.82,
+        amount: 22.12,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can parse a dividend+reinvests from 2018 (1) ', () => {
+      const activities = unioninvest.parsePages(dividendSamples[4]).activities;
+      expect(activities.length).toEqual(2);
+      expect(activities[0]).toEqual({
+        broker: 'unioninvest',
+        type: 'Dividend',
+        date: '2018-11-16',
+        datetime: '2018-11-16T' + activities[0].datetime.substring(11),
+        isin: 'DE000A1C81G1',
+        company: 'UniGlobal Vorsorge',
+        shares: 12.823,
+        price: 2.600015596974187,
+        amount: 33.34,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[1]).toEqual({
+        broker: 'unioninvest',
+        type: 'Buy',
+        date: '2018-11-16',
+        datetime: '2018-11-16T' + activities[0].datetime.substring(11),
+        isin: 'DE000A1C81G1',
+        company: 'UniGlobal Vorsorge',
+        shares: 0.173,
+        price: 193.08,
+        amount: 33.34,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can parse multiple reinvests from 2019 (1) ', () => {
+      const activities = unioninvest.parsePages(dividendSamples[5]).activities;
+      expect(activities.length).toEqual(4);
+      expect(activities[0]).toEqual({
+        broker: 'unioninvest',
+        type: 'Dividend',
+        date: '2019-11-15',
+        datetime: '2019-11-15T' + activities[0].datetime.substring(11),
+        isin: 'DE0008491069',
+        company: 'UniEuroRenta',
+        shares: 50.973,
+        price: 0.31997331920820826,
+        amount: 16.31,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[1]).toEqual({
+        broker: 'unioninvest',
+        type: 'Buy',
+        date: '2019-11-15',
+        datetime: '2019-11-15T' + activities[0].datetime.substring(11),
+        isin: 'DE0008491069',
+        company: 'UniEuroRenta',
+        shares: 0.245,
+        price: 66.63,
+        amount: 16.31,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[2]).toEqual({
+        broker: 'unioninvest',
+        type: 'Dividend',
+        date: '2019-11-15',
+        datetime: '2019-11-15T' + activities[0].datetime.substring(11),
+        isin: 'DE000A1C81G1',
+        company: 'UniGlobal Vorsorge',
+        shares: 1.817,
+        price: 2.399559713813979,
+        amount: 4.36,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[3]).toEqual({
+        broker: 'unioninvest',
+        type: 'Buy',
+        date: '2019-11-15',
+        datetime: '2019-11-15T' + activities[0].datetime.substring(11),
+        isin: 'DE000A1C81G1',
+        company: 'UniGlobal Vorsorge',
+        shares: 0.02,
+        price: 222.51,
+        amount: 4.36,
         fee: 0,
         tax: 0,
       });
@@ -351,6 +545,37 @@ describe('Broker: Union Invest', () => {
         shares: 2.964,
         amount: 687.99,
         price: 232.15,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can parse a reversed redistribution from 2017', () => {
+      const activities = unioninvest.parsePages(redistribution[1]).activities;
+      expect(activities.length).toEqual(2);
+      expect(activities[0]).toEqual({
+        broker: 'unioninvest',
+        type: 'Buy',
+        date: '2017-07-03',
+        datetime: '2017-07-03T' + activities[0].datetime.substring(11),
+        isin: 'DE000A1C81G1',
+        company: 'UniGlobal Vorsorge',
+        shares: 0.319,
+        amount: 61.52,
+        price: 192.72,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[1]).toEqual({
+        broker: 'unioninvest',
+        type: 'Sell',
+        date: '2017-07-03',
+        datetime: '2017-07-03T' + activities[1].datetime.substring(11),
+        isin: 'DE0008491069',
+        company: 'UniEuroRenta',
+        shares: 0.925,
+        amount: 61.52,
+        price: 66.51,
         fee: 0,
         tax: 0,
       });
