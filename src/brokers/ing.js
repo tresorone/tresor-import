@@ -131,7 +131,6 @@ const findTaxes = content => {
         totalTax = totalTax.plus(Big(parseGermanNum(regexMatch[1])));
         continue;
       }
-      console.log(lineNumber + 2);
       totalTax = totalTax.plus(Big(parseGermanNum(content[lineNumber + 2])));
       lineNumber += 2;
       continue;
@@ -166,10 +165,13 @@ const findPayout = textArr => {
 
 const findForeignInfoPayout = textArr => {
   const fxRateIdx = textArr.indexOf('Umg. z. Dev.-Kurs');
-  const fxRate = textArr[fxRateIdx+1].substr(1, textArr[fxRateIdx].length-1);
+  const fxRate = textArr[fxRateIdx + 1].substr(
+    1,
+    textArr[fxRateIdx].length - 1
+  );
 
-  return [textArr[fxRateIdx-2], parseGermanNum(fxRate)]
-} 
+  return [textArr[fxRateIdx - 2], parseGermanNum(fxRate)];
+};
 
 const parseData = textArr => {
   let activity = {
@@ -201,9 +203,10 @@ const parseData = textArr => {
     activity.type = 'Dividend';
     activity.tax = findTaxes(textArr);
     activity.amount = findPayout(textArr);
-    if ( textArr.includes('Umg. z. Dev.-Kurs')) {
-      [activity.foreignCurrency, activity.fxRate] =
-        findForeignInfoPayout(textArr);
+    if (textArr.includes('Umg. z. Dev.-Kurs')) {
+      [activity.foreignCurrency, activity.fxRate] = findForeignInfoPayout(
+        textArr
+      );
     }
   }
   return validateActivity(activity);

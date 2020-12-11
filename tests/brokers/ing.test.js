@@ -373,7 +373,7 @@ describe('Broker: ING', () => {
         fee: 0,
         tax: 1.7,
         fxRate: 8.262605,
-        foreignCurrency: 'HKD'
+        foreignCurrency: 'HKD',
       });
     });
   });
