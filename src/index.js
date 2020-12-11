@@ -22,20 +22,31 @@ export const parseActivitiesFromPages = (pages, extension) => {
   let status;
   const implementations = findImplementation(pages, extension);
 
-  if (implementations === undefined || implementations.length < 1) {
-    status = 1;
-  } else if (implementations.length === 1) {
-    if (extension === 'pdf') {
-      return filterResultActivities(implementations[0].parsePages(pages));
-    } else if (extension === 'csv') {
-      return filterResultActivities(
-        implementations[0].parsePages(JSON.parse(csvLinesToJSON(pages[0])))
-      );
-    } else {
-      status = 4;
+  try {
+    // Status 1, no broker could be found
+    if (implementations === undefined || implementations.length < 1) {
+      status = 1;
+    } else if (implementations.length === 1) {
+      if (extension === 'pdf') {
+        return filterResultActivities(implementations[0].parsePages(pages));
+      } else if (extension === 'csv') {
+        return filterResultActivities(
+          implementations[0].parsePages(JSON.parse(csvLinesToJSON(pages[0])))
+        );
+      }
+      // Invalid Filetype
+      else {
+        status = 4;
+      }
     }
-  } else if (implementations.length > 1) {
-    status = 2;
+    // More than one broker found
+    else if (implementations.length > 1) {
+      status = 2;
+    }
+  } catch (error) {
+    // Critical Error occurred
+    console.error(error);
+    status = 3;
   }
 
   return {
@@ -52,7 +63,8 @@ const filterResultActivities = result => {
 
     // If no activity exists, set the status code to 5
     const numberOfActivities = result.activities.length;
-    result.activities = numberOfActivities == 0 ? undefined : result.activities;
+    result.activities =
+      numberOfActivities === 0 ? undefined : result.activities;
     result.status = numberOfActivities === 0 ? 5 : result.status;
   }
 
