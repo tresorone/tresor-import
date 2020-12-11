@@ -115,6 +115,25 @@ describe('Broker: ING', () => {
         tax: 0,
       });
     });
+
+    test('Can parse Buy from 2020 of schroder stock', () => {
+      const activities = ing.parsePages(buySamples[4]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ing',
+        type: 'Buy',
+        date: '2020-12-10',
+        datetime: '2020-12-10T' + activities[0].datetime.substring(11),
+        isin: 'LU0302446991',
+        company: 'Schroder ISF-Gl.Clim.Chan.Equ.',
+        shares: 100,
+        price: 23.6627,
+        amount: 2366.27,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   describe('Sell', () => {
