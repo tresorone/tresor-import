@@ -172,6 +172,24 @@ describe('DKB broker', () => {
         tax: 0.37,
       });
     });
+
+    test('Should map the document correctly: 2020_etf_tecdax', () => {
+      const activities = dkb.parsePages(sellSamples[4]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Sell',
+        date: '2020-12-09',
+        datetime: '2020-12-09T' + activities[0].datetime.substring(11),
+        isin: 'DE0005933972',
+        company: 'ISHARES TECDAX UCITS ETF DE INHABER-ANTEILE',
+        shares: 100,
+        price: 28.3152,
+        amount: 2831.52,
+        fee: 10,
+        tax: 2.18,
+      });
+    });
   });
 
   describe('Dividend', () => {
