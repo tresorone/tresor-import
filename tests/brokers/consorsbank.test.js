@@ -197,6 +197,27 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('should map pdf data of fund (without issue) buy sample from 2020', () => {
+      const activity = consorsbank.parsePages(buySamples[8]).activities;
+
+      expect(activity).toEqual([
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'DWS IN.-AR.INT. LCEOA',
+          date: '2020-09-16',
+          datetime: '2020-09-16T06:24:08.000Z',
+          isin: 'LU1863263346',
+          wkn: 'DWS2W9',
+          price: 143.31000246493204,
+          shares: 1.74447,
+          amount: 250,
+          tax: 0,
+          fee: 0,
+        },
+      ]);
+    });
   });
 
   describe('Sell', () => {
