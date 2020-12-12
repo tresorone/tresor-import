@@ -239,14 +239,19 @@ const parsePositionAsActivity = (content, startLineNumber) => {
   }
 
   const numberOfShares = parseGermanNum(content[startLineNumber].split(' ')[0]);
-  const toalAmount = parseGermanNum(content[lineOfDate + 1]);
+  let toalAmount = parseGermanNum(content[lineOfDate + 1]);
+
+  if (lineNumberOfISIN - startLineNumber > 5) {
+    // Edge-case: On a pages change, the total amount are located under the company name.
+    toalAmount = parseGermanNum(content[startLineNumber + 3]);
+  }
 
   const [parsedDate, parsedDateTime] = createActivityDateTime(
     content[lineOfDate],
     undefined
   );
 
-  return {
+  return validateActivity({
     broker: 'traderepublic',
     type: 'Buy',
     date: parsedDate,
@@ -259,7 +264,7 @@ const parsePositionAsActivity = (content, startLineNumber) => {
     amount: toalAmount,
     fee: 0,
     tax: 0,
-  };
+  });
 };
 
 const parseOrderOrDividend = textArr => {
@@ -298,7 +303,7 @@ const parseOrderOrDividend = textArr => {
 
   const [parsedDate, parsedDateTime] = createActivityDateTime(date, time);
 
-  return {
+  return validateActivity({
     broker: 'traderepublic',
     type,
     date: parsedDate,
@@ -310,53 +315,51 @@ const parseOrderOrDividend = textArr => {
     amount,
     tax,
     fee,
-  };
+  });
 };
 
-const parsePage = content => {
-  let foundActivities = [];
-  if (
-    isBuySingle(content) ||
-    isBuySavingsPlan(content) ||
-    isSell(content) ||
-    isDividend(content)
-  ) {
-    foundActivities.push(parseOrderOrDividend(content));
-  } else if (isOverviewStatement(content)) {
-    for (let lineNumber = 0; lineNumber < content.length; lineNumber++) {
-      const line = content[lineNumber];
-      if (!line.includes(' Stk.')) {
-        continue;
-      }
+const parseOverviewStatement = content => {
+  const foundActivities = [];
 
-      foundActivities.push(parsePositionAsActivity(content, lineNumber));
+  for (let lineNumber = 0; lineNumber < content.length; lineNumber++) {
+    if (!content[lineNumber].includes(' Stk.')) {
+      continue;
     }
+
+    foundActivities.push(parsePositionAsActivity(content, lineNumber));
   }
-  let validatedActivities = [];
 
-  foundActivities.forEach(activity => {
-    if (validateActivity(activity)) {
-      validatedActivities.push(activity);
-    }
-  });
-
-  return validatedActivities;
+  return foundActivities;
 };
 
 export const parsePages = contents => {
   let activities = [];
 
-  for (let content of contents) {
+  if (isOverviewStatement(contents[0])) {
+    const content = contents.flat();
+
     try {
-      parsePage(content).forEach(activity => {
+      parseOverviewStatement(content).forEach(activity => {
         activities.push(activity);
       });
     } catch (exception) {
       console.error(
-        'Error while parsing page (trade republic)',
+        'Error while parsing over statement (trade republic)',
         exception,
         content
       );
+    }
+  } else {
+    for (let content of contents) {
+      try {
+        activities.push(parseOrderOrDividend(content));
+      } catch (exception) {
+        console.error(
+          'Error while parsing page (trade republic)',
+          exception,
+          content
+        );
+      }
     }
   }
 
