@@ -122,7 +122,10 @@ const findDividendShares = textArr => {
 
 const findAmount = (textArr, type) => {
   if (type === 'Buy' || type === 'Sell') {
-    const lineNumber = textArr.indexOf('Kurswert');
+    let lineNumber = textArr.indexOf('Kurswert');
+    if (lineNumber <= 0) {
+      lineNumber = textArr.indexOf('Nettoinventarwert');
+    }
 
     let offset = 0;
     if (textArr[lineNumber + 1] === '') {
@@ -135,7 +138,6 @@ const findAmount = (textArr, type) => {
       offset += 1;
     }
 
-    // console.warn(offset, textArr)
     return parseGermanNum(textArr[lineNumber + 1 + offset]);
   }
 
@@ -167,9 +169,10 @@ const findAmount = (textArr, type) => {
 };
 
 const getNumberAfterTermWithOffset = (content, termToLower, offset = 0) => {
-  const lineNumber = content.findIndex(
-    line => line.toLowerCase() === termToLower
+  const lineNumber = content.findIndex(line =>
+    line.toLowerCase().includes(termToLower)
   );
+
   if (lineNumber <= 0) {
     return 0;
   }
@@ -183,10 +186,14 @@ const getNumberAfterTermWithOffset = (content, termToLower, offset = 0) => {
 };
 
 const findFee = content => {
-  let feeBrokerage = getNumberAfterTermWithOffset(content, 'provision');
-  let feeBase = getNumberAfterTermWithOffset(content, 'grundgebühr');
+  const feeBrokerage = getNumberAfterTermWithOffset(content, 'provision');
+  const feeBase = getNumberAfterTermWithOffset(content, 'grundgebühr');
+  let feeIssue = 0;
+  if (!content.indexOf('Ausgabegebühr 0,00%')) {
+    feeIssue = getNumberAfterTermWithOffset(content, 'ausgabegebühr');
+  }
 
-  return Math.abs(+Big(feeBrokerage).plus(Big(feeBase)));
+  return Math.abs(+Big(feeBrokerage).plus(Big(feeBase)).plus(Big(feeIssue)));
 };
 
 const findTax = textArr => {
