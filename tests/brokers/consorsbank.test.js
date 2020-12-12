@@ -155,6 +155,27 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('should map pdf data of limit buy sample from 2020', () => {
+      const activity = consorsbank.parsePages(buySamples[6]).activities;
+
+      expect(activity).toEqual([
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'ADOBE INC.',
+          date: '2020-12-09',
+          datetime: '2020-12-09T20:18:29.000Z',
+          isin: 'US00724F1012',
+          wkn: '871981',
+          price: 400,
+          shares: 7,
+          amount: 2800,
+          tax: 0,
+          fee: 11.95,
+        },
+      ]);
+    });
   });
 
   describe('Sell', () => {
