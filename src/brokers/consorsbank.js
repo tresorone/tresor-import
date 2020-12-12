@@ -151,17 +151,27 @@ const findAmount = (textArr, type) => {
   return parseGermanNum(amount);
 };
 
-const findFee = textArr => {
-  const brokerageIdx = textArr.findIndex(t => t.toLowerCase() === 'provision');
-  const brokerage = brokerageIdx >= 0 ? textArr[brokerageIdx + 2] : null;
-  const baseFeeIdx = textArr.findIndex(t => t.toLowerCase() === 'grundgebühr');
-  const baseFee = baseFeeIdx >= 0 ? textArr[baseFeeIdx + 2] : null;
-
-  const sum = +Big(parseGermanNum(brokerage)).plus(
-    Big(parseGermanNum(baseFee))
+const getNumberAfterTermWithOffset = (content, termToLower, offset = 0) => {
+  const lineNumber = content.findIndex(
+    line => line.toLowerCase() === termToLower
   );
+  if (lineNumber <= 0) {
+    return 0;
+  }
 
-  return Math.abs(sum);
+  if (/^[A-Z]{3}$/.test(content[lineNumber + offset + 1])) {
+    // Documents before dec 2020 have the price after the currency line.
+    return parseGermanNum(content[lineNumber + offset + 2]);
+  }
+
+  return parseGermanNum(content[lineNumber + offset + 1]);
+};
+
+const findFee = content => {
+  let feeBrokerage = getNumberAfterTermWithOffset(content, 'provision');
+  let feeBase = getNumberAfterTermWithOffset(content, 'grundgebühr');
+
+  return Math.abs(+Big(feeBrokerage).plus(Big(feeBase)));
 };
 
 const findTax = textArr => {
