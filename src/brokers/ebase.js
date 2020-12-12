@@ -5,6 +5,10 @@ import {
   createActivityDateTime,
 } from '@/helper';
 
+function ForeignOnlyReinvest(message) {
+  this.message = message;
+}
+
 const parseShare = shareString => {
   try {
     return +Big(parseGermanNum(shareString)).abs();
@@ -58,7 +62,11 @@ function parseBaseAction(pdfArray, pdfOffset, actionType) {
     pdfArray[pdfOffset + 6],
     undefined
   );
-
+  if (actionType === 'Buy' && pdfArray[pdfOffset] === 'Wiederanlage Fondsertrag') {
+    if (!pdfArray[pdfOffset + 5].endsWith('EUR') && !pdfArray[pdfOffset + 7].endsWith('EUR')) {
+      throw (new ForeignOnlyReinvest('Found a reinvest containing only a non-EUR currency, can not be parsed yet.'))
+    }
+  }
   const activity = {
     broker: 'ebase',
     type: actionType,
@@ -92,11 +100,18 @@ const parseData = pdfPages => {
 
     while (i <= pdfPage.length) {
       if (isBuy(pdfPage[i])) {
-        const action = parseBaseAction(pdfPage, i, 'Buy');
-        if (action === undefined) {
-          return undefined;
+        try {
+          const action = parseBaseAction(pdfPage, i, 'Buy');
+          if (action === undefined) {
+            return undefined;
+          }
+          actions.push(action);
         }
-        actions.push(action);
+        catch ( error ) {
+          if (error instanceof ForeignOnlyReinvest) {
+            console.error(error.message);
+          }
+        }
         // Any buy transaction entry occupies at least 7 array entries.
         i += 6;
       } else if (pdfPage[i] === 'Fondsertrag (Ausschüttung)') {
