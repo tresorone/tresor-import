@@ -121,17 +121,31 @@ const findDividendShares = textArr => {
 };
 
 const findAmount = (textArr, type) => {
-  let amount, idx;
-
   if (type === 'Buy' || type === 'Sell') {
-    idx = textArr.indexOf('Kurswert');
-    // Documents before 12/2015 have an empty line after 'Kurswert'
-    const hasEmptyLineAfterAmountLabel = textArr[idx + 1] === '';
-    amount = hasEmptyLineAfterAmountLabel ? textArr[idx + 3] : textArr[idx + 2];
-  } else if (type === 'Dividend') {
+    const lineNumber = textArr.indexOf('Kurswert');
+
+    let offset = 0;
+    if (textArr[lineNumber + 1] === '') {
+      // Documents before 12/2015 have an empty line after 'Kurswert'
+      offset += 1;
+    }
+
+    if (/^[A-Z]{3}$/.test(textArr[lineNumber + 1 + offset])) {
+      // Documents before dec 2020 have the currency in a line before the amount.
+      offset += 1;
+    }
+
+    // console.warn(offset, textArr)
+    return parseGermanNum(textArr[lineNumber + 1 + offset]);
+  }
+
+  if (type === 'Dividend') {
+    let amount, idx;
+
     const oldDividendFile = textArr.some(
       line => line.includes('IBAN') && line !== 'IBAN'
     );
+
     if (!oldDividendFile) {
       // "Brutto in EUR" is only present if the dividend is paid in a foreign currency, otherwise its just "Brutto"
       idx = textArr.indexOf('Brutto in EUR');
@@ -147,8 +161,9 @@ const findAmount = (textArr, type) => {
         amount = textArr[idx].split(/\s+/)[2];
       }
     }
+
+    return parseGermanNum(amount);
   }
-  return parseGermanNum(amount);
 };
 
 const getNumberAfterTermWithOffset = (content, termToLower, offset = 0) => {
