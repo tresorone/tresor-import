@@ -25,6 +25,7 @@ export const dividendSamples = [
 export const quarterSamples = [
   require('./quarter_statement/without_stocks.json'),
   require('./quarter_statement/with_stocks.json'),
+  require('./quarter_statement/two_pages.json'),
 ];
 
 export const allSamples = buySamples.concat(

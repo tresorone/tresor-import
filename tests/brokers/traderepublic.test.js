@@ -366,6 +366,39 @@ describe('Broker: Trade Republic', () => {
         type: 'Buy',
       });
     });
+
+    test('Map a quarter statement with two pages correctly', () => {
+      const activities = traderepublic.parsePages(quarterSamples[2]).activities;
+
+      expect(activities[10]).toEqual({
+        amount: 366.12,
+        broker: 'traderepublic',
+        company: 'VISA Inc.',
+        date: '2020-03-31',
+        datetime: '2020-03-31T' + activities[1].datetime.substring(11),
+        fee: 0,
+        isin: 'US92826C8394',
+        price: 183.06,
+        shares: 2,
+        tax: 0,
+        type: 'Buy',
+      });
+      expect(activities[11]).toEqual({
+        amount: 391,
+        broker: 'traderepublic',
+        company: 'Zoom Video',
+        date: '2020-03-31',
+        datetime: '2020-03-31T' + activities[1].datetime.substring(11),
+        fee: 0,
+        isin: 'US98980L1017',
+        price: 130.33333333333334,
+        shares: 3,
+        tax: 0,
+        type: 'Buy',
+      });
+
+      expect(activities.length).toEqual(15);
+    });
   });
 
   beforeEach(() => {
