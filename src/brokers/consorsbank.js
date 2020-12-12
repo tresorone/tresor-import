@@ -53,7 +53,19 @@ const findBuySellLineNumber = content => {
 
 const findDateBuySell = content => {
   // Before 12/2015 the headline is 'Wertpapierabrechnung'
-  return content[findBuySellLineNumber(content) + 2].substr(3, 10).trim();
+  const lineNumber = findBuySellLineNumber(content);
+  if (lineNumber <= 0) {
+    return undefined;
+  }
+
+  let offset = 0;
+  let substrFrom = 3;
+  if (content[lineNumber + 2].toLowerCase() === 'am') {
+    offset = 1;
+    substrFrom = 0;
+  }
+
+  return content[lineNumber + 2 + offset].substr(substrFrom).trim();
 };
 
 const findOrderTime = content => {
@@ -63,7 +75,8 @@ const findOrderTime = content => {
     return undefined;
   }
 
-  const lineContent = content[lineNumber + 4];
+  const offset = content[lineNumber + 2].toLowerCase() !== 'am' ? 0 : 1;
+  const lineContent = content[lineNumber + 4 + offset];
   if (lineContent === undefined || !timeRegex(true).test(lineContent)) {
     return undefined;
   }
