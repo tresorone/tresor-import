@@ -40,8 +40,11 @@ export const canParsePage = (content, extension) => {
     'www.degiro.fi',
   ];
 
-  return extension === 'pdf' && content.some(line => allowedDegiroCountries.includes(line)) && isTransactionOverview(content);
-
+  return (
+    extension === 'pdf' &&
+    content.some(line => allowedDegiroCountries.includes(line)) &&
+    isTransactionOverview(content)
+  );
 };
 
 const parseTransaction = (content, index, numberParser) => {
