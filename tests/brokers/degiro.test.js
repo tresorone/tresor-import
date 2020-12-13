@@ -65,9 +65,6 @@ describe('Broker: DEGIRO', () => {
       const activities = degiro.parsePages(transactionLog[1]).activities;
 
       expect(activities.length).toEqual(28);
-      expect(
-        activities.filter(activity => activity !== undefined).length
-      ).toEqual(25);
       expect(activities[5]).toEqual({
         broker: 'degiro',
         type: 'Buy',
@@ -139,70 +136,37 @@ describe('Broker: DEGIRO', () => {
 
     test('Can the transactions be parsed from: mixed_transaction_log_2', () => {
       const activities = degiro.parsePages(transactionLog[3]).activities;
-
-      expect(activities.length).toEqual(29);
+      expect(activities.length).toEqual(237);
       expect(
         activities.filter(activity => activity !== undefined).length
-      ).toEqual(29);
+      ).toEqual(237);
       expect(activities[0]).toEqual({
         broker: 'degiro',
-        type: 'Buy',
-        date: '2020-12-10',
-        datetime: '2020-12-10T16:14:00.000Z',
-        isin: 'US3765361080',
-        company: 'GLADSTONE COMMERCIAL C',
-        shares: 2,
-        price: 16.205,
-        amount: 32.41,
-        fee: 0.55,
-        tax: 0,
-        fxRate: 1.1252,
+        type: 'Sell',
+        date: '2020-12-04',
+        datetime: '2020-12-04T15:39:00.000Z',
+        isin: 'US7615256093',
+        company: 'REVLON INC. NEW COMMO',
+        shares: 100,
+        price: 11.7069,
+        amount: 1170.69,
+        fee: 0,
+        tax: 0.83,
+        fxRate: 1.216,
         foreignCurrency: 'USD',
       });
-      expect(activities[1]).toEqual({
-        broker: 'degiro',
-        type: 'Sell',
-        date: '2020-12-10',
-        datetime: '2020-12-10T15:25:00.000Z',
-        isin: 'CA90022K1003',
-        company: 'TURMALINA METALS',
-        shares: 100,
-        price: 0.5057,
-        amount: 50.57,
-        fee: 0,
-        tax: 8.13,
-        foreignCurrency: 'EUR',
-        fxRate: 0.9305,
-      });
-      expect(activities[4]).toEqual({
+      expect(activities[236]).toEqual({
         broker: 'degiro',
         type: 'Buy',
-        date: '2020-06-22',
-        datetime: '2020-06-22T08:57:00.000Z',
-        isin: 'CA90022K1003',
-        company: 'TURMALINA METALS',
-        shares: 100,
-        price: 0.891,
-        amount: 89.1,
-        fee: 8.08,
+        date: '2015-01-02',
+        datetime: '2015-01-02T10:49:00.000Z',
+        isin: 'DE000A1PHEL8',
+        company: 'SNOWBIRD AG',
+        shares: 196,
+        price: 5.1,
+        amount: 999.6,
         tax: 0,
-        foreignCurrency: 'EUR',
-        fxRate: 0.9373,
-      });
-      expect(activities[6]).toEqual({
-        broker: 'degiro',
-        type: 'Sell',
-        date: '2020-05-11',
-        datetime: '2020-05-11T07:00:00.000Z',
-        isin: 'IE00B3WJKG14',
-        company: 'BLACKROCK ISHARES S&P 500 INFORMATION TECHNOLOGY SEC...',
-        shares: 3,
-        price: 11.616666666666667,
-        amount: 34.85,
-        fee: 0,
-        tax: 2.12,
-        foreignCurrency: 'USD',
-        fxRate: 1.0308,
+        fee: 2.08,
       });
     });
   });
