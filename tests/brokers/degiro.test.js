@@ -105,7 +105,7 @@ describe('Broker: DEGIRO', () => {
 
       expect(activities.length).toEqual(16);
       expect(
-          activities.filter(activity => activity !== undefined).length
+        activities.filter(activity => activity !== undefined).length
       ).toEqual(16);
       expect(activities[0]).toEqual({
         broker: 'degiro',
@@ -131,7 +131,7 @@ describe('Broker: DEGIRO', () => {
         company: 'CALL 16.12.21 NEXTERA 75',
         shares: 970,
         price: 0.62,
-        amount: 601.40,
+        amount: 601.4,
         fee: 2.66,
         tax: 0,
       });
@@ -142,7 +142,7 @@ describe('Broker: DEGIRO', () => {
 
       expect(activities.length).toEqual(29);
       expect(
-          activities.filter(activity => activity !== undefined).length
+        activities.filter(activity => activity !== undefined).length
       ).toEqual(29);
       expect(activities[0]).toEqual({
         broker: 'degiro',

@@ -7,7 +7,8 @@ import {
 } from '@/helper';
 
 export const canParsePage = (content, extension) =>
-  extension === 'pdf' && ( content.includes('www.degiro.de') || content.includes('www.degiro.ch'));
+  extension === 'pdf' &&
+  (content.includes('www.degiro.de') || content.includes('www.degiro.ch'));
 
 const parseActivity = (content, index, numberParser) => {
   // Is it possible that the transaction logs contains dividends?
@@ -39,10 +40,9 @@ const parseActivity = (content, index, numberParser) => {
   const price = amount.div(shares.abs());
   let tax = 0;
   let fee = 0;
-  if ( type === 'Buy' ) {
+  if (type === 'Buy') {
     fee = Math.abs(numberParser(content[index + 13 + span]));
-  }
-  else if ( type === 'Sell' ) {
+  } else if (type === 'Sell') {
     tax = Math.abs(numberParser(content[index + 13 + span]));
   }
 
@@ -80,7 +80,9 @@ const parseActivity = (content, index, numberParser) => {
 
 export const parsePages = contents => {
   let activities = [];
-  const numberParser = contents[0].includes('www.degiro.de') ? parseGermanNum : parseFloat;
+  const numberParser = contents[0].includes('www.degiro.de')
+    ? parseGermanNum
+    : parseFloat;
   for (let content of contents) {
     let transactionIndex = content.indexOf('Gesamt') + 1;
     while (transactionIndex > 0 && content.length - transactionIndex > 15) {
