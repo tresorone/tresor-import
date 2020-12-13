@@ -134,7 +134,7 @@ const findAmount = (textArr, type) => {
     }
 
     if (/^[A-Z]{3}$/.test(textArr[lineNumber + 1 + offset])) {
-      // Documents before dec 2020 have the currency in a line before the amount.
+      // Documents before nov 2020 have the currency in a line before the amount.
       offset += 1;
     }
 
@@ -174,11 +174,11 @@ const getNumberAfterTermWithOffset = (content, termToLower, offset = 0) => {
   );
 
   if (lineNumber <= 0) {
-    return 0;
+    return undefined;
   }
 
   if (/^[A-Z]{3}$/.test(content[lineNumber + offset + 1])) {
-    // Documents before dec 2020 have the price after the currency line.
+    // Documents before nov 2020 have the price after the currency line.
     return parseGermanNum(content[lineNumber + offset + 2]);
   }
 
@@ -193,7 +193,20 @@ const findFee = content => {
     feeIssue = getNumberAfterTermWithOffset(content, 'ausgabegebühr');
   }
 
-  return Math.abs(+Big(feeBrokerage).plus(Big(feeBase)).plus(Big(feeIssue)));
+  let totalFee = Big(0);
+  if (feeBrokerage !== undefined) {
+    totalFee = totalFee.plus(feeBrokerage);
+  }
+
+  if (feeBase !== undefined) {
+    totalFee = totalFee.plus(feeBase);
+  }
+
+  if (feeIssue !== undefined) {
+    totalFee = totalFee.plus(feeIssue);
+  }
+
+  return +totalFee;
 };
 
 const findTax = textArr => {
