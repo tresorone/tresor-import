@@ -4,8 +4,20 @@ import {
   validateActivity,
   createActivityDateTime,
   isinRegex,
-  //  findPreviousRegexMatchIdx,
 } from '@/helper';
+
+const allowedDegiroCountries = [
+  'www.degiro.de',
+  'www.degiro.es',
+  'www.degiro.ie',
+  'www.degiro.gr',
+  'www.degiro.it',
+  'www.degiro.pt',
+  'www.degiro.fr',
+  'www.degiro.nl',
+  'www.degiro.at',
+  'www.degiro.fi',
+];
 
 class zeroSharesTransaction extends Error {
   constructor(...params) {
@@ -25,28 +37,6 @@ const isAccountStatement = pdfPage => {
   return pdfPage[0].some(line => line.startsWith('Kontoauszug von'));
 };
 
-export const canParsePage = (content, extension) => {
-  // To enable DeGiro for swiss accounts also use: || content.includes('www.degiro.ch');
-  const allowedDegiroCountries = [
-    'www.degiro.de',
-    'www.degiro.es',
-    'www.degiro.ie',
-    'www.degiro.gr',
-    'www.degiro.it',
-    'www.degiro.pt',
-    'www.degiro.fr',
-    'www.degiro.nl',
-    'www.degiro.at',
-    'www.degiro.fi',
-  ];
-
-  return (
-    extension === 'pdf' &&
-    content.some(line => allowedDegiroCountries.includes(line)) &&
-    isTransactionOverview(content)
-  );
-};
-
 const parseTransaction = (content, index, numberParser) => {
   // Is it possible that the transaction logs contains dividends?
 
@@ -62,7 +52,6 @@ const parseTransaction = (content, index, numberParser) => {
   }
   const amount = Big(numberParser(content[isinIdx + 8])).abs();
   // There is the case where the amount is 0, might be a transfer out or a knockout certificate
-
   const currency = content[isinIdx + 5];
   const baseCurrency = content[isinIdx + 7];
 
@@ -121,10 +110,8 @@ const parseTransaction = (content, index, numberParser) => {
 
 const parseTransactionLog = pdfPages => {
   let activities = [];
-  // The swiss DeGiro parser has another number format
-  const numberParser = pdfPages[0].includes('www.degiro.de')
-    ? parseGermanNum
-    : parseFloat;
+  // Set another parser if foreign Degiros such as degiro.ch come into place, they will have other number formats.
+  const numberParser = parseGermanNum;
   for (let content of pdfPages) {
     let transactionIndex = content.indexOf('Gesamt') + 1;
     while (transactionIndex > 0 && content.length - transactionIndex > 15) {
@@ -155,6 +142,14 @@ const parseTransactionLog = pdfPages => {
     }
   }
   return activities;
+};
+
+export const canParsePage = (content, extension) => {
+  return (
+      extension === 'pdf' &&
+      content.some(line => allowedDegiroCountries.includes(line)) &&
+      isTransactionOverview(content)
+  );
 };
 
 export const parsePages = pdfPages => {
