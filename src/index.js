@@ -65,7 +65,8 @@ const filterResultActivities = result => {
     const numberOfActivities = result.activities.length;
     result.activities =
       numberOfActivities === 0 ? undefined : result.activities;
-    result.status = numberOfActivities === 0 ? 5 : result.status;
+    result.status =
+      numberOfActivities === 0 && result.status == 0 ? 5 : result.status;
   }
 
   return result;
