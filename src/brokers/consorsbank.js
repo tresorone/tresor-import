@@ -189,7 +189,7 @@ const findFee = content => {
   const feeBrokerage = getNumberAfterTermWithOffset(content, 'provision');
   const feeBase = getNumberAfterTermWithOffset(content, 'grundgebühr');
   let feeIssue = 0;
-  if (!content.indexOf('Ausgabegebühr 0,00%')) {
+  if (content.indexOf('Ausgabegebühr 0,00%') <= 0) {
     feeIssue = getNumberAfterTermWithOffset(content, 'ausgabegebühr');
   }
 
