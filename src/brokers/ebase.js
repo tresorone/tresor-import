@@ -111,6 +111,7 @@ const parseData = pdfPages => {
           if (error instanceof ForeignOnlyReinvest) {
             console.error(error.message);
           }
+          return undefined;
         }
         // Any buy transaction entry occupies at least 7 array entries.
         i += 6;
@@ -141,8 +142,12 @@ export const canParsePage = (content, extension) =>
   content.some(line => line.includes('Fondsertrag / Vorabpauschale'));
 
 export const parsePages = contents => {
+  const activities = parseData(contents);
+  const status = parseData(contents) !== undefined ? 0 : 6
   return {
-    activities: parseData(contents),
-    status: 0,
+    activities,
+    status,
   };
+
+
 };
