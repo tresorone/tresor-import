@@ -209,14 +209,30 @@ const isOverviewStatement = content =>
       line.includes('DEPOTAUSZUG') || line.includes('JAHRESDEPOTABSTIMMUNG')
   );
 
-export const canParsePage = (content, extension) =>
-  extension === 'pdf' &&
-  content.some(line => line.includes('TRADE REPUBLIC BANK GMBH')) &&
-  (isBuySingle(content) ||
+const detectedButIgnoredDocument = content => {
+  return (
+    // When the document contains one of the following lines, we want to ignore these document.
+    content.some(line => line.includes('KOSTENINFORMATION')) ||
+    // Only exclude these document, when a line contains one of the following:
+    content.some(line => line === 'SPARPLANAUSFÜHRUNG FEHLGESCHLAGEN') ||
+    content.some(line => line === 'SPLIT') ||
+    content.some(line => line === 'REVERSE SPLIT')
+  );
+};
+
+const isSupportedDocument = content => {
+  return (
+    isBuySingle(content) ||
     isBuySavingsPlan(content) ||
     isSell(content) ||
     isDividend(content) ||
-    isOverviewStatement(content));
+    isOverviewStatement(content)
+  );
+};
+
+export const canParsePage = (content, extension) =>
+  extension === 'pdf' &&
+  content.some(line => line.includes('TRADE REPUBLIC BANK GMBH'));
 
 const parsePositionAsActivity = (content, startLineNumber) => {
   // Find the line with ISIN and the next line with the date
@@ -334,19 +350,34 @@ const parseOverviewStatement = content => {
 
 export const parsePages = contents => {
   let activities = [];
+  const allPagesFlat = contents.flat();
+
+  if (detectedButIgnoredDocument(allPagesFlat)) {
+    // We know this type and we don't want to support it.
+    return {
+      activities,
+      status: 8,
+    };
+  }
+
+  if (!isSupportedDocument(contents[0])) {
+    // The first page is not one of the supported types.
+    return {
+      activities,
+      status: 7,
+    };
+  }
 
   if (isOverviewStatement(contents[0])) {
-    const content = contents.flat();
-
     try {
-      parseOverviewStatement(content).forEach(activity => {
+      parseOverviewStatement(allPagesFlat).forEach(activity => {
         activities.push(activity);
       });
     } catch (exception) {
       console.error(
         'Error while parsing over statement (trade republic)',
         exception,
-        content
+        allPagesFlat
       );
     }
   } else {
