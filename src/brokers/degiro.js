@@ -7,9 +7,9 @@ import {
 } from '@/helper';
 
 export const canParsePage = (content, extension) =>
-  extension === 'pdf' && content.includes('www.degiro.de');
+  extension === 'pdf' && ( content.includes('www.degiro.de') || content.includes('www.degiro.ch'));
 
-const parseActivity = (content, index) => {
+const parseActivity = (content, index, numberParser) => {
   // Is it possible that the transaction logs contains dividends?
 
   let span = 0;
@@ -22,22 +22,29 @@ const parseActivity = (content, index) => {
   }
 
   const isin = content[index + 3 + span];
-  const shares = Big(parseGermanNum(content[index + 5 + span])).abs();
-  const amount = Big(parseGermanNum(content[index + 11 + span])).abs();
+  const shares = Big(numberParser(content[index + 5 + span]));
+  const amount = Big(numberParser(content[index + 11 + span])).abs();
 
   const currency = content[index + 6 + span];
   const baseCurrency = content[index + 10 + span];
 
   let fxRate = undefined;
   if (currency !== baseCurrency) {
-    fxRate = parseGermanNum(content[index + 12 + span]);
+    fxRate = numberParser(content[index + 12 + span]);
     // For foreign currency we need to go one line ahead for the following fields.
     span++;
   }
 
   const type = shares > 0 ? 'Buy' : 'Sell';
   const price = amount.div(shares.abs());
-  const fee = Math.abs(parseGermanNum(content[index + 13 + span]));
+  let tax = 0;
+  let fee = 0;
+  if ( type === 'Buy' ) {
+    fee = Math.abs(numberParser(content[index + 13 + span]));
+  }
+  else if ( type === 'Sell' ) {
+    tax = Math.abs(numberParser(content[index + 13 + span]));
+  }
 
   const [parsedDate, parsedDateTime] = createActivityDateTime(
     content[index],
@@ -52,12 +59,12 @@ const parseActivity = (content, index) => {
     datetime: parsedDateTime,
     company,
     isin,
-    shares: +shares,
+    shares: +shares.abs(),
     amount: +amount,
     type,
     price: +price,
     fee,
-    tax: 0,
+    tax,
   };
 
   if (fxRate !== undefined) {
@@ -73,6 +80,7 @@ const parseActivity = (content, index) => {
 
 export const parsePages = contents => {
   let activities = [];
+  const numberParser = contents[0].includes('www.degiro.de') ? parseGermanNum : parseFloat;
   for (let content of contents) {
     let transactionIndex = content.indexOf('Gesamt') + 1;
     while (transactionIndex > 0 && content.length - transactionIndex > 15) {
@@ -84,7 +92,7 @@ export const parsePages = contents => {
       }
 
       try {
-        activities.push(parseActivity(content, transactionIndex));
+        activities.push(parseActivity(content, transactionIndex, numberParser));
       } catch (exception) {
         console.error('Error while parsing page (degiro)', exception, content);
       }
