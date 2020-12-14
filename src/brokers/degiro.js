@@ -101,10 +101,6 @@ const parseTransaction = (content, index, numberParser) => {
     activity.foreignCurrency = currency;
   }
 
-  if (validateActivity(activity) === undefined) {
-    console.log(activity);
-  }
-
   return validateActivity(activity);
 };
 
