@@ -8,6 +8,8 @@ export const buySamples = [
   require('./buy/2020_limit_buy.json'),
   require('./buy/2020_fund.json'),
   require('./buy/2020_fund_without_issue.json'),
+  require('./buy/2020_buy_apple_inc_1.json'),
+  require('./buy/2003_buy_acatis.json'),
 ];
 
 export const sellSamples = [

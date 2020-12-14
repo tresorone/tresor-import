@@ -57,6 +57,10 @@ const findDateBuySell = content => {
   if (lineNumber <= 0) {
     return undefined;
   }
+  // Might be a super old file, test from 2003
+  if (content[lineNumber+1].toLowerCase().startsWith('kauf') && content[lineNumber+1].toLowerCase().includes('am')) {
+    return content[lineNumber+1].split(/\s+/)[2];
+  }
 
   let offset = 0;
   let substrFrom = 3;
@@ -99,10 +103,15 @@ const findDateDividend = textArr => {
 };
 
 const findShares = textArr => {
-  const idx = textArr.findIndex(t => t.toLowerCase() === 'umsatz');
-  const shares = textArr[idx + 2];
+  let idx = textArr.findIndex(t => t.toLowerCase() === 'umsatz');
+  if (idx >= 0) {
+    return parseGermanNum(textArr[idx + 2])
+  }
+  idx = textArr.findIndex(t => t.startsWith('ST '));
+  if (idx >= 0) {
+    return parseGermanNum(textArr[idx].split(/\s+/)[1]);
+  }
 
-  return parseGermanNum(shares);
 };
 
 const findDividendShares = textArr => {
@@ -125,6 +134,16 @@ const findAmount = (textArr, type) => {
     let lineNumber = textArr.indexOf('Kurswert');
     if (lineNumber <= 0) {
       lineNumber = textArr.indexOf('Nettoinventarwert');
+    }
+    if (lineNumber <= 0) {
+      // For super old files (testfile from 2003)
+      lineNumber = textArr.findIndex(line => line.startsWith('KURSWERT'))
+      if ( lineNumber >= 0 && parseGermanNum(textArr[lineNumber].split(/\s+/)[2])) {
+        return parseGermanNum(textArr[lineNumber].split(/\s+/)[2]);
+      }
+      else {
+        return undefined
+      }
     }
 
     let offset = 0;
@@ -188,6 +207,7 @@ const getNumberAfterTermWithOffset = (content, termToLower, offset = 0) => {
 const findFee = content => {
   const feeBrokerage = getNumberAfterTermWithOffset(content, 'provision');
   const feeBase = getNumberAfterTermWithOffset(content, 'grundgebühr');
+  const bonificationIdx = content.findIndex(line => line.startsWith('BONIFIKAT'));
   let feeIssue = 0;
   if (content.indexOf('Ausgabegebühr 0,00%') <= 0) {
     feeIssue = getNumberAfterTermWithOffset(content, 'ausgabegebühr');
@@ -204,6 +224,10 @@ const findFee = content => {
 
   if (feeIssue !== undefined) {
     totalFee = totalFee.plus(feeIssue);
+  }
+
+  if ( bonificationIdx >= 0) {
+    totalFee = totalFee.minus(parseGermanNum(content[bonificationIdx].split(/\s+/)[4]))
   }
 
   return +totalFee;
@@ -252,7 +276,7 @@ const findForeignInformation = textArr => {
 const isBuy = textArr => {
   // Before 12/2015 the headline is 'Wertpapierabrechnung'
   const lineNumber = findBuySellLineNumber(textArr);
-  return lineNumber >= 0 && textArr[lineNumber + 1].toLowerCase() === 'kauf';
+  return lineNumber >= 0 && textArr[lineNumber + 1].toLowerCase().startsWith('kauf');
 };
 
 const isSell = textArr => {
@@ -270,10 +294,9 @@ export const canParsePage = (content, extension) => {
   if (extension !== 'pdf') {
     return false;
   }
-
   const isConsors = content.some(
     line => line.toLowerCase && line.toLowerCase().includes('consorsbank')
-  );
+  ) || content[content.length-2] === 'WERTPAPIERE ZU GUNSTEN GIROSAMMELVERWAHRUNG';
 
   if (!isConsors) {
     return false;
@@ -321,7 +344,6 @@ const parseData = textArr => {
     'dd.MM.yyyy',
     'dd.MM.yyyy HH:mm:ss'
   );
-
   const activity = {
     broker: 'consorsbank',
     type,

@@ -218,6 +218,46 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('Can parse buy from apple inc 2020', () => {
+      const activity = consorsbank.parsePages(buySamples[9]).activities;
+
+      expect(activity).toEqual([
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'APPLE INC.',
+          date: '2020-12-10',
+          datetime: '2020-12-10T12:36:43.000Z',
+          isin: 'US0378331005',
+          wkn: '865985',
+          price: 100,
+          shares: 10,
+          amount: 1000,
+          tax: 0,
+          fee: 9.95,
+        },
+      ]);
+    });
+
+    test('Can parse buy from ACATIS 2003', () => {
+      const activity = consorsbank.parsePages(buySamples[10]).activities;
+      expect(activity).toEqual([
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'ACATIS AKT.GLOB.FONDS UI',
+          date: '2003-12-15',
+          datetime: '2003-12-15T' + activity[0].datetime.substring(11),
+          wkn: '978174',
+          price: 118.29099307159353,
+          shares: 0.433,
+          amount: 51.22,
+          tax: 0,
+          fee: -1.22,
+        },
+      ]);
+    });
   });
 
   describe('Sell', () => {
