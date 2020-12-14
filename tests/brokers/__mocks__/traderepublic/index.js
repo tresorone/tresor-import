@@ -28,8 +28,16 @@ export const quarterSamples = [
   require('./quarter_statement/two_pages.json'),
 ];
 
+export const ignoredSamples = [
+  require('./ignored/cost_information.json'),
+  require('./ignored/reverse_split.json'),
+  require('./ignored/saving_plan_failed.json'),
+  require('./ignored/split.json'),
+];
+
 export const allSamples = buySamples.concat(
   sellSamples,
   dividendSamples,
-  quarterSamples
+  quarterSamples,
+  ignoredSamples
 );

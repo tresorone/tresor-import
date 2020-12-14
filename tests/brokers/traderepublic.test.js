@@ -6,6 +6,7 @@ import {
   sellSamples,
   dividendSamples,
   quarterSamples,
+  ignoredSamples,
 } from './__mocks__/traderepublic';
 
 describe('Broker: Trade Republic', () => {
@@ -398,6 +399,36 @@ describe('Broker: Trade Republic', () => {
       });
 
       expect(activities.length).toEqual(15);
+    });
+  });
+
+  describe('Validate the ignored statements', () => {
+    test('The statement should be ignored: cost_information.json', () => {
+      const result = traderepublic.parsePages(ignoredSamples[0]);
+
+      expect(result.status).toEqual(8);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('The statement should be ignored: reverse_split.json', () => {
+      const result = traderepublic.parsePages(ignoredSamples[1]);
+
+      expect(result.status).toEqual(8);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('The statement should be ignored: saving_plan_failed.json', () => {
+      const result = traderepublic.parsePages(ignoredSamples[2]);
+
+      expect(result.status).toEqual(8);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('The statement should be ignored: split.json', () => {
+      const result = traderepublic.parsePages(ignoredSamples[3]);
+
+      expect(result.status).toEqual(8);
+      expect(result.activities.length).toEqual(0);
     });
   });
 
