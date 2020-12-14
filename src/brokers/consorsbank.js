@@ -308,8 +308,8 @@ export const canParsePage = (content, extension) => {
     content.some(
       line => line.toLowerCase && line.toLowerCase().includes('consorsbank')
     ) ||
-    content[content.length - 2] ===
-      'WERTPAPIERE ZU GUNSTEN GIROSAMMELVERWAHRUNG';
+    content[1] ===
+      'POSTFACH 17 43';
 
   if (!isConsors) {
     return false;
