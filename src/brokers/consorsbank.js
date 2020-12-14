@@ -59,7 +59,7 @@ const findDateBuySell = content => {
   }
   // Might be a super old file, test from 2003
   if (
-    content[lineNumber + 1].toLowerCase().startsWith('kauf') &&
+    (content[lineNumber + 1].toLowerCase().startsWith('kauf') || content[lineNumber + 1].toLowerCase().startsWith('verkauf')) &&
     content[lineNumber + 1].toLowerCase().includes('am')
   ) {
     return content[lineNumber + 1].split(/\s+/)[2];
