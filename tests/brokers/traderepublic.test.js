@@ -289,7 +289,7 @@ describe('Broker: Trade Republic', () => {
         tax: 2.350661386805965,
         fee: 0.7582778667116017,
         fxRate: 1.1869,
-        foreignCurrency: "USD",
+        foreignCurrency: 'USD',
       });
     });
 

@@ -66,7 +66,7 @@ const findShares = textArr => {
   return parseGermanNum(shares);
 };
 
-const findAmount = ( textArr, fxRate )=> {
+const findAmount = (textArr, fxRate) => {
   const searchTerm = 'GESAMT';
   let totalAmountLine = textArr[textArr.indexOf(searchTerm) + 1];
   const totalAmount = totalAmountLine.split(' ')[0].trim();
@@ -76,16 +76,18 @@ const findAmount = ( textArr, fxRate )=> {
   return parseGermanNum(totalAmount);
 };
 
-const findForeignInformation = (textArr) => {
-  const foreignIdx = textArr.findIndex(line => /[1-9]+[0-9]*(,[0-9]*)? [A-Z]{3}\/[A-Z]{3}/.test(line));
+const findForeignInformation = textArr => {
+  const foreignIdx = textArr.findIndex(line =>
+    /[1-9]+[0-9]*(,[0-9]*)? [A-Z]{3}\/[A-Z]{3}/.test(line)
+  );
   if (foreignIdx >= 0) {
     const foreignInfo = textArr[foreignIdx].split(/\s+/);
-    return [parseGermanNum(foreignInfo[0]), foreignInfo[1].split('/')[1]]
+    return [parseGermanNum(foreignInfo[0]), foreignInfo[1].split('/')[1]];
   }
-  return [undefined, undefined]
-}
+  return [undefined, undefined];
+};
 
-const findFee = ( textArr, fxRate ) => {
+const findFee = (textArr, fxRate) => {
   let totalFee = Big(0);
   if (textArr.indexOf('Fremde Spesen') > -1) {
     const feeLine = textArr[textArr.indexOf('Fremde Spesen') + 1];
@@ -102,34 +104,53 @@ const findFee = ( textArr, fxRate ) => {
   return +totalFee;
 };
 
-const findTax = ( textArr, fxRate ) => {
-
+const findTax = (textArr, fxRate) => {
   let totalTax = Big(0);
-  const transactionTaxIdx = textArr.findIndex(line => line.includes('Finanztransaktionssteuer'));
+  const transactionTaxIdx = textArr.findIndex(line =>
+    line.includes('Finanztransaktionssteuer')
+  );
   if (transactionTaxIdx >= 0) {
-    const transactionTax = parseGermanNum(textArr[transactionTaxIdx + 1].split(/\s+/)[0]);
+    const transactionTax = parseGermanNum(
+      textArr[transactionTaxIdx + 1].split(/\s+/)[0]
+    );
     totalTax = totalTax.minus(transactionTax);
   }
-  const withholdingTaxLine = textArr.findIndex(line => line.startsWith('Quellensteuer'));
-  if ( withholdingTaxLine >= 0 ) {
-    const foreignTax = parseGermanNum(textArr[withholdingTaxLine + 1].split(/\s+/)[0]);
-    if ( fxRate !== undefined) {
+  const withholdingTaxLine = textArr.findIndex(line =>
+    line.startsWith('Quellensteuer')
+  );
+  if (withholdingTaxLine >= 0) {
+    const foreignTax = parseGermanNum(
+      textArr[withholdingTaxLine + 1].split(/\s+/)[0]
+    );
+    if (fxRate !== undefined) {
       totalTax = totalTax.minus(Big(foreignTax).div(fxRate));
     } else {
       totalTax = totalTax.minus(foreignTax);
     }
   }
-  const capitalTaxIdx = textArr.findIndex(line => line.includes('Kapitalertragssteuer'));
-  if ( capitalTaxIdx >= 0) {
-    totalTax = totalTax.minus(parseGermanNum(textArr[capitalTaxIdx + 1].split(/\s+/)[0]));
+  const capitalTaxIdx = textArr.findIndex(line =>
+    line.includes('Kapitalertragssteuer')
+  );
+  if (capitalTaxIdx >= 0) {
+    totalTax = totalTax.minus(
+      parseGermanNum(textArr[capitalTaxIdx + 1].split(/\s+/)[0])
+    );
   }
-  const soliTaxIdx = textArr.findIndex(line => line.includes('Solidaritätszuschlag'));
-  if ( soliTaxIdx >= 0) {
-    totalTax = totalTax.minus(parseGermanNum(textArr[soliTaxIdx + 1].split(/\s+/)[0]));
+  const soliTaxIdx = textArr.findIndex(line =>
+    line.includes('Solidaritätszuschlag')
+  );
+  if (soliTaxIdx >= 0) {
+    totalTax = totalTax.minus(
+      parseGermanNum(textArr[soliTaxIdx + 1].split(/\s+/)[0])
+    );
   }
-  const churchTaxIdx = textArr.findIndex(line => line.includes('Kirchensteuer'));
-  if ( churchTaxIdx >= 0) {
-    totalTax = totalTax.minus(parseGermanNum(textArr[churchTaxIdx + 1].split(/\s+/)[0]));
+  const churchTaxIdx = textArr.findIndex(line =>
+    line.includes('Kirchensteuer')
+  );
+  if (churchTaxIdx >= 0) {
+    totalTax = totalTax.minus(
+      parseGermanNum(textArr[churchTaxIdx + 1].split(/\s+/)[0])
+    );
   }
   return +totalTax;
 };
@@ -157,7 +178,6 @@ export const canParsePage = (content, extension) =>
     isSell(content) ||
     isDividend(content) ||
     isOverviewStatement(content));
-
 
 // Functions to parse an overview Statement
 const parsePositionAsActivity = (content, startLineNumber) => {
@@ -223,7 +243,6 @@ const parseOverviewStatement = content => {
   return foundActivities;
 };
 
-
 // Individual transaction file
 const parseTransaction = textArr => {
   const [fxRate, foreignCurrency] = findForeignInformation(textArr);
@@ -234,13 +253,16 @@ const parseTransaction = textArr => {
     shares: findShares(textArr),
     tax: findTax(textArr, fxRate),
     fee: findFee(textArr, fxRate),
-  }
+  };
   if (isBuySingle(textArr) || isBuySavingsPlan(textArr)) {
     activity.type = 'Buy';
     const date = isBuySavingsPlan(textArr)
       ? findDateBuySavingsPlan(textArr)
       : findDateSingleBuy(textArr);
-    [activity.date, activity.datetime] = createActivityDateTime(date, findOrderTime(textArr));
+    [activity.date, activity.datetime] = createActivityDateTime(
+      date,
+      findOrderTime(textArr)
+    );
     activity.amount = findAmount(textArr, fxRate);
   } else if (isSell(textArr)) {
     activity.type = 'Sell';
