@@ -155,6 +155,109 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('should map pdf data of limit buy sample from 2020', () => {
+      const activity = consorsbank.parsePages(buySamples[6]).activities;
+
+      expect(activity).toEqual([
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'ADOBE INC.',
+          date: '2020-12-09',
+          datetime: '2020-12-09T20:18:29.000Z',
+          isin: 'US00724F1012',
+          wkn: '871981',
+          price: 400,
+          shares: 7,
+          amount: 2800,
+          tax: 0,
+          fee: 11.95,
+        },
+      ]);
+    });
+
+    test('should map pdf data of fund buy sample from 2020', () => {
+      const activity = consorsbank.parsePages(buySamples[7]).activities;
+
+      expect(activity).toEqual([
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'DWS IN.-AR.INT. LCEOA',
+          date: '2020-11-17',
+          datetime: '2020-11-17T09:51:08.000Z',
+          isin: 'LU1863263346',
+          wkn: 'DWS2W9',
+          price: 152.42892587291965,
+          shares: 1.60009,
+          amount: 243.9,
+          tax: 0,
+          fee: 6.1,
+        },
+      ]);
+    });
+
+    test('should map pdf data of fund (without issue) buy sample from 2020', () => {
+      const activity = consorsbank.parsePages(buySamples[8]).activities;
+
+      expect(activity).toEqual([
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'DWS IN.-AR.INT. LCEOA',
+          date: '2020-09-16',
+          datetime: '2020-09-16T06:24:08.000Z',
+          isin: 'LU1863263346',
+          wkn: 'DWS2W9',
+          price: 143.31000246493204,
+          shares: 1.74447,
+          amount: 250,
+          tax: 0,
+          fee: 0,
+        },
+      ]);
+    });
+
+    test('Can parse buy from apple inc 2020', () => {
+      const activity = consorsbank.parsePages(buySamples[9]).activities;
+
+      expect(activity).toEqual([
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'APPLE INC.',
+          date: '2020-12-10',
+          datetime: '2020-12-10T12:36:43.000Z',
+          isin: 'US0378331005',
+          wkn: '865985',
+          price: 100,
+          shares: 10,
+          amount: 1000,
+          tax: 0,
+          fee: 9.95,
+        },
+      ]);
+    });
+
+    test('Can parse buy from ACATIS 2003', () => {
+      const activity = consorsbank.parsePages(buySamples[10]).activities;
+      expect(activity).toEqual([
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'ACATIS AKT.GLOB.FONDS UI',
+          date: '2003-12-15',
+          datetime: '2003-12-15T' + activity[0].datetime.substring(11),
+          wkn: '978174',
+          price: 118.29099307159353,
+          shares: 0.433,
+          amount: 51.22,
+          tax: 0,
+          fee: -1.22,
+        },
+      ]);
+    });
   });
 
   describe('Sell', () => {

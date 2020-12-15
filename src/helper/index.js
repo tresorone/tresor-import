@@ -53,6 +53,17 @@ export function parseGermanNum(n) {
   return parseFloat(n.replace(/\./g, '').replace(',', '.'));
 }
 
+export function findPreviousRegexMatchIdx(arr, idx, regex) {
+  let bckwrdIdx = 1;
+  while (idx - bckwrdIdx >= 0) {
+    if (regex.test(arr[idx - bckwrdIdx])) {
+      return idx - bckwrdIdx;
+    }
+    bckwrdIdx += 1;
+  }
+  return -1;
+}
+
 export function validateActivity(activity, findSecurityAlsoByCompany = false) {
   // All fields must have a value unequal undefined
   if (!every(values(activity), a => !!a || a === 0)) {
@@ -138,21 +149,21 @@ export function validateActivity(activity, findSecurityAlsoByCompany = false) {
     return undefined;
   }
 
-  if (Number(activity.price) !== activity.price || activity.price <= 0) {
+  if (Number(activity.price) !== activity.price || activity.price < 0) {
     console.error(
       'The price in activity for ' +
         activity.broker +
-        ' must be a number greater than 0.',
+        ' must be a number greater or equal 0.',
       activity
     );
     return undefined;
   }
 
-  if (Number(activity.amount) !== activity.amount || activity.amount <= 0) {
+  if (Number(activity.amount) !== activity.amount || activity.amount < 0) {
     console.error(
       'The amount in activity for ' +
         activity.broker +
-        ' must be a number greater than 0.',
+        ' must be a number greater or equal than 0.',
       activity
     );
     return undefined;
@@ -230,9 +241,11 @@ export function validateActivity(activity, findSecurityAlsoByCompany = false) {
   return activity;
 }
 
-export function findFirstIsinIndexInArray(array) {
-  const isinIndex = array.findIndex(element => isinRegex.test(element));
-  return isinIndex === -1 ? undefined : isinIndex;
+export function findFirstIsinIndexInArray(array, offset = 0) {
+  const isinIndex = array
+    .slice(offset)
+    .findIndex(element => isinRegex.test(element));
+  return isinIndex === -1 ? undefined : isinIndex + offset;
 }
 
 // This function will convert a date (reuqired) and a time (can be undefined) to a formatted date and datetime.

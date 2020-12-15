@@ -296,7 +296,7 @@ describe('Helper functions', () => {
 
       expect(helper.validateActivity(activity)).toEqual(undefined);
       expect(console.error).toHaveBeenLastCalledWith(
-        'The price in activity for comdirect must be a number greater than 0.',
+        'The price in activity for comdirect must be a number greater or equal 0.',
         activity
       );
     });
@@ -318,7 +318,7 @@ describe('Helper functions', () => {
 
       expect(helper.validateActivity(activity)).toEqual(undefined);
       expect(console.error).toHaveBeenLastCalledWith(
-        'The price in activity for comdirect must be a number greater than 0.',
+        'The price in activity for comdirect must be a number greater or equal 0.',
         activity
       );
     });
@@ -340,7 +340,7 @@ describe('Helper functions', () => {
 
       expect(helper.validateActivity(activity)).toEqual(undefined);
       expect(console.error).toHaveBeenLastCalledWith(
-        'The amount in activity for comdirect must be a number greater than 0.',
+        'The amount in activity for comdirect must be a number greater or equal than 0.',
         activity
       );
     });
@@ -362,7 +362,7 @@ describe('Helper functions', () => {
 
       expect(helper.validateActivity(activity)).toEqual(undefined);
       expect(console.error).toHaveBeenLastCalledWith(
-        'The amount in activity for comdirect must be a number greater than 0.',
+        'The amount in activity for comdirect must be a number greater or equal than 0.',
         activity
       );
     });

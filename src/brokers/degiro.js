@@ -6,38 +6,71 @@ import {
   isinRegex,
 } from '@/helper';
 
-export const canParsePage = (content, extension) =>
-  extension === 'pdf' && content.includes('www.degiro.de');
+const allowedDegiroCountries = [
+  'www.degiro.de',
+  'www.degiro.es',
+  'www.degiro.ie',
+  'www.degiro.gr',
+  'www.degiro.it',
+  'www.degiro.pt',
+  'www.degiro.fr',
+  'www.degiro.nl',
+  'www.degiro.at',
+  'www.degiro.fi',
+];
 
-const parseActivity = (content, index) => {
+class zeroSharesTransaction extends Error {
+  constructor(...params) {
+    super(...params);
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, zeroSharesTransaction);
+    }
+  }
+}
+
+const isTransactionOverview = pdfPage => {
+  return pdfPage.some(line => line.startsWith('Transaktionsübersicht von'));
+};
+
+const isAccountStatement = pdfPage => {
+  return pdfPage[0].some(line => line.startsWith('Kontoauszug von'));
+};
+
+const parseTransaction = (content, index, numberParser) => {
   // Is it possible that the transaction logs contains dividends?
 
-  let span = 0;
-  let company = content[index + 2];
-  while (!isinRegex.test(content[index + 3 + span]) && span < 5) {
-    // It's possible that the name of a company use more than one line. To prevent
-    // an infinity loop, we break this after 5 lines we tested for an ISIN.
-    company += ' ' + content[index + 3 + span];
-    span++;
+  const isinIdx =
+    content.slice(index).findIndex(line => isinRegex.test(line)) + index;
+  const company = content.slice(index + 2, isinIdx).join(' ');
+  const isin = content[isinIdx];
+  const shares = Big(numberParser(content[isinIdx + 2]));
+  if (+shares === 0) {
+    throw new zeroSharesTransaction(
+      'Transaction with ISIN ' + isin + ' has no shares.'
+    );
   }
-
-  const isin = content[index + 3 + span];
-  const shares = Big(parseGermanNum(content[index + 5 + span])).abs();
-  const amount = Big(parseGermanNum(content[index + 11 + span])).abs();
-
-  const currency = content[index + 6 + span];
-  const baseCurrency = content[index + 10 + span];
+  const amount = Big(numberParser(content[isinIdx + 8])).abs();
+  // There is the case where the amount is 0, might be a transfer out or a knockout certificate
+  const currency = content[isinIdx + 5];
+  const baseCurrency = content[isinIdx + 7];
 
   let fxRate = undefined;
+  let fxOffset = 0;
   if (currency !== baseCurrency) {
-    fxRate = parseGermanNum(content[index + 12 + span]);
+    fxRate = numberParser(content[isinIdx + 9]);
     // For foreign currency we need to go one line ahead for the following fields.
-    span++;
+    fxOffset = 1;
   }
-
   const type = shares > 0 ? 'Buy' : 'Sell';
   const price = amount.div(shares.abs());
-  const fee = Math.abs(parseGermanNum(content[index + 13 + span]));
+  let tax = 0;
+  let fee = 0;
+  if (type === 'Buy') {
+    fee = Math.abs(numberParser(content[isinIdx + fxOffset + 10]));
+  } else if (type === 'Sell') {
+    tax = Math.abs(numberParser(content[isinIdx + fxOffset + 10]));
+  }
 
   const [parsedDate, parsedDateTime] = createActivityDateTime(
     content[index],
@@ -52,12 +85,12 @@ const parseActivity = (content, index) => {
     datetime: parsedDateTime,
     company,
     isin,
-    shares: +shares,
+    shares: +shares.abs(),
     amount: +amount,
     type,
     price: +price,
     fee,
-    tax: 0,
+    tax,
   };
 
   if (fxRate !== undefined) {
@@ -71,9 +104,11 @@ const parseActivity = (content, index) => {
   return validateActivity(activity);
 };
 
-export const parsePages = contents => {
+const parseTransactionLog = pdfPages => {
   let activities = [];
-  for (let content of contents) {
+  // Set another parser if foreign Degiros such as degiro.ch come into place, they will have other number formats.
+  const numberParser = parseGermanNum;
+  for (let content of pdfPages) {
     let transactionIndex = content.indexOf('Gesamt') + 1;
     while (transactionIndex > 0 && content.length - transactionIndex > 15) {
       // Entries might have a longer length (by 1) if there is a currency rate
@@ -84,9 +119,16 @@ export const parsePages = contents => {
       }
 
       try {
-        activities.push(parseActivity(content, transactionIndex));
+        const transaction = parseTransaction(
+          content,
+          transactionIndex,
+          numberParser
+        );
+        activities.push(transaction);
       } catch (exception) {
-        console.error('Error while parsing page (degiro)', exception, content);
+        if (!(exception instanceof zeroSharesTransaction)) {
+          throw exception;
+        }
       }
 
       // Always go forward, not only in case of success, to prevent an infinity loop
@@ -95,7 +137,32 @@ export const parsePages = contents => {
       transactionIndex += 14;
     }
   }
+  return activities;
+};
 
+export const canParsePage = (content, extension) => {
+  return (
+    extension === 'pdf' &&
+    content.some(line => allowedDegiroCountries.includes(line)) &&
+    isTransactionOverview(content)
+  );
+};
+
+export const parsePages = pdfPages => {
+  let activities;
+
+  // This type of file contains Buy and Sell operations
+  if (isTransactionOverview(pdfPages[0])) {
+    activities = parseTransactionLog(pdfPages);
+  }
+  // This type of file contains Dividends and other information. Only dividends are processed. This is not implemented
+  // yet as the dividends lack the information how many shares are in the account
+  else if (isAccountStatement(pdfPages[0])) {
+    return {
+      undefined,
+      status: 5,
+    };
+  }
   return {
     activities,
     status: 0,
