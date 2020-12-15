@@ -79,7 +79,7 @@ const findAmount = (textArr, fxRate) => {
 const findForeignInformation = textArr => {
   // Look for a line with the format 1,234 EUR/USD
   const foreignIdx = textArr.findIndex(line =>
-      /[0-9]+(,[0-9]*)?\s[A-Z]{3}\/[A-Z]{3}/.test(line)
+    /[0-9]+(,[0-9]+)?\s[A-Z]{3}\/[A-Z]{3}/.test(line)
   );
   if (foreignIdx >= 0) {
     const foreignInfo = textArr[foreignIdx].split(/\s+/);
