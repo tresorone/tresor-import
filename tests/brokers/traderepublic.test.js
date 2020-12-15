@@ -326,6 +326,26 @@ describe('Broker: Trade Republic', () => {
         type: 'Dividend',
       });
     });
+
+    test('New Dividend Date Format starting in 2020: 2020_walgreens_boots_alliance', () => {
+      const activities = traderepublic.parsePages(dividendSamples[7])
+          .activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'traderepublic',
+        type: 'Dividend',
+        isin: 'US9314271084',
+        company: 'Walgreens Boots Alliance Inc.',
+        amount: 0.38759894676211637,
+        date: '2020-12-11',
+        datetime: '2020-12-11T' + activities[0].datetime.substring(11),
+        fee: 0,
+        price: 0.3850901012095779,
+        shares: 1,
+        tax: 0.05759894676211635,
+      });
+    });
   });
 
   describe('Validate quarter statement', () => {

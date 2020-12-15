@@ -268,46 +268,38 @@ const parsePositionAsActivity = (content, startLineNumber) => {
 };
 
 const parseOrderOrDividend = textArr => {
-  let type, date, time, isin, company, shares, price, amount, tax, fee;
+  let type, date, datetime, amount
 
+  const company = findCompany(textArr);
+  const fee = +findFee(textArr);
+  const tax = +findTax(textArr);
+  const isin = findISIN(textArr);
+  const shares = findShares(textArr);
+  const price = findPriceOfShare(textArr);
   if (isBuySingle(textArr) || isBuySavingsPlan(textArr)) {
     type = 'Buy';
-    company = findCompany(textArr);
     date = isBuySavingsPlan(textArr)
       ? findDateBuySavingsPlan(textArr)
       : findDateSingleBuy(textArr);
-    time = findOrderTime(textArr);
+    [date, datetime] = createActivityDateTime(date, findOrderTime(textArr));
     amount = +findAmount(textArr);
-    fee = +findFee(textArr);
-    tax = +findTax(textArr);
   } else if (isSell(textArr)) {
     type = 'Sell';
-    company = findCompany(textArr);
-    date = findDateSell(textArr);
-    time = findOrderTime(textArr);
+    [date, datetime] = createActivityDateTime(findDateSell(textArr), findOrderTime(textArr));
     amount = +findAmount(textArr);
-    fee = +findFee(textArr);
-    tax = +findTax(textArr);
   } else if (isDividend(textArr)) {
     type = 'Dividend';
-    company = findCompany(textArr);
-    date = findDateDividend(textArr);
-    tax = +findTax(textArr);
-    fee = +findFee(textArr);
+    console.log(findDateDividend(textArr));
+    const dateFormat = findDateDividend(textArr).includes('-') ? 'yyyy-MM-dd' : 'dd.MM.yyyy';
+    [date, datetime] = createActivityDateTime(findDateDividend(textArr), findOrderTime(textArr), dateFormat);
     amount = +findDividendNetPayout(textArr).plus(tax).plus(fee);
   }
-
-  isin = findISIN(textArr);
-  shares = findShares(textArr);
-  price = findPriceOfShare(textArr);
-
-  const [parsedDate, parsedDateTime] = createActivityDateTime(date, time);
 
   return validateActivity({
     broker: 'traderepublic',
     type,
-    date: parsedDate,
-    datetime: parsedDateTime,
+    date,
+    datetime,
     isin,
     company,
     shares,
