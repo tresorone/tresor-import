@@ -268,7 +268,7 @@ const parsePositionAsActivity = (content, startLineNumber) => {
 };
 
 const parseOrderOrDividend = textArr => {
-  let type, date, datetime, amount
+  let type, date, datetime, amount;
 
   const company = findCompany(textArr);
   const fee = +findFee(textArr);
@@ -285,13 +285,21 @@ const parseOrderOrDividend = textArr => {
     amount = +findAmount(textArr);
   } else if (isSell(textArr)) {
     type = 'Sell';
-    [date, datetime] = createActivityDateTime(findDateSell(textArr), findOrderTime(textArr));
+    [date, datetime] = createActivityDateTime(
+      findDateSell(textArr),
+      findOrderTime(textArr)
+    );
     amount = +findAmount(textArr);
   } else if (isDividend(textArr)) {
     type = 'Dividend';
-    console.log(findDateDividend(textArr));
-    const dateFormat = findDateDividend(textArr).includes('-') ? 'yyyy-MM-dd' : 'dd.MM.yyyy';
-    [date, datetime] = createActivityDateTime(findDateDividend(textArr), findOrderTime(textArr), dateFormat);
+    const dateFormat = findDateDividend(textArr).includes('-')
+      ? 'yyyy-MM-dd'
+      : 'dd.MM.yyyy';
+    [date, datetime] = createActivityDateTime(
+      findDateDividend(textArr),
+      findOrderTime(textArr),
+      dateFormat
+    );
     amount = +findDividendNetPayout(textArr).plus(tax).plus(fee);
   }
 

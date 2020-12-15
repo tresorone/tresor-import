@@ -329,7 +329,7 @@ describe('Broker: Trade Republic', () => {
 
     test('New Dividend Date Format starting in 2020: 2020_walgreens_boots_alliance', () => {
       const activities = traderepublic.parsePages(dividendSamples[7])
-          .activities;
+        .activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -344,6 +344,26 @@ describe('Broker: Trade Republic', () => {
         price: 0.3850901012095779,
         shares: 1,
         tax: 0.05759894676211635,
+      });
+    });
+
+    test('New Dividend Date Format starting in 2020: 2020_exxon_mobile_corp', () => {
+      const activities = traderepublic.parsePages(dividendSamples[8])
+          .activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'traderepublic',
+        type: 'Dividend',
+        isin: 'US30231G1022',
+        company: 'Exxon Mobil Corp.',
+        date: '2020-12-10',
+        datetime: '2020-12-10T' + activities[0].datetime.substring(11),
+        amount: 3.585994062834996,
+        price: 0.7174074379483797,
+        shares: 5,
+        tax: 0.5359940628349963,
+        fee: 0,
       });
     });
   });
