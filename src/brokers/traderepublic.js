@@ -66,132 +66,72 @@ const findShares = textArr => {
   return parseGermanNum(shares);
 };
 
-const findPriceOfShare = textArr => {
-  const lineWithValue =
-    textArr[textArr.findIndex(t => t.includes(' Stk.')) + 1];
-  return +findAndConvertNumber(lineWithValue, textArr);
-};
-
-const findAmount = textArr => {
+const findAmount = ( textArr, fxRate )=> {
   const searchTerm = 'GESAMT';
-  const totalAmountLine = textArr[textArr.indexOf(searchTerm) + 1];
+  let totalAmountLine = textArr[textArr.indexOf(searchTerm) + 1];
   const totalAmount = totalAmountLine.split(' ')[0].trim();
-  return Big(parseGermanNum(totalAmount));
-};
-
-const findDividendNetPayout = textArr => {
-  const searchTerm = 'GESAMT';
-  const totalAmountLine = textArr[textArr.lastIndexOf(searchTerm) + 1];
-  const totalAmount = totalAmountLine.split(' ')[0].trim();
-  return Big(parseGermanNum(totalAmount));
-};
-
-const findExchangeRate = (textArr, currency) => {
-  // Find the value of "1,1869 EUR/USD" by searching for "EUR/USD"
-  const searchTerm = 'EUR/' + currency;
-  const totalExchangeRateLine =
-    textArr[textArr.findIndex(line => line.includes(searchTerm))];
-  const exchangeRateValue = totalExchangeRateLine.split(' ')[0].trim();
-  return Big(parseGermanNum(exchangeRateValue));
-};
-
-const findAndConvertNumber = (valueWithCurrency, textArr) => {
-  // Find a value and convert it to EUR using the rate given in the document.
-  const lineElements = valueWithCurrency.split(' ');
-  const value = Big(Math.abs(parseGermanNum(lineElements[0])));
-  if (lineElements[1] === 'EUR') {
-    // No currency conversion is required.
-    return value;
+  if (fxRate !== undefined) {
+    return +Big(parseGermanNum(totalAmount)).div(fxRate);
   }
-
-  // Convert the number with the exchange rate from document.
-  return value.div(findExchangeRate(textArr, lineElements[1]));
+  return parseGermanNum(totalAmount);
 };
 
-const findFee = textArr => {
+const findForeignInformation = (textArr) => {
+  const foreignIdx = textArr.findIndex(line => /[1-9]+[0-9]*(,[0-9]*)? [A-Z]{3}\/[A-Z]{3}/.test(line));
+  if (foreignIdx >= 0) {
+    const foreignInfo = textArr[foreignIdx].split(/\s+/);
+    return [parseGermanNum(foreignInfo[0]), foreignInfo[1].split('/')[1]]
+  }
+  return [undefined, undefined]
+}
+
+const findFee = ( textArr, fxRate ) => {
   let totalFee = Big(0);
+  if (textArr.indexOf('Fremde Spesen') > -1) {
+    const feeLine = textArr[textArr.indexOf('Fremde Spesen') + 1];
+    const feeNumberString = feeLine.split(/\s+/)[0];
+    totalFee = totalFee.minus(Big(parseGermanNum(feeNumberString)).div(fxRate));
+  }
+  if (textArr.indexOf('Fremdkostenzuschlag') > -1) {
+    const feeLine = textArr[textArr.indexOf('Fremdkostenzuschlag') + 1];
+    const feeNumberString = feeLine.split(/\s+/)[0];
 
-  const searchTerm = 'Fremdkostenzuschlag';
-  if (textArr.indexOf(searchTerm) > -1) {
-    const feeLine = textArr[textArr.indexOf(searchTerm) + 1];
-    const feeNumberString = feeLine.split(' EUR')[0];
-
-    totalFee = totalFee.plus(Big(Math.abs(parseGermanNum(feeNumberString))));
+    totalFee = totalFee.minus(parseGermanNum(feeNumberString));
   }
 
-  const searchTermThirdPartyExpenses = 'Fremde Spesen';
-  if (textArr.indexOf(searchTermThirdPartyExpenses) > -1) {
-    const lineWithValue =
-      textArr[textArr.indexOf(searchTermThirdPartyExpenses) + 1];
-    totalFee = totalFee.plus(findAndConvertNumber(lineWithValue, textArr));
-  }
-
-  return totalFee;
+  return +totalFee;
 };
 
-const findTax = textArr => {
+const findTax = ( textArr, fxRate ) => {
+
   let totalTax = Big(0);
-
-  // There are three `BETRAG` values in each document. After the second, there are the taxes located.
-  const searchTerm = 'BETRAG';
-  let startTaxLineNumber = textArr.indexOf(
-    searchTerm,
-    textArr.indexOf(searchTerm) + 1
-  );
-
-  // The taxes end with the second `GESAMT` value, after which the total amount is displayed.
-  const searchTermEnd = 'GESAMT';
-  const endTaxLineNumber = textArr.lastIndexOf(searchTermEnd);
-
-  // Skip the field `Fremdkostenzuschlag` after `BETRAG` to get the first tax.
-  let skipLineCounter = 4;
-
-  if (isDividend(textArr)) {
-    // The dividend documents needs quite other logic...
-    // For dividends in other currencies we need to search the last field `Zwischensumme` and skip all lines which contains `EUR` to find the first tax field.
-
-    const searchTermSubtotal = 'Zwischensumme';
-    const subtotalLineNumber = textArr.lastIndexOf(searchTermSubtotal);
-    if (subtotalLineNumber > -1) {
-      skipLineCounter = 0;
-      while (
-        textArr[subtotalLineNumber + skipLineCounter + 1].includes('EUR')
-      ) {
-        skipLineCounter++;
-      }
-
-      startTaxLineNumber = subtotalLineNumber + 2;
+  const transactionTaxIdx = textArr.findIndex(line => line.includes('Finanztransaktionssteuer'));
+  if (transactionTaxIdx >= 0) {
+    const transactionTax = parseGermanNum(textArr[transactionTaxIdx + 1].split(/\s+/)[0]);
+    totalTax = totalTax.minus(transactionTax);
+  }
+  const withholdingTaxLine = textArr.findIndex(line => line.startsWith('Quellensteuer'));
+  if ( withholdingTaxLine >= 0 ) {
+    const foreignTax = parseGermanNum(textArr[withholdingTaxLine + 1].split(/\s+/)[0]);
+    if ( fxRate !== undefined) {
+      totalTax = totalTax.minus(Big(foreignTax).div(fxRate));
     } else {
-      // This dividend is payed in `EUR`. We don't need the fancy logic above and can set the `skipLineCounter` to zero, because there is no `Fremdkostenzuschlag` field for dividends.
-      skipLineCounter = 2;
+      totalTax = totalTax.minus(foreignTax);
     }
   }
-  // Parse all taxes in the range of relevant line numbers
-  for (
-    let lineNumber = startTaxLineNumber + skipLineCounter;
-    lineNumber < endTaxLineNumber;
-    lineNumber += 2
-  ) {
-    const lineContent = textArr[lineNumber].split(' EUR')[0];
-    // A positive tax amount in the json indicates tax return and a negative tax amount indicates a paid tax
-    // TresorOne handles this the other way around
-    const lineParsedAmount = -parseGermanNum(lineContent);
-    totalTax = totalTax.plus(Big(lineParsedAmount));
+  const capitalTaxIdx = textArr.findIndex(line => line.includes('Kapitalertragssteuer'));
+  if ( capitalTaxIdx >= 0) {
+    totalTax = totalTax.minus(parseGermanNum(textArr[capitalTaxIdx + 1].split(/\s+/)[0]));
   }
-
-  // Find Withholding Tax in foreign currency
-  const searchTermWithholdingTax = 'Quellensteuer';
-  const withholdingTaxLine = textArr.findIndex(line =>
-    line.includes(searchTermWithholdingTax)
-  );
-  if (
-    withholdingTaxLine > -1 &&
-    !textArr[withholdingTaxLine + 1].includes('EUR')
-  ) {
-    const lineWithValue = textArr[withholdingTaxLine + 1];
-    totalTax = totalTax.plus(findAndConvertNumber(lineWithValue, textArr));
+  const soliTaxIdx = textArr.findIndex(line => line.includes('Solidaritätszuschlag'));
+  if ( soliTaxIdx >= 0) {
+    totalTax = totalTax.minus(parseGermanNum(textArr[soliTaxIdx + 1].split(/\s+/)[0]));
   }
-  return totalTax;
+  const churchTaxIdx = textArr.findIndex(line => line.includes('Kirchensteuer'));
+  if ( churchTaxIdx >= 0) {
+    totalTax = totalTax.minus(parseGermanNum(textArr[churchTaxIdx + 1].split(/\s+/)[0]));
+  }
+  return +totalTax;
 };
 
 const isBuySingle = textArr => textArr.some(t => t.includes('Kauf am'));
@@ -218,6 +158,8 @@ export const canParsePage = (content, extension) =>
     isDividend(content) ||
     isOverviewStatement(content));
 
+
+// Functions to parse an overview Statement
 const parsePositionAsActivity = (content, startLineNumber) => {
   // Find the line with ISIN and the next line with the date
   let lineNumberOfISIN;
@@ -267,57 +209,6 @@ const parsePositionAsActivity = (content, startLineNumber) => {
   });
 };
 
-const parseOrderOrDividend = textArr => {
-  let type, date, datetime, amount;
-
-  const company = findCompany(textArr);
-  const fee = +findFee(textArr);
-  const tax = +findTax(textArr);
-  const isin = findISIN(textArr);
-  const shares = findShares(textArr);
-  const price = findPriceOfShare(textArr);
-  if (isBuySingle(textArr) || isBuySavingsPlan(textArr)) {
-    type = 'Buy';
-    date = isBuySavingsPlan(textArr)
-      ? findDateBuySavingsPlan(textArr)
-      : findDateSingleBuy(textArr);
-    [date, datetime] = createActivityDateTime(date, findOrderTime(textArr));
-    amount = +findAmount(textArr);
-  } else if (isSell(textArr)) {
-    type = 'Sell';
-    [date, datetime] = createActivityDateTime(
-      findDateSell(textArr),
-      findOrderTime(textArr)
-    );
-    amount = +findAmount(textArr);
-  } else if (isDividend(textArr)) {
-    type = 'Dividend';
-    const dateFormat = findDateDividend(textArr).includes('-')
-      ? 'yyyy-MM-dd'
-      : 'dd.MM.yyyy';
-    [date, datetime] = createActivityDateTime(
-      findDateDividend(textArr),
-      findOrderTime(textArr),
-      dateFormat
-    );
-    amount = +findDividendNetPayout(textArr).plus(tax).plus(fee);
-  }
-
-  return validateActivity({
-    broker: 'traderepublic',
-    type,
-    date,
-    datetime,
-    isin,
-    company,
-    shares,
-    price,
-    amount,
-    tax,
-    fee,
-  });
-};
-
 const parseOverviewStatement = content => {
   const foundActivities = [];
 
@@ -330,6 +221,53 @@ const parseOverviewStatement = content => {
   }
 
   return foundActivities;
+};
+
+
+// Individual transaction file
+const parseTransaction = textArr => {
+  const [fxRate, foreignCurrency] = findForeignInformation(textArr);
+  let activity = {
+    broker: 'traderepublic',
+    isin: findISIN(textArr),
+    company: findCompany(textArr),
+    shares: findShares(textArr),
+    tax: findTax(textArr, fxRate),
+    fee: findFee(textArr, fxRate),
+  }
+  if (isBuySingle(textArr) || isBuySavingsPlan(textArr)) {
+    activity.type = 'Buy';
+    const date = isBuySavingsPlan(textArr)
+      ? findDateBuySavingsPlan(textArr)
+      : findDateSingleBuy(textArr);
+    [activity.date, activity.datetime] = createActivityDateTime(date, findOrderTime(textArr));
+    activity.amount = findAmount(textArr, fxRate);
+  } else if (isSell(textArr)) {
+    activity.type = 'Sell';
+    [activity.date, activity.datetime] = createActivityDateTime(
+      findDateSell(textArr),
+      findOrderTime(textArr)
+    );
+    activity.amount = +findAmount(textArr);
+  } else if (isDividend(textArr)) {
+    activity.type = 'Dividend';
+    const dateFormat = findDateDividend(textArr).includes('-')
+      ? 'yyyy-MM-dd'
+      : 'dd.MM.yyyy';
+    [activity.date, activity.datetime] = createActivityDateTime(
+      findDateDividend(textArr),
+      findOrderTime(textArr),
+      dateFormat
+    );
+    activity.amount = +Big(findAmount(textArr, fxRate));
+  }
+
+  activity.price = +Big(activity.amount).div(activity.shares);
+  if (fxRate !== undefined && foreignCurrency !== undefined) {
+    activity.fxRate = fxRate;
+    activity.foreignCurrency = foreignCurrency;
+  }
+  return validateActivity(activity);
 };
 
 export const parsePages = contents => {
@@ -352,7 +290,7 @@ export const parsePages = contents => {
   } else {
     for (let content of contents) {
       try {
-        activities.push(parseOrderOrDividend(content));
+        activities.push(parseTransaction(content));
       } catch (exception) {
         console.error(
           'Error while parsing page (trade republic)',
