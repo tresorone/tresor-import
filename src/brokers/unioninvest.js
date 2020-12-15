@@ -188,7 +188,7 @@ const parseBuySell = (
   taxReinvest = false
 ) => {
   const dateIdx =
-    findPriorRegexMatch(pdfPage, activityIdx, /[0-9]{2}\.[0-9]{2}\.[0-9]{4}/) -
+    findPriorRegexMatch(pdfPage, activityIdx, dateRegex) -
     1;
   const companyIsinDict = createCompanyIsinDict(pdfPage);
 

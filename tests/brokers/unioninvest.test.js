@@ -519,7 +519,7 @@ describe('Broker: Union Invest', () => {
   });
 
   describe('Validate Redistributions', () => {
-    test('Can parse a redistribution from 2016', () => {
+    test('Can parse a redistribution from 2020', () => {
       const activities = unioninvest.parsePages(redistribution[0]).activities;
       expect(activities.length).toEqual(2);
       expect(activities[0]).toEqual({
