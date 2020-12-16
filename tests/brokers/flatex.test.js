@@ -275,6 +275,25 @@ describe('Broker: Flatex', () => {
         tax: +Big(3.02).minus(Big(2.18)), // calculate from Bemessungsgrundlage - Endbetrag (note: diff in pdf is wrong by 0,01)
       });
     });
+
+    test('should map pdf data of sample correctly: 2018_etf_001.json', () => {
+      const activities = flatex.parsePages(dividendsSamples[3]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Dividend',
+        date: '2018-08-23',
+        datetime: '2018-08-23T' + activities[0].datetime.substring(11),
+        isin: 'LU0378449770',
+        company: 'COMST.-NASDAQ-100 U.ETF I',
+        shares: 25.28,
+        amount: 9.2235944382071,
+        price: 0.36485737492907827,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   describe('Mixed pages', () => {
