@@ -189,19 +189,31 @@ const findPayout = (textArr, startLineNumber) => {
     : 0; // Bemessungsgrundlage
 
   if (assessmentBasis <= 0) {
-    const payoutForeign = getTableValueByKey(
+    let payoutForeign = getTableValueByKey(
       textArr,
       startLineNumber,
       'Bruttodividende'
-    ).split(' ')[0];
-    const conversionRate = getTableValueByKey(
-      textArr,
-      startLineNumber,
-      'Devisenkurs'
-    ).split(' ')[0];
-    return +Big(parseGermanNum(payoutForeign)).div(
-      parseGermanNum(conversionRate)
     );
+
+    if (payoutForeign === null) {
+      payoutForeign = getTableValueByKey(
+        textArr,
+        startLineNumber,
+        'Bruttoausschüttung'
+      );
+    }
+
+    if (payoutForeign !== null) {
+      const conversionRate = getTableValueByKey(
+        textArr,
+        startLineNumber,
+        'Devisenkurs'
+      ).split(' ')[0];
+
+      return +Big(parseGermanNum(payoutForeign.split(' ')[0])).div(
+        parseGermanNum(conversionRate)
+      );
+    }
   }
   return assessmentBasis;
 };
