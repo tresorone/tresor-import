@@ -6,9 +6,25 @@ import {
   timeRegex,
 } from '@/helper';
 
-const findISIN = text => text[text.findIndex(t => t === 'ISIN') + 3];
+const findISIN = text => {
+  const isinIdx = text.findIndex(t => t === 'ISIN');
+  if ( isinIdx >= 0 ){
+    return text[ isinIdx+3 ];
+  }
+}
 
-const findCompany = text => text[text.findIndex(t => t === 'ISIN') + 1];
+const findCompany = text => {
+  // New format
+  const isinIdx = text.findIndex(t => t === 'ISIN');
+  if(isinIdx >= 0) {
+    return text[isinIdx + 1];
+  }
+  // Old format (Testfile from 2015)
+  const wknIdx = text.findIndex(t => t === 'WKN:');
+  if(wknIdx >= 0) {
+    return text[wknIdx + 2];
+  }
+}
 
 const findDividendCompany = content => {
   let lineNumber = content.findIndex(
@@ -25,7 +41,16 @@ const findDividendCompany = content => {
 };
 
 const findBuySellWKN = content => {
-  return content[content.findIndex(line => line === 'WKN') + 3];
+  const wknIdx = content.findIndex(line => line === 'WKN');
+  if (wknIdx >= 0) {
+    return content[wknIdx + 3];
+  }
+  // Older type of File (Testfile from 2005)
+  const oldWknIdx = content.findIndex(line => line === 'WKN:');
+  if (oldWknIdx >= 0) {
+    return content[oldWknIdx + 1];
+  }
+
 };
 
 const findDividendWKN = content => {
@@ -72,10 +97,15 @@ const findDateDividend = content => {
 };
 
 const findShares = textArr => {
-  const idx = textArr.findIndex(t => t.toLowerCase() === 'umsatz');
-  const shares = textArr[idx + 2];
+  let idx = textArr.findIndex(t => t.toLowerCase() === 'umsatz');
+  if ( idx >= 0 ) {
+    return parseGermanNum(textArr[idx + 2]);
+  }
+  idx = textArr.indexOf('ST')
+  if ( idx >= 0) {
+    return parseGermanNum(textArr[idx + 1]);
+  }
 
-  return parseGermanNum(shares);
 };
 
 const findDividendShares = textArr => {
@@ -108,7 +138,7 @@ const findFee = content => {
   {
     const lineNumber = content.findIndex(line => line.includes('Provision'));
 
-    if (lineNumber > 0) {
+    if (lineNumber >= 0) {
       totalFee = totalFee.plus(parseGermanNum(content[lineNumber + 2]));
     }
   }
@@ -117,7 +147,7 @@ const findFee = content => {
   {
     const lineNumber = content.findIndex(line => line.includes('Eig. Spesen'));
 
-    if (lineNumber > 0) {
+    if (lineNumber >= 0) {
       totalFee = totalFee.plus(parseGermanNum(content[lineNumber + 2]));
     }
   }
@@ -126,8 +156,17 @@ const findFee = content => {
   {
     const lineNumber = content.findIndex(line => line.includes('Grundgebühr'));
 
-    if (lineNumber > 0) {
+    if (lineNumber >= 0) {
       totalFee = totalFee.plus(parseGermanNum(content[lineNumber + 2]));
+    }
+  }
+
+  // Bonifikation
+  {
+    const lineNumber = content.findIndex(line => line.startsWith('BONIFIKAT.'));
+
+    if (lineNumber >= 0) {
+      totalFee = totalFee.minus(parseGermanNum(content[lineNumber + 2]));
     }
   }
 
@@ -168,7 +207,7 @@ const isBuy = content => {
   const lineNumber = content.findIndex(line =>
     line.includes('WERTPAPIERABRECHNUNG')
   );
-  return lineNumber > 0 && content[lineNumber + 1] === 'KAUF';
+  return lineNumber > 0 && content[lineNumber + 1].toLowerCase() === 'kauf';
 };
 
 const isSell = content => {
@@ -192,7 +231,6 @@ export const canParsePage = (content, extension) =>
 
 const parseData = content => {
   let type, date, time, isin, wkn, company, shares, price, amount, fee, tax;
-
   if (isBuy(content)) {
     type = 'Buy';
     wkn = findBuySellWKN(content);
@@ -253,7 +291,6 @@ const parseData = content => {
   if (isin !== undefined) {
     activity.isin = isin;
   }
-
   return validateActivity(activity);
 };
 
