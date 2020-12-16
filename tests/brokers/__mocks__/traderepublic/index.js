@@ -20,6 +20,8 @@ export const dividendSamples = [
   require('./dividend/gazprom_third_party_expenses_and_withholding_tax.json'),
   require('./dividend/realty_income_with_other_withholding_tax_format.json'),
   require('./dividend/unilever_withholding_tax.json'),
+  require('./dividend/2020_walgreens_boots_alliance.json'),
+  require('./dividend/2020_exxon_mobile_corp.json'),
 ];
 
 export const quarterSamples = [
