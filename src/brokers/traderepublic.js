@@ -213,10 +213,8 @@ const detectedButIgnoredDocument = content => {
   return (
     // When the document contains one of the following lines, we want to ignore these document.
     content.some(line => line.includes('KOSTENINFORMATION')) ||
-    // Only exclude these document, when a line contains one of the following:
-    content.some(line => line === 'SPARPLANAUSFÜHRUNG FEHLGESCHLAGEN') ||
-    content.some(line => line === 'SPLIT') ||
-    content.some(line => line === 'REVERSE SPLIT')
+    content.some(line => line.includes('SPLIT')) ||
+    content.some(line => line === 'SPARPLANAUSFÜHRUNG FEHLGESCHLAGEN')
   );
 };
 
