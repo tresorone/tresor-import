@@ -176,6 +176,7 @@ const detectedButIgnoredDocument = content => {
     // When the document contains one of the following lines, we want to ignore these document.
     content.some(line => line.includes('KOSTENINFORMATION')) ||
     content.some(line => line.includes('SPLIT')) ||
+    content.some(line => line.includes('AUFTRAGSBESTÄTIGUNG')) ||
     content.some(line => line === 'SPARPLANAUSFÜHRUNG FEHLGESCHLAGEN')
   );
 };
