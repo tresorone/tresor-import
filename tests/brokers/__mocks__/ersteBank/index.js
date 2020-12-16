@@ -25,4 +25,7 @@ export const dividendSamples = [
   require('./dividend/2017_div.json'),
   require('./dividend/2018_div.json'),
   require('./dividend/2019_div.json'),
+  require('./dividend/2020_3m_co.json'),
+  require('./dividend/2020_coca_cola_corp.json'),
+  require('./dividend/2020_royal_dutch_shell.json'),
 ];

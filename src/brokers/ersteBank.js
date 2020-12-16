@@ -6,16 +6,23 @@ import {
 } from '@/helper';
 
 const findForeignCurrencyFxRate = pageArray => {
-  const foreignIndex = pageArray.findIndex(line =>
+  let foreignIndex = pageArray.findIndex(line =>
     line.includes('-Kurs Mitte')
   );
-  if (foreignIndex <= 0) {
-    return [undefined, undefined];
+  if (foreignIndex >= 0) {
+    const foreignIndexLine = pageArray[foreignIndex].split(' ');
+    return [parseGermanNum(foreignIndexLine[2]), foreignIndexLine[0].split('-')[0]];
   }
-  const foreignIndexLine = pageArray[foreignIndex].split(' ');
-  const fxRate = parseGermanNum(foreignIndexLine[2]);
-  const foreignCurrency = foreignIndexLine[0].split('-')[0];
-  return [fxRate, foreignCurrency];
+  foreignIndex = pageArray.findIndex(line =>
+      line.startsWith('Devisenkurs Mitte')
+  );
+  if (foreignIndex >= 0) {
+    const foreignIndexLine = pageArray[foreignIndex].split(/\s+/);
+    return [parseGermanNum(foreignIndexLine[5]), foreignIndexLine[2].split('/')[0]];
+  }
+
+
+  return [undefined, undefined];
 };
 
 const isForeignCurrencyTransaction = pageArray =>
@@ -27,13 +34,6 @@ const findIsinBuy = pageArray => {
   return pageArray[isinIndex].split(/\s/)[0];
 };
 
-const findIsinPayout = pageArray => {
-  const lineIndex = pageArray.indexOf('Ausschüttung') + 2;
-  if (lineIndex >= 0) {
-    return pageArray[lineIndex].split(/\s+/)[0];
-  }
-};
-
 const findCompanyBuy = pageArray => {
   const companyIndex =
     pageArray.findIndex(line => line.includes('Ihr Auftrag vom')) + 1;
@@ -42,10 +42,10 @@ const findCompanyBuy = pageArray => {
   }
 };
 
-const findCompanyDividend = pageArray => {
-  const companyIndex = pageArray.indexOf('Ausschüttung') + 1;
-  if (companyIndex >= 0) {
-    return pageArray[companyIndex].split(/(\s+)/).slice(2).join('');
+const findCompanyIsinDividend = pageArray => {
+  const isinIndex = pageArray.findIndex(line => line.startsWith('ISIN:'));
+  if (isinIndex >= 0) {
+    return [pageArray[isinIndex + 1].split(/\s+/)[0], pageArray[isinIndex].split(/(\s+)/).slice(2).join('')]
   }
 };
 
@@ -75,8 +75,17 @@ const findOrderTime = content => {
 };
 
 const findDateDividend = pageArray => {
-  const dateIndex = pageArray.findIndex(line => line.includes('mit Valuta'));
-  return pageArray[dateIndex].split(/(\s+)/)[22];
+  let dateLineIdx = pageArray.findIndex(line => line.includes('mit Valuta'))
+  if ( dateLineIdx >= 0 ){
+    const dateLine = pageArray[dateLineIdx].split(/(\s+)/);
+    return dateLine[dateLine.length - 1];
+  }
+  dateLineIdx = pageArray.findIndex(line =>
+      line.startsWith('Extag ')
+  );
+  if ( dateLineIdx >= 0 ) {
+    return parseGermanNum(pageArray[dateLineIdx].split(/\s+/)[1]);
+  }
 };
 
 const findAmountBuy = (pageArray, legacyDocument = false) => {
@@ -94,10 +103,16 @@ const findAmountBuy = (pageArray, legacyDocument = false) => {
 };
 
 const findAmountDividend = pageArray => {
+  // Regex matches lines such as
+  // Brutto USD                                                     9,84                  8,07
+  // and
+  // Brutto EUR                                                                           9,98
   let amountLineIndex = pageArray.findIndex(line =>
-    line.includes('Brutto EUR')
-  );
-  return parseGermanNum(pageArray[amountLineIndex].split(/\s+/)[2]);
+    /^Brutto [A-Z]{3}\s+([0-9]+(,[0-9]+)?\s+)?[0-9]+(,[0-9]+)?$/.test(line));
+  if ( amountLineIndex >= 0 ) {
+    const taxLine = pageArray[amountLineIndex].split(/\s+/);
+    return parseGermanNum(taxLine[taxLine.length - 1]);
+  }
 };
 
 const findSharesBuy = pageArray => {
@@ -108,11 +123,17 @@ const findSharesBuy = pageArray => {
 };
 
 const findSharesDividend = pageArray => {
-  const sharesLineIndex = pageArray.findIndex(line =>
+  let sharesLineIndex = pageArray.findIndex(line =>
     line.includes('Menge/Währung:')
   );
   if (sharesLineIndex >= 0) {
     return parseGermanNum(pageArray[sharesLineIndex].split(/\s+/)[1]);
+  }
+  sharesLineIndex = pageArray.findIndex(line =>
+      line.includes('Menge/W')
+  );
+  if (sharesLineIndex >= 0) {
+    return parseGermanNum(pageArray[sharesLineIndex+2].split(/\s+/)[1]);
   }
 };
 
@@ -165,38 +186,36 @@ const findFeeBuy = (pageArray, legacyDocument = false) => {
 
 const findTaxPayout = pageArray => {
   let completeTax = Big(0);
-  const kestThreeIndex = pageArray.findIndex(line =>
-    line.includes('KESt III pro Stück')
-  );
+  const kestThreeIndex = pageArray.findIndex(line => line.startsWith('KESt III '));
   if (kestThreeIndex >= 0) {
-    completeTax = completeTax.plus(
-      Big(parseGermanNum(pageArray[kestThreeIndex].split(/\s+/)[6])).abs()
-    );
+    const taxLine = pageArray[kestThreeIndex].split(/\s+/);
+    completeTax = completeTax.plus(Big(parseGermanNum(taxLine[taxLine.length - 1])).abs());
   }
-  const kestTwoIndex = pageArray.findIndex(line =>
-    line.includes('KESt II pro Stück')
-  );
+  const kestTwoIndex = pageArray.findIndex(line => line.startsWith('KESt II '));
   if (kestTwoIndex >= 0) {
-    completeTax = completeTax.plus(
-      Big(parseGermanNum(pageArray[kestTwoIndex].split(/\s+/)[6])).abs()
-    );
+    const taxLine = pageArray[kestTwoIndex].split(/\s+/);
+    completeTax = completeTax.plus(Big(parseGermanNum(taxLine[taxLine.length - 1])).abs());
   }
-  const kestOneIndex = pageArray.findIndex(line =>
-    line.includes('KESt I pro Stück')
-  );
+  const kestOneIndex = pageArray.findIndex(line => line.startsWith('KESt I '));
   if (kestOneIndex >= 0) {
-    completeTax = completeTax.plus(
-      Big(parseGermanNum(pageArray[kestOneIndex].split(/\s+/)[6])).abs()
-    );
+    const taxLine = pageArray[kestOneIndex].split(/\s+/);
+    completeTax = completeTax.plus(Big(parseGermanNum(taxLine[taxLine.length - 1])).abs());
   }
-  return completeTax;
+  const withholdingTaxIndex = pageArray.findIndex(line => line.startsWith('QESt '));
+  if (withholdingTaxIndex >= 0) {
+    const taxLine = pageArray[withholdingTaxIndex].split(/\s+/);
+    completeTax = completeTax.plus(Big(parseGermanNum(taxLine[taxLine.length - 1])).abs());
+  }
+  return +completeTax;
 };
 
 const isBuy = pageArray => {
   return pageArray.some(line => line.includes('uf Marktplatz vom'));
 };
 
-const isDividend = pageArray => pageArray.includes('Ausschüttung');
+const isDividend = pageArray => {
+  return pageArray.includes('Ausschüttung') || pageArray.includes('Quartalsdividende');
+}
 
 const isOldBuy = pageArray => {
   return pageArray.some(line => line.includes('Kauf aus Wertpapierliste'));
@@ -221,6 +240,8 @@ export const parsePages = content => {
   // Flatten every incomming array
   const pdfPagesConcat = [].concat.apply([], content);
   const broker = 'ersteBank';
+  const [fxRate, foreignCurrency] = findForeignCurrencyFxRate(pdfPagesConcat);
+
   let type, amount, shares, isin, company, date, time, price, tax, fee;
 
   if (isBuy(pdfPagesConcat)) {
@@ -247,17 +268,15 @@ export const parsePages = content => {
     tax = 0;
   } else if (isDividend(pdfPagesConcat)) {
     type = 'Dividend';
-    isin = findIsinPayout(pdfPagesConcat);
-    company = findCompanyDividend(pdfPagesConcat);
+    [isin, company] = findCompanyIsinDividend(pdfPagesConcat);
     date = findDateDividend(pdfPagesConcat);
-    amount = findAmountDividend(pdfPagesConcat);
+    amount = findAmountDividend(pdfPagesConcat, fxRate);
     shares = findSharesDividend(pdfPagesConcat);
     price = +Big(amount).div(shares);
     fee = 0;
-    tax = +findTaxPayout(pdfPagesConcat);
+    tax = findTaxPayout(pdfPagesConcat);
   }
 
-  const [fxRate, foreignCurrency] = findForeignCurrencyFxRate(pdfPagesConcat);
   const [parsedDate, parsedDateTime] = createActivityDateTime(
     date,
     time,
