@@ -482,6 +482,13 @@ describe('Broker: Trade Republic', () => {
       expect(result.status).toEqual(7);
       expect(result.activities.length).toEqual(0);
     });
+
+    test('The statement should be ignored: order_confirmation.json', () => {
+      const result = traderepublic.parsePages(ignoredSamples[4]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
+    });
   });
 
   beforeEach(() => {
