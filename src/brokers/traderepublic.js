@@ -230,7 +230,11 @@ const isSupportedDocument = content => {
 
 export const canParsePage = (content, extension) =>
   extension === 'pdf' &&
-  content.some(line => line.includes('TRADE REPUBLIC BANK GMBH'));
+  content.some(
+    line =>
+      line.includes('TRADE REPUBLIC BANK GMBH') &&
+      (isSupportedDocument(content) || detectedButIgnoredDocument(content))
+  );
 
 const parsePositionAsActivity = (content, startLineNumber) => {
   // Find the line with ISIN and the next line with the date
@@ -352,14 +356,6 @@ export const parsePages = contents => {
 
   if (detectedButIgnoredDocument(allPagesFlat)) {
     // We know this type and we don't want to support it.
-    return {
-      activities,
-      status: 8,
-    };
-  }
-
-  if (!isSupportedDocument(contents[0])) {
-    // The first page is not one of the supported types.
     return {
       activities,
       status: 7,

@@ -402,32 +402,32 @@ describe('Broker: Trade Republic', () => {
     });
   });
 
-  describe('Validate the ignored statements', () => {
+  describe('Validate all ignored statements', () => {
     test('The statement should be ignored: cost_information.json', () => {
       const result = traderepublic.parsePages(ignoredSamples[0]);
 
-      expect(result.status).toEqual(8);
+      expect(result.status).toEqual(7);
       expect(result.activities.length).toEqual(0);
     });
 
     test('The statement should be ignored: reverse_split.json', () => {
       const result = traderepublic.parsePages(ignoredSamples[1]);
 
-      expect(result.status).toEqual(8);
+      expect(result.status).toEqual(7);
       expect(result.activities.length).toEqual(0);
     });
 
     test('The statement should be ignored: saving_plan_failed.json', () => {
       const result = traderepublic.parsePages(ignoredSamples[2]);
 
-      expect(result.status).toEqual(8);
+      expect(result.status).toEqual(7);
       expect(result.activities.length).toEqual(0);
     });
 
     test('The statement should be ignored: split.json', () => {
       const result = traderepublic.parsePages(ignoredSamples[3]);
 
-      expect(result.status).toEqual(8);
+      expect(result.status).toEqual(7);
       expect(result.activities.length).toEqual(0);
     });
   });
