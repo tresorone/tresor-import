@@ -6,6 +6,7 @@ export const buySamples = [
   require('./buy/2018_buy_tesla.json'),
   require('./buy/2020_buy_byd_co_ltd.json'),
   require('./buy/multi_page_multi_buys.json'),
+  require('./buy/2018_etf_ishares_tecdax.json'),
 ];
 
 export const sellSamples = [

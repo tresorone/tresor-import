@@ -173,6 +173,25 @@ describe('Broker: Flatex', () => {
         tax: 0,
       });
     });
+
+    test('Can parse statement: 2018_etf_ishares_tecdax.json', () => {
+      const result = flatex.parsePages(buySamples[7]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2018-01-02',
+        datetime: '2018-01-01T23:00:00.000Z',
+        isin: 'DE0005933972',
+        company: 'ISHARES TECDAX UCITS ETF',
+        shares: 2.649551,
+        price: 23.5889,
+        amount: 62.5,
+        fee: 1.5,
+        tax: 0,
+      });
+    });
   });
 
   describe('Sell', () => {
