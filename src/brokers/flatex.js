@@ -270,7 +270,7 @@ const findPayout = (textArr, startLineNumber) => {
         1
       );
 
-      if (conversionRate.trim().length === 0) {
+      if (conversionRate != null && conversionRate.trim().length === 0) {
         // In some formats we need to match the second group, when only the `Devisenkurs` is in the line:
         // Devisenkurs     :        1,113700
         // insead of
@@ -281,6 +281,10 @@ const findPayout = (textArr, startLineNumber) => {
           'Devisenkurs',
           2
         );
+      }
+
+      if (conversionRate === null) {
+        return parseGermanNum(payoutForeign.split(' ')[0]);
       }
 
       return +Big(parseGermanNum(payoutForeign.split(' ')[0])).div(
