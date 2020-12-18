@@ -6,16 +6,18 @@ import {
   timeRegex,
 } from '@/helper';
 
-const getTableValueByKey = (textArr, startLineNumber, key) => {
+const getTableValueByKey = (textArr, startLineNumber, key, groupIndex = 1) => {
   const finding = textArr.find(
     t =>
       textArr.indexOf(t, startLineNumber - 1) > startLineNumber &&
-      t.match(new RegExp(key + '\\s*:\\s+'))
+      t.match(key + '[\\s+:]+\\s+')
   );
+
   const result = finding
-    ? finding.match(new RegExp(key + '\\s*:\\s+((\\s?\\S+\\s?\\S*)+)\\s*'))
+    ? finding.match(new RegExp('^.*' + key + '[\\s+:]+\\s+(.+?)\\s+(.+)$'))
     : null;
-  return result ? result[1] : null;
+
+  return result ? result[groupIndex] : null;
 };
 
 const getHeaderValueByKey = (textArr, startLineNumber, key) => {
@@ -53,20 +55,42 @@ const findCompany = (textArr, tableIndex) => {
     : undefined;
 };
 
-const findDateBuySell = (textArr, startLineNumber) =>
-  getTableValueByKey(textArr, startLineNumber, 'Schlusstag')
-    ? getTableValueByKey(textArr, startLineNumber, 'Schlusstag').split(', ')[0] // standard stock
-    : getHeaderValueByKey(textArr, 0, 'Handelstag'); // etf
+const findDateBuySell = (textArr, startLineNumber) => {
+  if (getTableValueByKey(textArr, startLineNumber, 'Schlusstag')) {
+    // Standard stock
+    return getTableValueByKey(textArr, startLineNumber, 'Schlusstag').split(
+      ','
+    )[0];
+  }
+
+  if (getHeaderValueByKey(textArr, 0, 'Handelstag')) {
+    // ETF
+    return getHeaderValueByKey(textArr, 0, 'Handelstag');
+  }
+
+  // Old format has the date above the transactions
+  let lineNumber = textArr.findIndex(line => line.startsWith('Schlusstag'));
+  if (lineNumber < 0) {
+    lineNumber = textArr.findIndex(line => line.startsWith('Handelstag'));
+  }
+
+  if (lineNumber < 0) {
+    return undefined;
+  }
+
+  return textArr[lineNumber].split(/\s+/)[1];
+};
 
 const findOrderTime = (textArr, startLineNumber) => {
   const lineWithOrderTime = getTableValueByKey(
     textArr,
     startLineNumber,
-    'Schlusstag'
+    'Schlusstag',
+    2
   );
 
   if (lineWithOrderTime !== null && timeRegex(false).test(lineWithOrderTime)) {
-    return lineWithOrderTime.split(' ')[1].trim();
+    return lineWithOrderTime.split(' ')[0].trim();
   }
 
   const lineWithExecutionTime = getHeaderValueByKey(
@@ -85,8 +109,8 @@ const findOrderTime = (textArr, startLineNumber) => {
   return lineWithExecutionTime.split(' ')[0];
 };
 
-const findShares = (textArr, startLineNumber) =>
-  parseGermanNum(
+const findShares = (textArr, startLineNumber) => {
+  return parseGermanNum(
     getTableValueByKey(textArr, startLineNumber, 'Ordervolumen')
       ? getTableValueByKey(textArr, startLineNumber, 'Ordervolumen').split(
           ' '
@@ -95,6 +119,7 @@ const findShares = (textArr, startLineNumber) =>
       ? getTableValueByKey(textArr, startLineNumber, 'Ausgeführt').split(' ')[0] // etf
       : getTableValueByKey(textArr, startLineNumber, 'St.').split(' ')[0] // dividend
   );
+};
 
 const findPrice = (textArr, startLineNumber) =>
   parseGermanNum(
@@ -103,35 +128,63 @@ const findPrice = (textArr, startLineNumber) =>
 
 const findAmount = (textArr, startLineNumber) =>
   parseGermanNum(
-    getTableValueByKey(textArr, startLineNumber, 'Kurswert').split(' ')[0]
+    findTableValueByKeyWithDocumentFormat(textArr, startLineNumber, 'Kurswert')
   );
 
+const findTableValueByKeyWithDocumentFormat = (
+  content,
+  startLineNumber,
+  term
+) => {
+  // New document format has the following content 'Kurswert      :             207,83 EUR'
+  // In the old format from 2018 the line contains 'Kurswert       EUR                62,50'
+  let value = getTableValueByKey(content, startLineNumber, term, 1);
+
+  if (/[A-Z]{3}/.test(value)) {
+    value = getTableValueByKey(content, startLineNumber, term, 2);
+  }
+
+  return value;
+};
+
 const findFee = (textArr, startLineNumber) => {
-  const provision = getTableValueByKey(textArr, startLineNumber, 'Provision')
+  const provision = findTableValueByKeyWithDocumentFormat(
+    textArr,
+    startLineNumber,
+    'Provision'
+  )
     ? parseGermanNum(
-        getTableValueByKey(textArr, startLineNumber, 'Provision').split(' ')[0]
+        findTableValueByKeyWithDocumentFormat(
+          textArr,
+          startLineNumber,
+          'Provision'
+        ).split(' ')[0]
       )
     : 0;
-  const ownExpenses = getTableValueByKey(
+  const ownExpenses = findTableValueByKeyWithDocumentFormat(
     textArr,
     startLineNumber,
     'Eigene Spesen'
   )
     ? parseGermanNum(
-        getTableValueByKey(textArr, startLineNumber, 'Eigene Spesen').split(
-          ' '
-        )[0]
+        findTableValueByKeyWithDocumentFormat(
+          textArr,
+          startLineNumber,
+          'Eigene Spesen'
+        ).split(' ')[0]
       )
     : 0;
-  const foreignExpenses = getTableValueByKey(
+  const foreignExpenses = findTableValueByKeyWithDocumentFormat(
     textArr,
     startLineNumber,
     'Fremde Spesen'
   )
     ? parseGermanNum(
-        getTableValueByKey(textArr, startLineNumber, 'Fremde Spesen').split(
-          ' '
-        )[0]
+        findTableValueByKeyWithDocumentFormat(
+          textArr,
+          startLineNumber,
+          'Fremde Spesen'
+        ).split(' ')[0]
       )
     : 0;
 
@@ -174,8 +227,14 @@ const findDividendTax = (textArr, startLineNumber) => {
     : 0;
 };
 
-const findDateDividend = (textArr, startLineNumber) =>
-  getTableValueByKey(textArr, startLineNumber, 'Valuta');
+const findDateDividend = (textArr, startLineNumber) => {
+  const date = getTableValueByKey(textArr, startLineNumber, 'Valuta', 1);
+  if (/\d{2}.\d{2}.\d{4}/.test(date)) {
+    return date;
+  }
+
+  return getTableValueByKey(textArr, startLineNumber, 'Valuta', 2);
+};
 
 const findPayout = (textArr, startLineNumber) => {
   const assessmentBasis = getTableValueByKey(
@@ -194,15 +253,19 @@ const findPayout = (textArr, startLineNumber) => {
       startLineNumber,
       'Bruttodividende'
     ).split(' ')[0];
+
     const conversionRate = getTableValueByKey(
       textArr,
       startLineNumber,
-      'Devisenkurs'
+      'Devisenkurs',
+      2
     ).split(' ')[0];
+
     return +Big(parseGermanNum(payoutForeign)).div(
       parseGermanNum(conversionRate)
     );
   }
+
   return assessmentBasis;
 };
 
