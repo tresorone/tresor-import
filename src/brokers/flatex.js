@@ -299,7 +299,9 @@ export const canParsePage = (content, extension) =>
   extension === 'pdf' &&
   content.some(
     line =>
-      line.includes('flatex Bank AG') || line.includes('FinTech Group Bank AG')
+      line.includes('flatex Bank AG') ||
+      line.includes('FinTech Group Bank AG') ||
+      line.includes('biw AG')
   ) &&
   (content.some(line => line.includes('Kauf')) ||
     content.some(line => line.includes('Verkauf')) ||
