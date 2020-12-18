@@ -192,6 +192,25 @@ describe('Broker: Flatex', () => {
         tax: 0,
       });
     });
+
+    test('Can parse statement: 2016_old_bank_name.json', () => {
+      const result = flatex.parsePages(buySamples[8]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2016-05-17',
+        datetime: '2016-05-17T07:04:00.000Z',
+        isin: 'IE00B4L5Y983',
+        company: 'ISHSIII-C.MSCI W.U.E.ACDL',
+        shares: 15,
+        price: 36.54,
+        amount: 548.1,
+        fee: 7.88,
+        tax: 0,
+      });
+    });
   });
 
   describe('Sell', () => {
