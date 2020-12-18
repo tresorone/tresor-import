@@ -332,6 +332,25 @@ describe('Broker: Flatex', () => {
         tax: 0,
       });
     });
+
+    test('should map pdf data of sample correctly: 2020_ishare_msci_eu.json', () => {
+      const activities = flatex.parsePages(dividendsSamples[4]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Dividend',
+        date: '2020-11-25',
+        datetime: '2020-11-25T' + activities[0].datetime.substring(11),
+        isin: 'IE00BYYHSM20',
+        company: 'ISHSII-MSCI EU.QUA.DV.EOD',
+        shares: 709.25,
+        amount: 58.44,
+        price: 0.08239689813182939,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   describe('Mixed pages', () => {
