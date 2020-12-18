@@ -248,22 +248,45 @@ const findPayout = (textArr, startLineNumber) => {
     : 0; // Bemessungsgrundlage
 
   if (assessmentBasis <= 0) {
-    const payoutForeign = getTableValueByKey(
+    let payoutForeign = getTableValueByKey(
       textArr,
       startLineNumber,
       'Bruttodividende'
-    ).split(' ')[0];
-
-    const conversionRate = getTableValueByKey(
-      textArr,
-      startLineNumber,
-      'Devisenkurs',
-      2
-    ).split(' ')[0];
-
-    return +Big(parseGermanNum(payoutForeign)).div(
-      parseGermanNum(conversionRate)
     );
+
+    if (payoutForeign === null) {
+      payoutForeign = getTableValueByKey(
+        textArr,
+        startLineNumber,
+        'Bruttoausschüttung'
+      );
+    }
+
+    if (payoutForeign !== null) {
+      let conversionRate = getTableValueByKey(
+        textArr,
+        startLineNumber,
+        'Devisenkurs',
+        1
+      );
+
+      if (conversionRate.trim().length === 0) {
+        // In some formats we need to match the second group, when only the `Devisenkurs` is in the line:
+        // Devisenkurs     :        1,113700
+        // insead of
+        // Devisenkurs     :    1,157900         *Einbeh. Steuer     :         0,00 EUR
+        conversionRate = getTableValueByKey(
+          textArr,
+          startLineNumber,
+          'Devisenkurs',
+          2
+        );
+      }
+
+      return +Big(parseGermanNum(payoutForeign.split(' ')[0])).div(
+        parseGermanNum(conversionRate.split(' ')[0])
+      );
+    }
   }
 
   return assessmentBasis;
