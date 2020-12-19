@@ -312,6 +312,13 @@ export const canParsePage = (content, extension) =>
     content.some(line => line.includes('Dividendengutschrift')) ||
     content.some(line => line.includes('Ertragsmitteilung')));
 
+const detectedButIgnoredDocument = content => {
+  return (
+    // When the document contains one of the following lines, we want to ignore these document.
+    content.some(line => line.toLowerCase().includes('auftragsbestätigung'))
+  );
+};
+
 const parsePage = (textArr, startLineNumber) => {
   let type,
     date,
@@ -382,6 +389,15 @@ const parsePage = (textArr, startLineNumber) => {
 
 export const parsePages = contents => {
   let activities = [];
+
+  if (detectedButIgnoredDocument(contents.flat())) {
+    // We know this type and we don't want to support it.
+    return {
+      activities,
+      status: 7,
+    };
+  }
+
   for (let content of contents) {
     try {
       findTableIndexes(content).forEach(index => {
