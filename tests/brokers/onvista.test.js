@@ -5,16 +5,14 @@ import {
   sellSamples,
   dividendsSamples,
   multiPageSamples,
+  ignoredSamples,
+  allSamples,
 } from './__mocks__/onvista';
 
 console.error = jest.fn();
 
 describe('Broker: onvista', () => {
   let multiPageResult;
-  const allSamples = buySamples
-    .concat(dividendsSamples)
-    .concat(multiPageSamples)
-    .concat(sellSamples);
 
   describe('Check all documents', () => {
     test('Can the document parsed with onvista', () => {
@@ -410,6 +408,15 @@ describe('Broker: onvista', () => {
           tax: 0.38,
         },
       ]);
+    });
+  });
+
+  describe('Validate all ignored statements', () => {
+    test('The statement should be ignored: 2020_cost_information.json', () => {
+      const result = onvista.parsePages(ignoredSamples[0]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
     });
   });
 });
