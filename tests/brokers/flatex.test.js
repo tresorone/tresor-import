@@ -3,18 +3,15 @@ import { findImplementation } from '../../src';
 import {
   buySamples,
   sellSamples,
-  dividendsSamples,
+  dividendSamples,
   mixedPageSamples,
+  ignoredSamples,
+  allSamples,
 } from './__mocks__/flatex';
 import Big from 'big.js';
 
 describe('Broker: Flatex', () => {
   let consoleErrorSpy;
-
-  const allSamples = buySamples
-    .concat(sellSamples)
-    .concat(dividendsSamples)
-    .concat(mixedPageSamples);
 
   describe('Check all documents', () => {
     test('Can the document parsed with Flatex', () => {
@@ -255,7 +252,7 @@ describe('Broker: Flatex', () => {
 
   describe('Dividend', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const activities = flatex.parsePages(dividendsSamples[0]).activities;
+      const activities = flatex.parsePages(dividendSamples[0]).activities;
 
       // stock
       expect(activities.length).toEqual(1);
@@ -275,7 +272,7 @@ describe('Broker: Flatex', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const activities = flatex.parsePages(dividendsSamples[1]).activities;
+      const activities = flatex.parsePages(dividendSamples[1]).activities;
 
       // stock
       expect(activities.length).toEqual(1);
@@ -295,7 +292,7 @@ describe('Broker: Flatex', () => {
     });
 
     test('should map pdf data of sample 3 correctly', () => {
-      const activities = flatex.parsePages(dividendsSamples[2]).activities;
+      const activities = flatex.parsePages(dividendSamples[2]).activities;
 
       // index fund
       expect(activities.length).toEqual(1);
@@ -315,7 +312,7 @@ describe('Broker: Flatex', () => {
     });
 
     test('should map pdf data of sample correctly: 2018_etf_001.json', () => {
-      const activities = flatex.parsePages(dividendsSamples[3]).activities;
+      const activities = flatex.parsePages(dividendSamples[3]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -334,7 +331,7 @@ describe('Broker: Flatex', () => {
     });
 
     test('should map pdf data of sample correctly: 2020_ishare_msci_eu.json', () => {
-      const activities = flatex.parsePages(dividendsSamples[4]).activities;
+      const activities = flatex.parsePages(dividendSamples[4]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
@@ -397,6 +394,15 @@ describe('Broker: Flatex', () => {
         tax: 0,
         type: 'Sell',
       });
+    });
+  });
+
+  describe('Validate all ignored statements', () => {
+    test('The statement should be ignored: 2020_order_confirmation', () => {
+      const result = flatex.parsePages(ignoredSamples[0]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
     });
   });
 

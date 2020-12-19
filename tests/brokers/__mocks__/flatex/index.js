@@ -15,7 +15,7 @@ export const sellSamples = [
   require('./sell/sell2.json'),
 ];
 
-export const dividendsSamples = [
+export const dividendSamples = [
   require('./dividend/dividend1.json'),
   require('./dividend/dividend2.json'),
   require('./dividend/dividend3.json'),
@@ -24,3 +24,14 @@ export const dividendsSamples = [
 ];
 
 export const mixedPageSamples = [require('./mixed-pages/0.json')];
+
+export const ignoredSamples = [
+  require('./ignored/2020_order_confirmation.json'),
+];
+
+export const allSamples = buySamples.concat(
+  sellSamples,
+  dividendSamples,
+  mixedPageSamples,
+  ignoredSamples
+);
