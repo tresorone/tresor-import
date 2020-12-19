@@ -301,6 +301,13 @@ const isDividend = textArr =>
     ['ertragsgutschrift', 'dividendengutschrift'].includes(t.toLowerCase())
   );
 
+const detectedButIgnoredDocument = content => {
+  return (
+    // When the document contains one of the following lines, we want to ignore these document.
+    content.some(line => line.includes('Kostenausweis'))
+  );
+};
+
 export const canParsePage = (content, extension) => {
   if (extension !== 'pdf') {
     return false;
@@ -314,7 +321,12 @@ export const canParsePage = (content, extension) => {
     return false;
   }
 
-  return isBuy(content) || isSell(content) || isDividend(content);
+  return (
+    isBuy(content) ||
+    isSell(content) ||
+    isDividend(content) ||
+    detectedButIgnoredDocument(content)
+  );
 };
 
 const parseData = textArr => {
@@ -386,6 +398,14 @@ const parseData = textArr => {
 };
 
 export const parsePages = contents => {
+  if (detectedButIgnoredDocument(contents[0])) {
+    // We know this type and we don't want to support it.
+    return {
+      activities: [],
+      status: 7,
+    };
+  }
+
   const activities = [parseData(contents[0])];
 
   return {

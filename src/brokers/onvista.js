@@ -177,8 +177,10 @@ const findPayout = text => {
 
 export const canParsePage = (content, extension) =>
   extension === 'pdf' &&
-  content.some(line => line.includes(onvistaIdentificationString)) &&
-  !content.some(line => line.includes(smartbrokerIdentificationString));
+  ((content.some(line => line.includes(onvistaIdentificationString)) &&
+    !content.some(line => line.includes(smartbrokerIdentificationString))) ||
+    (content.some(line => line.includes('Webtrading onvista bank')) &&
+      detectedButIgnoredDocument(content)));
 
 export const isBuy = text =>
   text.some(t => t.includes('Wir haben für Sie gekauft'));
@@ -189,6 +191,13 @@ export const isSell = text =>
 export const isDividend = text =>
   text.some(t => t.includes('Erträgnisgutschrift')) ||
   text.some(t => t.includes('Dividendengutschrift'));
+
+const detectedButIgnoredDocument = content => {
+  return (
+    // When the document contains one of the following lines, we want to ignore these document.
+    content.some(line => line.includes('Kostenausweis'))
+  );
+};
 
 const parseData = text => {
   let type, date, time, price, amount, fee, tax;
@@ -241,11 +250,20 @@ const parseData = text => {
 
 export const parsePages = contents => {
   let activities = [];
-  for (let c of contents) {
+
+  if (detectedButIgnoredDocument(contents[0])) {
+    // We know this type and we don't want to support it.
+    return {
+      activities,
+      status: 7,
+    };
+  }
+
+  for (let content of contents) {
     try {
-      activities.push(parseData(c));
-    } catch (e) {
-      console.error('Error while parsing page (onvista)', e, c);
+      activities.push(parseData(content));
+    } catch (error) {
+      console.error('Error while parsing page (onvista)', error, content);
     }
   }
 
