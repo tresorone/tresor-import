@@ -359,6 +359,13 @@ const isTaxinfoDividend = textArr => {
   );
 };
 
+const detectedButIgnoredDocument = content => {
+  return (
+    // When the document contains one of the following lines, we want to ignore these document.
+    content.some(line => line.includes('Kosteninformation'))
+  );
+};
+
 export const canParsePage = (content, extension) =>
   // The defining string used to be 'comdirect bank'. However, this string is
   // not present in every document; 'comdirect' is.
@@ -368,7 +375,8 @@ export const canParsePage = (content, extension) =>
   (isBuy(content) ||
     isSell(content) ||
     isDividend(content) ||
-    isTaxinfoDividend(content));
+    isTaxinfoDividend(content) ||
+    detectedButIgnoredDocument(content));
 
 const parseData = textArr => {
   let type,
@@ -467,6 +475,14 @@ const parseData = textArr => {
 };
 
 export const parsePages = contents => {
+  if (detectedButIgnoredDocument(contents[0])) {
+    // We know this type and we don't want to support it.
+    return {
+      activities: [],
+      status: 7,
+    };
+  }
+
   // Sometimes information regarding the first transcation (i. e. tax in sell
   // documents) is spread across multiple pdf pages
   const activities = [parseData(contents.flat())];

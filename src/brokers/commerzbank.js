@@ -347,6 +347,7 @@ export const canParsePage = (content, extension) => {
   if (!Array.isArray(content)) {
     return undefined;
   }
+
   const joinedContent = content.join('');
   return (
     extension === 'pdf' &&
@@ -354,6 +355,13 @@ export const canParsePage = (content, extension) => {
       joinedContent.includes(
         'SteuerlicheBehandlung:AusländischeInvestment-Ausschüttung'
       )) &&
+      !(
+        // Don't match the sub brands of commerzbank which we implemented with custom logic
+        (
+          joinedContent.toLowerCase().includes('comdirect') ||
+          joinedContent.toLowerCase().includes('onvista')
+        )
+      ) &&
       (isBuy(content) || isDividend(content))) ||
       isTransactionReport(content))
   );
