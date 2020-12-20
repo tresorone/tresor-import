@@ -316,15 +316,7 @@ export const parsePages = contents => {
   let activities = [];
 
   for (let content of contents) {
-    try {
-      activities.push(parsePage(content));
-    } catch (exception) {
-      console.error(
-        'Error while parsing page (Baader Bank)',
-        exception,
-        content
-      );
-    }
+    activities.push(parsePage(content));
   }
 
   return {

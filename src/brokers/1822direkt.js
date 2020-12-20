@@ -173,20 +173,12 @@ export const parsePages = contents => {
   let activities = [];
 
   for (let content of contents) {
-    try {
-      const activity = parsePage(content);
-      if (activity === undefined) {
-        continue;
-      }
-
-      activities.push(activity);
-    } catch (exception) {
-      console.error(
-        'Error while parsing page (1822direkt)',
-        exception,
-        content
-      );
+    const activity = parsePage(content);
+    if (activity === undefined) {
+      continue;
     }
+
+    activities.push(activity);
   }
 
   return {

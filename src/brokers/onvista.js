@@ -248,12 +248,8 @@ const parseData = text => {
 
 export const parsePages = contents => {
   let activities = [];
-  for (let c of contents) {
-    try {
-      activities.push(parseData(c));
-    } catch (e) {
-      console.error('Error while parsing page (onvista)', e, c);
-    }
+  for (let content of contents) {
+    activities.push(parseData(content));
   }
 
   return {
