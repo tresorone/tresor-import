@@ -197,7 +197,7 @@ export const parsePages = contents => {
   }
 
   return {
-    activities,
+    activities: activities.filter(activity => activity !== undefined),
     status: 0,
   };
 };

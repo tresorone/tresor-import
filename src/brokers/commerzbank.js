@@ -369,7 +369,7 @@ export const parsePages = contents => {
     activities = [parseSingleTransaction(contents[0])];
   }
   return {
-    activities,
+    activities: activities.filter(activity => activity !== undefined),
     status: 0,
   };
 };

@@ -142,7 +142,7 @@ const parseData = pdfPages => {
       i++;
     }
   }
-  return actions;
+  return actions.filter(activity => activity !== undefined);
 };
 
 export const canParseFirstPage = (content, extension) =>

@@ -173,7 +173,7 @@ export const parsePages = content => {
     .flatMap(validate);
 
   return {
-    activities,
+    activities: activities.filter(activity => activity !== undefined),
     status: 0,
   };
 };
