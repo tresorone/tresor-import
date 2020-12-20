@@ -187,9 +187,7 @@ const parseBuySell = (
   isRedistribution = false,
   taxReinvest = false
 ) => {
-  const dateIdx =
-    findPriorRegexMatch(pdfPage, activityIdx, dateRegex) -
-    1;
+  const dateIdx = findPriorRegexMatch(pdfPage, activityIdx, dateRegex) - 1;
   const companyIsinDict = createCompanyIsinDict(pdfPage);
 
   const [parsedDate, parsedDateTime] = createActivityDateTime(

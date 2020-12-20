@@ -36,9 +36,9 @@ describe('Broker: ebase', () => {
   describe('Check all documents', () => {
     test('Can parse one page containing sell orders with ebase', () => {
       sellSamples.forEach(samples => {
-        expect(samples.some(item => ebase.canParseFirstPage(item, 'pdf'))).toEqual(
-          true
-        );
+        expect(
+          samples.some(item => ebase.canParseFirstPage(item, 'pdf'))
+        ).toEqual(true);
       });
     });
 

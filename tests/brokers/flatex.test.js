@@ -19,9 +19,9 @@ describe('Broker: Flatex', () => {
   describe('Check all documents', () => {
     test('Can the document parsed with Flatex', () => {
       allSamples.forEach(samples => {
-        expect(samples.some(item => flatex.canParseFirstPage(item, 'pdf'))).toEqual(
-          true
-        );
+        expect(
+          samples.some(item => flatex.canParseFirstPage(item, 'pdf'))
+        ).toEqual(true);
       });
     });
 
@@ -37,25 +37,28 @@ describe('Broker: Flatex', () => {
 
   describe('canParseFirstPage', () => {
     test('should accept Buy, Sell, Div Flatex PDFs only', () => {
-      expect(flatex.canParseFirstPage(['flatex Bank AG', 'Kauf'], 'pdf')).toEqual(
-        true
-      );
+      expect(
+        flatex.canParseFirstPage(['flatex Bank AG', 'Kauf'], 'pdf')
+      ).toEqual(true);
       expect(
         flatex.canParseFirstPage(['FinTech Group Bank AG', 'Kauf'], 'pdf')
       ).toEqual(true); // old bank name
-      expect(flatex.canParseFirstPage(['flatex Bank AG', 'Verkauf'], 'pdf')).toEqual(
-        true
-      );
       expect(
-        flatex.canParseFirstPage(['flatex Bank AG', 'Dividendengutschrift'], 'pdf')
+        flatex.canParseFirstPage(['flatex Bank AG', 'Verkauf'], 'pdf')
+      ).toEqual(true);
+      expect(
+        flatex.canParseFirstPage(
+          ['flatex Bank AG', 'Dividendengutschrift'],
+          'pdf'
+        )
       ).toEqual(true);
     });
 
     test('should not accept any PDFs', () => {
       expect(flatex.canParseFirstPage(['42'], 'pdf')).toEqual(false);
-      expect(flatex.canParseFirstPage(['flatex Bank AG', 'Kauf'], 'csv')).toEqual(
-        false
-      );
+      expect(
+        flatex.canParseFirstPage(['flatex Bank AG', 'Kauf'], 'csv')
+      ).toEqual(false);
     });
   });
 

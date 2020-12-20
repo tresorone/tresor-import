@@ -68,10 +68,10 @@ const findShares = content =>
 const findAmount = (content, findTotalAmount) => {
   return formatNumber(
     content[
-    findLineNumberByContent(
-      content,
-      findTotalAmount ? 'Ausmachender Betrag' : 'Kurswert'
-    ) + 1
+      findLineNumberByContent(
+        content,
+        findTotalAmount ? 'Ausmachender Betrag' : 'Kurswert'
+      ) + 1
     ]
   );
 };

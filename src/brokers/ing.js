@@ -114,7 +114,7 @@ const findFee = textArr => {
   );
   totalFee = totalFee.plus(fee && fee > 0 ? fee : 0);
   const discount = getValueByPreviousElement(textArr, 'Rabatt', 2);
-  if ( discount &&  parseGermanNum(discount.replace(' ', ''))) {
+  if (discount && parseGermanNum(discount.replace(' ', ''))) {
     totalFee = totalFee.plus(parseGermanNum(discount.replace(' ', '')));
   }
   return +totalFee;
