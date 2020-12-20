@@ -19,7 +19,7 @@ describe('Broker: onvista', () => {
   describe('Check all documents', () => {
     test('Can the document parsed with onvista', () => {
       allSamples.forEach(samples => {
-        expect(samples.some(item => onvista.canParsePage(item, 'pdf'))).toEqual(
+        expect(samples.some(item => onvista.canParseFirstPage(item, 'pdf'))).toEqual(
           true
         );
       });

@@ -14,7 +14,7 @@ describe('Broker: 1822direkt', () => {
     test('Can the document parsed with 1822direkt', () => {
       allSamples.forEach(samples => {
         expect(
-          samples.some(item => _1822direkt.canParsePage(item, 'pdf'))
+          samples.some(item => _1822direkt.canParseFirstPage(item, 'pdf'))
         ).toEqual(true);
       });
     });

@@ -14,7 +14,7 @@ describe('Broker: commerzbank', () => {
     test('Can pdf file be parsed with commerzbank', () => {
       allSamples.forEach(sample => {
         expect(
-          sample.some(item => commerzbank.canParsePage(item, 'pdf'))
+          sample.some(item => commerzbank.canParseFirstPage(item, 'pdf'))
         ).toEqual(true);
       });
     });

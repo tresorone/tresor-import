@@ -11,7 +11,7 @@ describe('Portfolio Performance', () => {
     test('Can the document parsed with Portfolio Performance', () => {
       testCases.forEach(sample => {
         expect(
-          portfolioPerformance.canParsePage(
+          portfolioPerformance.canParseFirstPage(
             readTestFile(sample, false)[0],
             'csv'
           )

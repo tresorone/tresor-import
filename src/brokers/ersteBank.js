@@ -202,7 +202,7 @@ const isOldBuy = pageArray => {
   return pageArray.some(line => line.includes('Kauf aus Wertpapierliste'));
 };
 
-export const canParsePage = (pageArray, extension) => {
+export const canParseFirstPage = (pageArray, extension) => {
   try {
     const isErsteBankFile = pageArray
       .join('')

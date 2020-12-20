@@ -117,7 +117,7 @@ const validate = activity => {
   return [activity];
 };
 
-export const canParsePage = (content, extension) =>
+export const canParseFirstPage = (content, extension) =>
   extension === 'csv' &&
   content.some(
     line =>

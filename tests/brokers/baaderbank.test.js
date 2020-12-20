@@ -14,7 +14,7 @@ describe('Broker: scalable.capital', () => {
     test('Can the document parsed with scalable.capital', () => {
       allSamples.forEach(samples => {
         expect(
-          samples.some(item => baaderBank.canParsePage(item, 'pdf'))
+          samples.some(item => baaderBank.canParseFirstPage(item, 'pdf'))
         ).toEqual(true);
       });
     });

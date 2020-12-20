@@ -191,7 +191,7 @@ const isSupportedDocument = content => {
   );
 };
 
-export const canParsePage = (content, extension) =>
+export const canParseFirstPage = (content, extension) =>
   extension === 'pdf' &&
   content.some(
     line =>

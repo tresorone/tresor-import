@@ -97,7 +97,7 @@ const formatNumber = value => {
 const findLineNumberByContent = (content, term) =>
   content.findIndex(line => line.includes(term));
 
-export const canParsePage = (content, extension) =>
+export const canParseFirstPage = (content, extension) =>
   extension === 'pdf' &&
   content.some(line => line.includes('1822direkt')) &&
   (isPageTypeBuy(content) ||

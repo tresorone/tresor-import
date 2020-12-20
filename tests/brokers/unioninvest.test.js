@@ -15,7 +15,7 @@ describe('Broker: Union Invest', () => {
     test('Can the document parsed with the Union Invest parser', () => {
       allSamples.forEach(samples => {
         expect(
-          samples.some(item => unioninvest.canParsePage(item, 'pdf'))
+          samples.some(item => unioninvest.canParseFirstPage(item, 'pdf'))
         ).toEqual(true);
       });
     });

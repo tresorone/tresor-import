@@ -14,7 +14,7 @@ describe('Broker: Consorsbank', () => {
     test('Can the document parsed with Consorsbank', () => {
       allSamples.forEach(samples => {
         expect(
-          samples.some(item => consorsbank.canParsePage(item, 'pdf'))
+          samples.some(item => consorsbank.canParseFirstPage(item, 'pdf'))
         ).toEqual(true);
       });
     });

@@ -15,7 +15,7 @@ describe('Broker: ING', () => {
   describe('Check all documents', () => {
     test('Can the document parsed with ING', () => {
       allSamples.forEach(samples => {
-        expect(samples.some(item => ing.canParsePage(item, 'pdf'))).toEqual(
+        expect(samples.some(item => ing.canParseFirstPage(item, 'pdf'))).toEqual(
           true
         );
       });

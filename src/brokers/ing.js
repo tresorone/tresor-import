@@ -27,7 +27,7 @@ const isDividend = textArr =>
     t => t.includes('Dividendengutschrift') || t.includes('Ertragsgutschrift')
   );
 
-export const canParsePage = (content, extension) =>
+export const canParseFirstPage = (content, extension) =>
   extension === 'pdf' &&
   content.some(t => t.includes('BIC: INGDDEFFXX')) &&
   (isBuy(content) || isSell(content) || isDividend(content));

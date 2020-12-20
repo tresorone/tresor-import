@@ -108,7 +108,7 @@ const findOrderTime = content => {
   return content[lineNumber + 1].trim().substr(0, 5);
 };
 
-export const canParsePage = (content, extension) =>
+export const canParseFirstPage = (content, extension) =>
   extension === 'pdf' &&
   content.some(line =>
     line.includes(onvista.smartbrokerIdentificationString)

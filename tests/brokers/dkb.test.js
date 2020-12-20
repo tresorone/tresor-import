@@ -10,7 +10,7 @@ describe('DKB broker', () => {
   describe('Check all documents', () => {
     test('Can the document parsed with DKB', () => {
       allSamples.forEach(samples => {
-        expect(samples.some(item => dkb.canParsePage(item, 'pdf'))).toEqual(
+        expect(samples.some(item => dkb.canParseFirstPage(item, 'pdf'))).toEqual(
           true
         );
       });

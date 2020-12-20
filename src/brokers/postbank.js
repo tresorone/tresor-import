@@ -67,7 +67,7 @@ const isDividend = textArr =>
       t.includes('Ausschüttung Investmentfonds')
   );
 
-export const canParsePage = (content, extension) =>
+export const canParseFirstPage = (content, extension) =>
   extension === 'pdf' &&
   (content.some(line => line.includes('BIC PBNKDEFFXXX')) ||
     content.some(line => line.includes('Postbank'))) &&

@@ -366,7 +366,7 @@ const parsePage = pdfPage => {
   return activities;
 };
 
-export const canParsePage = (pdfPage, extension) => {
+export const canParseFirstPage = (pdfPage, extension) => {
   return (
     extension === 'pdf' &&
     pdfPage.some(line =>

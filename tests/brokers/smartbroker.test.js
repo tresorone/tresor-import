@@ -15,7 +15,7 @@ describe('Smartbroker broker test', () => {
     test('Can the document parsed with smartbroker', () => {
       allSamples.forEach(sample => {
         expect(
-          sample.some(item => smartbroker.canParsePage(item, 'pdf'))
+          sample.some(item => smartbroker.canParseFirstPage(item, 'pdf'))
         ).toEqual(true);
       });
     });

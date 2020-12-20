@@ -341,7 +341,7 @@ const parseTransactionReport = pdfPages => {
 // BLOCK 3
 // GENERAL PARSING FUNCTIONS
 //===========================
-export const canParsePage = (content, extension) => {
+export const canParseFirstPage = (content, extension) => {
   // The first PDF Page does not always contain "Commerzbank", thus this ugly
   // workaround. e. G. dividend_IE00B3RBWM25_1.json
   if (!Array.isArray(content)) {

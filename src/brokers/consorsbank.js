@@ -301,7 +301,7 @@ const isDividend = textArr =>
     ['ertragsgutschrift', 'dividendengutschrift'].includes(t.toLowerCase())
   );
 
-export const canParsePage = (content, extension) => {
+export const canParseFirstPage = (content, extension) => {
   if (extension !== 'pdf') {
     return false;
   }

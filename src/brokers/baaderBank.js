@@ -228,7 +228,7 @@ const findTax = content => {
   return +totalTax;
 };
 
-export const canParsePage = (content, extension) =>
+export const canParseFirstPage = (content, extension) =>
   extension === 'pdf' &&
   (isBrokerGratisbroker(content) ||
     isBrokerScalableCapital(content) ||

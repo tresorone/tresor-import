@@ -140,7 +140,7 @@ const parseTransactionLog = pdfPages => {
   return activities;
 };
 
-export const canParsePage = (content, extension) => {
+export const canParseFirstPage = (content, extension) => {
   return (
     extension === 'pdf' &&
     content.some(line => allowedDegiroCountries.includes(line)) &&

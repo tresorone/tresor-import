@@ -14,7 +14,7 @@ describe('Broker: Cortal Consors', () => {
     test('Can one page parsed with cortal consors', () => {
       allSamples.forEach(samples => {
         expect(
-          samples.some(item => cortalconsors.canParsePage(item, 'pdf'))
+          samples.some(item => cortalconsors.canParseFirstPage(item, 'pdf'))
         ).toEqual(true);
       });
     });

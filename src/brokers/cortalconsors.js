@@ -185,7 +185,7 @@ const isDividend = content =>
       line.includes('ERTRAGSGUTSCHRIFT')
   );
 
-export const canParsePage = (content, extension) =>
+export const canParseFirstPage = (content, extension) =>
   extension === 'pdf' &&
   content.some(line => line.includes('Cortal Consors')) &&
   (isBuy(content) || isSell(content) || isDividend(content));

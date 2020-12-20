@@ -11,7 +11,7 @@ describe('Broker: Erste Bank', () => {
     test('Can the document parsed with Erste Bank', () => {
       allSamples.forEach(samples => {
         expect(
-          samples.some(item => ersteBank.canParsePage(item, 'pdf'))
+          samples.some(item => ersteBank.canParseFirstPage(item, 'pdf'))
         ).toEqual(true);
       });
     });

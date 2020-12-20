@@ -12,7 +12,7 @@ describe('Broker: Postbank', () => {
     test('Can the document be parsed with postbank', () => {
       allSamples.forEach(samples => {
         expect(
-          samples.some(item => postbank.canParsePage(item, 'pdf'))
+          samples.some(item => postbank.canParseFirstPage(item, 'pdf'))
         ).toEqual(true);
       });
     });

@@ -10,7 +10,7 @@ describe('Broker: DEGIRO', () => {
   describe('Check all documents', () => {
     test('Can the document parsed with DEGIRO', () => {
       allSamples.forEach(samples => {
-        expect(samples.some(item => degiro.canParsePage(item, 'pdf'))).toEqual(
+        expect(samples.some(item => degiro.canParseFirstPage(item, 'pdf'))).toEqual(
           true
         );
       });

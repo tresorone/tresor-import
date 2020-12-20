@@ -359,7 +359,7 @@ const isTaxinfoDividend = textArr => {
   );
 };
 
-export const canParsePage = (content, extension) =>
+export const canParseFirstPage = (content, extension) =>
   // The defining string used to be 'comdirect bank'. However, this string is
   // not present in every document; 'comdirect' is.
   extension === 'pdf' &&

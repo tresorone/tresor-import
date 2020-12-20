@@ -14,7 +14,7 @@ describe('Broker: ebase', () => {
 
   test('should only accept revenue-summary reports', () => {
     expect(
-      ebase.canParsePage(
+      ebase.canParseFirstPage(
         ['Fondsertrag / Vorabpauschale', 'ebase Depot flex standard'],
         'pdf'
       )
@@ -23,7 +23,7 @@ describe('Broker: ebase', () => {
 
   test('should reject unknown PDF files', () => {
     expect(
-      ebase.canParsePage([
+      ebase.canParseFirstPage([
         'This String should never occur in a legitimate document',
       ])
     ).toEqual(false);
@@ -36,7 +36,7 @@ describe('Broker: ebase', () => {
   describe('Check all documents', () => {
     test('Can parse one page containing sell orders with ebase', () => {
       sellSamples.forEach(samples => {
-        expect(samples.some(item => ebase.canParsePage(item, 'pdf'))).toEqual(
+        expect(samples.some(item => ebase.canParseFirstPage(item, 'pdf'))).toEqual(
           true
         );
       });

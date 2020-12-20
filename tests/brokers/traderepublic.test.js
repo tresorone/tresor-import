@@ -16,7 +16,7 @@ describe('Broker: Trade Republic', () => {
     test('Can the document parsed with Trade Republic', () => {
       allSamples.forEach(samples => {
         expect(
-          samples.some(item => traderepublic.canParsePage(item, 'pdf'))
+          samples.some(item => traderepublic.canParseFirstPage(item, 'pdf'))
         ).toEqual(true);
       });
     });

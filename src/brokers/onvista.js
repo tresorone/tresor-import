@@ -175,7 +175,7 @@ const findPayout = text => {
   return parseGermanNum(amount);
 };
 
-export const canParsePage = (content, extension) =>
+export const canParseFirstPage = (content, extension) =>
   extension === 'pdf' &&
   content.some(line => line.includes(onvistaIdentificationString)) &&
   !content.some(line => line.includes(smartbrokerIdentificationString));

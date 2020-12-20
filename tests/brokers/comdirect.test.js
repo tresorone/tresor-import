@@ -16,7 +16,7 @@ describe('Broker: comdirect', () => {
     test('Can one page parsed with comdirect', () => {
       allSamples.forEach(samples => {
         expect(
-          samples.some(item => comdirect.canParsePage(item, 'pdf'))
+          samples.some(item => comdirect.canParseFirstPage(item, 'pdf'))
         ).toEqual(true);
       });
     });
