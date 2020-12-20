@@ -2,11 +2,12 @@ import Big from 'big.js';
 import { findImplementation } from '@/index';
 import * as comdirect from '../../src/brokers/comdirect';
 import {
-  allSamples,
   buySamples,
   sellSamples,
   dividendSamples,
   taxInfoDividendSamples,
+  ignoredSamples,
+  allSamples,
 } from './__mocks__/comdirect';
 
 describe('Broker: comdirect', () => {
@@ -608,6 +609,15 @@ describe('Broker: comdirect', () => {
         fee: 0,
         tax: 0.39,
       });
+    });
+  });
+
+  describe('Validate all ignored statements', () => {
+    test('The statement should be ignored: 2020_cost_information.json', () => {
+      const result = comdirect.parsePages(ignoredSamples[0]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
     });
   });
 
