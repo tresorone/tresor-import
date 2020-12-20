@@ -228,16 +228,23 @@ const findTax = content => {
   return +totalTax;
 };
 
+const canParsePage = content =>
+  isPageTypeBuy(content) ||
+  isPageTypeSell(content) ||
+  isPageTypeDividend(content);
+
 export const canParseFirstPage = (content, extension) =>
   extension === 'pdf' &&
+  canParsePage(content) &&
   (isBrokerGratisbroker(content) ||
     isBrokerScalableCapital(content) ||
-    isBrokerOskar(content)) &&
-  (isPageTypeBuy(content) ||
-    isPageTypeSell(content) ||
-    isPageTypeDividend(content));
+    isBrokerOskar(content));
 
 const parsePage = content => {
+  if (!canParsePage(content) || content.some(line => line === 'Fortsetzung:')) {
+    return undefined;
+  }
+
   let type, date, time, isin, company, shares, price, amount, fee, tax;
 
   if (isPageTypeBuy(content)) {
