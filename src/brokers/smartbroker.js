@@ -108,16 +108,23 @@ const findOrderTime = content => {
   return content[lineNumber + 1].trim().substr(0, 5);
 };
 
+const canParsePage = content =>
+  onvista.isBuy(content) ||
+  onvista.isSell(content) ||
+  onvista.isDividend(content);
+
 export const canParseFirstPage = (content, extension) =>
   extension === 'pdf' &&
   content.some(line =>
     line.includes(onvista.smartbrokerIdentificationString)
   ) &&
-  (onvista.isBuy(content) ||
-    onvista.isSell(content) ||
-    onvista.isDividend(content));
+  canParsePage(content);
 
 const parseData = textArr => {
+  if (!canParsePage(textArr)) {
+    return undefined;
+  }
+
   const broker = 'smartbroker';
   const shares = onvista.findShares(textArr);
   const isin = onvista.findISIN(textArr);
