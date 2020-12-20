@@ -180,17 +180,24 @@ export const canParseFirstPage = (content, extension) =>
   content.some(line => line.includes(onvistaIdentificationString)) &&
   !content.some(line => line.includes(smartbrokerIdentificationString));
 
-export const isBuy = text =>
-  text.some(t => t.includes('Wir haben für Sie gekauft'));
+export const isBuy = content =>
+  content.some(line => line.includes('Wir haben für Sie gekauft'));
 
-export const isSell = text =>
-  text.some(t => t.includes('Wir haben für Sie verkauft'));
+export const isSell = content =>
+  content.some(line => line.includes('Wir haben für Sie verkauft'));
 
-export const isDividend = text =>
-  text.some(t => t.includes('Erträgnisgutschrift')) ||
-  text.some(t => t.includes('Dividendengutschrift'));
+export const isDividend = content =>
+  content.some(line => line.includes('Erträgnisgutschrift')) ||
+  content.some(line => line.includes('Dividendengutschrift'));
+
+const canParsePage = content =>
+  isBuy(content) || isSell(content) || isDividend(content);
 
 const parseData = text => {
+  if (!canParsePage(text)) {
+    return undefined;
+  }
+
   let type, date, time, price, amount, fee, tax;
 
   const isin = findISIN(text);

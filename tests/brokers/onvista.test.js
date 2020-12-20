@@ -39,7 +39,6 @@ describe('Broker: onvista', () => {
     test('should parse a PDF with multiple bills', () => {
       multiPageResult = onvista.parsePages(multiPageSamples[0]);
       expect(multiPageResult.activities.length).toEqual(2);
-      expect(console.error).toHaveBeenCalled();
     });
   });
 
