@@ -48,59 +48,83 @@
             </div>
           </div>
           <br>
-          <ul v-cloak v-show="activities.length > 0" class="list">
-            <li class="list-item" v-for="(activity, i) in activities" :key="i">
-              <div v-if="!activity.parserError">
+            <ul v-cloak v-show="errors.length > 0" class="list">
+              <li class="list-item" v-for="(error, i) in errors" :key="i">
                 <div>
                   <div class="level is-marginless is-mobile">
                     <div class="level-left">
                       <div class="level-item">
-                        <p v-if="activity.type">
-                          <span class="tag is-success is-light"
-                            :class="getTypeColor(activity.type)">{{activity.type}}</span>
-                          <span class="tag is-light">{{activity.shares}}x</span>
-                        </p>
-                      </div>
-                    </div>
-                    <div class="level-right">
-                      <div class="level-item has-text-right">
-                        <p v-if="activity.amount !== undefined">
-                          <strong :class="getPriceColor(activity.type)">
-                            <small>{{formatPrice(activity.amount)}}€</small>
-                          </strong>
+                        <p>
+                          <span class="tag is-success is-light is-warning">Status-Code:</span>
+                          <span class="tag is-light">{{ error.status }}</span>
                         </p>
                       </div>
                     </div>
                   </div>
-                  <p style="margin: .5em 0 0">
-                    <strong>
-                      <small v-if="activity.holding">{{getHoldingName(activity.holding)}}</small>
-                      <small v-else>{{activity.company}}</small>
-                    </strong>
+                  <p style="margin: .5em 0 0 .3em">
+                    <small>Datei: {{ error.file }}</small>
                   </p>
-
-                  <p>
-                    <small class="is-size-7">Tax: {{formatPrice(activity.tax)}}€</small>
+                  <p style="margin-left: .3em">
+                    <small>Anzahl Seiten: 1</small>
                   </p>
-                  <p>
-                    <small class="is-size-7">Fee: {{formatPrice(activity.fee)}}€</small>
+                  <p style="margin-left: .3em">
+                    <input :id="'content-' + i" type="text" :value="error.content" style="display: none" />
+                    <small><a href="#" @click="copyContentToClipboard('content-0')">Inhalt kopieren</a></small>
                   </p>
-
-                  <div class="level is-mobile">
-                    <div class="level-left">
-                      <div class="level-item">
-                        <p style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px;"
-                          :title="activity.filename">
-                          <small v-if="activity.filename" class="is-size-7">{{activity.filename}}</small>
-                        </p>
-                      </div>
+                </div>
+              </li>
+            </ul>
+            <ul v-cloak v-show="activities.length > 0" class="list">
+            <li class="list-item" v-for="(activity, i) in activities" :key="i">
+              <div>
+                <div class="level is-marginless is-mobile">
+                  <div class="level-left">
+                    <div class="level-item">
+                      <p v-if="activity.type">
+                        <span class="tag is-success is-light"
+                          :class="getTypeColor(activity.type)">{{ activity.type }}</span>
+                        <span class="tag is-light">{{ activity.shares }}x</span>
+                      </p>
                     </div>
-                    <div class="level-right">
-                      <div class="level-item">
-                        <p>
-                          <small class="is-size-7 has-text-grey">{{formatDate(activity.date)}}</small>
-                        </p>
-                      </div>
+                  </div>
+                  <div class="level-right">
+                    <div class="level-item has-text-right">
+                      <p v-if="activity.amount !== undefined">
+                        <strong :class="getPriceColor(activity.type)">
+                          <small>{{ formatPrice(activity.amount) }}€</small>
+                        </strong>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <p style="margin: .5em 0 0">
+                  <strong>
+                    <small v-if="activity.holding">{{ getHoldingName(activity.holding) }}</small>
+                    <small v-else>{{ activity.company }}</small>
+                  </strong>
+                </p>
+
+                <p>
+                  <small class="is-size-7">Tax: {{ formatPrice(activity.tax) }}€</small>
+                </p>
+                <p>
+                  <small class="is-size-7">Fee: {{ formatPrice(activity.fee) }}€</small>
+                </p>
+
+                <div class="level is-mobile">
+                  <div class="level-left">
+                    <div class="level-item">
+                      <p style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px;"
+                        :title="activity.filename">
+                        <small v-if="activity.filename" class="is-size-7">{{ activity.filename }}</small>
+                      </p>
+                    </div>
+                  </div>
+                  <div class="level-right">
+                    <div class="level-item">
+                      <p>
+                        <small class="is-size-7 has-text-grey">{{ formatDate(activity.date) }}</small>
+                      </p>
                     </div>
                   </div>
                 </div>

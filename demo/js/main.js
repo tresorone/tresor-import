@@ -11,6 +11,7 @@ import getActivities, {
 new Vue({
   el: '#app',
   data: {
+    errors: [],
     activities: [],
     jsonInputActive: false,
     jsonContent: '',
@@ -54,6 +55,7 @@ new Vue({
       }
 
       if (!result.successful) {
+        this.errors.push(result);
         return;
       }
 
@@ -74,19 +76,39 @@ new Vue({
 
       const result = parseActivitiesFromPages(content, this.jsonExtension);
 
+      this.clearResults();
+
       this.handleParserResults({
-        file: 'Json Input',
+        file: 'json.' + this.jsonExtension,
+        content: this.jsonContent,
         activities: result.activities,
         status: result.status,
         successful: result.activities !== undefined && result.status === 0,
       });
+    },
+    copyContentToClipboard(name) {
+      const copyText = document.getElementById(name);
+
+      copyText.style.display = 'block';
+
+      copyText.select();
+      copyText.setSelectionRange(0, 99999);
+
+      document.execCommand('copy');
+
+      copyText.style.display = 'none';
     },
     async fileHandler() {
       const results = await Promise.all(
         Array.from(this.$refs.myFiles.files).map(getActivities)
       );
 
+      this.clearResults();
       results.forEach(this.handleParserResults);
+    },
+    clearResults() {
+      this.errors = [];
+      this.activities = [];
     },
   },
 });
