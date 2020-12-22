@@ -87,7 +87,7 @@ new Vue({
       });
     },
     copyContentToClipboard(name) {
-      const copyText = document.getElementById(name);
+      const copyText = document.getElementById('content-' + name);
 
       copyText.style.display = 'block';
 
