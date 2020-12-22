@@ -65,7 +65,7 @@
                     <small>Datei: {{ error.file }}</small>
                   </p>
                   <p style="margin-left: .3em">
-                    <small>Anzahl Seiten: 1</small>
+                    <small>Anzahl Seiten: {{ error.content.length }}</small>
                   </p>
                   <p style="margin-left: .3em">
                     <textarea :id="'content-' + i" style="display: none">{{ error.content }}</textarea>
