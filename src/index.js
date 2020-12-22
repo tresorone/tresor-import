@@ -55,6 +55,65 @@ export const parseActivitiesFromPages = (pages, extension) => {
   };
 };
 
+export const parseFile = file => {
+  return new Promise(resolve => {
+    const extension = file.name.split('.').pop().toLowerCase();
+    const reader = new FileReader();
+
+    reader.onload = async e => {
+      let fileContent, pdfDocument;
+      let pages = [];
+
+      if (extension === 'pdf') {
+        fileContent = new Uint8Array(e.currentTarget.result);
+        pdfDocument = await pdfjs.getDocument(fileContent).promise;
+
+        const loopHelper = Array.from(Array(pdfDocument.numPages)).entries();
+        for (const [pageIndex] of loopHelper) {
+          pages.push(
+            await parsePageToContent(await pdfDocument.getPage(pageIndex + 1))
+          );
+        }
+      } else {
+        pages.push(e.currentTarget.result.trim().split('\n'));
+      }
+
+      resolve({
+        pages,
+        extension,
+      });
+    };
+
+    if (extension === 'pdf') {
+      reader.readAsArrayBuffer(file);
+    } else {
+      reader.readAsText(file);
+    }
+  });
+};
+
+export default file => {
+  return new Promise(resolve => {
+    try {
+      parseFile(file).then(parsedFile => {
+        const result = parseActivitiesFromPages(
+          parsedFile.pages,
+          parsedFile.extension
+        );
+
+        resolve({
+          file: file.name,
+          activities: result.activities,
+          status: result.status,
+          successful: result.activities !== undefined && result.status === 0,
+        });
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  });
+};
+
 const filterResultActivities = result => {
   if (result.activities !== undefined) {
     result.activities = result.activities.filter(
@@ -81,49 +140,4 @@ const parsePageToContent = async page => {
   }
 
   return parsedContent.filter(item => item.length > 0);
-};
-
-export default file => {
-  return new Promise(resolve => {
-    try {
-      const extension = file.name.split('.').pop().toLowerCase();
-      const reader = new FileReader();
-
-      reader.onload = async e => {
-        let fileContent, pdfDocument;
-        let pages = [];
-
-        if (extension === 'pdf') {
-          fileContent = new Uint8Array(e.currentTarget.result);
-          pdfDocument = await pdfjs.getDocument(fileContent).promise;
-
-          const loopHelper = Array.from(Array(pdfDocument.numPages)).entries();
-          for (const [pageIndex] of loopHelper) {
-            pages.push(
-              await parsePageToContent(await pdfDocument.getPage(pageIndex + 1))
-            );
-          }
-        } else {
-          pages.push(e.currentTarget.result.trim().split('\n'));
-        }
-
-        const result = parseActivitiesFromPages(pages, extension);
-
-        resolve({
-          file: file.name,
-          activities: result.activities,
-          status: result.status,
-          successful: result.activities !== undefined && result.status === 0,
-        });
-      };
-
-      if (extension === 'pdf') {
-        reader.readAsArrayBuffer(file);
-      } else {
-        reader.readAsText(file);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  });
 };
