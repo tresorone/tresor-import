@@ -304,7 +304,8 @@ const isDividend = textArr =>
 const detectedButIgnoredDocument = content => {
   return (
     // When the document contains one of the following lines, we want to ignore these document.
-    content.some(line => line.includes('Kostenausweis'))
+    content.some(line => line.includes('Kostenausweis')) ||
+    content.some(line => line.includes('Aktiensplit'))
   );
 };
 

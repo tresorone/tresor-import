@@ -654,5 +654,12 @@ describe('Broker: Consorsbank', () => {
       expect(result.status).toEqual(7);
       expect(result.activities.length).toEqual(0);
     });
+
+    test('The statement should be ignored: 2020_stock_split.json', () => {
+      const result = consorsbank.parsePages(ignoredSamples[1]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
+    });
   });
 });

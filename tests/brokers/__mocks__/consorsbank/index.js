@@ -35,7 +35,10 @@ export const dividendsSamples = [
   require('./dividends/dividend_2018_deutsche_post.json'),
 ];
 
-export const ignoredSamples = [require('./ignored/2020_cost_information.json')];
+export const ignoredSamples = [
+  require('./ignored/2020_cost_information.json'),
+  require('./ignored/2020_stock_split.json'),
+];
 
 export const allSamples = buySamples
   .concat(sellSamples)
