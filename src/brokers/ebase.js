@@ -147,9 +147,12 @@ const parseData = pdfPages => {
 
 export const canParsePage = (content, extension) =>
   extension === 'pdf' &&
-  (content.some(line => line.includes('ebase Depot') ||
-    line.includes('finvesto Depot') ||
-    line.includes('VL-FondsDepot'))) &&
+  content.some(
+    line =>
+      line.includes('ebase Depot') ||
+      line.includes('finvesto Depot') ||
+      line.includes('VL-FondsDepot')
+  ) &&
   content.some(line => line.includes('Fondsertrag / Vorabpauschale'));
 
 export const parsePages = contents => {
