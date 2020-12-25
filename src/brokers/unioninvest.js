@@ -389,9 +389,8 @@ export const parsePages = pdfPages => {
     }
     activities = activities.concat(parsePage(pdfPage));
   }
-
   return {
-    activities: activities.filter(activity => activity !== undefined),
+    activities,
     status: 0,
   };
 };

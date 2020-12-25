@@ -472,7 +472,7 @@ export const parsePages = contents => {
   const activities = [parseData(contents.flat())];
 
   return {
-    activities: activities.filter(activity => activity !== undefined),
+    activities,
     status: 0,
   };
 };
