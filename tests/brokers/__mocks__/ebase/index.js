@@ -4,6 +4,7 @@ export const buySamples = [
   require('./buy/buy_single_pdfpage.json'),
   require('./buy/finvesto_buy_multi_pdfpage.json'),
   require('./buy/buy_reinvest_multi_pdfpage.json'),
+  require('./buy/capital_accumulation_benefit_multipage.json'),
 ];
 
 export const sellSamples = [

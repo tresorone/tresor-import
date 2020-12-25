@@ -225,6 +225,11 @@ describe('Broker: ebase', () => {
         fee: 0.0,
       });
     });
+
+    test('Can parse capital accumulation benefits', () => {
+      const activities = ebase.parsePages(buySamples[5]).activities;
+      expect(activities.length).toEqual(26);
+    });
   });
 
   describe('Validate sells', () => {
