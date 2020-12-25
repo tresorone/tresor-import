@@ -186,7 +186,7 @@ const findExchangeRate = (content, currency) => {
 const findTax = content => {
   var totalTax = Big(0);
 
-  // We should only parse the tax amounts before the information about the tax calculation.  
+  // We should only parse the tax amounts before the information about the tax calculation.
   const lineNumberWithTaxCalculations = findLineNumberByContent(
     content,
     'Darstellung der steuerlichen Berechnungsgrundlagen'
