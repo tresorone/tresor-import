@@ -8,23 +8,23 @@ import {
 
 const findISIN = text => {
   const isinIdx = text.findIndex(t => t === 'ISIN');
-  if ( isinIdx >= 0 ){
-    return text[ isinIdx+3 ];
+  if (isinIdx >= 0) {
+    return text[isinIdx + 3];
   }
-}
+};
 
 const findCompany = text => {
   // New format
   const isinIdx = text.findIndex(t => t === 'ISIN');
-  if(isinIdx >= 0) {
+  if (isinIdx >= 0) {
     return text[isinIdx + 1];
   }
   // Old format (Testfile from 2015)
   const wknIdx = text.findIndex(t => t === 'WKN:');
-  if(wknIdx >= 0) {
+  if (wknIdx >= 0) {
     return text[wknIdx + 2];
   }
-}
+};
 
 const findDividendCompany = content => {
   let lineNumber = content.findIndex(
@@ -50,7 +50,6 @@ const findBuySellWKN = content => {
   if (oldWknIdx >= 0) {
     return content[oldWknIdx + 1];
   }
-
 };
 
 const findDividendWKN = content => {
@@ -98,14 +97,13 @@ const findDateDividend = content => {
 
 const findShares = textArr => {
   let idx = textArr.findIndex(t => t.toLowerCase() === 'umsatz');
-  if ( idx >= 0 ) {
+  if (idx >= 0) {
     return parseGermanNum(textArr[idx + 2]);
   }
-  idx = textArr.indexOf('ST')
-  if ( idx >= 0) {
+  idx = textArr.indexOf('ST');
+  if (idx >= 0) {
     return parseGermanNum(textArr[idx + 1]);
   }
-
 };
 
 const findDividendShares = textArr => {
