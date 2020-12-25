@@ -186,9 +186,15 @@ const findExchangeRate = (content, currency) => {
 const findTax = content => {
   var totalTax = Big(0);
 
+  // We should only parse the tax amounts before the information about the tax calculation.  
+  const lineNumberWithTaxCalculations = findLineNumberByContent(
+    content,
+    'Darstellung der steuerlichen Berechnungsgrundlagen'
+  );
+
   const searchTermTax = 'Kapitalertragsteuer';
   const lineWithTax = findLineNumberByContent(content, searchTermTax);
-  if (lineWithTax > -1) {
+  if (lineWithTax > -1 && lineWithTax < lineNumberWithTaxCalculations) {
     totalTax = totalTax.plus(Big(parseGermanNum(content[lineWithTax + 1])));
   }
 
@@ -197,7 +203,10 @@ const findTax = content => {
     content,
     searchTermChurchTax
   );
-  if (lineWithChurchTax > -1) {
+  if (
+    lineWithChurchTax > -1 &&
+    lineWithChurchTax < lineNumberWithTaxCalculations
+  ) {
     totalTax = totalTax.plus(
       Big(parseGermanNum(content[lineWithChurchTax + 1]))
     );
@@ -208,7 +217,10 @@ const findTax = content => {
     content,
     searchTermSolidarityTax
   );
-  if (lineWithSolidarityTax > -1) {
+  if (
+    lineWithSolidarityTax > -1 &&
+    lineWithSolidarityTax < lineNumberWithTaxCalculations
+  ) {
     totalTax = totalTax.plus(
       Big(parseGermanNum(content[lineWithSolidarityTax + 1]))
     );
@@ -219,7 +231,10 @@ const findTax = content => {
     content,
     searchTermWithholdingTax
   );
-  if (lineWithWithholdingTax > -1) {
+  if (
+    lineWithWithholdingTax > -1 &&
+    lineWithWithholdingTax < lineNumberWithTaxCalculations
+  ) {
     totalTax = totalTax.plus(
       Big(parseGermanNum(content[lineWithWithholdingTax + 1]))
     );
