@@ -4,12 +4,12 @@ import {
   buySamples,
   sellSamples,
   dividendsSamples,
+  ignoredSamples,
+  allSamples,
 } from './__mocks__/consorsbank';
 console.error = jest.fn();
 
 describe('Broker: Consorsbank', () => {
-  const allSamples = buySamples.concat(dividendsSamples).concat(sellSamples);
-
   describe('Check all documents', () => {
     test('Can the document parsed with Consorsbank', () => {
       allSamples.forEach(samples => {
@@ -644,6 +644,22 @@ describe('Broker: Consorsbank', () => {
           type: 'Dividend',
         },
       ]);
+    });
+  });
+
+  describe('Validate all ignored statements', () => {
+    test('The statement should be ignored: 2020_cost_information.json', () => {
+      const result = consorsbank.parsePages(ignoredSamples[0]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('The statement should be ignored: 2020_stock_split.json', () => {
+      const result = consorsbank.parsePages(ignoredSamples[1]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
     });
   });
 });

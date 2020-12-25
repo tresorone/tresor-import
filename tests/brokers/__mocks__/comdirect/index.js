@@ -38,8 +38,11 @@ export const taxInfoDividendSamples = [
   require('./taxInfo/dividend/2020_foreign_payout_ishsii_jpm.json'),
 ];
 
+export const ignoredSamples = [require('./ignored/2020_cost_information.json')];
+
 export const allSamples = buySamples.concat(
   sellSamples,
   dividendSamples,
-  taxInfoDividendSamples
+  taxInfoDividendSamples,
+  ignoredSamples
 );

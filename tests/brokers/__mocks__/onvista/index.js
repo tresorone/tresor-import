@@ -21,3 +21,11 @@ export const dividendsSamples = [
   require('./dividend/2019_iSh.EO_ST.Sel.Div.30.json'),
   require('./dividend/2019_MetLife.json'),
 ];
+
+export const ignoredSamples = [require('./ignored/2020_cost_information.json')];
+
+export const allSamples = buySamples
+  .concat(sellSamples)
+  .concat(multiPageSamples)
+  .concat(dividendsSamples)
+  .concat(ignoredSamples);

@@ -3,18 +3,15 @@ import { findImplementation } from '../../src';
 import {
   buySamples,
   sellSamples,
-  dividendsSamples,
+  dividendSamples,
   mixedPageSamples,
+  ignoredSamples,
+  allSamples,
 } from './__mocks__/flatex';
 import Big from 'big.js';
 
 describe('Broker: Flatex', () => {
   let consoleErrorSpy;
-
-  const allSamples = buySamples
-    .concat(sellSamples)
-    .concat(dividendsSamples)
-    .concat(mixedPageSamples);
 
   describe('Check all documents', () => {
     test('Can the document parsed with Flatex', () => {
@@ -176,6 +173,44 @@ describe('Broker: Flatex', () => {
         tax: 0,
       });
     });
+
+    test('Can parse statement: 2018_etf_ishares_tecdax.json', () => {
+      const result = flatex.parsePages(buySamples[7]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2018-01-02',
+        datetime: '2018-01-01T23:00:00.000Z',
+        isin: 'DE0005933972',
+        company: 'ISHARES TECDAX UCITS ETF',
+        shares: 2.649551,
+        price: 23.5889,
+        amount: 62.5,
+        fee: 1.5,
+        tax: 0,
+      });
+    });
+
+    test('Can parse statement: 2016_old_bank_name.json', () => {
+      const result = flatex.parsePages(buySamples[8]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2016-05-17',
+        datetime: '2016-05-17T07:04:00.000Z',
+        isin: 'IE00B4L5Y983',
+        company: 'ISHSIII-C.MSCI W.U.E.ACDL',
+        shares: 15,
+        price: 36.54,
+        amount: 548.1,
+        fee: 7.88,
+        tax: 0,
+      });
+    });
   });
 
   describe('Sell', () => {
@@ -220,7 +255,7 @@ describe('Broker: Flatex', () => {
 
   describe('Dividend', () => {
     test('should map pdf data of sample 1 correctly', () => {
-      const activities = flatex.parsePages(dividendsSamples[0]).activities;
+      const activities = flatex.parsePages(dividendSamples[0]).activities;
 
       // stock
       expect(activities.length).toEqual(1);
@@ -240,7 +275,7 @@ describe('Broker: Flatex', () => {
     });
 
     test('should map pdf data of sample 2 correctly', () => {
-      const activities = flatex.parsePages(dividendsSamples[1]).activities;
+      const activities = flatex.parsePages(dividendSamples[1]).activities;
 
       // stock
       expect(activities.length).toEqual(1);
@@ -260,7 +295,7 @@ describe('Broker: Flatex', () => {
     });
 
     test('should map pdf data of sample 3 correctly', () => {
-      const activities = flatex.parsePages(dividendsSamples[2]).activities;
+      const activities = flatex.parsePages(dividendSamples[2]).activities;
 
       // index fund
       expect(activities.length).toEqual(1);
@@ -276,6 +311,44 @@ describe('Broker: Flatex', () => {
         price: 3.02 / 36,
         fee: 0,
         tax: +Big(3.02).minus(Big(2.18)), // calculate from Bemessungsgrundlage - Endbetrag (note: diff in pdf is wrong by 0,01)
+      });
+    });
+
+    test('should map pdf data of sample correctly: 2018_etf_001.json', () => {
+      const activities = flatex.parsePages(dividendSamples[3]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Dividend',
+        date: '2018-08-23',
+        datetime: '2018-08-23T' + activities[0].datetime.substring(11),
+        isin: 'LU0378449770',
+        company: 'COMST.-NASDAQ-100 U.ETF I',
+        shares: 25.28,
+        amount: 9.2235944382071,
+        price: 0.36485737492907827,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('should map pdf data of sample correctly: 2020_ishare_msci_eu.json', () => {
+      const activities = flatex.parsePages(dividendSamples[4]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Dividend',
+        date: '2020-11-25',
+        datetime: '2020-11-25T' + activities[0].datetime.substring(11),
+        isin: 'IE00BYYHSM20',
+        company: 'ISHSII-MSCI EU.QUA.DV.EOD',
+        shares: 709.25,
+        amount: 58.44,
+        price: 0.08239689813182939,
+        fee: 0,
+        tax: 0,
       });
     });
   });
@@ -324,6 +397,15 @@ describe('Broker: Flatex', () => {
         tax: 0,
         type: 'Sell',
       });
+    });
+  });
+
+  describe('Validate all ignored statements', () => {
+    test('The statement should be ignored: 2020_order_confirmation', () => {
+      const result = flatex.parsePages(ignoredSamples[0]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
     });
   });
 
