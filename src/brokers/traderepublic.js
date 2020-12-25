@@ -177,6 +177,7 @@ const detectedButIgnoredDocument = content => {
     content.some(line => line.includes('KOSTENINFORMATION')) ||
     content.some(line => line.includes('SPLIT')) ||
     content.some(line => line.includes('AUFTRAGSBESTÄTIGUNG')) ||
+    content.some(line => line.includes('ÄNDERUNGSBESTÄTIGUNG')) ||
     content.some(line => line === 'SPARPLANAUSFÜHRUNG FEHLGESCHLAGEN')
   );
 };
