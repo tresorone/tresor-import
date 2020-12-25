@@ -483,8 +483,15 @@ describe('Broker: Trade Republic', () => {
       expect(result.activities.length).toEqual(0);
     });
 
-    test('The statement should be ignored: order_confirmation.json', () => {
+    test('The statement should be ignored: saving_plan_confirmation.json', () => {
       const result = traderepublic.parsePages(ignoredSamples[4]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('The statement should be ignored: saving_plan_change_confirmation.json', () => {
+      const result = traderepublic.parsePages(ignoredSamples[5]);
 
       expect(result.status).toEqual(7);
       expect(result.activities.length).toEqual(0);

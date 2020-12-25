@@ -35,7 +35,8 @@ export const ignoredSamples = [
   require('./ignored/reverse_split.json'),
   require('./ignored/saving_plan_failed.json'),
   require('./ignored/split.json'),
-  require('./ignored/order_confirmation.json'),
+  require('./ignored/saving_plan_confirmation.json'),
+  require('./ignored/saving_plan_change_confirmation.json'),
 ];
 
 export const allSamples = buySamples.concat(
