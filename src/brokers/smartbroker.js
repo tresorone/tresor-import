@@ -121,10 +121,6 @@ export const canParseFirstPage = (content, extension) =>
   canParsePage(content);
 
 const parseData = textArr => {
-  if (!canParsePage(textArr)) {
-    return undefined;
-  }
-
   const broker = 'smartbroker';
   const shares = onvista.findShares(textArr);
   const isin = onvista.findISIN(textArr);
@@ -189,7 +185,9 @@ const parseData = textArr => {
 export const parsePages = contents => {
   const activities = [];
   for (let content of contents) {
-    activities.push(parseData(content));
+    if (canParsePage(content)) {
+      activities.push(parseData(content));
+    }
   }
 
   return {

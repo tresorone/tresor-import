@@ -241,10 +241,6 @@ export const canParseFirstPage = (content, extension) =>
     isBrokerOskar(content));
 
 const parsePage = content => {
-  if (!canParsePage(content) || content.some(line => line === 'Fortsetzung:')) {
-    return undefined;
-  }
-
   let type, date, time, isin, company, shares, price, amount, fee, tax;
 
   if (isPageTypeBuy(content)) {
@@ -314,8 +310,8 @@ const parsePage = content => {
 
 export const parsePages = contents => {
   let activities = [];
-
-  for (let content of contents) {
+  const content = contents.flat();
+  if (canParsePage(content)) {
     activities.push(parsePage(content));
   }
 

@@ -194,10 +194,6 @@ const canParsePage = content =>
   isBuy(content) || isSell(content) || isDividend(content);
 
 const parseData = text => {
-  if (!canParsePage(text)) {
-    return undefined;
-  }
-
   let type, date, time, price, amount, fee, tax;
 
   const isin = findISIN(text);
@@ -249,7 +245,9 @@ const parseData = text => {
 export const parsePages = contents => {
   let activities = [];
   for (let content of contents) {
-    activities.push(parseData(content));
+    if (canParsePage(content)) {
+      activities.push(parseData(content));
+    }
   }
 
   return {
