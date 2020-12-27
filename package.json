@@ -15,7 +15,8 @@
     "start": "concurrently --kill-others \"npm run demo\" \"npm run dev\"",
     "test": "jest --verbose",
     "lint": "eslint .",
-    "precommit": "pretty-quick --staged --no-restage && npm run lint && npm t"
+    "format-staged": "pretty-quick --staged --no-restage",
+    "precommit": "npm run format-staged && npm run lint && npm t"
   },
   "keywords": [
     "tresor",
