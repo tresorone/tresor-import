@@ -6,9 +6,9 @@ import {
 
 const getType = details => {
 	if (details.includes("repurchased") || details.includes("principal")) {
-		return "transferIn";
-	} else if (details.includes("investment")) {
 		return "transferOut";
+	} else if (details.includes("investment")) {
+		return "transferIn";
 	} else if (details.includes("interest")) {
 		return "Dividend";
 	}

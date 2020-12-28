@@ -2,7 +2,7 @@ import { findImplementation } from '@/index';
 import { csvLinesToJSON } from '@/helper';
 import glob from 'glob';
 import fs from 'fs';
-import * as mintos from '../../src/brokers/mintos';
+import * as mintos from '../../src/p2p/mintos';
 
 describe('Mintos', () => {
   const testCases = glob.sync(`${__dirname}/__mocks__/mintos/*.csv`);
