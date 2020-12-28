@@ -11,10 +11,7 @@ describe('Mintos', () => {
     test('Can the document parsed with Mintos', () => {
       testCases.forEach(sample => {
         expect(
-          mintos.canParseFirstPage(
-            readTestFile(sample, false)[0],
-            'csv'
-          )
+          mintos.canParseFirstPage(readTestFile(sample, false)[0], 'csv')
         ).toEqual(true);
       });
     });
@@ -38,9 +35,7 @@ describe('Mintos', () => {
       fs.readFileSync(activityFile, 'utf8')
     );
 
-    const result = mintos.parsePages(
-      readTestFile(testFile, true)
-    );
+    const result = mintos.parsePages(readTestFile(testFile, true));
 
     // uncomment to update expected activities
     // fs.writeFileSync(activityFile, JSON.stringify(result.activities, null, 2));
