@@ -16,9 +16,9 @@ export const sellSamples = [
 ];
 
 export const dividendSamples = [
-  require('./dividend/dividend1.json'),
-  require('./dividend/dividend2.json'),
-  require('./dividend/dividend3.json'),
+  require('./dividend/2020_apple.json'),
+  require('./dividend/2019_microsoft.json'),
+  require('./dividend/2018_msci_world.json'),
   require('./dividend/2018_etf_001.json'),
   require('./dividend/2020_ishare_msci_eu.json'),
 ];

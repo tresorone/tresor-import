@@ -254,7 +254,7 @@ describe('Broker: Flatex', () => {
   });
 
   describe('Dividend', () => {
-    test('should map pdf data of sample 1 correctly', () => {
+    test('should map pdf data of sample correctly: 2020_apple.json', () => {
       const activities = flatex.parsePages(dividendSamples[0]).activities;
 
       // stock
@@ -274,7 +274,7 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('should map pdf data of sample 2 correctly', () => {
+    test('should map pdf data of sample correctly: 2019_microsoft.json', () => {
       const activities = flatex.parsePages(dividendSamples[1]).activities;
 
       // stock
@@ -294,7 +294,7 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('should map pdf data of sample 3 correctly', () => {
+    test('should map pdf data of sample correctly: 2018_msci_world.json', () => {
       const activities = flatex.parsePages(dividendSamples[2]).activities;
 
       // index fund
