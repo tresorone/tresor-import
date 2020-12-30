@@ -351,6 +351,25 @@ describe('Broker: Flatex', () => {
         tax: 0,
       });
     });
+
+    test('should map pdf data of sample correctly: 2020_royal_dutch_shell.json', () => {
+      const activities = flatex.parsePages(dividendSamples[5]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Dividend',
+        date: '2020-09-22',
+        datetime: '2020-09-22T' + activities[0].datetime.substring(11),
+        isin: 'GB00B03MLX29',
+        company: 'ROYAL DUTCH SHELL A EO-07',
+        shares: 25,
+        amount: 3.38,
+        price: 0.1352,
+        fee: 0,
+        tax: 0.51,
+      });
+    });
   });
 
   describe('Mixed pages', () => {

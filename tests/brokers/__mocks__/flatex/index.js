@@ -21,6 +21,7 @@ export const dividendSamples = [
   require('./dividend/2018_msci_world.json'),
   require('./dividend/2018_etf_001.json'),
   require('./dividend/2020_ishare_msci_eu.json'),
+  require('./dividend/2020_royal_dutch_shell.json'),
 ];
 
 export const mixedPageSamples = [require('./mixed-pages/0.json')];
