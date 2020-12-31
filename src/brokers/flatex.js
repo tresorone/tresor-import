@@ -306,12 +306,14 @@ export const canParseFirstPage = (content, extension) =>
   (content.some(line => line.includes('Kauf')) ||
     content.some(line => line.includes('Verkauf')) ||
     content.some(line => line.includes('Dividendengutschrift')) ||
-    content.some(line => line.includes('Ertragsmitteilung')));
+    content.some(line => line.includes('Ertragsmitteilung')) ||
+    detectedButIgnoredDocument(content));
 
 const detectedButIgnoredDocument = content => {
   return (
     // When the document contains one of the following lines, we want to ignore these document.
-    content.some(line => line.toLowerCase().includes('auftragsbestätigung'))
+    content.some(line => line.toLowerCase().includes('auftragsbestätigung')) ||
+    content.some(line => line.toLowerCase().includes('einrichtung sparplan nr'))
   );
 };
 
