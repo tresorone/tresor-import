@@ -390,17 +390,14 @@ export const parsePages = contents => {
   }
 
   for (let content of contents) {
-    try {
-      findTableIndexes(content).forEach(index => {
-        let activity = parsePage(content, index);
-        if (activity === undefined) {
-          return;
-        }
-        activities.push(activity);
-      });
-    } catch (exception) {
-      console.error('Error while parsing page (flatex)', exception, content);
-    }
+    findTableIndexes(content).forEach(index => {
+      let activity = parsePage(content, index);
+      if (activity === undefined) {
+        return;
+      }
+
+      activities.push(activity);
+    });
   }
 
   return {
