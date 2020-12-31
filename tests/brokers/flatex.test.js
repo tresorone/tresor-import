@@ -257,7 +257,6 @@ describe('Broker: Flatex', () => {
     test('should map pdf data of sample correctly: 2020_apple.json', () => {
       const activities = flatex.parsePages(dividendSamples[0]).activities;
 
-      // stock
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
         broker: 'flatex',
@@ -267,17 +266,18 @@ describe('Broker: Flatex', () => {
         isin: 'US0378331005',
         company: 'APPLE INC.',
         shares: 7,
-        amount: 4.96,
-        price: 4.96 / 7,
+        amount: 4.95997055305052,
+        price: 0.7085672218643599,
         fee: 0,
-        tax: +Big(4.96).minus(Big(3.6)), // calculate from Bemessungsgrundlage - Endbetrag#
+        tax: 1.35997055305052,
+        fxRate: 1.0867,
+        foreignCurrency: 'USD',
       });
     });
 
     test('should map pdf data of sample correctly: 2019_microsoft.json', () => {
       const activities = flatex.parsePages(dividendSamples[1]).activities;
 
-      // stock
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
         broker: 'flatex',
@@ -287,17 +287,18 @@ describe('Broker: Flatex', () => {
         isin: 'US5949181045',
         company: 'MICROSOFT DL-,00000625',
         shares: 16,
-        amount: 7.326928257160815, // only available in USD, thus using net dividend in EUR
-        price: 7.326928257160815 / 16,
+        amount: 7.326928257160815,
+        price: 0.45793301607255094,
         fee: 0,
-        tax: 0, // skip bc only available in USD
+        tax: 1.0969282571608152,
+        fxRate: 1.1137,
+        foreignCurrency: 'USD',
       });
     });
 
     test('should map pdf data of sample correctly: 2018_msci_world.json', () => {
       const activities = flatex.parsePages(dividendSamples[2]).activities;
 
-      // index fund
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
         broker: 'flatex',
@@ -307,10 +308,12 @@ describe('Broker: Flatex', () => {
         isin: 'DE000A1C9KL8',
         company: 'HSBC MSCI WORLD UC.ETF DZ',
         shares: 36,
-        amount: 3.02,
-        price: 3.02 / 36,
+        amount: 3.0142781597038604,
+        price: 0.08372994888066279,
         fee: 0,
-        tax: +Big(3.02).minus(Big(2.18)), // calculate from Bemessungsgrundlage - Endbetrag (note: diff in pdf is wrong by 0,01)
+        tax: 0.8342781597038604,
+        fxRate: 1.1346,
+        foreignCurrency: 'USD',
       });
     });
 
@@ -330,6 +333,8 @@ describe('Broker: Flatex', () => {
         price: 0.36485737492907827,
         fee: 0,
         tax: 0,
+        fxRate: 1.1579,
+        foreignCurrency: 'USD',
       });
     });
 
