@@ -425,8 +425,15 @@ describe('Broker: Flatex', () => {
   });
 
   describe('Validate all ignored statements', () => {
-    test('The statement should be ignored: 2020_order_confirmation', () => {
+    test('The statement should be ignored: 2020_order_confirmation.json', () => {
       const result = flatex.parsePages(ignoredSamples[0]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('The statement should be ignored: 2020_saving_plan_confirmation.json', () => {
+      const result = flatex.parsePages(ignoredSamples[1]);
 
       expect(result.status).toEqual(7);
       expect(result.activities.length).toEqual(0);
