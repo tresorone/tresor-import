@@ -324,9 +324,9 @@ const parsePage = (textArr, startLineNumber) => {
     date,
     datetime,
     time,
-    isin,
-    company,
-    shares,
+    isin = findISIN(textArr, startLineNumber),
+    company = findCompany(textArr, startLineNumber),
+    shares = findShares(textArr, startLineNumber),
     price,
     amount,
     fee,
@@ -334,22 +334,16 @@ const parsePage = (textArr, startLineNumber) => {
 
   if (lineContains(textArr, startLineNumber, 'Kauf')) {
     type = 'Buy';
-    isin = findISIN(textArr, startLineNumber);
-    company = findCompany(textArr, startLineNumber);
     date = findDateBuySell(textArr, startLineNumber);
     time = findOrderTime(textArr, startLineNumber);
-    shares = findShares(textArr, startLineNumber);
     amount = findAmount(textArr, startLineNumber);
     price = findPrice(textArr, startLineNumber);
     fee = findFee(textArr, startLineNumber);
     tax = 0;
   } else if (lineContains(textArr, startLineNumber, 'Verkauf')) {
     type = 'Sell';
-    isin = findISIN(textArr, startLineNumber);
-    company = findCompany(textArr, startLineNumber);
     date = findDateBuySell(textArr, startLineNumber);
     time = findOrderTime(textArr, startLineNumber);
-    shares = findShares(textArr, startLineNumber);
     amount = findAmount(textArr, startLineNumber);
     price = findPrice(textArr, startLineNumber);
     fee = findFee(textArr, startLineNumber);
@@ -359,10 +353,7 @@ const parsePage = (textArr, startLineNumber) => {
     lineContains(textArr, startLineNumber - 3, 'Ertragsmitteilung')
   ) {
     type = 'Dividend';
-    isin = findISIN(textArr, startLineNumber);
-    company = findCompany(textArr, startLineNumber);
     date = findDateDividend(textArr, startLineNumber);
-    shares = findShares(textArr, startLineNumber);
     amount = findPayout(textArr, startLineNumber);
     price = amount / shares;
     fee = 0;
