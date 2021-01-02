@@ -11,6 +11,7 @@ export const sellSamples = [
   require('./sell/sell_etf_IE00B4L5Y983.json'),
   require('./sell/redemption_etf.json'),
   require('./sell/2020_etf_tecdax.json'),
+  require('./sell/2020_msci_world.json'),
 ];
 
 export const dividendsSamples = [
