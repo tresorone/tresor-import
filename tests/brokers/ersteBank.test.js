@@ -9,16 +9,14 @@ describe('Broker: Erste Bank', () => {
 
   describe('Check all documents', () => {
     test('Can the document parsed with Erste Bank', () => {
-      allSamples.forEach(samples => {
-        expect(
-          samples.some(item => ersteBank.canParseFirstPage(item, 'pdf'))
-        ).toEqual(true);
+      allSamples.forEach(pages => {
+        expect(ersteBank.canParseDocument(pages, 'pdf')).toEqual(true);
       });
     });
 
     test('Can identify a implementation from the document as Erste Bank', () => {
-      allSamples.forEach(samples => {
-        const implementations = findImplementation(samples, 'pdf');
+      allSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'pdf');
 
         expect(implementations.length).toEqual(1);
         expect(implementations[0]).toEqual(ersteBank);

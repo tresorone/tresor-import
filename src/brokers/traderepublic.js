@@ -192,13 +192,18 @@ const isSupportedDocument = content => {
   );
 };
 
-export const canParseFirstPage = (content, extension) =>
-  extension === 'pdf' &&
-  content.some(
-    line =>
-      line.includes('TRADE REPUBLIC BANK GMBH') &&
-      (isSupportedDocument(content) || detectedButIgnoredDocument(content))
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
+  return (
+    extension === 'pdf' &&
+    firstPageContent.some(
+      line =>
+        line.includes('TRADE REPUBLIC BANK GMBH') &&
+        (isSupportedDocument(firstPageContent) ||
+          detectedButIgnoredDocument(firstPageContent))
+    )
   );
+};
 
 // Functions to parse an overview Statement
 const parsePositionAsActivity = (content, startLineNumber) => {

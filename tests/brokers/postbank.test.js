@@ -10,16 +10,14 @@ describe('Broker: Postbank', () => {
 
   describe('Check all documents', () => {
     test('Can the document be parsed with postbank', () => {
-      allSamples.forEach(samples => {
-        expect(
-          samples.some(item => postbank.canParseFirstPage(item, 'pdf'))
-        ).toEqual(true);
+      allSamples.forEach(pages => {
+        expect(postbank.canParseDocument(pages, 'pdf')).toEqual(true);
       });
     });
 
     test('Can identify a implementation from the document as postbank', () => {
-      allSamples.forEach(samples => {
-        const implementations = findImplementation(samples, 'pdf');
+      allSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'pdf');
 
         expect(implementations.length).toEqual(1);
         expect(implementations[0]).toEqual(postbank);

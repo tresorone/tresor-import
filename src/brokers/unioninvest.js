@@ -364,10 +364,11 @@ const parsePage = pdfPage => {
   return activities;
 };
 
-export const canParseFirstPage = (pdfPage, extension) => {
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
   return (
     extension === 'pdf' &&
-    pdfPage.some(line =>
+    firstPageContent.some(line =>
       line.includes(
         'Union Investment Service Bank AG · 60621 Frankfurt am Main'
       )

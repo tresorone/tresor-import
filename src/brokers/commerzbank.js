@@ -341,14 +341,15 @@ const parseTransactionReport = pdfPages => {
 // BLOCK 3
 // GENERAL PARSING FUNCTIONS
 //===========================
-export const canParseFirstPage = (content, extension) => {
+export const canParseDocument = (pages, extension) => {
   // The first PDF Page does not always contain "Commerzbank", thus this ugly
   // workaround. e. G. dividend_IE00B3RBWM25_1.json
-  if (!Array.isArray(content)) {
+  if (!Array.isArray(pages)) {
     return undefined;
   }
 
-  const joinedContent = content.join('');
+  const firstPageContent = pages[0];
+  const joinedContent = firstPageContent.join('');
   return (
     extension === 'pdf' &&
     (((joinedContent.toLowerCase().includes('commerzbank') ||
@@ -362,8 +363,8 @@ export const canParseFirstPage = (content, extension) => {
           joinedContent.toLowerCase().includes('onvista')
         )
       ) &&
-      (isBuy(content) || isDividend(content))) ||
-      isTransactionReport(content))
+      (isBuy(firstPageContent) || isDividend(firstPageContent))) ||
+      isTransactionReport(firstPageContent))
   );
 };
 

@@ -166,10 +166,16 @@ const isDividend = textArr =>
       t.includes('Ausschüttung Investmentfonds')
   );
 
-export const canParseFirstPage = (content, extension) =>
-  extension === 'pdf' &&
-  content.some(line => line.includes('BIC BYLADEM1001')) &&
-  (isBuy(content) || isSell(content) || isDividend(content));
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
+  return (
+    extension === 'pdf' &&
+    firstPageContent.some(line => line.includes('BIC BYLADEM1001')) &&
+    (isBuy(firstPageContent) ||
+      isSell(firstPageContent) ||
+      isDividend(firstPageContent))
+  );
+};
 
 export const parsePages = pages => {
   const firstPage = pages[0];

@@ -12,16 +12,14 @@ describe('Broker: 1822direkt', () => {
 
   describe('Check all documents', () => {
     test('Can the document parsed with 1822direkt', () => {
-      allSamples.forEach(samples => {
-        expect(
-          samples.some(item => _1822direkt.canParseFirstPage(item, 'pdf'))
-        ).toEqual(true);
+      allSamples.forEach(pages => {
+        expect(_1822direkt.canParseDocument(pages, 'pdf')).toEqual(true);
       });
     });
 
     test('Can identify a implementation from the document as 1822direkt', () => {
-      allSamples.forEach(samples => {
-        const implementations = findImplementation(samples, 'pdf');
+      allSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'pdf');
 
         expect(implementations.length).toEqual(1);
         expect(implementations[0]).toEqual(_1822direkt);
