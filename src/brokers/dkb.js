@@ -68,10 +68,21 @@ const findTimeBuySell = content => {
   return lineContent.split(' ')[1].trim();
 };
 
-const findPrice = textArr =>
-  parseGermanNum(
-    getValueByPreviousElement(textArr, 'Ausführungskurs').split(' ')[0]
-  );
+const findPrinceLine = content => {
+  let priceLine = getValueByPreviousElement(content, 'Ausführungskurs');
+
+  if (priceLine === '') {
+    priceLine = getValueByPreviousElement(content, 'Abrech.-Preis');
+  }
+
+  return priceLine;
+};
+
+const findPrice = content =>
+  parseGermanNum(findPrinceLine(content).split(' ')[0]);
+
+const findPriceCurrency = content =>
+  parseGermanNum(findPrinceLine(content).split(' ')[1]);
 
 const findAmount = textArr =>
   parseGermanNum(getValueByPreviousElement(textArr, 'Kurswert').trim());
@@ -171,6 +182,38 @@ const findTax = pages => {
   return +totalTax;
 };
 
+const findForeignInformation = content => {
+  let fxRate, foreignCurrency, baseCurrency;
+
+  let fxRateLineIndex = content.findIndex(line => line === 'Devisenkurs');
+  if (fxRateLineIndex > 0) {
+    // Get the fxRate and the currency from:
+    // Devisenkurs
+    // EUR / USD
+    // 1,1011
+    fxRate = content[fxRateLineIndex + 2];
+    foreignCurrency = content[fxRateLineIndex + 1].split('/')[1].trim();
+  } else {
+    fxRateLineIndex = content.findIndex(line => line.includes('Devisenkurs '));
+    if (fxRateLineIndex > 0) {
+      // Match the fxRate and the currency from:
+      // Devisenkurs (EUR/CAD) 1,5268 vom 14.04.2020
+      const lineContent = content[fxRateLineIndex];
+      fxRate = lineContent.split(/\s+/)[2];
+      foreignCurrency = lineContent.split('/')[1].substring(0, 3);
+    }
+  }
+
+  const baseCurrencyLineIndex = content.findIndex(
+    line => line === 'Ausmachender Betrag'
+  );
+  if (baseCurrencyLineIndex) {
+    baseCurrency = content[baseCurrencyLineIndex + 2];
+  }
+
+  return [Big(parseGermanNum(fxRate)), foreignCurrency, baseCurrency];
+};
+
 const isBuy = textArr =>
   textArr.some(
     t =>
@@ -200,7 +243,15 @@ export const canParseFirstPage = (content, extension) =>
 export const parsePages = pages => {
   const firstPage = pages[0];
 
-  let type, amount, price, date, time;
+  let type,
+    amount,
+    price,
+    priceCurrency,
+    date,
+    time,
+    fxRate,
+    foreignCurrency,
+    baseCurrency;
   const pieceIdx = firstPage.findIndex(t => t.includes('Stück'));
   const isinIdx = findISINIdx(firstPage, pieceIdx);
   const isin = firstPage[isinIdx];
@@ -209,16 +260,25 @@ export const parsePages = pages => {
   const fee = findFee(pages);
   const tax = findTax(pages);
 
+  [fxRate, foreignCurrency, baseCurrency] = findForeignInformation(firstPage);
+
+  const canConvertCurrency =
+    fxRate !== undefined &&
+    foreignCurrency !== undefined &&
+    foreignCurrency != baseCurrency;
+
   if (isBuy(firstPage)) {
     type = 'Buy';
     amount = findAmount(firstPage);
     price = findPrice(firstPage);
+    priceCurrency = findPriceCurrency(firstPage);
     date = findDateBuySell(firstPage);
     time = findTimeBuySell(firstPage);
   } else if (isSell(firstPage)) {
     type = 'Sell';
     amount = findAmount(firstPage);
     price = findPrice(firstPage);
+    priceCurrency = findPriceCurrency(firstPage);
     date = findDateBuySell(firstPage);
     time = findTimeBuySell(firstPage);
   } else if (isDividend(firstPage)) {
@@ -235,6 +295,15 @@ export const parsePages = pages => {
     'dd.MM.yyyy HH:mm:ss'
   );
 
+  if (
+    priceCurrency !== undefined &&
+    canConvertCurrency &&
+    (type === 'Buy' || type === 'Sell')
+  ) {
+    // For buy and sell documents we need to convert the currency to the base currency (when possible).
+    price = +Big(price).div(fxRate);
+  }
+
   const activity = {
     broker: 'dkb',
     type,
@@ -248,6 +317,11 @@ export const parsePages = pages => {
     fee,
     tax,
   };
+
+  if (canConvertCurrency) {
+    activity.fxRate = +fxRate;
+    activity.foreignCurrency = foreignCurrency;
+  }
 
   return {
     activities: [validateActivity(activity)],
