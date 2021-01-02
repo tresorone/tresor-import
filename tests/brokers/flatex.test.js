@@ -211,6 +211,27 @@ describe('Broker: Flatex', () => {
         tax: 0,
       });
     });
+
+    test('Can parse statement: 2020_dropbox.json', () => {
+      const result = flatex.parsePages(buySamples[9]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2020-12-02',
+        datetime: '2020-12-02T18:31:00.000Z',
+        isin: 'US26210C1045',
+        company: 'DROPBOX INC CL. A',
+        shares: 60,
+        price: 16.60067896776978,
+        amount: 996.04,
+        fee: 15.9,
+        tax: 0,
+        fxRate: 1.20477,
+        foreignCurrency: 'USD',
+      });
+    });
   });
 
   describe('Sell', () => {
