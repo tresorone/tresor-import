@@ -202,10 +202,12 @@ describe('DKB broker', () => {
         isin: 'CA2376321048',
         company: 'DATA DEPOSIT BOX INC. REGISTERED SHARES O.N.',
         shares: 1712,
-        price: 0.0081815562,
+        price: 0.008181556195965417,
         amount: 14.01,
         fee: 10,
         tax: 0,
+        fxRate: 1.5268,
+        foreignCurrency: 'CAD',
       });
     });
   });
@@ -226,6 +228,8 @@ describe('DKB broker', () => {
         amount: 25.49,
         fee: 0,
         tax: 3.82,
+        fxRate: 1.0874,
+        foreignCurrency: 'USD',
       });
     });
 
@@ -244,6 +248,8 @@ describe('DKB broker', () => {
         amount: 1.63,
         fee: 0,
         tax: 0.24,
+        fxRate: 1.1011,
+        foreignCurrency: 'USD',
       });
     });
     test('should map pdf data of sample 3 correctly', () => {
@@ -261,6 +267,8 @@ describe('DKB broker', () => {
         amount: 4.5,
         fee: 0,
         tax: 0,
+        fxRate: 1.0878,
+        foreignCurrency: 'USD',
       });
     });
     test('should map pdf data of sample 4 correctly', () => {
@@ -278,6 +286,8 @@ describe('DKB broker', () => {
         amount: 4.5,
         fee: 0,
         tax: 0.83,
+        fxRate: 1.0878,
+        foreignCurrency: 'USD',
       });
     });
   });
