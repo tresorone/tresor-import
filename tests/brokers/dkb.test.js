@@ -190,6 +190,24 @@ describe('DKB broker', () => {
         tax: 2.18,
       });
     });
+
+    test('Should map the document correctly: 2020_data_deposit_box.json', () => {
+      const activities = dkb.parsePages(sellSamples[5]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Sell',
+        date: '2020-04-14',
+        datetime: '2020-04-14T' + activities[0].datetime.substring(11),
+        isin: 'CA2376321048',
+        company: 'DATA DEPOSIT BOX INC. REGISTERED SHARES O.N.',
+        shares: 1712,
+        price: 0.0081815562,
+        amount: 14.01,
+        fee: 10,
+        tax: 0,
+      });
+    });
   });
 
   describe('Dividend', () => {
