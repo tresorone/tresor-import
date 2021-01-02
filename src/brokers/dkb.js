@@ -235,13 +235,34 @@ const isDividend = textArr =>
       t.includes('Ausschüttung Investmentfonds')
   );
 
+const detectedButIgnoredDocument = content => {
+  return (
+    // When the document contains one of the following lines, we want to ignore these document.
+    content.some(line => line.includes('Auftragsbestätigung')) ||
+    content.some(line => line.includes('Streichungsbestätigung')) ||
+    content.some(line => line.includes('Ausführungsanzeige'))
+  );
+};
+
 export const canParseFirstPage = (content, extension) =>
   extension === 'pdf' &&
-  content.some(line => line.includes('BIC BYLADEM1001')) &&
-  (isBuy(content) || isSell(content) || isDividend(content));
+  (content.some(line => line.includes('BIC BYLADEM1001')) ||
+    content[0] === '10919 Berlin') &&
+  (isBuy(content) ||
+    isSell(content) ||
+    isDividend(content) ||
+    detectedButIgnoredDocument(content));
 
 export const parsePages = pages => {
   const firstPage = pages[0];
+
+  if (detectedButIgnoredDocument(pages.flat())) {
+    // We know this type and we don't want to support it.
+    return {
+      activities: [],
+      status: 7,
+    };
+  }
 
   let type,
     amount,
@@ -252,6 +273,7 @@ export const parsePages = pages => {
     fxRate,
     foreignCurrency,
     baseCurrency;
+
   const pieceIdx = firstPage.findIndex(t => t.includes('Stück'));
   const isinIdx = findISINIdx(firstPage, pieceIdx);
   const isin = firstPage[isinIdx];
