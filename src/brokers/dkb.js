@@ -30,8 +30,34 @@ const findCompany = (textArr, pieceIdx, isinIdx) =>
     .join(' ')
     .trim();
 
-const findDateBuySell = textArr =>
-  getValueByPreviousElement(textArr, 'Schlusstag').split(' ')[0];
+const findDateBuySell = content => {
+  // Use normaly the closing date for market orders.
+  let dateLine = getValueByPreviousElement(content, 'Schlusstag');
+
+  if (dateLine === '') {
+    // Sometimes a currency fx rate has a givven date:
+    // Devisenkursdatum
+    // 10.03.2016
+    dateLine = getValueByPreviousElement(content, 'Devisenkursdatum');
+  }
+
+  if (dateLine === '') {
+    // Sometimes a date is set in the currency fx rate line:
+    // Devisenkurs (EUR/CAD) 1,5268 vom 14.04.2020
+    const lineIndex = content.findIndex(line => line.includes('Devisenkurs '));
+    const regex = /(\d{2}\.\d{2}\.\d{4})/;
+    if (lineIndex > 0 && regex.test(content[lineIndex])) {
+      dateLine = regex.exec(content[lineIndex])[0];
+    }
+  }
+
+  if (dateLine === '') {
+    // Last one: Get the date of the document. This is not the real order date but it's better than nothing.
+    dateLine = getValueByPreviousElement(content, 'Datum');
+  }
+
+  return dateLine.split(' ')[0];
+};
 
 const findTimeBuySell = content => {
   const lineContent = getValueByPreviousElement(content, '-Zeit');
