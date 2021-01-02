@@ -121,10 +121,29 @@ const findShares = (textArr, startLineNumber) => {
   );
 };
 
-const findPrice = (textArr, startLineNumber) =>
-  parseGermanNum(
-    getTableValueByKey(textArr, startLineNumber, 'Kurs').split(' ')[0]
-  );
+const findPrice = (content, startLineNumber) => {
+  const lineValue = getTableValueByKey(content, startLineNumber, 'Kurs');
+  if (!lineValue) {
+    return undefined;
+  }
+
+  return Big(parseGermanNum(lineValue));
+};
+
+const findPriceCurrency = (content, startLineNumber) => {
+  const lineValue = getTableValueByKey(content, startLineNumber, 'Kurs', 2);
+  if (!lineValue) {
+    return undefined;
+  }
+
+  const currency = lineValue.split(/\s+/)[0];
+  if (!/[A-Z]{3}/.test(currency)) {
+    // This can't be the ISO currency code. Better safe than sorry...
+    return undefined;
+  }
+
+  return currency;
+};
 
 const findAmount = (textArr, startLineNumber) =>
   parseGermanNum(
@@ -285,9 +304,14 @@ const findForeignInformation = (content, startLineNumber) => {
     return [undefined, undefined, undefined];
   }
 
+  let foreignCurrency = grossValueByGroupIndex(content, startLineNumber, 2);
+  if (foreignCurrency === undefined) {
+    foreignCurrency = findPriceCurrency(content, startLineNumber);
+  }
+
   return [
     Big(parseGermanNum(fxRate)),
-    grossValueByGroupIndex(content, startLineNumber, 2),
+    foreignCurrency,
     getTableValueByKey(content, startLineNumber, 'Endbetrag', 2),
   ];
 };
@@ -325,7 +349,8 @@ const parsePage = (textArr, startLineNumber) => {
     isin = findISIN(textArr, startLineNumber),
     company = findCompany(textArr, startLineNumber),
     shares = findShares(textArr, startLineNumber),
-    price,
+    price = findPrice(textArr, startLineNumber),
+    priceCurrency = findPriceCurrency(textArr, startLineNumber),
     amount,
     fee,
     tax,
@@ -333,12 +358,16 @@ const parsePage = (textArr, startLineNumber) => {
     foreignCurrency,
     baseCurrency;
 
+  [fxRate, foreignCurrency, baseCurrency] = findForeignInformation(
+    textArr,
+    startLineNumber
+  );
+
   if (lineContains(textArr, startLineNumber, 'Kauf')) {
     type = 'Buy';
     date = findDateBuySell(textArr, startLineNumber);
     time = findOrderTime(textArr, startLineNumber);
     amount = findAmount(textArr, startLineNumber);
-    price = findPrice(textArr, startLineNumber);
     fee = findFee(textArr, startLineNumber);
     tax = 0;
   } else if (lineContains(textArr, startLineNumber, 'Verkauf')) {
@@ -346,19 +375,12 @@ const parsePage = (textArr, startLineNumber) => {
     date = findDateBuySell(textArr, startLineNumber);
     time = findOrderTime(textArr, startLineNumber);
     amount = findAmount(textArr, startLineNumber);
-    price = findPrice(textArr, startLineNumber);
     fee = findFee(textArr, startLineNumber);
     tax = findTax(textArr, startLineNumber);
   } else if (
     lineContains(textArr, startLineNumber - 3, 'Dividendengutschrift') ||
     lineContains(textArr, startLineNumber - 3, 'Ertragsmitteilung')
   ) {
-    // Currenly we only have mock files from dividends with foreign informations.
-    [fxRate, foreignCurrency, baseCurrency] = findForeignInformation(
-      textArr,
-      startLineNumber
-    );
-
     const grossPayout = findPayout(
       textArr,
       startLineNumber,
@@ -371,11 +393,24 @@ const parsePage = (textArr, startLineNumber) => {
     type = 'Dividend';
     date = findDateDividend(textArr, startLineNumber);
     amount = +grossPayout;
-    price = +grossPayout.div(shares);
+    price = grossPayout.div(shares);
     fee = 0;
 
     // A possible tax amount lower than 0.00 should be ignored because this can be a number ceiling issue with fxrate conversion
     tax = Math.abs(taxAmount) < 0.01 ? 0 : taxAmount;
+  }
+
+  const canConvertCurrency =
+    fxRate !== undefined &&
+    foreignCurrency !== undefined &&
+    foreignCurrency != baseCurrency;
+  if (
+    priceCurrency !== undefined &&
+    canConvertCurrency &&
+    (type === 'Buy' || type === 'Sell')
+  ) {
+    // For buy and sell documents we need to convert the currency to the base currency (when possible).
+    price = price.div(fxRate);
   }
 
   [date, datetime] = createActivityDateTime(date, time);
@@ -388,17 +423,13 @@ const parsePage = (textArr, startLineNumber) => {
     isin,
     company,
     shares,
-    price,
+    price: +price,
     amount,
     fee,
     tax,
   };
 
-  if (
-    fxRate !== undefined &&
-    foreignCurrency !== undefined &&
-    foreignCurrency != baseCurrency
-  ) {
+  if (canConvertCurrency) {
     activity.fxRate = +fxRate;
     activity.foreignCurrency = foreignCurrency;
   }
