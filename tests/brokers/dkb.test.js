@@ -1,11 +1,15 @@
 import { findImplementation } from '../../src';
 import * as dkb from '../../src/brokers/dkb';
-import { buySamples, sellSamples, dividendsSamples } from './__mocks__/dkb';
+import {
+  buySamples,
+  sellSamples,
+  dividendsSamples,
+  ignoredSamples,
+  allSamples,
+} from './__mocks__/dkb';
 
 describe('DKB broker', () => {
   let consoleErrorSpy;
-
-  const allSamples = buySamples.concat(sellSamples).concat(dividendsSamples);
 
   describe('Check all documents', () => {
     test('Can the document parsed with DKB', () => {
@@ -289,6 +293,29 @@ describe('DKB broker', () => {
         fxRate: 1.0878,
         foreignCurrency: 'USD',
       });
+    });
+  });
+
+  describe('Validate all ignored statements', () => {
+    test('The statement should be ignored: order_confirmation.json', () => {
+      const result = dkb.parsePages(ignoredSamples[0]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('The statement should be ignored: order_cancelation.json', () => {
+      const result = dkb.parsePages(ignoredSamples[1]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('The statement should be ignored: execution_information.json', () => {
+      const result = dkb.parsePages(ignoredSamples[2]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
     });
   });
 

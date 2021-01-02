@@ -20,3 +20,15 @@ export const dividendsSamples = [
   require('./dividend/dividend_taxed_usd_3.json'),
   require('./dividend/dividend_taxed_usd_4.json'),
 ];
+
+export const ignoredSamples = [
+  require('./ignore/order_confirmation.json'),
+  require('./ignore/order_cancelation.json'),
+  require('./ignore/execution_information.json'),
+];
+
+export const allSamples = buySamples.concat(
+  sellSamples,
+  dividendsSamples,
+  ignoredSamples
+);
