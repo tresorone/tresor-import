@@ -241,10 +241,16 @@ const findPayout = (textArr, startLineNumber, fxRate, foreignCurrency) => {
   const payoutAmount = Big(
     parseGermanNum(grossValueByGroupIndex(textArr, startLineNumber, 1))
   );
-  const payoutCurrency = grossValueByGroupIndex(textArr, startLineNumber, 2);
 
-  if (foreignCurrency === undefined || foreignCurrency !== payoutCurrency) {
+  if (foreignCurrency === undefined) {
+    // When no foreign currency is set no conversion is required.
     return payoutAmount;
+  }
+
+  const payoutCurrency = grossValueByGroupIndex(textArr, startLineNumber, 2);
+  if (foreignCurrency !== payoutCurrency) {
+    // The payout currency (e.g. USD) is unequal to the fxRate currency (e.g. CAD). No conversion is required.
+    throw new Error('Unable to convert the payout currency ' + payoutCurrency + ' with the fx rate of currency ' + foreignCurrency);
   }
 
   return payoutAmount.div(fxRate);
