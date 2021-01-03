@@ -19,6 +19,7 @@ export const dividendsSamples = [
   require('./dividend/dividend_taxed_usd_2.json'),
   require('./dividend/dividend_taxed_usd_3.json'),
   require('./dividend/dividend_taxed_usd_4.json'),
+  require('./dividend/2020_deutsche_telekom.json'),
 ];
 
 export const ignoredSamples = [

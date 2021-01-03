@@ -248,7 +248,7 @@ describe('DKB broker', () => {
         isin: 'US5949181045',
         company: 'MICROSOFT CORP. REGISTERED SHARES DL-,00000625',
         shares: 5,
-        price: 0.32599999999999996,
+        price: 0.326,
         amount: 1.63,
         fee: 0,
         tax: 0.24,
@@ -275,6 +275,7 @@ describe('DKB broker', () => {
         foreignCurrency: 'USD',
       });
     });
+
     test('should map pdf data of sample 4 correctly', () => {
       const activities = dkb.parsePages(dividendsSamples[3]).activities;
 
@@ -292,6 +293,24 @@ describe('DKB broker', () => {
         tax: 0.83,
         fxRate: 1.0878,
         foreignCurrency: 'USD',
+      });
+    });
+
+    test('Should map the document correctly: 2020_deutsche_telekom.json', () => {
+      const activities = dkb.parsePages(dividendsSamples[4]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Dividend',
+        date: '2020-06-24',
+        datetime: '2020-06-24T' + activities[0].datetime.substring(11),
+        isin: 'DE0005557508',
+        company: 'DEUTSCHE TELEKOM AG NAMENS-AKTIEN O.N.',
+        shares: 32,
+        price: 0.6,
+        amount: 19.2,
+        fee: 0,
+        tax: 0,
       });
     });
   });
