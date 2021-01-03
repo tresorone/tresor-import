@@ -9,16 +9,14 @@ describe('DKB broker', () => {
 
   describe('Check all documents', () => {
     test('Can the document parsed with DKB', () => {
-      allSamples.forEach(samples => {
-        expect(
-          samples.some(item => dkb.canParseFirstPage(item, 'pdf'))
-        ).toEqual(true);
+      allSamples.forEach(pages => {
+        expect(dkb.canParseDocument(pages, 'pdf')).toEqual(true);
       });
     });
 
     test('Can identify a implementation from the document as DKB', () => {
-      allSamples.forEach(samples => {
-        const implementations = findImplementation(samples, 'pdf');
+      allSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'pdf');
 
         expect(implementations.length).toEqual(1);
         expect(implementations[0]).toEqual(dkb);
@@ -188,6 +186,24 @@ describe('DKB broker', () => {
         amount: 2831.52,
         fee: 10,
         tax: 2.18,
+      });
+    });
+
+    test('Should map the document correctly: 2020_msci_world.json', () => {
+      const activities = dkb.parsePages(sellSamples[5]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Sell',
+        date: '2020-08-11',
+        datetime: '2020-08-11T07:44:24.000Z',
+        isin: 'LU0950674332',
+        company: 'UBS-ETF-MSCI WORLD SOC.RESP. NAMENS-ANTEILE A ACC. USD O.N.',
+        shares: 900,
+        price: 17.6,
+        amount: 15840,
+        fee: 25,
+        tax: 180.68,
       });
     });
   });

@@ -14,7 +14,7 @@ export const allImplementations = [
 export const findImplementation = (pages, extension) => {
   // The broker or app will be selected by the content of the first page
   return allImplementations.filter(implementation =>
-    implementation.canParseFirstPage(pages[0], extension)
+    implementation.canParseDocument(pages, extension)
   );
 };
 

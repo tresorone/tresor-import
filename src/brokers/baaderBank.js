@@ -248,12 +248,16 @@ const canParsePage = content =>
   isPageTypeSell(content) ||
   isPageTypeDividend(content);
 
-export const canParseFirstPage = (content, extension) =>
-  extension === 'pdf' &&
-  canParsePage(content) &&
-  (isBrokerGratisbroker(content) ||
-    isBrokerScalableCapital(content) ||
-    isBrokerOskar(content));
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
+  return (
+    extension === 'pdf' &&
+    canParsePage(firstPageContent) &&
+    (isBrokerGratisbroker(firstPageContent) ||
+      isBrokerScalableCapital(firstPageContent) ||
+      isBrokerOskar(firstPageContent))
+  );
+};
 
 const parsePage = content => {
   let type, date, time, isin, company, shares, price, amount, fee, tax;

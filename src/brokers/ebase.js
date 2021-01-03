@@ -145,15 +145,19 @@ const parseData = pdfPages => {
   return actions;
 };
 
-export const canParseFirstPage = (content, extension) =>
-  extension === 'pdf' &&
-  content.some(
-    line =>
-      line.includes('ebase Depot') ||
-      line.includes('finvesto Depot') ||
-      line.includes('VL-FondsDepot')
-  ) &&
-  content.some(line => line.includes('Fondsertrag / Vorabpauschale'));
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
+  return (
+    extension === 'pdf' &&
+    firstPageContent.some(
+      line =>
+        line.includes('ebase Depot') ||
+        line.includes('finvesto Depot') ||
+        line.includes('VL-FondsDepot')
+    ) &&
+    firstPageContent.some(line => line.includes('Fondsertrag / Vorabpauschale'))
+  );
+};
 
 export const parsePages = contents => {
   const activities = parseData(contents);

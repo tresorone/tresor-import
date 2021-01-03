@@ -239,19 +239,18 @@ const isOldBuy = pageArray => {
   return pageArray.some(line => line.includes('Kauf aus Wertpapierliste'));
 };
 
-export const canParseFirstPage = (pageArray, extension) => {
-  try {
-    const isErsteBankFile = pageArray
-      .join('')
-      .includes('ESTERREICHISCHENSPARKASSEN');
-    return (
-      extension === 'pdf' &&
-      (isBuy(pageArray) || isOldBuy(pageArray) || isDividend(pageArray)) &&
-      isErsteBankFile
-    );
-  } catch (TypeError) {
-    return false;
-  }
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
+  const isErsteBankFile = firstPageContent
+    .join('')
+    .includes('ESTERREICHISCHENSPARKASSEN');
+  return (
+    extension === 'pdf' &&
+    (isBuy(firstPageContent) ||
+      isOldBuy(firstPageContent) ||
+      isDividend(firstPageContent)) &&
+    isErsteBankFile
+  );
 };
 
 export const parsePages = content => {

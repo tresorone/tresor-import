@@ -309,24 +309,27 @@ const detectedButIgnoredDocument = content => {
   );
 };
 
-export const canParseFirstPage = (content, extension) => {
+export const canParseDocument = (pages, extension) => {
   if (extension !== 'pdf') {
     return false;
   }
+
+  const firstPageContent = pages[0];
+
   const isConsors =
-    content.some(
+    firstPageContent.some(
       line => line.toLowerCase && line.toLowerCase().includes('consorsbank')
-    ) || content[1] === 'POSTFACH 17 43';
+    ) || firstPageContent[1] === 'POSTFACH 17 43';
 
   if (!isConsors) {
     return false;
   }
 
   return (
-    isBuy(content) ||
-    isSell(content) ||
-    isDividend(content) ||
-    detectedButIgnoredDocument(content)
+    isBuy(firstPageContent) ||
+    isSell(firstPageContent) ||
+    isDividend(firstPageContent) ||
+    detectedButIgnoredDocument(firstPageContent)
   );
 };
 

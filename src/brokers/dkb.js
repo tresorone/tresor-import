@@ -166,40 +166,44 @@ const isDividend = textArr =>
       t.includes('Ausschüttung Investmentfonds')
   );
 
-export const canParseFirstPage = (content, extension) =>
-  extension === 'pdf' &&
-  content.some(line => line.includes('BIC BYLADEM1001')) &&
-  (isBuy(content) || isSell(content) || isDividend(content));
+export const canParseDocument = (pages, extension) => {
+  const allPages = pages.flat();
+  return (
+    extension === 'pdf' &&
+    allPages.some(line => line.includes('BIC BYLADEM1001')) &&
+    (isBuy(allPages) || isSell(allPages) || isDividend(allPages))
+  );
+};
 
 export const parsePages = pages => {
-  const firstPage = pages[0];
+  const allPages = pages.flat();
 
   let type, amount, price, date, time;
-  const pieceIdx = firstPage.findIndex(t => t.includes('Stück'));
-  const isinIdx = findISINIdx(firstPage, pieceIdx);
-  const isin = firstPage[isinIdx];
-  const company = findCompany(firstPage, pieceIdx, isinIdx);
-  const shares = findShares(firstPage, pieceIdx);
+  const pieceIdx = allPages.findIndex(t => t.includes('Stück'));
+  const isinIdx = findISINIdx(allPages, pieceIdx);
+  const isin = allPages[isinIdx];
+  const company = findCompany(allPages, pieceIdx, isinIdx);
+  const shares = findShares(allPages, pieceIdx);
   const fee = findFee(pages);
   const tax = findTax(pages);
 
-  if (isBuy(firstPage)) {
+  if (isBuy(allPages)) {
     type = 'Buy';
-    amount = findAmount(firstPage);
-    price = findPrice(firstPage);
-    date = findDateBuySell(firstPage);
-    time = findTimeBuySell(firstPage);
-  } else if (isSell(firstPage)) {
+    amount = findAmount(allPages);
+    price = findPrice(allPages);
+    date = findDateBuySell(allPages);
+    time = findTimeBuySell(allPages);
+  } else if (isSell(allPages)) {
     type = 'Sell';
-    amount = findAmount(firstPage);
-    price = findPrice(firstPage);
-    date = findDateBuySell(firstPage);
-    time = findTimeBuySell(firstPage);
-  } else if (isDividend(firstPage)) {
+    amount = findAmount(allPages);
+    price = findPrice(allPages);
+    date = findDateBuySell(allPages);
+    time = findTimeBuySell(allPages);
+  } else if (isDividend(allPages)) {
     type = 'Dividend';
-    amount = findPayout(firstPage);
+    amount = findPayout(allPages);
     price = amount / shares;
-    date = findDateDividend(firstPage);
+    date = findDateDividend(allPages);
   }
 
   const [parsedDate, parsedDateTime] = createActivityDateTime(

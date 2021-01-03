@@ -334,19 +334,23 @@ const findForeignInformation = (content, startLineNumber) => {
 const lineContains = (textArr, lineNumber, value) =>
   textArr[lineNumber].includes(value);
 
-export const canParseFirstPage = (content, extension) =>
-  extension === 'pdf' &&
-  content.some(
-    line =>
-      line.includes('flatex Bank AG') ||
-      line.includes('FinTech Group Bank AG') ||
-      line.includes('biw AG')
-  ) &&
-  (content.some(line => line.includes('Kauf')) ||
-    content.some(line => line.includes('Verkauf')) ||
-    content.some(line => line.includes('Dividendengutschrift')) ||
-    content.some(line => line.includes('Ertragsmitteilung')) ||
-    detectedButIgnoredDocument(content));
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
+  return (
+    extension === 'pdf' &&
+    firstPageContent.some(
+      line =>
+        line.includes('flatex Bank AG') ||
+        line.includes('FinTech Group Bank AG') ||
+        line.includes('biw AG')
+    ) &&
+    (firstPageContent.some(line => line.includes('Kauf')) ||
+      firstPageContent.some(line => line.includes('Verkauf')) ||
+      firstPageContent.some(line => line.includes('Dividendengutschrift')) ||
+      firstPageContent.some(line => line.includes('Ertragsmitteilung')) ||
+      detectedButIgnoredDocument(firstPageContent))
+  );
+};
 
 const detectedButIgnoredDocument = content => {
   return (

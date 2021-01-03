@@ -366,17 +366,23 @@ const detectedButIgnoredDocument = content => {
   );
 };
 
-export const canParseFirstPage = (content, extension) =>
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
   // The defining string used to be 'comdirect bank'. However, this string is
   // not present in every document; 'comdirect' is.
-  extension === 'pdf' &&
-  content.some(line => line.includes('comdirect')) &&
-  content.every(line => !line.includes(onvistaIdentificationString)) &&
-  (isBuy(content) ||
-    isSell(content) ||
-    isDividend(content) ||
-    isTaxinfoDividend(content) ||
-    detectedButIgnoredDocument(content));
+  return (
+    extension === 'pdf' &&
+    firstPageContent.some(line => line.includes('comdirect')) &&
+    firstPageContent.every(
+      line => !line.includes(onvistaIdentificationString)
+    ) &&
+    (isBuy(firstPageContent) ||
+      isSell(firstPageContent) ||
+      isDividend(firstPageContent) ||
+      isTaxinfoDividend(firstPageContent) ||
+      detectedButIgnoredDocument(firstPageContent))
+  );
+};
 
 const parseData = textArr => {
   let type,

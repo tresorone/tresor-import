@@ -16,16 +16,14 @@ describe('Broker: onvista', () => {
 
   describe('Check all documents', () => {
     test('Can the document parsed with onvista', () => {
-      allSamples.forEach(samples => {
-        expect(
-          samples.some(item => onvista.canParseFirstPage(item, 'pdf'))
-        ).toEqual(true);
+      allSamples.forEach(pages => {
+        expect(onvista.canParseDocument(pages, 'pdf')).toEqual(true);
       });
     });
 
     test('Can identify a implementation from the document as onvista', () => {
-      allSamples.forEach(samples => {
-        const implementations = findImplementation(samples, 'pdf');
+      allSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'pdf');
 
         expect(implementations.length).toEqual(1);
         expect(implementations[0]).toEqual(onvista);

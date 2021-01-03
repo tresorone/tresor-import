@@ -13,10 +13,8 @@ describe('Smartbroker broker test', () => {
 
   describe('Check all documents', () => {
     test('Can the document parsed with smartbroker', () => {
-      allSamples.forEach(sample => {
-        expect(
-          sample.some(item => smartbroker.canParseFirstPage(item, 'pdf'))
-        ).toEqual(true);
+      allSamples.forEach(pages => {
+        expect(smartbroker.canParseDocument(pages, 'pdf')).toEqual(true);
       });
     });
 
