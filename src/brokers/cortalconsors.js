@@ -222,10 +222,16 @@ const isDividend = content =>
       line.includes('ERTRAGSGUTSCHRIFT')
   );
 
-export const canParseFirstPage = (content, extension) =>
-  extension === 'pdf' &&
-  content.some(line => line.includes('Cortal Consors')) &&
-  (isBuy(content) || isSell(content) || isDividend(content));
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
+  return (
+    extension === 'pdf' &&
+    firstPageContent.some(line => line.includes('Cortal Consors')) &&
+    (isBuy(firstPageContent) ||
+      isSell(firstPageContent) ||
+      isDividend(firstPageContent))
+  );
+};
 
 const parseData = content => {
   let type, date, time, isin, wkn, company, shares, price, amount, fee, tax;

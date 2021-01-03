@@ -12,16 +12,14 @@ console.error = jest.fn();
 describe('Broker: Consorsbank', () => {
   describe('Check all documents', () => {
     test('Can the document parsed with Consorsbank', () => {
-      allSamples.forEach(samples => {
-        expect(
-          samples.some(item => consorsbank.canParseFirstPage(item, 'pdf'))
-        ).toEqual(true);
+      allSamples.forEach(pages => {
+        expect(consorsbank.canParseDocument(pages, 'pdf')).toEqual(true);
       });
     });
 
     test('Can identify a implementation from the document as Consorsbank', () => {
-      allSamples.forEach(samples => {
-        const implementations = findImplementation(samples, 'pdf');
+      allSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'pdf');
 
         expect(implementations.length).toEqual(1);
         expect(implementations[0]).toEqual(consorsbank);

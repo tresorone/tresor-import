@@ -113,12 +113,16 @@ const canParsePage = content =>
   onvista.isSell(content) ||
   onvista.isDividend(content);
 
-export const canParseFirstPage = (content, extension) =>
-  extension === 'pdf' &&
-  content.some(line =>
-    line.includes(onvista.smartbrokerIdentificationString)
-  ) &&
-  canParsePage(content);
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
+  return (
+    extension === 'pdf' &&
+    firstPageContent.some(line =>
+      line.includes(onvista.smartbrokerIdentificationString)
+    ) &&
+    canParsePage(firstPageContent)
+  );
+};
 
 const parseData = textArr => {
   const broker = 'smartbroker';

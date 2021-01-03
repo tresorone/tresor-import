@@ -14,16 +14,14 @@ describe('Broker: ING', () => {
 
   describe('Check all documents', () => {
     test('Can the document parsed with ING', () => {
-      allSamples.forEach(samples => {
-        expect(
-          samples.some(item => ing.canParseFirstPage(item, 'pdf'))
-        ).toEqual(true);
+      allSamples.forEach(pages => {
+        expect(ing.canParseDocument(pages, 'pdf')).toEqual(true);
       });
     });
 
     test('Can identify a implementation from the document as ING', () => {
-      allSamples.forEach(samples => {
-        const implementations = findImplementation(samples, 'pdf');
+      allSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'pdf');
 
         expect(implementations.length).toEqual(1);
         expect(implementations[0]).toEqual(ing);
@@ -31,8 +29,8 @@ describe('Broker: ING', () => {
     });
 
     test('Should not identify ing as broker if ing BIC is not present', () => {
-      invalidSamples.forEach(samples => {
-        const implementations = findImplementation(samples, 'pdf');
+      invalidSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'pdf');
 
         expect(implementations.length).toEqual(0);
       });

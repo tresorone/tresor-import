@@ -261,17 +261,21 @@ const detectedButIgnoredDocument = content => {
   );
 };
 
-export const canParseFirstPage = (content, extension) =>
-  extension === 'pdf' &&
-  (content.some(line => line.includes('BIC BYLADEM1001')) ||
-    content[0] === '10919 Berlin') &&
-  (isBuy(content) ||
-    isSell(content) ||
-    isDividend(content) ||
-    detectedButIgnoredDocument(content));
+export const canParseDocument = (pages, extension) => {
+  const allPages = pages.flat();
+  return (
+    extension === 'pdf' &&
+    (allPages.some(line => line.includes('BIC BYLADEM1001')) ||
+      allPages[0] === '10919 Berlin') &&
+    (isBuy(allPages) ||
+      isSell(allPages) ||
+      isDividend(allPages) ||
+      detectedButIgnoredDocument(allPages))
+  );
+};
 
 export const parsePages = pages => {
-  const firstPage = pages[0];
+  const allPages = pages.flat();
 
   if (detectedButIgnoredDocument(pages.flat())) {
     // We know this type and we don't want to support it.
@@ -291,41 +295,41 @@ export const parsePages = pages => {
     foreignCurrency,
     baseCurrency;
 
-  const pieceIdx = firstPage.findIndex(t => t.includes('Stück'));
-  const isinIdx = findISINIdx(firstPage, pieceIdx);
-  const isin = firstPage[isinIdx];
-  const company = findCompany(firstPage, pieceIdx, isinIdx);
-  const shares = findShares(firstPage, pieceIdx);
+  const pieceIdx = allPages.findIndex(t => t.includes('Stück'));
+  const isinIdx = findISINIdx(allPages, pieceIdx);
+  const isin = allPages[isinIdx];
+  const company = findCompany(allPages, pieceIdx, isinIdx);
+  const shares = findShares(allPages, pieceIdx);
   const fee = findFee(pages);
   const tax = findTax(pages);
 
-  [fxRate, foreignCurrency, baseCurrency] = findForeignInformation(firstPage);
+  [fxRate, foreignCurrency, baseCurrency] = findForeignInformation(allPages);
 
   const canConvertCurrency =
     fxRate !== undefined &&
     foreignCurrency !== undefined &&
     foreignCurrency != baseCurrency;
 
-  if (isBuy(firstPage)) {
+  if (isBuy(allPages)) {
     type = 'Buy';
-    amount = findAmount(firstPage);
-    price = findPrice(firstPage);
-    priceCurrency = findPriceCurrency(firstPage);
-    date = findDateBuySell(firstPage);
-    time = findTimeBuySell(firstPage);
-  } else if (isSell(firstPage)) {
+    amount = findAmount(allPages);
+    price = findPrice(allPages);
+    priceCurrency = findPriceCurrency(allPages);
+    date = findDateBuySell(allPages);
+    time = findTimeBuySell(allPages);
+  } else if (isSell(allPages)) {
     type = 'Sell';
-    amount = findAmount(firstPage);
-    price = findPrice(firstPage);
-    priceCurrency = findPriceCurrency(firstPage);
-    date = findDateBuySell(firstPage);
-    time = findTimeBuySell(firstPage);
-  } else if (isDividend(firstPage)) {
-    const payout = findPayout(firstPage, baseCurrency);
+    amount = findAmount(allPages);
+    price = findPrice(allPages);
+    priceCurrency = findPriceCurrency(allPages);
+    date = findDateBuySell(allPages);
+    time = findTimeBuySell(allPages);
+  } else if (isDividend(allPages)) {
+    const payout = findPayout(allPages, baseCurrency);
     type = 'Dividend';
     amount = +payout;
     price = +payout.div(shares);
-    date = findDateDividend(firstPage);
+    date = findDateDividend(allPages);
   }
 
   const [parsedDate, parsedDateTime] = createActivityDateTime(

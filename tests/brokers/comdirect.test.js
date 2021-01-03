@@ -15,16 +15,14 @@ describe('Broker: comdirect', () => {
 
   describe('Check all documents', () => {
     test('Can one page parsed with comdirect', () => {
-      allSamples.forEach(samples => {
-        expect(
-          samples.some(item => comdirect.canParseFirstPage(item, 'pdf'))
-        ).toEqual(true);
+      allSamples.forEach(pages => {
+        expect(comdirect.canParseDocument(pages, 'pdf')).toEqual(true);
       });
     });
 
     test('Can identify a broker from one page as comdirect', () => {
-      allSamples.forEach(samples => {
-        const implementations = findImplementation(samples, 'pdf');
+      allSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'pdf');
 
         expect(implementations.length).toEqual(1);
         expect(implementations[0]).toEqual(comdirect);

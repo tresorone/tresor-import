@@ -67,11 +67,17 @@ const isDividend = textArr =>
       t.includes('Ausschüttung Investmentfonds')
   );
 
-export const canParseFirstPage = (content, extension) =>
-  extension === 'pdf' &&
-  (content.some(line => line.includes('BIC PBNKDEFFXXX')) ||
-    content.some(line => line.includes('Postbank'))) &&
-  (isBuy(content) || isSell(content) || isDividend(content));
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
+  return (
+    extension === 'pdf' &&
+    (firstPageContent.some(line => line.includes('BIC PBNKDEFFXXX')) ||
+      firstPageContent.some(line => line.includes('Postbank'))) &&
+    (isBuy(firstPageContent) ||
+      isSell(firstPageContent) ||
+      isDividend(firstPageContent))
+  );
+};
 
 const parseData = textArr => {
   let type, date, isin, company, shares, price, amount, fee, tax;

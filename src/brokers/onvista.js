@@ -175,12 +175,22 @@ const findPayout = text => {
   return parseGermanNum(amount);
 };
 
-export const canParseFirstPage = (content, extension) =>
-  extension === 'pdf' &&
-  ((content.some(line => line.includes(onvistaIdentificationString)) &&
-    !content.some(line => line.includes(smartbrokerIdentificationString))) ||
-    (content.some(line => line.includes('Webtrading onvista bank')) &&
-      detectedButIgnoredDocument(content)));
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
+  return (
+    extension === 'pdf' &&
+    ((firstPageContent.some(line =>
+      line.includes(onvistaIdentificationString)
+    ) &&
+      !firstPageContent.some(line =>
+        line.includes(smartbrokerIdentificationString)
+      )) ||
+      (firstPageContent.some(line =>
+        line.includes('Webtrading onvista bank')
+      ) &&
+        detectedButIgnoredDocument(firstPageContent)))
+  );
+};
 
 export const isBuy = content =>
   content.some(line => line.includes('Wir haben für Sie gekauft'));

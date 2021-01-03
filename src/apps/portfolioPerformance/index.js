@@ -117,31 +117,33 @@ const validate = activity => {
   return [activity];
 };
 
-export const canParseFirstPage = (content, extension) =>
+export const canParseDocument = (pages, extension) =>
   extension === 'csv' &&
-  content.some(
-    line =>
-      (line.includes('Datum') &&
-        line.includes('Typ') &&
-        line.includes('Wert') &&
-        line.includes('Buchungswährung') &&
-        line.includes('Steuern') &&
-        line.includes('Stück') &&
-        line.includes('ISIN') &&
-        line.includes('WKN') &&
-        line.includes('Ticker-Symbol') &&
-        line.includes('Wertpapiername')) ||
-      (line.includes('Date') &&
-        line.includes('Type') &&
-        line.includes('Value') &&
-        line.includes('Transaction Currency') &&
-        line.includes('Taxes') &&
-        line.includes('Shares') &&
-        line.includes('ISIN') &&
-        line.includes('WKN') &&
-        line.includes('Ticker Symbol') &&
-        line.includes('Security Name'))
-  );
+  pages
+    .flat()
+    .some(
+      line =>
+        (line.includes('Datum') &&
+          line.includes('Typ') &&
+          line.includes('Wert') &&
+          line.includes('Buchungswährung') &&
+          line.includes('Steuern') &&
+          line.includes('Stück') &&
+          line.includes('ISIN') &&
+          line.includes('WKN') &&
+          line.includes('Ticker-Symbol') &&
+          line.includes('Wertpapiername')) ||
+        (line.includes('Date') &&
+          line.includes('Type') &&
+          line.includes('Value') &&
+          line.includes('Transaction Currency') &&
+          line.includes('Taxes') &&
+          line.includes('Shares') &&
+          line.includes('ISIN') &&
+          line.includes('WKN') &&
+          line.includes('Ticker Symbol') &&
+          line.includes('Security Name'))
+    );
 
 export const parsePages = content => {
   if (content.length === 0) {
