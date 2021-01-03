@@ -129,13 +129,29 @@ const findFee = pages => {
 const findDateDividend = textArr =>
   getValueByPreviousElement(textArr, 'Zahlbarkeitstag').split(' ')[0];
 
-const findPayout = textArr => {
-  let index = textArr.indexOf('Ausschüttung');
-  if (index < 0) index = textArr.lastIndexOf('Dividendengutschrift');
-  const currency = textArr[index + 2];
-  const eurAmount =
-    currency === 'EUR' ? textArr[index + 1] : textArr[index + 3];
-  return parseGermanNum(eurAmount.split(' ')[0]);
+const findPayout = (content, baseCurrency) => {
+  let payoutLineIndex = content.indexOf('Ausschüttung');
+  if (payoutLineIndex < 0) {
+    // Some documents have the payout amount after the last:
+    // Dividendengutschrift
+    payoutLineIndex = content.lastIndexOf('Dividendengutschrift');
+  }
+
+  if (payoutLineIndex < 0) {
+    // Some documents have the payout amount after:
+    // Dividendengutschrift nach § 27 KStG
+    payoutLineIndex = content.findIndex(line =>
+      line.includes('Dividendengutschrift')
+    );
+  }
+
+  const currencyLine = content[payoutLineIndex + 2];
+  const payout =
+    currencyLine === baseCurrency
+      ? content[payoutLineIndex + 1]
+      : content[payoutLineIndex + 3];
+
+  return Big(parseGermanNum(payout.split(/\s+/)[0]));
 };
 
 const findTax = pages => {
@@ -304,9 +320,10 @@ export const parsePages = pages => {
     date = findDateBuySell(firstPage);
     time = findTimeBuySell(firstPage);
   } else if (isDividend(firstPage)) {
+    const payout = findPayout(firstPage, baseCurrency);
     type = 'Dividend';
-    amount = findPayout(firstPage);
-    price = amount / shares;
+    amount = +payout;
+    price = +payout.div(shares);
     date = findDateDividend(firstPage);
   }
 
