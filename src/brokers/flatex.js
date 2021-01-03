@@ -239,6 +239,7 @@ const findDateDividend = (textArr, startLineNumber) => {
 
 const findPayout = (textArr, startLineNumber, fxRate, foreignCurrency) => {
   const payoutAmount = Big(
+    // Use groupIndex 1 for the amount.
     parseGermanNum(grossValueByGroupIndex(textArr, startLineNumber, 1))
   );
 
@@ -247,10 +248,16 @@ const findPayout = (textArr, startLineNumber, fxRate, foreignCurrency) => {
     return payoutAmount;
   }
 
+  // Use groupIndex 2 for the currency.
   const payoutCurrency = grossValueByGroupIndex(textArr, startLineNumber, 2);
   if (foreignCurrency !== payoutCurrency) {
     // The payout currency (e.g. USD) is unequal to the fxRate currency (e.g. CAD). No conversion is required.
-    throw new Error('Unable to convert the payout currency ' + payoutCurrency + ' with the fx rate of currency ' + foreignCurrency);
+    throw new Error(
+      'Unable to convert the payout currency ' +
+        payoutCurrency +
+        ' with the fx rate of currency ' +
+        foreignCurrency
+    );
   }
 
   return payoutAmount.div(fxRate);
@@ -291,6 +298,7 @@ const grossValueByGroupIndex = (content, startLineNumber, groupIndex) => {
   return undefined;
 };
 
+// This function returns an array with: fxRate, foreignCurrency, baseCurrency (or undefined).
 const findForeignInformation = (content, startLineNumber) => {
   let fxRate = getTableValueByKey(content, startLineNumber, 'Devisenkurs', 1);
 
@@ -310,6 +318,7 @@ const findForeignInformation = (content, startLineNumber) => {
     return [undefined, undefined, undefined];
   }
 
+  // Use groupIndex 2 for the currency.
   let foreignCurrency = grossValueByGroupIndex(content, startLineNumber, 2);
   if (foreignCurrency === undefined) {
     foreignCurrency = findPriceCurrency(content, startLineNumber);
