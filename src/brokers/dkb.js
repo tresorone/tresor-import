@@ -198,6 +198,7 @@ const findTax = pages => {
   return +totalTax;
 };
 
+// This function returns an array with: fxRate, foreignCurrency, baseCurrency (or undefined).
 const findForeignInformation = content => {
   let fxRate, foreignCurrency, baseCurrency;
 
