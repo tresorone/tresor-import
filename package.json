@@ -7,15 +7,16 @@
   ],
   "main": "dist/tresor-import.js",
   "scripts": {
-    "build": "./node_modules/.bin/webpack --config=webpack.build.js",
+    "build": "webpack --config=webpack.build.js",
     "watch": "npm run dev",
-    "dev": "./node_modules/.bin/webpack --config=webpack.dev.js",
+    "dev": "webpack --config=webpack.dev.js",
     "demo": "serve demo",
     "prepare": "npm run build",
     "start": "concurrently --kill-others \"npm run demo\" \"npm run dev\"",
     "test": "jest --verbose",
     "lint": "eslint .",
-    "precommit": "pretty-quick --staged --no-restage && npm run lint && npm t"
+    "format-staged": "pretty-quick --staged --no-restage",
+    "precommit": "npm run format-staged && npm run lint && npm t"
   },
   "keywords": [
     "tresor",

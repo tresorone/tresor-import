@@ -3,12 +3,14 @@ import pdfjs from 'pdfjs-dist/build/pdf';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 import * as brokers from './brokers';
 import * as apps from './apps';
+import * as p2p from './p2p';
 
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 export const allImplementations = [
   ...Object.values(brokers),
   ...Object.values(apps),
+  ...Object.values(p2p),
 ];
 
 export const findImplementation = (pages, extension) => {

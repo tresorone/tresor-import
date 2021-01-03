@@ -21,17 +21,20 @@ export function csvLinesToJSON(content, trimAndSplit = false) {
   // to deal with those before doing the next step
   // (you might convert them to &&& or something, then covert them back later)
   // jsfiddle showing the issue https://jsfiddle.net/
-  let headers = lines[0].split(';');
+  let firstLine = lines[0];
+  let delim = (countString(firstLine, ";") < countString(firstLine, ",")) ? "," : ";";
+  let headers = lines[0].split(delim);
 
   for (let i = 1; i < lines.length; i++) {
     let obj = {};
-    const currentline = lines[i].split(';');
+    const currentline = lines[i].split(delim);
 
     for (let j = 0; j < headers.length; j++) {
       // Some .csv files contains leading/trailing " and spaces. We need to replace the double quote at the beginning an
       // the end to get the real value. E.g.: Value for a Starbucks WKN was in a .csv file "884437 ". T1 was unable to
       // found the Holding by WKN because of the double quote. Also we need to trim spaces.
 
+      headers[j] = headers[j].replace(/["]/g, "");
       if (currentline[j] === undefined) {
         obj[headers[j]] = undefined;
         continue;
@@ -44,6 +47,10 @@ export function csvLinesToJSON(content, trimAndSplit = false) {
   }
 
   return JSON.stringify(result);
+}
+
+export function countString(str, substr) {
+	return str.split(substr).length - 1;
 }
 
 export function parseGermanNum(n) {

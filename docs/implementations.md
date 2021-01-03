@@ -7,7 +7,7 @@ For the following brokers and apps we are ready to parse the following documents
 | Consorsbank            | Buy, Sell, Dividend                      |                                                                                    |
 | Degiro (DE)            | Transaction log                          |                                                                                    |
 | DKB                    | Buy, Sell, Dividend                      |                                                                                    |
-| ebase                  | Transaction log                          | Currenlty only the `.pdf` documents                                                |
+| ebase                  | Transaction log                          | Currently only the `.pdf` documents                                                |
 | Erste Bank (AT)        | Buy, Sell, Dividend                      |                                                                                    |
 | flatex / FinTech Group | Buy, Sell, Dividend                      |                                                                                    |
 | Gratisbroker           | Buy, Sell, Dividend                      |                                                                                    |
