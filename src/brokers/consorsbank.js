@@ -215,8 +215,9 @@ const findFee = content => {
   const bonificationIdx = content.findIndex(line =>
     line.startsWith('BONIFIKAT')
   );
+
   let feeIssue = 0;
-  if (content.indexOf('Ausgabegebühr 0,00%') <= 0) {
+  if (!content.some(line => line.includes('Ausgabegebühr 0,00%'))) {
     feeIssue = getNumberAfterTermWithOffset(content, 'ausgabegebühr');
   }
 
