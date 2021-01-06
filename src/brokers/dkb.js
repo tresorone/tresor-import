@@ -233,51 +233,56 @@ const findForeignInformation = content => {
 
 // Saving plan summaries require a completely different logic to individual activity documents
 const parseSavingsplan = content => {
-  return content
-}
+  return content;
+};
 
 // Return which type of DKB document the given file is: Buy, Sell, Dividend, Savingsplan, an unsupported DKB file, or
 // none of the above (undefined)
 const getDocumentType = content => {
-  if (content.some(
+  if (
+    content.some(
       t =>
-          t.includes('Wertpapier Abrechnung Kauf') ||
-          t.includes('Wertpapier Abrechnung Ausgabe Investmentfonds')
-  )) {
-    return 'Buy'
-  } else if (content.some(
+        t.includes('Wertpapier Abrechnung Kauf') ||
+        t.includes('Wertpapier Abrechnung Ausgabe Investmentfonds')
+    )
+  ) {
+    return 'Buy';
+  } else if (
+    content.some(
       t =>
-          t.includes('Wertpapier Abrechnung Verkauf') ||
-          t.includes('Wertpapier Abrechnung Rücknahme')
-  )) {
-    return 'Sell'
-  } else if (content.some(
+        t.includes('Wertpapier Abrechnung Verkauf') ||
+        t.includes('Wertpapier Abrechnung Rücknahme')
+    )
+  ) {
+    return 'Sell';
+  } else if (
+    content.some(
       t =>
-          t.includes('Dividendengutschrift') ||
-          t.includes('Ausschüttung Investmentfonds')
-  )) {
-    return 'Dividend'
+        t.includes('Dividendengutschrift') ||
+        t.includes('Ausschüttung Investmentfonds')
+    )
+  ) {
+    return 'Dividend';
   } else if (content.includes('Im Abrechnungszeitraum angelegter Betrag')) {
-    return 'Savingsplan'
+    return 'Savingsplan';
   }
   // When the document contains one of the following lines, we want to ignore these document.
   else if (
-      content.some(line => line.includes('Auftragsbestätigung')) ||
-      content.some(line => line.includes('Streichungsbestätigung')) ||
-      content.some(line => line.includes('Ausführungsanzeige'))
+    content.some(line => line.includes('Auftragsbestätigung')) ||
+    content.some(line => line.includes('Streichungsbestätigung')) ||
+    content.some(line => line.includes('Ausführungsanzeige'))
   ) {
-    return 'Unsupported'
+    return 'Unsupported';
   }
-}
-
+};
 
 export const canParseDocument = (pages, extension) => {
   const allPages = pages.flat();
   return (
-    extension === 'pdf' &&
-    ((allPages.some(line => line.includes('BIC BYLADEM1001')) ||
-      allPages[0] === '10919 Berlin') &&
-    getDocumentType(allPages) !== undefined) ||
+    (extension === 'pdf' &&
+      (allPages.some(line => line.includes('BIC BYLADEM1001')) ||
+        allPages[0] === '10919 Berlin') &&
+      getDocumentType(allPages) !== undefined) ||
     // This is the case for savings plan summaries, they don't contain the strings above.
     allPages.includes('Im Abrechnungszeitraum angelegter Betrag')
   );
@@ -298,7 +303,7 @@ export const parsePages = pages => {
       return {
         activities: parseSavingsplan(allPages),
         status: 0,
-      }
+      };
   }
 
   const pieceIdx = allPages.findIndex(t => t.includes('Stück'));
@@ -312,8 +317,13 @@ export const parsePages = pages => {
     shares: findShares(allPages, pieceIdx),
     fee: findFee(pages),
     tax: findTax(pages),
-  }
-  let priceCurrency, unparsedDate, unparsedTime, fxRate, foreignCurrency, baseCurrency
+  };
+  let priceCurrency,
+    unparsedDate,
+    unparsedTime,
+    fxRate,
+    foreignCurrency,
+    baseCurrency;
 
   [fxRate, foreignCurrency, baseCurrency] = findForeignInformation(allPages);
 
@@ -346,20 +356,22 @@ export const parsePages = pages => {
   }
 
   [activity.date, activity.datetime] = createActivityDateTime(
-      unparsedDate, unparsedTime,
-      'dd.MM.yyyy',
-      'dd.MM.yyyy HH:mm:ss'
+    unparsedDate,
+    unparsedTime,
+    'dd.MM.yyyy',
+    'dd.MM.yyyy HH:mm:ss'
   );
 
   if (canConvertCurrency) {
     activity.fxRate = +fxRate;
     activity.foreignCurrency = foreignCurrency;
 
-    if (priceCurrency !== undefined &&
-        ['Buy', 'Sell'].includes(activity.type)) {
+    if (
+      priceCurrency !== undefined &&
+      ['Buy', 'Sell'].includes(activity.type)
+    ) {
       // For buy and sell documents we need to convert the currency to the base currency (when possible).
       activity.price = +Big(activity.price).div(fxRate);
-
     }
   }
 
