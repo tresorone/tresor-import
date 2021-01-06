@@ -231,140 +231,136 @@ const findForeignInformation = content => {
   return [Big(parseGermanNum(fxRate)), foreignCurrency, baseCurrency];
 };
 
-const isBuy = textArr =>
-  textArr.some(
-    t =>
-      t.includes('Wertpapier Abrechnung Kauf') ||
-      t.includes('Wertpapier Abrechnung Ausgabe Investmentfonds')
-  );
+// Saving plan summaries require a completely different logic to individual activity documents
+const parseSavingsplan = content => {
+  return content
+}
 
-const isSell = textArr =>
-  textArr.some(
-    t =>
-      t.includes('Wertpapier Abrechnung Verkauf') ||
-      t.includes('Wertpapier Abrechnung Rücknahme')
-  );
+// Return which type of DKB document the given file is: Buy, Sell, Dividend, Savingsplan, an unsupported DKB file, or
+// none of the above (undefined)
+const getDocumentType = content => {
+  if (content.some(
+      t =>
+          t.includes('Wertpapier Abrechnung Kauf') ||
+          t.includes('Wertpapier Abrechnung Ausgabe Investmentfonds')
+  )) {
+    return 'Buy'
+  } else if (content.some(
+      t =>
+          t.includes('Wertpapier Abrechnung Verkauf') ||
+          t.includes('Wertpapier Abrechnung Rücknahme')
+  )) {
+    return 'Sell'
+  } else if (content.some(
+      t =>
+          t.includes('Dividendengutschrift') ||
+          t.includes('Ausschüttung Investmentfonds')
+  )) {
+    return 'Dividend'
+  } else if (content.includes('Im Abrechnungszeitraum angelegter Betrag')) {
+    return 'Savingsplan'
+  }
+  // When the document contains one of the following lines, we want to ignore these document.
+  else if (
+      content.some(line => line.includes('Auftragsbestätigung')) ||
+      content.some(line => line.includes('Streichungsbestätigung')) ||
+      content.some(line => line.includes('Ausführungsanzeige'))
+  ) {
+    return 'Unsupported'
+  }
+}
 
-const isDividend = textArr =>
-  textArr.some(
-    t =>
-      t.includes('Dividendengutschrift') ||
-      t.includes('Ausschüttung Investmentfonds')
-  );
-
-const detectedButIgnoredDocument = content => {
-  return (
-    // When the document contains one of the following lines, we want to ignore these document.
-    content.some(line => line.includes('Auftragsbestätigung')) ||
-    content.some(line => line.includes('Streichungsbestätigung')) ||
-    content.some(line => line.includes('Ausführungsanzeige'))
-  );
-};
 
 export const canParseDocument = (pages, extension) => {
   const allPages = pages.flat();
   return (
     extension === 'pdf' &&
-    (allPages.some(line => line.includes('BIC BYLADEM1001')) ||
+    ((allPages.some(line => line.includes('BIC BYLADEM1001')) ||
       allPages[0] === '10919 Berlin') &&
-    (isBuy(allPages) ||
-      isSell(allPages) ||
-      isDividend(allPages) ||
-      detectedButIgnoredDocument(allPages))
+    getDocumentType(allPages) !== undefined) ||
+    // This is the case for savings plan summaries, they don't contain the strings above.
+    allPages.includes('Im Abrechnungszeitraum angelegter Betrag')
   );
 };
 
 export const parsePages = pages => {
   const allPages = pages.flat();
+  const typeOfDocument = getDocumentType(allPages);
 
-  if (detectedButIgnoredDocument(pages.flat())) {
-    // We know this type and we don't want to support it.
-    return {
-      activities: [],
-      status: 7,
-    };
+  switch (typeOfDocument) {
+    case 'Unsupported':
+      // We know this type and we don't want to support it.
+      return {
+        activities: [],
+        status: 7,
+      };
+    case 'Savingsplan':
+      return {
+        activities: parseSavingsplan(allPages),
+        status: 0,
+      }
   }
-
-  let type,
-    amount,
-    price,
-    priceCurrency,
-    date,
-    time,
-    fxRate,
-    foreignCurrency,
-    baseCurrency;
 
   const pieceIdx = allPages.findIndex(t => t.includes('Stück'));
   const isinIdx = findISINIdx(allPages, pieceIdx);
-  const isin = allPages[isinIdx];
-  const company = findCompany(allPages, pieceIdx, isinIdx);
-  const shares = findShares(allPages, pieceIdx);
-  const fee = findFee(pages);
-  const tax = findTax(pages);
+
+  let activity = {
+    broker: 'dkb',
+    type: typeOfDocument,
+    isin: allPages[isinIdx],
+    company: findCompany(allPages, pieceIdx, isinIdx),
+    shares: findShares(allPages, pieceIdx),
+    fee: findFee(pages),
+    tax: findTax(pages),
+  }
+  let priceCurrency, unparsedDate, unparsedTime, fxRate, foreignCurrency, baseCurrency
 
   [fxRate, foreignCurrency, baseCurrency] = findForeignInformation(allPages);
 
   const canConvertCurrency =
     fxRate !== undefined &&
     foreignCurrency !== undefined &&
-    foreignCurrency != baseCurrency;
+    foreignCurrency !== baseCurrency;
 
-  if (isBuy(allPages)) {
-    type = 'Buy';
-    amount = findAmount(allPages);
-    price = findPrice(allPages);
-    priceCurrency = findPriceCurrency(allPages);
-    date = findDateBuySell(allPages);
-    time = findTimeBuySell(allPages);
-  } else if (isSell(allPages)) {
-    type = 'Sell';
-    amount = findAmount(allPages);
-    price = findPrice(allPages);
-    priceCurrency = findPriceCurrency(allPages);
-    date = findDateBuySell(allPages);
-    time = findTimeBuySell(allPages);
-  } else if (isDividend(allPages)) {
-    const payout = findPayout(allPages, baseCurrency);
-    type = 'Dividend';
-    amount = +payout;
-    price = +payout.div(shares);
-    date = findDateDividend(allPages);
+  switch (typeOfDocument) {
+    case 'Buy':
+      activity.amount = findAmount(allPages);
+      activity.price = findPrice(allPages);
+      priceCurrency = findPriceCurrency(allPages);
+      unparsedDate = findDateBuySell(allPages);
+      unparsedTime = findTimeBuySell(allPages);
+      break;
+    case 'Sell':
+      activity.amount = findAmount(allPages);
+      activity.price = findPrice(allPages);
+      priceCurrency = findPriceCurrency(allPages);
+      unparsedDate = findDateBuySell(allPages);
+      unparsedTime = findTimeBuySell(allPages);
+      break;
+    case 'Dividend': {
+      const payout = findPayout(allPages, baseCurrency);
+      activity.amount = +payout;
+      activity.price = +payout.div(activity.shares);
+      unparsedDate = findDateDividend(allPages);
+    }
   }
 
-  const [parsedDate, parsedDateTime] = createActivityDateTime(
-    date,
-    time,
-    'dd.MM.yyyy',
-    'dd.MM.yyyy HH:mm:ss'
+  [activity.date, activity.datetime] = createActivityDateTime(
+      unparsedDate, unparsedTime,
+      'dd.MM.yyyy',
+      'dd.MM.yyyy HH:mm:ss'
   );
-
-  if (
-    priceCurrency !== undefined &&
-    canConvertCurrency &&
-    (type === 'Buy' || type === 'Sell')
-  ) {
-    // For buy and sell documents we need to convert the currency to the base currency (when possible).
-    price = +Big(price).div(fxRate);
-  }
-
-  const activity = {
-    broker: 'dkb',
-    type,
-    date: parsedDate,
-    datetime: parsedDateTime,
-    isin,
-    company,
-    shares,
-    price,
-    amount,
-    fee,
-    tax,
-  };
 
   if (canConvertCurrency) {
     activity.fxRate = +fxRate;
     activity.foreignCurrency = foreignCurrency;
+
+    if (priceCurrency !== undefined &&
+        ['Buy', 'Sell'].includes(activity.type)) {
+      // For buy and sell documents we need to convert the currency to the base currency (when possible).
+      activity.price = +Big(activity.price).div(fxRate);
+
+    }
   }
 
   return {

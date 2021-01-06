@@ -5,6 +5,7 @@ import {
   sellSamples,
   dividendsSamples,
   ignoredSamples,
+  // savingsplanSamples,
   allSamples,
 } from './__mocks__/dkb';
 
@@ -329,6 +330,60 @@ describe('DKB broker', () => {
         tax: 0,
       });
     });
+  });
+
+  describe('Savings Plan Summary', () => {
+    /*
+    test('Can parse a 2019 half-yearly savings plan summary', () => {
+      const result = dkb.parsePages(savingsplanSamples[0]);
+      expect(result.status.toEqual(0));
+      expect(result.activities.length.toEqual(3));
+      expect(result.activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Buy',
+        date: '2019-10-09',
+        datetime: '2019-10-09T' + result.activities[0].datetime.substring(11),
+        isin: 'IE00B4L5Y983',
+        wkn: 'A0RPWH',
+        company: 'ISHSIII-CORE MSCI WORLD U.ETF REGISTERED SHS USD (ACC) O.N.',
+        shares: 1.9091,
+        price: 52.38,
+        amount: 100,
+        fee: 1.5,
+        tax: 0,
+      });
+
+      expect(result.activities[1]).toEqual({
+        broker: 'dkb',
+        type: 'Buy',
+        date: '2019-11-07',
+        datetime: '2019-11-07T' + result.activities[0].datetime.substring(11),
+        isin: 'IE00B4L5Y983',
+        wkn: 'A0RPWH',
+        company: 'ISHSIII-CORE MSCI WORLD U.ETF REGISTERED SHS USD (ACC) O.N.',
+        shares: 1.8354,
+        price: 54.483,
+        amount: 100,
+        fee: 1.5,
+        tax: 0,
+      });
+
+      expect(result.activities[2]).toEqual({
+        broker: 'dkb',
+        type: 'Buy',
+        date: '2019-12-09',
+        datetime: '2019-12-09T' + result.activities[0].datetime.substring(11),
+        isin: 'IE00B4L5Y983',
+        wkn: 'A0RPWH',
+        company: 'ISHSIII-CORE MSCI WORLD U.ETF REGISTERED SHS USD (ACC) O.N.',
+        shares: 1.8148,
+        price: 55.104,
+        amount: 100,
+        fee: 1.5,
+        tax: 0,
+      });
+    });
+    */
   });
 
   describe('Validate all ignored statements', () => {
