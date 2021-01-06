@@ -11,6 +11,7 @@ export const buySamples = [
   require('./buy/2020_buy_apple_inc_1.json'),
   require('./buy/2003_buy_acatis.json'),
   require('./buy/2021_allianz_strategy_fond.json'),
+  require('./buy/2021_janus_henderson_capital_funds.json'),
 ];
 
 export const sellSamples = [

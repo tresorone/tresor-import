@@ -277,6 +277,29 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('Should map the document correctly: 2021_janus_henderson_capital_funds', () => {
+      const activity = consorsbank.parsePages(buySamples[12]).activities;
+
+      expect(activity).toEqual([
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'JHC-J.H.GL.LI.SC. AA',
+          date: '2021-01-04',
+          datetime: '2021-01-04T' + activity[0].datetime.substring(11),
+          isin: 'IE0009355771',
+          wkn: '935590',
+          price: 38.58322401419863,
+          shares: 0.64795,
+          amount: 25,
+          tax: 0,
+          fee: 0,
+          fxRate: 1.2254,
+          foreignCurrency: 'USD',
+        },
+      ]);
+    });
   });
 
   describe('Sell', () => {
