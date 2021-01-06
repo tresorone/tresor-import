@@ -281,7 +281,7 @@ describe('Broker: Consorsbank', () => {
     test('Should map the document correctly: 2021_janus_henderson_capital_funds', () => {
       const activity = consorsbank.parsePages(buySamples[12]).activities;
 
-      expect(activity).toEqual([
+      expect(activity).toEqual([ 
         {
           broker: 'consorsbank',
           type: 'Buy',
