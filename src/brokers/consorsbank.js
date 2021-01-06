@@ -134,7 +134,7 @@ const findDividendShares = textArr => {
 
 const findAmount = (textArr, type) => {
   if (type === 'Buy' || type === 'Sell') {
-    let lineNumber = textArr.indexOf('Kurswert');
+    let lineNumber = textArr.findIndex(line => line.includes('Kurswert'));
     if (lineNumber <= 0) {
       lineNumber = textArr.indexOf('Nettoinventarwert');
     }
@@ -274,11 +274,14 @@ const findDividendTax = (textArr, amount) => {
   }
 };
 
-const findForeignInformation = textArr => {
-  const foreignInfo = textArr.findIndex(line => line.includes('Devisenkurs'));
+const findForeignInformation = (content, isDividend) => {
+  const foreignInfo = content.findIndex(line => line.includes('Devisenkurs'));
   if (foreignInfo >= 0) {
-    const foreignInfoLine = textArr[foreignInfo + 1].split(/\s+/);
-    return [parseGermanNum(foreignInfoLine[0]), foreignInfoLine[1]];
+    const foreignInfoLine = content[foreignInfo + 1].split(/\s+/);
+    return [
+      parseGermanNum(foreignInfoLine[0]),
+      foreignInfoLine[isDividend ? 1 : 3],
+    ];
   }
   return [undefined, undefined];
 };
@@ -341,6 +344,11 @@ const parseData = textArr => {
   const company = findCompany(textArr);
   const wkn = findWKN(textArr);
 
+  [fxRate, foreignCurrency] = findForeignInformation(
+    textArr,
+    isDividend(textArr)
+  );
+
   if (isBuy(textArr)) {
     type = 'Buy';
     date = findDateBuySell(textArr);
@@ -364,7 +372,6 @@ const parseData = textArr => {
     amount = findAmount(textArr, 'Dividend');
     fee = 0;
     tax = findDividendTax(textArr, amount);
-    [fxRate, foreignCurrency] = findForeignInformation(textArr);
   }
 
   const [parsedDate, parsedDateTime] = createActivityDateTime(
@@ -373,6 +380,7 @@ const parseData = textArr => {
     'dd.MM.yyyy',
     'dd.MM.yyyy HH:mm:ss'
   );
+
   const activity = {
     broker: 'consorsbank',
     type,
