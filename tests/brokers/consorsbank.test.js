@@ -256,6 +256,27 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('Should map the document correctly: 2021_allianz_strategy_fond', () => {
+      const activity = consorsbank.parsePages(buySamples[11]).activities;
+
+      expect(activity).toEqual([
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'ALL.STRATEG.WACHST.A2 EUR',
+          date: '2021-01-05',
+          datetime: '2021-01-05T' + activity[0].datetime.substring(11),
+          isin: 'DE0009797639',
+          wkn: '979763',
+          price: 68.0605466623108,
+          shares: 0.36732,
+          amount: 25,
+          tax: 0,
+          fee: 0,
+        },
+      ]);
+    });
   });
 
   describe('Sell', () => {
