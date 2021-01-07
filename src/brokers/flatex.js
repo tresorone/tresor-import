@@ -210,20 +210,29 @@ const findFee = (textArr, startLineNumber) => {
   return +Big(provision).plus(Big(ownExpenses)).plus(Big(foreignExpenses));
 };
 
-const findTax = (textArr, startLineNumber) =>
-  getTableValueByKey(textArr, startLineNumber, 'Einbeh. Steuer')
-    ? parseGermanNum(
-        getTableValueByKey(textArr, startLineNumber, 'Einbeh. Steuer').split(
-          ' '
-        )[0]
-      )
-    : getTableValueByKey(textArr, startLineNumber, 'Einbeh. KESt')
-    ? parseGermanNum(
-        getTableValueByKey(textArr, startLineNumber, 'Einbeh. KESt').split(
-          ' '
-        )[0]
-      )
-    : 0;
+const findTax = (textArr, startLineNumber) => {
+  let totalTax = Big(0);
+
+  const tax = findTableValueByKeyWithDocumentFormat(
+    textArr,
+    startLineNumber,
+    'Einbeh. Steuer'
+  );
+  if (tax) {
+    totalTax = totalTax.plus(parseGermanNum(tax));
+  }
+
+  const kest = findTableValueByKeyWithDocumentFormat(
+    textArr,
+    startLineNumber,
+    'Einbeh. KESt'
+  );
+  if (kest) {
+    totalTax = totalTax.plus(parseGermanNum(kest));
+  }
+
+  return +totalTax;
+};
 
 const findNetPayout = (content, startLineNumber) =>
   parseGermanNum(getTableValueByKey(content, startLineNumber, 'Endbetrag', 1));
