@@ -273,28 +273,51 @@ describe('Broker: onvista', () => {
         },
       ]);
     });
-  });
 
-  test('should map pdf data of sample 4 correctly', () => {
-    expect(onvista.parsePages(sellSamples[3]).activities).toEqual([
-      {
+    test('should map pdf data of sample 4 correctly', () => {
+      expect(onvista.parsePages(sellSamples[3]).activities).toEqual([
+        {
+          broker: 'onvista',
+          type: 'Sell',
+          date: '2018-11-27',
+          datetime: '2018-11-27T16:22:00.000Z',
+          isin: 'DE0007480204',
+          company: 'Deutsche EuroShop AG Namens-Aktien o.N.',
+          shares: 84,
+          price: 28.16,
+          amount: 2365.44,
+          fee: 6.5,
+          tax: 0,
+        },
+      ]);
+    });
+
+    test('Can parse Sell in USD from epam systems', () => {
+      const activities = onvista.parsePages(sellSamples[4]).activities;
+
+      expect(activities[0]).toEqual({
         broker: 'onvista',
         type: 'Sell',
-        date: '2018-11-27',
-        datetime: '2018-11-27T16:22:00.000Z',
-        isin: 'DE0007480204',
-        company: 'Deutsche EuroShop AG Namens-Aktien o.N.',
-        shares: 84,
-        price: 28.16,
-        amount: 2365.44,
-        fee: 6.5,
+        date: '2021-01-04',
+        datetime: '2021-01-04T' + activities[0].datetime.substring(11),
+        isin: 'US29414B1044',
+        company: 'EPAM Systems Inc. Registered Shares DL -,001',
+        shares: 10,
+        price: 277.60741822903987,
+        amount: 2776.0733706679653,
+        fee: 14.998782566350133,
         tax: 0,
-      },
-    ]);
+        fxRate: 1.2321,
+        foreignCurrency: 'USD',
+      });
+    });
+
   });
 
+
+
   describe('Dividend', () => {
-    test('should map pdf data of sample 1 correctly', () => {
+    test('Can parse dividend for 2020_Vanguard_FTSE_All_World', () => {
       const activities = onvista.parsePages(dividendsSamples[0]).activities;
 
       expect(activities).toEqual([
@@ -310,11 +333,13 @@ describe('Broker: onvista', () => {
           amount: 83.8,
           fee: 0,
           tax: 0,
+          foreignCurrency: 'USD',
+          fxRate: 1.0864,
         },
       ]);
     });
 
-    test('should map pdf data of sample 2 correctly', () => {
+    test('Can parse dividend for 2019_iShare.NASDAQ-100', () => {
       const activities = onvista.parsePages(dividendsSamples[1]).activities;
 
       expect(activities).toEqual([
@@ -330,11 +355,13 @@ describe('Broker: onvista', () => {
           amount: 0.14,
           fee: 0,
           tax: 0.03,
+          foreignCurrency: 'USD',
+          fxRate: 1.1078,
         },
       ]);
     });
 
-    test('should map pdf data of sample 3 correctly', () => {
+    test('Can parse dividend for 2019_ComSta._MSCI_Em.Mkts', () => {
       const activities = onvista.parsePages(dividendsSamples[2]).activities;
 
       expect(activities).toEqual([
@@ -350,11 +377,13 @@ describe('Broker: onvista', () => {
           amount: 49.11,
           fee: 0,
           tax: 4.14,
+          foreignCurrency: 'USD',
+          fxRate: 1.1129,
         },
       ]);
     });
 
-    test('should map pdf data of sample 4 correctly', () => {
+    test('Can parse dividend for 2019_iSh.EO_ST.Sel.Div.30', () => {
       const activities = onvista.parsePages(dividendsSamples[3]).activities;
 
       expect(activities).toEqual([
@@ -403,6 +432,8 @@ describe('Broker: onvista', () => {
           amount: 2.32,
           fee: 0,
           tax: 0.38,
+          foreignCurrency: 'USD',
+          fxRate: 1.1373,
         },
       ]);
     });

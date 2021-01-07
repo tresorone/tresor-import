@@ -69,45 +69,38 @@ export const findShares = textArr => {
   return parseGermanNum(sharesLine.split(' ')[1]);
 };
 
-export const findPrice = text => {
+export const findPrice = ( text, fxRate = undefined ) => {
   const priceLine = text[text.findIndex(t => t.includes('Kurs')) + 1];
-  const price = priceLine.split(' ')[1];
-  return parseGermanNum(price);
+  const price = parseGermanNum(priceLine.split(' ')[1]);
+
+  return fxRate === undefined ? price : +Big(price).div(fxRate);
 };
 
-export const findAmount = text => {
-  let amount = text[text.findIndex(t => t.includes('Kurswert')) + 2];
-  return parseGermanNum(amount);
+export const findAmount = ( text, fxRate = undefined ) => {
+  let amount = parseGermanNum(text[text.findIndex(t => t.includes('Kurswert')) + 2]);
+  return fxRate === undefined ? amount : +Big(amount).div(fxRate);
 };
 
-export const findFee = text => {
-  const totalTradedLineNumber = text.findIndex(t => t.includes('Kurswert')) + 2;
-  const totalTraded = parseGermanNum(text[totalTradedLineNumber]);
-
-  let skipLineCounter = 1;
-  const amountLineNumber = text.findIndex(t => t.includes('Betrag zu Ihren '));
-  const fristTaxLineNumber = text.findIndex(
-    t =>
-      (t.toLowerCase().includes('steuer') ||
-        t.toLowerCase().includes('zuschlag')) &&
-      !t.toLowerCase().startsWith('steuer')
-  );
-
-  // Search the debited amount which is in a line after `EUR`
-  while (!text[amountLineNumber + skipLineCounter].includes('EUR')) {
-    skipLineCounter++;
+export const findFee = ( content, fxRate = undefined ) => {
+  let fee = Big(0);
+  const stockFeeIdx = content.indexOf('Börsengebühr') + 2;
+  if (stockFeeIdx > 1) {
+    fee = fee.plus(parseGermanNum(content[stockFeeIdx]))
   }
-
-  let totalPrice = Big(
-    parseGermanNum(text[amountLineNumber + skipLineCounter + 1])
-  );
-
-  if (fristTaxLineNumber < amountLineNumber) {
-    // This is an old document. Old documents has an amount with deducted taxes.
-    totalPrice = totalPrice.plus(findTax(text));
+  const foreignFeeIdx = content.indexOf('Fremdspesen') + 2;
+  if (foreignFeeIdx > 1) {
+    fee = fee.plus(parseGermanNum(content[foreignFeeIdx]))
   }
+  const exchangeFeeIdx = content.indexOf('Handelsplatzgebühr') + 2;
+  if (exchangeFeeIdx > 1) {
+    fee = fee.plus(parseGermanNum(content[exchangeFeeIdx]))
+  }
+  const orderProvisionIdx = content.indexOf('Orderprovision') + 2;
+  if (orderProvisionIdx > 1) {
+    fee = fee.plus(Big(parseGermanNum(content[orderProvisionIdx])));
+  }
+  return fxRate === undefined ? +fee : +fee.div(fxRate);
 
-  return +totalPrice.minus(totalTraded).abs();
 };
 
 const findTax = text => {
@@ -169,10 +162,10 @@ const findTax = text => {
   return +totalTax;
 };
 
-const findPayout = text => {
-  const amount =
+const findGrossPayout = ( text, tax ) => {
+  const netPayout =
     text[text.findIndex(t => t.includes('Betrag zu Ihren Gunsten')) + 2];
-  return parseGermanNum(amount);
+  return +Big(parseGermanNum(netPayout)).plus(tax);
 };
 
 export const canParseDocument = (pages, extension) => {
@@ -213,52 +206,43 @@ const detectedButIgnoredDocument = content => {
 };
 
 const parseData = text => {
-  let type, date, time, price, amount, fee, tax;
 
-  const isin = findISIN(text);
-  const company = findCompany(text);
-  const shares = findShares(text);
-
-  if (isBuy(text)) {
-    type = 'Buy';
-    date = findDateBuySell(text);
-    time = findOrderTime(text);
-    amount = findAmount(text);
-    fee = findFee(text);
-    tax = 0.0;
-    price = findPrice(text);
-  } else if (isSell(text)) {
-    type = 'Sell';
-    date = findDateBuySell(text);
-    time = findOrderTime(text);
-    amount = findAmount(text);
-    fee = findFee(text);
-    tax = findTax(text);
-    price = findPrice(text);
-  } else if (isDividend(text)) {
-    type = 'Dividend';
-    date = findDateDividend(text);
-    fee = 0;
-    tax = findTax(text);
-    amount = +Big(findPayout(text)).plus(tax);
-    price = +Big(amount).div(shares);
+  let activity = {
+    broker: 'onvista',
+    isin: findISIN(text),
+    company: findCompany(text),
+    shares: findShares(text),
   }
 
-  const [parsedDate, parsedDateTime] = createActivityDateTime(date, time);
+  const foreignCurrencyIdx = text.indexOf('Devisenkurs') + 1;
+  if (foreignCurrencyIdx > 0) {
+    activity.fxRate = parseGermanNum(text[foreignCurrencyIdx].split(/\s+/)[1]);
+    activity.foreignCurrency = text[foreignCurrencyIdx].split(/\s+/)[0].split(/\//)[1]
+  }
 
-  return validateActivity({
-    broker: 'onvista',
-    type: type,
-    shares: shares,
-    date: parsedDate,
-    datetime: parsedDateTime,
-    isin: isin,
-    company: company,
-    price: price,
-    amount: amount,
-    tax: tax,
-    fee: fee,
-  });
+  if (isBuy(text)) {
+    activity.type = 'Buy';
+    [activity.date, activity.datetime] = createActivityDateTime(findDateBuySell(text), findOrderTime(text));
+    activity.amount = findAmount(text, activity.fxRate);
+    activity.fee = findFee(text, activity.fxRate);
+    activity.tax = 0.0;
+    activity.price = findPrice(text, activity.fxRate);
+  } else if (isSell(text)) {
+    activity.type = 'Sell';
+    [activity.date, activity.datetime] = createActivityDateTime(findDateBuySell(text), findOrderTime(text));
+    activity.amount = findAmount(text, activity.fxRate);
+    activity.fee = findFee(text, activity.fxRate);
+    activity.tax = findTax(text);
+    activity.price = findPrice(text, activity.fxRate);
+  } else if (isDividend(text)) {
+    activity.type = 'Dividend';
+    [activity.date, activity.datetime] = createActivityDateTime(findDateDividend(text), undefined);
+    activity.fee = 0;
+    activity.tax = findTax(text);
+    activity.amount = findGrossPayout(text, activity.tax);
+    activity.price = +Big(activity.amount).div(activity.shares);
+  }
+  return validateActivity(activity);
 };
 
 export const parsePages = contents => {

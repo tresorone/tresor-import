@@ -10,6 +10,7 @@ export const sellSamples = [
   require('./sell/2018_Deutsche_Beteiligungs_AG.json'),
   require('./sell/2018_iShsII-J.P.M..json'),
   require('./sell/2018_Deutsche_EuroShop_AG.json'),
+  require('./sell/2021_usd_epam_systems.json'),
 ];
 
 export const multiPageSamples = [require('./multi-page.json')];
