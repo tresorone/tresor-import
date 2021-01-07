@@ -69,38 +69,39 @@ export const findShares = textArr => {
   return parseGermanNum(sharesLine.split(' ')[1]);
 };
 
-export const findPrice = ( text, fxRate = undefined ) => {
+export const findPrice = (text, fxRate = undefined) => {
   const priceLine = text[text.findIndex(t => t.includes('Kurs')) + 1];
   const price = parseGermanNum(priceLine.split(' ')[1]);
 
   return fxRate === undefined ? price : +Big(price).div(fxRate);
 };
 
-export const findAmount = ( text, fxRate = undefined ) => {
-  let amount = parseGermanNum(text[text.findIndex(t => t.includes('Kurswert')) + 2]);
+export const findAmount = (text, fxRate = undefined) => {
+  let amount = parseGermanNum(
+    text[text.findIndex(t => t.includes('Kurswert')) + 2]
+  );
   return fxRate === undefined ? amount : +Big(amount).div(fxRate);
 };
 
-export const findFee = ( content, fxRate = undefined ) => {
+export const findFee = (content, fxRate = undefined) => {
   let fee = Big(0);
   const stockFeeIdx = content.indexOf('Börsengebühr') + 2;
   if (stockFeeIdx > 1) {
-    fee = fee.plus(parseGermanNum(content[stockFeeIdx]))
+    fee = fee.plus(parseGermanNum(content[stockFeeIdx]));
   }
   const foreignFeeIdx = content.indexOf('Fremdspesen') + 2;
   if (foreignFeeIdx > 1) {
-    fee = fee.plus(parseGermanNum(content[foreignFeeIdx]))
+    fee = fee.plus(parseGermanNum(content[foreignFeeIdx]));
   }
   const exchangeFeeIdx = content.indexOf('Handelsplatzgebühr') + 2;
   if (exchangeFeeIdx > 1) {
-    fee = fee.plus(parseGermanNum(content[exchangeFeeIdx]))
+    fee = fee.plus(parseGermanNum(content[exchangeFeeIdx]));
   }
   const orderProvisionIdx = content.indexOf('Orderprovision') + 2;
   if (orderProvisionIdx > 1) {
     fee = fee.plus(Big(parseGermanNum(content[orderProvisionIdx])));
   }
   return fxRate === undefined ? +fee : +fee.div(fxRate);
-
 };
 
 const findTax = text => {
@@ -162,7 +163,7 @@ const findTax = text => {
   return +totalTax;
 };
 
-const findGrossPayout = ( text, tax ) => {
+const findGrossPayout = (text, tax) => {
   const netPayout =
     text[text.findIndex(t => t.includes('Betrag zu Ihren Gunsten')) + 2];
   return +Big(parseGermanNum(netPayout)).plus(tax);
@@ -206,37 +207,47 @@ const detectedButIgnoredDocument = content => {
 };
 
 const parseData = text => {
-
   let activity = {
     broker: 'onvista',
     isin: findISIN(text),
     company: findCompany(text),
     shares: findShares(text),
-  }
+  };
 
   const foreignCurrencyIdx = text.indexOf('Devisenkurs') + 1;
   if (foreignCurrencyIdx > 0) {
     activity.fxRate = parseGermanNum(text[foreignCurrencyIdx].split(/\s+/)[1]);
-    activity.foreignCurrency = text[foreignCurrencyIdx].split(/\s+/)[0].split(/\//)[1]
+    activity.foreignCurrency = text[foreignCurrencyIdx]
+      .split(/\s+/)[0]
+      .split(/\//)[1];
   }
 
   if (isBuy(text)) {
     activity.type = 'Buy';
-    [activity.date, activity.datetime] = createActivityDateTime(findDateBuySell(text), findOrderTime(text));
+    [activity.date, activity.datetime] = createActivityDateTime(
+      findDateBuySell(text),
+      findOrderTime(text)
+    );
     activity.amount = findAmount(text, activity.fxRate);
     activity.fee = findFee(text, activity.fxRate);
     activity.tax = 0.0;
     activity.price = findPrice(text, activity.fxRate);
   } else if (isSell(text)) {
     activity.type = 'Sell';
-    [activity.date, activity.datetime] = createActivityDateTime(findDateBuySell(text), findOrderTime(text));
+    [activity.date, activity.datetime] = createActivityDateTime(
+      findDateBuySell(text),
+      findOrderTime(text)
+    );
     activity.amount = findAmount(text, activity.fxRate);
     activity.fee = findFee(text, activity.fxRate);
     activity.tax = findTax(text);
     activity.price = findPrice(text, activity.fxRate);
   } else if (isDividend(text)) {
     activity.type = 'Dividend';
-    [activity.date, activity.datetime] = createActivityDateTime(findDateDividend(text), undefined);
+    [activity.date, activity.datetime] = createActivityDateTime(
+      findDateDividend(text),
+      undefined
+    );
     activity.fee = 0;
     activity.tax = findTax(text);
     activity.amount = findGrossPayout(text, activity.tax);

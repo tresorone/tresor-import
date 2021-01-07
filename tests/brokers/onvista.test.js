@@ -311,10 +311,7 @@ describe('Broker: onvista', () => {
         foreignCurrency: 'USD',
       });
     });
-
   });
-
-
 
   describe('Dividend', () => {
     test('Can parse dividend for 2020_Vanguard_FTSE_All_World', () => {
