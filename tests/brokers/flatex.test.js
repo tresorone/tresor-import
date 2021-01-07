@@ -172,7 +172,7 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('Can parse statement: 2018_etf_ishares_tecdax.json', () => {
+    test('Can parse statement: 2018_etf_ishares_tecdax', () => {
       const result = flatex.parsePages(buySamples[7]);
 
       expect(result.activities.length).toEqual(1);
@@ -191,7 +191,7 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('Can parse statement: 2016_old_bank_name.json', () => {
+    test('Can parse statement: 2016_old_bank_name', () => {
       const result = flatex.parsePages(buySamples[8]);
 
       expect(result.activities.length).toEqual(1);
@@ -210,7 +210,7 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('Can parse statement: 2020_dropbox.json', () => {
+    test('Can parse statement: 2020_dropbox', () => {
       const result = flatex.parsePages(buySamples[9]);
 
       expect(result.activities.length).toEqual(1);
@@ -270,10 +270,29 @@ describe('Broker: Flatex', () => {
         tax: 17.17,
       });
     });
+
+    test('Can parse statement: 2018_ishares_global_corporate', () => {
+      const result = flatex.parsePages(sellSamples[2]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Sell',
+        date: '2018-12-11',
+        datetime: '2018-12-11T20:47:00.000Z',
+        isin: 'IE00B7J7TB45',
+        company: 'IS GBL CORP BD U.ETF DLD',
+        shares: 2,
+        price: 82.106,
+        amount: 164.21,
+        fee: 6.54,
+        tax: -0.21,
+      });
+    });
   });
 
   describe('Dividend', () => {
-    test('should map pdf data of sample correctly: 2020_apple.json', () => {
+    test('should map pdf data of sample correctly: 2020_apple', () => {
       const activities = flatex.parsePages(dividendSamples[0]).activities;
 
       expect(activities.length).toEqual(1);
@@ -294,7 +313,7 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('should map pdf data of sample correctly: 2019_microsoft.json', () => {
+    test('should map pdf data of sample correctly: 2019_microsoft', () => {
       const activities = flatex.parsePages(dividendSamples[1]).activities;
 
       expect(activities.length).toEqual(1);
@@ -315,7 +334,7 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('should map pdf data of sample correctly: 2018_msci_world.json', () => {
+    test('should map pdf data of sample correctly: 2018_msci_world', () => {
       const activities = flatex.parsePages(dividendSamples[2]).activities;
 
       expect(activities.length).toEqual(1);
@@ -336,7 +355,7 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('should map pdf data of sample correctly: 2018_etf_001.json', () => {
+    test('should map pdf data of sample correctly: 2018_etf_001', () => {
       const activities = flatex.parsePages(dividendSamples[3]).activities;
 
       expect(activities.length).toEqual(1);
@@ -357,7 +376,7 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('should map pdf data of sample correctly: 2020_ishare_msci_eu.json', () => {
+    test('should map pdf data of sample correctly: 2020_ishare_msci_eu', () => {
       const activities = flatex.parsePages(dividendSamples[4]).activities;
 
       expect(activities.length).toEqual(1);
@@ -376,7 +395,7 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('should map pdf data of sample correctly: 2020_royal_dutch_shell.json', () => {
+    test('should map pdf data of sample correctly: 2020_royal_dutch_shell', () => {
       const activities = flatex.parsePages(dividendSamples[5]).activities;
 
       expect(activities.length).toEqual(1);
@@ -444,14 +463,14 @@ describe('Broker: Flatex', () => {
   });
 
   describe('Validate all ignored statements', () => {
-    test('The statement should be ignored: 2020_order_confirmation.json', () => {
+    test('The statement should be ignored: 2020_order_confirmation', () => {
       const result = flatex.parsePages(ignoredSamples[0]);
 
       expect(result.status).toEqual(7);
       expect(result.activities.length).toEqual(0);
     });
 
-    test('The statement should be ignored: 2020_saving_plan_confirmation.json', () => {
+    test('The statement should be ignored: 2020_saving_plan_confirmation', () => {
       const result = flatex.parsePages(ignoredSamples[1]);
 
       expect(result.status).toEqual(7);
