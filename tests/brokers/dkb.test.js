@@ -333,7 +333,6 @@ describe('DKB broker', () => {
   });
 
   describe('Savings Plan Summary', () => {
-
     test('Can parse a 2019 half-yearly savings plan summary', () => {
       const result = dkb.parsePages(savingsplanSamples[0]);
       expect(result.status).toEqual(0);

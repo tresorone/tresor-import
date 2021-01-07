@@ -29,7 +29,7 @@ const findCompany = (textArr, pieceIdx, isinIdx) => {
     .slice(pieceIdx + 1, isinIdx)
     .join(' ')
     .trim();
-}
+};
 
 const findDateBuySell = content => {
   // Use normaly the closing date for market orders.
@@ -234,38 +234,39 @@ const findForeignInformation = content => {
 
 // Saving plan summaries require a completely different logic to individual activity documents
 const parseSavingsplan = content => {
-
   const isinStringIdx = content.indexOf('ISIN');
   const isinIdx = findFirstIsinIndexInArray(content, isinStringIdx);
   const isin = content[isinIdx];
-  const wkn = content[isinIdx+1].substr(1, content[isinIdx+1].length - 2);
-  const company = content.slice(isinStringIdx+2, isinIdx).join(' ');
+  const wkn = content[isinIdx + 1].substr(1, content[isinIdx + 1].length - 2);
+  const company = content.slice(isinStringIdx + 2, isinIdx).join(' ');
 
-  let activities = []
+  let activities = [];
   let idx = content.indexOf('Kauf');
   while (idx >= 0) {
     const [date, datetime] = createActivityDateTime(
-        content[idx+7],
-        undefined,
-        'dd.MM.yyyy',
-        'dd.MM.yyyy HH:mm:ss'
+      content[idx + 7],
+      undefined,
+      'dd.MM.yyyy',
+      'dd.MM.yyyy HH:mm:ss'
     );
     let activity = {
-      broker:'dkb',
+      broker: 'dkb',
       type: 'Buy',
       isin,
       wkn,
       company,
-      shares: parseGermanNum(content[idx+5]),
-      amount: parseGermanNum(content[idx+1]),
-      price: parseGermanNum(content[idx+3]),
+      shares: parseGermanNum(content[idx + 5]),
+      amount: parseGermanNum(content[idx + 1]),
+      price: parseGermanNum(content[idx + 3]),
       date,
       datetime,
       tax: 0,
-    }
-    activity.fee = +Big(parseGermanNum(content[content.indexOf('Summe', idx)+1])).minus(activity.amount);
+    };
+    activity.fee = +Big(
+      parseGermanNum(content[content.indexOf('Summe', idx) + 1])
+    ).minus(activity.amount);
     activities.push(validateActivity(activity));
-    idx = content.indexOf('Kauf', idx+1);
+    idx = content.indexOf('Kauf', idx + 1);
   }
   return activities;
 };
