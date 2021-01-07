@@ -14,6 +14,7 @@ export const buySamples = [
 export const sellSamples = [
   require('./sell/sell1.json'),
   require('./sell/sell2.json'),
+  require('./sell/2018_ishares_global_corporate.json'),
 ];
 
 export const dividendSamples = [

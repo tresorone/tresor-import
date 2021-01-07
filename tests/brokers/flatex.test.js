@@ -270,6 +270,25 @@ describe('Broker: Flatex', () => {
         tax: 17.17,
       });
     });
+
+    test('Can parse statement: 2018_ishares_global_corporate', () => {
+      const result = flatex.parsePages(sellSamples[2]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Sell',
+        date: '2018-12-11',
+        datetime: '2018-12-11T20:47:00.000Z',
+        isin: 'IE00B7J7TB45',
+        company: 'IS GBL CORP BD U.ETF DLD',
+        shares: 2,
+        price: 82.106,
+        amount: 164.21,
+        fee: 6.54,
+        tax: -0.21,
+      });
+    });
   });
 
   describe('Dividend', () => {
