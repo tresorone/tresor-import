@@ -25,6 +25,7 @@ export const dividendsSamples = [
 
 export const savingsplanSamples = [
   require('./savingsplan/2019_half_yearly_savings_plan_summary.json'),
+  require('./savingsplan/2020_half_yearly_savings_plan_summary.json'),
 ];
 
 export const ignoredSamples = [

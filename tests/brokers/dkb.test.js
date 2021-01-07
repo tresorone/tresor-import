@@ -5,7 +5,7 @@ import {
   sellSamples,
   dividendsSamples,
   ignoredSamples,
-  // savingsplanSamples,
+  savingsplanSamples,
   allSamples,
 } from './__mocks__/dkb';
 
@@ -333,11 +333,11 @@ describe('DKB broker', () => {
   });
 
   describe('Savings Plan Summary', () => {
-    /*
+
     test('Can parse a 2019 half-yearly savings plan summary', () => {
       const result = dkb.parsePages(savingsplanSamples[0]);
-      expect(result.status.toEqual(0));
-      expect(result.activities.length.toEqual(3));
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(3);
       expect(result.activities[0]).toEqual({
         broker: 'dkb',
         type: 'Buy',
@@ -357,7 +357,7 @@ describe('DKB broker', () => {
         broker: 'dkb',
         type: 'Buy',
         date: '2019-11-07',
-        datetime: '2019-11-07T' + result.activities[0].datetime.substring(11),
+        datetime: '2019-11-07T' + result.activities[1].datetime.substring(11),
         isin: 'IE00B4L5Y983',
         wkn: 'A0RPWH',
         company: 'ISHSIII-CORE MSCI WORLD U.ETF REGISTERED SHS USD (ACC) O.N.',
@@ -372,7 +372,7 @@ describe('DKB broker', () => {
         broker: 'dkb',
         type: 'Buy',
         date: '2019-12-09',
-        datetime: '2019-12-09T' + result.activities[0].datetime.substring(11),
+        datetime: '2019-12-09T' + result.activities[2].datetime.substring(11),
         isin: 'IE00B4L5Y983',
         wkn: 'A0RPWH',
         company: 'ISHSIII-CORE MSCI WORLD U.ETF REGISTERED SHS USD (ACC) O.N.',
@@ -383,7 +383,41 @@ describe('DKB broker', () => {
         tax: 0,
       });
     });
-    */
+
+    test('Can parse a 2020 half-yearly savings plan summary', () => {
+      const result = dkb.parsePages(savingsplanSamples[1]);
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(6);
+      expect(result.activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Buy',
+        date: '2020-07-08',
+        datetime: '2020-07-08T' + result.activities[0].datetime.substring(11),
+        isin: 'IE00B53SZB19',
+        wkn: 'A0YEDL',
+        company: 'ISHSVII-NASDAQ 100 UCITS ETF REG. SHARES USD (ACC) O.N.',
+        shares: 0.1148,
+        price: 522.8,
+        amount: 60,
+        fee: 1.5,
+        tax: 0,
+      });
+
+      expect(result.activities[5]).toEqual({
+        broker: 'dkb',
+        type: 'Buy',
+        date: '2020-12-09',
+        datetime: '2020-12-09T' + result.activities[5].datetime.substring(11),
+        isin: 'IE00B53SZB19',
+        wkn: 'A0YEDL',
+        company: 'ISHSVII-NASDAQ 100 UCITS ETF REG. SHARES USD (ACC) O.N.',
+        shares: 0.103,
+        price: 582.4,
+        amount: 60,
+        fee: 1.5,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate all ignored statements', () => {
