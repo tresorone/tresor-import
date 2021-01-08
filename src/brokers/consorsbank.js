@@ -125,10 +125,16 @@ const findDividendShares = textArr => {
   }
   // For older files:
   else {
-    const idxOld = textArr.findIndex(line => line === 'DIVIDENDENGUTSCHRIFT');
-    if (idxOld >= 0) {
-      return parseGermanNum(textArr[idxOld + 1].split(/\s+/)[1]);
+    let lineNumber = textArr.findIndex(line => line === 'DIVIDENDENGUTSCHRIFT');
+    if (lineNumber < 0) {
+      lineNumber = textArr.findIndex(line => line === 'ERTRAGSGUTSCHRIFT');
     }
+
+    if (lineNumber < 0) {
+      return undefined;
+    }
+
+    return parseGermanNum(textArr[lineNumber + 1].split(/\s+/)[1]);
   }
 };
 
@@ -373,6 +379,7 @@ const parseData = textArr => {
     'dd.MM.yyyy',
     'dd.MM.yyyy HH:mm:ss'
   );
+
   const activity = {
     broker: 'consorsbank',
     type,
