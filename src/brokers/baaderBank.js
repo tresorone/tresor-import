@@ -241,11 +241,11 @@ const findTax = content => {
     );
   }
 
-  const financialTaxIdx = content.findIndex( l => l.endsWith('Finanztransaktionssteuer'));
-  if ( financialTaxIdx >= 0 ) {
-    totalTax = totalTax.plus(
-        Big(parseGermanNum(content[financialTaxIdx + 1]))
-    );
+  const financialTaxIdx = content.findIndex(l =>
+    l.endsWith('Finanztransaktionssteuer')
+  );
+  if (financialTaxIdx >= 0) {
+    totalTax = totalTax.plus(Big(parseGermanNum(content[financialTaxIdx + 1])));
   }
 
   return +totalTax;
