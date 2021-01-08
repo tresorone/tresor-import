@@ -664,6 +664,27 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('The statement should be parsed: 2015_ishare_stoxx', () => {
+      const activities = consorsbank.parsePages(dividendsSamples[15])
+        .activities;
+
+      expect(activities).toEqual([
+        {
+          broker: 'consorsbank',
+          company: 'iSh.STOXX Europe 600 U.ETF DE',
+          date: '2015-09-15',
+          datetime: '2015-09-15T' + activities[0].datetime.substring(11),
+          wkn: '263530',
+          amount: 23.44,
+          fee: 0,
+          price: 0.37206349206349204,
+          shares: 63,
+          tax: 0,
+          type: 'Dividend',
+        },
+      ]);
+    });
   });
 
   describe('Validate all ignored statements', () => {
