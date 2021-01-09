@@ -377,6 +377,28 @@ describe('Broker: Trade Republic', () => {
         fxRate: 1.2127,
       });
     });
+
+    test('Should map the pdf data correctly for: 2020_schlumberger', () => {
+      const activities = traderepublic.parsePages(dividendSamples[9])
+        .activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'traderepublic',
+        type: 'Dividend',
+        isin: 'AN8068571086',
+        company: 'Schlumberger N.V. (Ltd.)',
+        date: '2020-10-08',
+        datetime: '2020-10-08T' + activities[0].datetime.substring(11),
+        amount: 13.767686181479284,
+        price: 0.10590527831907141,
+        shares: 130,
+        tax: 3.64,
+        fee: 0,
+        foreignCurrency: 'USD',
+        fxRate: 1.1803,
+      });
+    });
   });
 
   describe('Validate quarter statement', () => {
