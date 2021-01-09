@@ -24,14 +24,12 @@
           PDF Import
         </p>
         <p>
-          <div class="file is-primary">
-            <label class="file-label">
-              <input class="file-input" type="file" name="resume" ref="myFiles" @change="fileHandler" multiple />
-              <span class="file-cta">
-                <span class="file-label">PDFs / PP CSV Export hinzufügen</span>
-              </span>
-            </label>
-          </div>
+        <div class="drop-zone">
+          <input type="file" class="file-input" ref="myFiles" @change="fileHandler" multiple/>
+          <span class="drop-zone-label">
+            PDFs / PP CSV Export hinzufügen
+          </span>
+        </div>
           <br>
           <div>
             <button v-if="!jsonInputActive" class="button is-info is-light" @click="jsonInputActive = !jsonInputActive">Dokument im JSON Format hinzufügen</button>
