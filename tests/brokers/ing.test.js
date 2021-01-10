@@ -215,6 +215,25 @@ describe('Broker: ING', () => {
         tax: 209.47,
       });
     });
+
+    test('Can parse 2021 morgan stanley document with multiple taxes', () => {
+      const result = ing.parsePages(sellSamples[3]);
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'ing',
+        type: 'Sell',
+        date: '2021-01-08',
+        datetime: '2021-01-08T13:59:58.000Z',
+        isin: 'DE000MA0LP65',
+        company: 'Morgan Stanley & Co. Intl PLC MiniL O.End E-Wa. Eu 54,96',
+        shares: 120,
+        price: 10.61,
+        amount: 1273.20,
+        fee: 11.42,
+        tax: 53.23,
+      });
+    });
   });
 
   describe('Dividend', () => {
