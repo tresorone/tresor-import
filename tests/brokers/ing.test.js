@@ -229,7 +229,7 @@ describe('Broker: ING', () => {
         company: 'Morgan Stanley & Co. Intl PLC MiniL O.End E-Wa. Eu 54,96',
         shares: 120,
         price: 10.61,
-        amount: 1273.20,
+        amount: 1273.2,
         fee: 11.42,
         tax: 53.23,
       });

@@ -140,22 +140,27 @@ const findAmount = (textArr, type) => {
   }
 };
 
-const findFee = ( content ) => {
+const findFee = content => {
   let totalFee = Big(0);
   const provisionIdx = content.indexOf('Provision');
   if (provisionIdx >= 0 && parseGermanNum(content[provisionIdx + 2])) {
     totalFee = totalFee.plus(parseGermanNum(content[provisionIdx + 2]));
   }
   const discountIdx = content.indexOf('Rabatt');
-  if (discountIdx >= 0 && parseGermanNum(content[discountIdx + 2].replace(' ', ''))) {
-    totalFee = totalFee.plus(parseGermanNum(content[discountIdx + 2].replace(' ', '')));
+  if (
+    discountIdx >= 0 &&
+    parseGermanNum(content[discountIdx + 2].replace(' ', ''))
+  ) {
+    totalFee = totalFee.plus(
+      parseGermanNum(content[discountIdx + 2].replace(' ', ''))
+    );
   }
   const transactionFeeIdx = content.indexOf('Variables Transaktionsentgelt');
-  if (transactionFeeIdx >= 0 ) {
+  if (transactionFeeIdx >= 0) {
     totalFee = totalFee.plus(parseGermanNum(content[transactionFeeIdx + 2]));
   }
   const exchangeFeeIdx = content.indexOf('Handelsplatzgebühr');
-  if (exchangeFeeIdx >= 0 ) {
+  if (exchangeFeeIdx >= 0) {
     totalFee = totalFee.plus(parseGermanNum(content[exchangeFeeIdx + 2]));
   }
   return +totalFee;
