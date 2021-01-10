@@ -14,61 +14,72 @@ const getValueByPreviousElement = (textArr, prev, range) => {
   return textArr[lineNumber + range];
 };
 
-const isBuy = textArr =>
-  textArr.some(t => t.includes('Wertpapierabrechnung')) &&
-  textArr.some(t => t.includes('Kauf aus Sparplan') || t.includes('Kauf'));
+const activityType = content => {
+  switch (content[0]) {
+    case 'Wertpapierabrechnung':
+      if (content[1].startsWith('Kauf')) {
+        return 'Buy';
+      } else if (content[1] === 'Verkauf') {
+        return 'Sell';
+      }
+      break;
+    case 'Dividendengutschrift':
+    case 'Ertragsgutschrift':
+      return 'Dividend';
+    case 'Rückzahlung':
+      return 'Payback'
+  }
+}
 
-const isSell = textArr =>
-  textArr.some(t => t.includes('Wertpapierabrechnung')) &&
-  textArr.some(t => t.includes('Verkauf'));
+const findShares = ( content, type ) => {
+  switch (type) {
+    case 'Buy':
+    case 'Sell':
+      return parseGermanNum(getValueByPreviousElement(content, 'Stück', 1));
+    case 'Payback':
+    case 'Dividend':
+      return parseGermanNum(getValueByPreviousElement(content, 'Nominale', 1).split(' ')[0]);
 
-const isDividend = textArr =>
-  textArr.some(
-    t => t.includes('Dividendengutschrift') || t.includes('Ertragsgutschrift')
-  );
-
-export const canParseDocument = (pages, extension) => {
-  const firstPageContent = pages[0];
-  return (
-    extension === 'pdf' &&
-    firstPageContent.some(line => line.includes('BIC: INGDDEFFXX')) &&
-    (isBuy(firstPageContent) ||
-      isSell(firstPageContent) ||
-      isDividend(firstPageContent))
-  );
+  }
 };
-
-const findShares = textArr =>
-  isBuy(textArr) || isSell(textArr)
-    ? parseGermanNum(getValueByPreviousElement(textArr, 'Stück', 1))
-    : parseGermanNum(
-        getValueByPreviousElement(textArr, 'Nominale', 1).split(' ')[0]
-      );
 
 const findISIN = textArr => {
   const isin = getValueByPreviousElement(textArr, 'ISIN', 1).split(' ')[0];
   return /^([A-Z]{2})((?![A-Z]{10})[A-Z0-9]{10})$/.test(isin) ? isin : null;
 };
 
-const findCompany = textArr =>
-  getValueByPreviousElement(textArr, 'Wertpapierbezeichnung', 1).split(' -')[0];
+const findCompany = content => {
+  const companyIdx = content.indexOf('Wertpapierbezeichnung')
+  return content[companyIdx + 1]+ ' ' + content[companyIdx + 2];
+}
 
-const findDateTime = textArr => {
-  if (isBuy(textArr) || isSell(textArr)) {
-    const dateIdx = textArr.findIndex(t => t.includes('Ausführungstag'));
-    if (textArr[dateIdx + 1] === '/ -zeit') {
-      return [textArr[dateIdx + 2], textArr[dateIdx + 3].split(' ')[1]];
-    } else {
-      return [textArr[dateIdx + 1], undefined];
+const findDateTime = ( content, type ) => {
+  switch (type) {
+    case 'Buy':
+    case 'Sell':{
+      const dateIdx = content.findIndex(t => t.includes('Ausführungstag'));
+      if (content[dateIdx + 1] === '/ -zeit') {
+        return [content[dateIdx + 2], content[dateIdx + 3].split(' ')[1]];
+      } else {
+        return [content[dateIdx + 1], undefined];
+      }
     }
-  } else if (isDividend(textArr)) {
-    return [getValueByPreviousElement(textArr, 'Zahltag', 1), undefined];
+    case 'Payback':
+      return [getValueByPreviousElement(content, 'Fälligkeit', 1)];
+    case 'Dividend':
+      return [getValueByPreviousElement(content, 'Zahltag', 1)];
   }
 };
 
-const findPrice = content => {
-  if (isBuy(content) || isSell(content)) {
+const findPrice = ( content, type ) => {
+  if (['Buy', 'Sell'].includes(type)) {
     return parseGermanNum(getValueByPreviousElement(content, 'Kurs', 2));
+  } else if (type === 'Payback') {
+    const priceIdx = content.indexOf('Einlösung zum Kurs von');
+    if (priceIdx >= 0) {
+      // Example for the price format: 0,0001 EUR
+      return parseGermanNum(content[priceIdx+1].split(/\s+/)[0])
+    }
   }
 
   let amountAndCurrency = getValueByPreviousElement(
@@ -110,8 +121,23 @@ const findExchangeRate = content => {
   return Big(parseGermanNum(regexMatch[1]));
 };
 
-const findAmount = textArr =>
-  parseGermanNum(getValueByPreviousElement(textArr, 'Kurswert', 2));
+const findAmount = ( textArr, type ) => {
+  switch (type) {
+    case 'Buy':
+    case 'Sell':
+    case 'Payback':
+      return parseGermanNum(getValueByPreviousElement(textArr, 'Kurswert', 2));
+    case 'Dividend': {
+      const bruttoIndex = textArr.indexOf('Brutto');
+      if (!(textArr[bruttoIndex + 1] === 'EUR')) {
+        const foreignPayout = parseGermanNum(textArr[bruttoIndex + 2]);
+        return +Big(foreignPayout).div(findExchangeRate(textArr));
+      } else {
+        return +Big(parseGermanNum(textArr[bruttoIndex + 2]));
+      }
+    }
+  }
+}
 
 const findFee = textArr => {
   let totalFee = Big(0);
@@ -165,15 +191,6 @@ const findTaxes = content => {
   return +totalTax;
 };
 
-const findPayout = textArr => {
-  const bruttoIndex = textArr.indexOf('Brutto');
-  if (!(textArr[bruttoIndex + 1] === 'EUR')) {
-    const foreignPayout = parseGermanNum(textArr[bruttoIndex + 2]);
-    return +Big(foreignPayout).div(findExchangeRate(textArr));
-  } else {
-    return +Big(parseGermanNum(textArr[bruttoIndex + 2]));
-  }
-};
 
 const findForeignInfoPayout = textArr => {
   const fxRateIdx = textArr.indexOf('Umg. z. Dev.-Kurs');
@@ -185,43 +202,59 @@ const findForeignInfoPayout = textArr => {
   return [textArr[fxRateIdx - 2], parseGermanNum(fxRate)];
 };
 
-const parseData = textArr => {
+const parseData = content => {
   let activity = {
     broker: 'ing',
-    isin: findISIN(textArr),
-    company: findCompany(textArr),
-    shares: findShares(textArr),
-    price: findPrice(textArr),
+    type: activityType(content),
+    isin: findISIN(content),
+    company: findCompany(content),
     fee: 0,
     tax: 0,
   };
-  const [date, datetime] = findDateTime(textArr);
+
+  activity.amount = findAmount(content, activity.type);
+  activity.shares = findShares(content, activity.type);
+  activity.price = findPrice(content, activity.type);
+
+  const [date, datetime] = findDateTime(content, activity.type);
   [activity.date, activity.datetime] = createActivityDateTime(
     date,
     datetime,
     'dd.MM.yyyy',
     'dd.MM.yyyy HH:mm:ss'
   );
-  if (isBuy(textArr)) {
-    activity.type = 'Buy';
-    activity.amount = findAmount(textArr);
-    activity.fee = findFee(textArr);
-  } else if (isSell(textArr)) {
-    activity.type = 'Sell';
-    activity.amount = findAmount(textArr);
-    activity.fee = findFee(textArr);
-    activity.tax = findTaxes(textArr);
-  } else if (isDividend(textArr)) {
-    activity.type = 'Dividend';
-    activity.tax = findTaxes(textArr);
-    activity.amount = findPayout(textArr);
-    if (textArr.includes('Umg. z. Dev.-Kurs')) {
-      [activity.foreignCurrency, activity.fxRate] = findForeignInfoPayout(
-        textArr
-      );
-    }
+  switch (activity.type) {
+    case 'Buy':
+      activity.fee = findFee(content);
+      break;
+    case 'Sell':
+      activity.fee = findFee(content);
+      activity.tax = findTaxes(content);
+      break;
+    case 'Dividend':
+      activity.tax = findTaxes(content);
+      if (content.includes('Umg. z. Dev.-Kurs')) {
+        [activity.foreignCurrency, activity.fxRate] = findForeignInfoPayout(
+            content
+        );
+      }
+      break;
+    case 'Payback':
+      activity.type = 'Sell';
+      activity.fee = findFee(content);
+      activity.tax = findTaxes(content);
+      break;
   }
   return validateActivity(activity);
+};
+
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
+  return (
+      extension === 'pdf' &&
+      firstPageContent.some(line => line.includes('BIC: INGDDEFFXX')) &&
+      activityType(firstPageContent) !== undefined
+  );
 };
 
 export const parsePages = contents => {

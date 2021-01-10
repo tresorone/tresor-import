@@ -25,4 +25,8 @@ export const dividendsSamples = [
   require('./dividend/HKD_byd_co_ltd_with_taxes.json'),
 ];
 
+export const paybackSamples = [
+    require('./payback/2021_turbo_knockout_payback.json')
+]
+
 export const invalidSamples = [require('./invalid/invalid_buy.json')];
