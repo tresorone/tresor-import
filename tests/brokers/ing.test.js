@@ -11,7 +11,11 @@ import {
 describe('Broker: ING', () => {
   let consoleErrorSpy;
 
-  const allSamples = buySamples.concat(sellSamples, dividendsSamples, paybackSamples);
+  const allSamples = buySamples.concat(
+    sellSamples,
+    dividendsSamples,
+    paybackSamples
+  );
 
   describe('Check all documents', () => {
     test('Can the document parsed with ING', () => {
@@ -412,8 +416,7 @@ describe('Broker: ING', () => {
         amount: 4,
         fee: 0,
         tax: 0,
-      })
-
+      });
     });
   });
 

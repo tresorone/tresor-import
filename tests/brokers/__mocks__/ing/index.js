@@ -26,7 +26,7 @@ export const dividendsSamples = [
 ];
 
 export const paybackSamples = [
-    require('./payback/2021_turbo_knockout_payback.json')
-]
+  require('./payback/2021_turbo_knockout_payback.json'),
+];
 
 export const invalidSamples = [require('./invalid/invalid_buy.json')];
