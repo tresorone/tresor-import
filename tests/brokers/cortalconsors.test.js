@@ -89,6 +89,26 @@ describe('Broker: Cortal Consors', () => {
         },
       ]);
     });
+
+    test('Can parse 2007 Acatis buy', () => {
+      const activities = cortalconsors.parsePages(buySamples[3]).activities;
+
+      expect(activities).toEqual([
+        {
+          broker: 'cortalconsors',
+          type: 'Buy',
+          date: '2007-11-15',
+          datetime: '2007-11-15T' + activities[0].datetime.substr(11),
+          wkn: '978174',
+          company: 'ACATIS AKT. GLO. FDS UI A',
+          shares: 0.27399,
+          price: 186.94112923829337,
+          amount: 51.22,
+          fee: -1.22,
+          tax: 0,
+        },
+      ]);
+    });
   });
 
   describe('Sell', () => {
