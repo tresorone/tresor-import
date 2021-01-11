@@ -39,7 +39,7 @@ describe('Broker: onvista', () => {
   });
 
   describe('Buy', () => {
-    test('should map pdf data of sample 1 correctly', () => {
+    test('Can parse ComSta MSCI EM 2019', () => {
       const result = onvista.parsePages(buySamples[0]);
 
       expect(result.activities).toEqual([
@@ -59,7 +59,7 @@ describe('Broker: onvista', () => {
       ]);
     });
 
-    test('should map pdf data of sample 2 correctly', () => {
+    test('Can parse Vanguard FTSE All-World 2020', () => {
       const result = onvista.parsePages(buySamples[1]);
 
       expect(result.activities).toEqual([
@@ -79,7 +79,7 @@ describe('Broker: onvista', () => {
       ]);
     });
 
-    test('should map pdf data of sample 3 correctly', () => {
+    test('Can parse 2018 ComStage MSCI World', () => {
       const result = onvista.parsePages(buySamples[2]);
 
       expect(result.activities).toEqual([
@@ -99,7 +99,7 @@ describe('Broker: onvista', () => {
       ]);
     });
 
-    test('should map pdf data of sample 4 correctly', () => {
+    test('Can parse 2010 Münchener Rück', () => {
       const result = onvista.parsePages(buySamples[3]);
 
       expect(result.activities).toEqual([
