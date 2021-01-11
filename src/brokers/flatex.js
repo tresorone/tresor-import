@@ -110,15 +110,35 @@ const findOrderTime = (textArr, startLineNumber) => {
 };
 
 const findShares = (textArr, startLineNumber) => {
-  return parseGermanNum(
-    getTableValueByKey(textArr, startLineNumber, 'Ordervolumen')
-      ? getTableValueByKey(textArr, startLineNumber, 'Ordervolumen').split(
-          ' '
-        )[0] // stock
-      : getTableValueByKey(textArr, startLineNumber, 'Ausgeführt')
-      ? getTableValueByKey(textArr, startLineNumber, 'Ausgeführt').split(' ')[0] // etf
-      : getTableValueByKey(textArr, startLineNumber, 'St.').split(' ')[0] // dividend
+  const partialExecution = getTableValueByKey(
+    textArr,
+    startLineNumber,
+    'davon ausgef.'
   );
+  if (partialExecution) {
+    return parseGermanNum(partialExecution);
+  }
+
+  const numberOrder = getTableValueByKey(
+    textArr,
+    startLineNumber,
+    'Ordervolumen'
+  );
+  if (numberOrder) {
+    return parseGermanNum(numberOrder);
+  }
+
+  // ETFs
+  const executed = getTableValueByKey(textArr, startLineNumber, 'Ausgeführt');
+  if (executed) {
+    return parseGermanNum(executed);
+  }
+
+  // Dividends
+  const numberDividends = getTableValueByKey(textArr, startLineNumber, 'St.');
+  if (numberDividends) {
+    return parseGermanNum(numberDividends);
+  }
 };
 
 const findPrice = (content, startLineNumber) => {
