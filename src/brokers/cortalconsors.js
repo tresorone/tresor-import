@@ -170,7 +170,9 @@ const findFee = content => {
 
   // CortalConsors Discount
   {
-    const lineNumber = content.findIndex(line => line.startsWith('abz. CortalConsors Discount'));
+    const lineNumber = content.findIndex(line =>
+      line.startsWith('abz. CortalConsors Discount')
+    );
     if (lineNumber >= 0) {
       totalFee = totalFee.minus(parseGermanNum(content[lineNumber + 2]));
     }
@@ -244,7 +246,7 @@ export const canParseDocument = (pages, extension) => {
 const parseData = content => {
   let activity = {
     broker: 'cortalconsors',
-  }
+  };
   let date, time;
   if (isBuy(content)) {
     activity.type = 'Buy';
