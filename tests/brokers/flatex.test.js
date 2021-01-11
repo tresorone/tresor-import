@@ -230,6 +230,38 @@ describe('Broker: Flatex', () => {
         foreignCurrency: 'USD',
       });
     });
+
+    test('Can parse statement: 2017_lion_e_mobility', () => {
+      const result = flatex.parsePages(buySamples[10]);
+
+      expect(result.activities.length).toEqual(2);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2017-08-14',
+        datetime: '2017-08-14T07:37:00.000Z',
+        isin: 'CH0132594711',
+        company: 'LION E-MOBILITY AG SF-,13',
+        shares: 129,
+        price: 7.7,
+        amount: 993.3,
+        fee: 7.25,
+        tax: 0,
+      });
+      expect(result.activities[1]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2017-08-14',
+        datetime: '2017-08-14T15:20:00.000Z',
+        isin: 'CH0132594711',
+        company: 'LION E-MOBILITY AG SF-,13',
+        shares: 21,
+        price: 7.7,
+        amount: 161.7,
+        fee: 0.69,
+        tax: 0,
+      });
+    });
   });
 
   describe('Sell', () => {
