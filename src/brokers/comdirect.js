@@ -169,6 +169,18 @@ const findAmount = (textArr, fxRate, foreignCurrency, formatId) => {
       );
     }
   }
+
+  {
+    // Bonifikation like:
+    // 2,49400% Bonifikation                : EUR                1,28-
+    const lineNumber = textArr.findIndex(line => line.includes('Bonifikation'));
+    if (lineNumber >= 0) {
+      amount = amount.minus(
+        parseGermanNum(textArr[lineNumber].split(/\s+/)[4])
+      );
+    }
+  }
+
   return isInForeignCurrency ? amount.div(fxRate) : amount;
 };
 
