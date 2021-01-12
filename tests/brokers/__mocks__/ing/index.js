@@ -5,6 +5,7 @@ export const buySamples = [
   require('./buy/buy_plan.json'),
   require('./buy/2020_buy_schroder_1.json'),
   require('./buy/2017_m_g_invest_savings_plan.json'),
+  require('./buy/2020_newborn_acquisition.json'),
 ];
 
 export const sellSamples = [

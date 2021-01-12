@@ -156,6 +156,27 @@ describe('Broker: ING', () => {
         tax: 0,
       });
     });
+
+    test('Can parse statement: 2020_newborn_acquisition', () => {
+      const activities = ing.parsePages(buySamples[6]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ing',
+        type: 'Buy',
+        date: '2020-12-28',
+        datetime: '2020-12-28T17:12:00.000Z',
+        isin: 'KYG6463T1067',
+        company: 'Newborn Acquisition Corp. Registered Shares o.N.',
+        shares: 125,
+        price: 16.21140859401755,
+        amount: 2026.4260742521933,
+        fee: 22.47,
+        tax: 0,
+        fxRate: 1.217661,
+        foreignCurrency: 'USD',
+      });
+    });
   });
 
   describe('Sell', () => {
