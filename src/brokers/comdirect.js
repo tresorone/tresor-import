@@ -211,14 +211,17 @@ const findPayout = (textArr, fxRate) => {
 const findFee = (textArr, amount, isSell = false, formatId = undefined) => {
   const span = formatId === undefined || formatId === 1 ? 8 : 1;
 
-  const preTaxLine = textArr[
-    textArr.findIndex(t => t.includes('vor Steuern')) + span
-  ].split(/\s+/);
+  const lineNumberGross = textArr.findIndex(t => t.includes('vor Steuern'));
+  if (lineNumberGross < 0) {
+    return 0;
+  }
+
+  const preTaxLine = textArr[lineNumberGross + span].split(/\s+/);
   const preTaxAmount = parseGermanNum(preTaxLine[preTaxLine.length - 1]);
 
-  return isSell
+  return +(isSell
     ? Big(amount).minus(preTaxAmount)
-    : Big(preTaxAmount).minus(amount);
+    : Big(preTaxAmount).minus(amount));
 };
 
 const findTax = (textArr, fxRate, formatId) => {
@@ -411,7 +414,7 @@ const parseData = textArr => {
     amount = +findAmount(textArr, fxRate, foreignCurrency, formatId);
     shares = findShares(textArr, formatId);
     price = +Big(amount).div(shares);
-    fee = +findFee(textArr, amount, false, formatId);
+    fee = findFee(textArr, amount, false, formatId);
   } else if (isSell(textArr)) {
     type = 'Sell';
     [isin, wkn] = findISINAndWKN(
@@ -426,7 +429,7 @@ const parseData = textArr => {
     shares = findShares(textArr, formatId);
     amount = +findAmount(textArr, fxRate, foreignCurrency, formatId);
     price = +Big(amount).div(shares);
-    fee = +findFee(textArr, amount, true, formatId);
+    fee = findFee(textArr, amount, true, formatId);
     tax = findTax(textArr, fxRate, formatId)[0];
   } else if (isDividend(textArr)) {
     [fxRate, foreignCurrency] = findPayoutFxrateForeignCurrency(textArr);
