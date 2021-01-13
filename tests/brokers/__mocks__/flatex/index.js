@@ -9,6 +9,7 @@ export const buySamples = [
   require('./buy/2018_etf_ishares_tecdax.json'),
   require('./buy/2016_old_bank_name.json'),
   require('./buy/2020_dropbox.json'),
+  require('./buy/2017_lion_e_mobility.json'),
 ];
 
 export const sellSamples = [
