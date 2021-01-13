@@ -146,6 +146,7 @@ const findFee = content => {
   if (provisionIdx >= 0 && parseGermanNum(content[provisionIdx + 2])) {
     totalFee = totalFee.plus(parseGermanNum(content[provisionIdx + 2]));
   }
+
   const discountIdx = content.indexOf('Rabatt');
   if (
     discountIdx >= 0 &&
@@ -155,14 +156,24 @@ const findFee = content => {
       parseGermanNum(content[discountIdx + 2].replace(' ', ''))
     );
   }
+
   const transactionFeeIdx = content.indexOf('Variables Transaktionsentgelt');
   if (transactionFeeIdx >= 0) {
     totalFee = totalFee.plus(parseGermanNum(content[transactionFeeIdx + 2]));
   }
+
   const exchangeFeeIdx = content.indexOf('Handelsplatzgebühr');
   if (exchangeFeeIdx >= 0) {
     totalFee = totalFee.plus(parseGermanNum(content[exchangeFeeIdx + 2]));
   }
+
+  const courtageFeeLineNumber = content.indexOf('Courtage');
+  if (courtageFeeLineNumber >= 0) {
+    totalFee = totalFee.plus(
+      parseGermanNum(content[courtageFeeLineNumber + 2])
+    );
+  }
+
   return +totalFee;
 };
 
