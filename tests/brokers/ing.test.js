@@ -156,6 +156,25 @@ describe('Broker: ING', () => {
         tax: 0,
       });
     });
+
+    test('Can parse statement: 2020_ark_etf', () => {
+      const activities = ing.parsePages(buySamples[6]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ing',
+        type: 'Buy',
+        date: '2020-12-29',
+        datetime: '2020-12-29T16:52:58.000Z',
+        isin: 'US00214Q1040',
+        company: 'ARK ETF Trust - Innovation ETF Registered Shares o.N.',
+        shares: 11,
+        price: 101.86,
+        amount: 1120.46,
+        fee: 13.6,
+        tax: 0,
+      });
+    });
   });
 
   describe('Sell', () => {
