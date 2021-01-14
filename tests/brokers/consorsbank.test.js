@@ -300,6 +300,27 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('Should map the document correctly: 2021 put on citi gl', () => {
+      const activity = consorsbank.parsePages(buySamples[13]).activities;
+
+      expect(activity).toEqual([
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'CITI.GL.M. PUT21 PLUN',
+          date: '2021-01-13',
+          datetime: '2021-01-13T15:40:57.000Z',
+          isin: 'DE000KE18UW0',
+          wkn: 'KE18UW',
+          price: 0.49,
+          shares: 400,
+          amount: 196,
+          tax: 0,
+          fee: 12.45,
+        },
+      ]);
+    });
   });
 
   describe('Sell', () => {
