@@ -14,6 +14,7 @@ export const sellSamples = [
   require('./sell/sell2.json'),
   require('./sell/sell3.json'),
   require('./sell/2021_morgan_stanley_multi_tax.json'),
+  require('./sell/2020_deutsche_lufthansa.json'),
 ];
 
 export const dividendsSamples = [

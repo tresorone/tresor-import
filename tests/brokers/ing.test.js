@@ -175,7 +175,7 @@ describe('Broker: ING', () => {
         tax: 0,
       });
     });
-    
+
     test('Can parse statement: 2020_newborn_acquisition', () => {
       const activities = ing.parsePages(buySamples[7]).activities;
 
@@ -272,6 +272,25 @@ describe('Broker: ING', () => {
         amount: 1273.2,
         fee: 11.42,
         tax: 53.23,
+      });
+    });
+
+    test('Can parse statement: 2020_deutsche_lufthansa', () => {
+      const activities = ing.parsePages(sellSamples[4]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ing',
+        type: 'Sell',
+        date: '2020-12-21',
+        datetime: '2020-12-21T08:03:52.000Z',
+        isin: 'DE0008232125',
+        company: 'Deutsche Lufthansa AG vink.Namens-Aktien o.N.',
+        shares: 500,
+        price: 9,
+        amount: 4500,
+        fee: 16.15,
+        tax: 156.74,
       });
     });
   });
