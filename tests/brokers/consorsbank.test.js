@@ -281,7 +281,7 @@ describe('Broker: Consorsbank', () => {
     test('Should map the document correctly: 2021_janus_henderson_capital_funds', () => {
       const activity = consorsbank.parsePages(buySamples[12]).activities;
 
-      expect(activity).toEqual([ 
+      expect(activity).toEqual([
         {
           broker: 'consorsbank',
           type: 'Buy',
@@ -741,6 +741,13 @@ describe('Broker: Consorsbank', () => {
 
     test('The statement should be ignored: 2020_stock_split.json', () => {
       const result = consorsbank.parsePages(ignoredSamples[1]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('The statement should be ignored: 2021_advance_flat_rate.json', () => {
+      const result = consorsbank.parsePages(ignoredSamples[2]);
 
       expect(result.status).toEqual(7);
       expect(result.activities.length).toEqual(0);

@@ -110,7 +110,9 @@ const findDateDividend = textArr => {
 const findShares = textArr => {
   let idx = textArr.findIndex(t => t.toLowerCase() === 'umsatz');
   if (idx >= 0) {
-    return textArr[idx+1] === 'Fälligkeit' ? parseGermanNum(textArr[idx + 3]) : parseGermanNum(textArr[idx + 2]);
+    return textArr[idx + 1] === 'Fälligkeit'
+      ? parseGermanNum(textArr[idx + 3])
+      : parseGermanNum(textArr[idx + 2]);
   }
   idx = textArr.findIndex(t => t.startsWith('ST '));
   if (idx >= 0) {
@@ -248,7 +250,9 @@ const findFee = content => {
   }
 
   if (exchangeFeeIdx >= 0) {
-    totalFee = totalFee.plus(parseGermanNum(content[exchangeFeeIdx+1].split(/\s+/)[0]));
+    totalFee = totalFee.plus(
+      parseGermanNum(content[exchangeFeeIdx + 1].split(/\s+/)[0])
+    );
   }
 
   return +totalFee;
@@ -298,27 +302,29 @@ const findForeignInformation = (content, isDividend) => {
 };
 
 const activityType = content => {
-
   // Before 12/2015 the headline is 'Wertpapierabrechnung'
   const lineNumber = findBuySellLineNumber(content);
-  if ( lineNumber >= 0 ) {
-    if ( content[lineNumber + 1].toLowerCase().startsWith('kauf') ) {
-      return 'Buy'
-    } else if ( content[lineNumber + 1].toLowerCase() === 'verkauf') {
-      return 'Sell'
+  if (lineNumber >= 0) {
+    if (content[lineNumber + 1].toLowerCase().startsWith('kauf')) {
+      return 'Buy';
+    } else if (content[lineNumber + 1].toLowerCase() === 'verkauf') {
+      return 'Sell';
     }
-  } else if ( content.some(t =>
+  } else if (
+    content.some(t =>
       ['ertragsgutschrift', 'dividendengutschrift'].includes(t.toLowerCase())
-  )) {
-    return 'Dividend'
+    )
+  ) {
+    return 'Dividend';
   }
-}
+};
 
 const detectedButIgnoredDocument = content => {
   return (
     // When the document contains one of the following lines, we want to ignore these document.
     content.some(line => line.includes('Kostenausweis')) ||
-    content.some(line => line.includes('Aktiensplit'))
+    content.some(line => line.includes('Aktiensplit')) ||
+    content.some(line => line.includes('Vorabpauschale'))
   );
 };
 
@@ -338,7 +344,8 @@ export const canParseDocument = (pages, extension) => {
     return false;
   }
 
-  return ( activityType(firstPageContent) !== undefined ||
+  return (
+    activityType(firstPageContent) !== undefined ||
     detectedButIgnoredDocument(firstPageContent)
   );
 };
@@ -349,8 +356,8 @@ const parseData = textArr => {
     type: activityType(textArr),
     company: findCompany(textArr),
     fee: 0,
-    tax: 0
-  }
+    tax: 0,
+  };
   let isin = findISIN(textArr);
   let wkn = findWKN(textArr);
 
@@ -361,7 +368,6 @@ const parseData = textArr => {
     activity.isin = isin;
   }
   let date, time, fxRate, foreignCurrency;
-
 
   [fxRate, foreignCurrency] = findForeignInformation(
     textArr,
@@ -399,7 +405,7 @@ const parseData = textArr => {
     'dd.MM.yyyy HH:mm:ss'
   );
 
-  activity.price = +Big(activity.amount).div(Big(activity.shares))
+  activity.price = +Big(activity.amount).div(Big(activity.shares));
 
   if (fxRate !== undefined) {
     activity.fxRate = fxRate;
