@@ -210,18 +210,42 @@ const findTaxes = content => {
         totalTax = totalTax.plus(Big(parseGermanNum(regexMatch[1])));
         continue;
       }
+
       totalTax = totalTax.plus(Big(parseGermanNum(content[lineNumber + 2])));
       lineNumber += 2;
       continue;
     }
 
-    if (!line.includes('steuer ') && !line.includes('zuschlag ')) {
+    if (
+      !line.includes('steuer ') &&
+      !line.includes('zuschlag ') &&
+      !line.includes('st anteilig')
+    ) {
       continue;
     }
 
-    const offset = line.endsWith('%') ? 2 : 3;
-    const lineWithTaxAmount = content[lineNumber + offset];
-    if (!lineWithTaxAmount.includes(',')) {
+    // Normaly the tax amount is in the line after the tax title
+    let offset = 2;
+    if (line.endsWith('%')) {
+      offset = 2;
+    } else if (!line.endsWith('%') && !content[lineNumber + 2].endsWith('%')) {
+      // but sometimes the line after contains only a %
+      // Kapitalertragsteuer 25,00  // <- variable line
+      // %
+      // EUR
+      // 50,46                      // <- tax amount
+      offset = 3;
+    } else if (!line.endsWith('%') && content[lineNumber + 2].endsWith('%')) {
+      // but sometimes the line after contains only a % and the line after this the percentage
+      // KapSt anteilig 50,00      // <- variable line
+      // %
+      // 25,00%
+      // EUR
+      // 74,29                      // <- tax amount
+      offset = 4;
+    }
+
+    if (!content[lineNumber + offset].includes(',')) {
       lineNumber += offset;
       continue;
     }
