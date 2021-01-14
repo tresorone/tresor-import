@@ -42,7 +42,7 @@ export const dividendsSamples = [
 export const ignoredSamples = [
   require('./ignored/2020_cost_information.json'),
   require('./ignored/2020_stock_split.json'),
-  require('./ignored/2021_advance_flat_rate.json')
+  require('./ignored/2021_advance_flat_rate.json'),
 ];
 
 export const allSamples = buySamples
