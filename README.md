@@ -3,11 +3,11 @@
 This is the PDF and PP-CSV Import used on [tresor.one](https://tresor.one). All supported brokers and apps are listed [here](docs/implementations.md).
 
 ## Supported Brokers
+
 The following brokers are supported partly or in full by the tresor-import Library. For more details on which documents
 are supported exactly, check the linked documentation.
 
-* [Deutsche Bank](docs/supportedBrokers/deutschebank.md)
-
+- [Deutsche Bank](docs/supportedBrokers/deutschebank.md)
 
 ## Installation
 
