@@ -445,6 +445,27 @@ describe('Broker: Flatex', () => {
         tax: 0.51,
       });
     });
+
+    test('should map pdf data of sample correctly: 2015_williams', () => {
+      const activities = flatex.parsePages(dividendSamples[6]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Dividend',
+        date: '2015-12-28',
+        datetime: '2015-12-28T' + activities[0].datetime.substring(11),
+        isin: 'US9694571004',
+        company: 'WILLIAMS COS INC. DL 1',
+        shares: 250,
+        amount: 145.95876664842183,
+        price: 0.5838350665936873,
+        fee: 0,
+        tax: 37.28876664842182,
+        fxRate: 1.0962,
+        foreignCurrency: 'USD',
+      });
+    });
   });
 
   describe('Mixed pages', () => {
