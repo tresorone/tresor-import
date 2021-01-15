@@ -315,8 +315,10 @@ export const canParseDocument = (pages, extension) => {
   const allPages = pages.flat();
   return (
     (extension === 'pdf' &&
+      // Some documents have the BIC inside
       (allPages.some(line => line.includes('BIC BYLADEM1001')) ||
-        allPages[0] === '10919 Berlin') &&
+        // And some in the first line the Zip-Code and City. For multipage documents the information are on line two.
+        allPages.slice(0, 2).some(line => line === '10919 Berlin')) &&
       getDocumentType(allPages) !== undefined) ||
     // This is the case for savings plan summaries, they don't contain the strings above.
     allPages.includes('Im Abrechnungszeitraum angelegter Betrag')
