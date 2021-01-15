@@ -135,7 +135,12 @@ const findShares = (textArr, startLineNumber) => {
   }
 
   // Dividends
-  const numberDividends = getTableValueByKey(textArr, startLineNumber, 'St.');
+  let numberDividends = getTableValueByKey(textArr, startLineNumber, 'St.');
+  if (numberDividends === null || numberDividends.trim().length === 0) {
+    // For old documents (e.g. from 2015) we need to get the number of shares from group 2
+    numberDividends = getTableValueByKey(textArr, startLineNumber, 'St.', 2);
+  }
+
   if (numberDividends) {
     return parseGermanNum(numberDividends);
   }
