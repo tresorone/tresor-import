@@ -30,7 +30,7 @@ const findNextIdx = (content, transactionTypes, offset = 0) => {
 
 const parseTransactionLog = content => {
   const transactionTypes = ['Kauf'];
-  let txIdx = 0
+  let txIdx = 0;
   let activities = [];
   while (txIdx >= 0) {
     txIdx = findNextIdx(content, transactionTypes, txIdx + 1);
