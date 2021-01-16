@@ -4,7 +4,7 @@ import {
   findFirstIsinIndexInArray,
   parseGermanNum,
   validateActivity,
-  regexMatchIndex,
+  findNextLineIndexByRegex,
 } from '@/helper';
 
 const idStringLong =
@@ -29,14 +29,15 @@ const findNextIdx = (content, transactionTypes, offset = 0) => {
 };
 
 const parseTransactionLog = content => {
-  const transactionTypes = ['Kauf', 'Dividende /'];
-  let txIdx = findNextIdx(content, transactionTypes);
+  const transactionTypes = ['Kauf'];
+  let txIdx = 0
   let activities = [];
   while (txIdx >= 0) {
+    txIdx = findNextIdx(content, transactionTypes, txIdx + 1);
     switch (content[txIdx]) {
       // Buy
       case transactionTypes[0]: {
-        const firstCurrencyIdx = regexMatchIndex(
+        const firstCurrencyIdx = findNextLineIndexByRegex(
           content,
           /^[A-Z]{3}$/,
           txIdx + 2
@@ -63,13 +64,7 @@ const parseTransactionLog = content => {
         }
         break;
       }
-
-      // Dividend
-      case transactionTypes[1]:
-        //This can't be parsed yet.
-        break;
     }
-    txIdx = findNextIdx(content, transactionTypes, txIdx + 1);
   }
   return activities;
 };
@@ -79,7 +74,7 @@ const parseTransactionLog = content => {
 /////////////////////////////////////////////////
 const parseDepotStatus = content => {
   let activities = [];
-  let idx = regexMatchIndex(content, /^[A-Z0-9]{6}$/);
+  let idx = findNextLineIndexByRegex(content, /^[A-Z0-9]{6}$/);
   const dateTimeLine = content[
     content.indexOf('Vermögensaufstellung Standard') + 4
   ].split(/\s+/);
@@ -109,7 +104,7 @@ const parseDepotStatus = content => {
         return undefined;
       }
     }
-    idx = regexMatchIndex(content, /[A-Z0-9]{6}/, idx + 1);
+    idx = findNextLineIndexByRegex(content, /[A-Z0-9]{6}/, idx + 1);
   }
   return activities;
 };
