@@ -1,15 +1,15 @@
 import { findImplementation } from '../../src';
 import * as smartbroker from '../../src/brokers/smartbroker';
 import {
+  allSamples,
   buySamples,
   sellSamples,
   dividendSamples,
+  ignoredSamples,
 } from './__mocks__/smartbroker';
 
 describe('Smartbroker broker test', () => {
   let consoleErrorSpy;
-
-  const allSamples = buySamples.concat(sellSamples).concat(dividendSamples);
 
   describe('Check all documents', () => {
     test('Can the document parsed with smartbroker', () => {
@@ -203,6 +203,14 @@ describe('Smartbroker broker test', () => {
         tax: 7.039151712887439,
         fxRate: 1.226,
         foreignCurrency: 'USD',
+      });
+    });
+  });
+
+  describe('Validate all ignored statements', () => {
+    test('The statement should be ignored: 2020_cost_information.json', () => {
+      ignoredSamples.forEach(pages => {
+        expect(smartbroker.parsePages(pages).status).toEqual(7);
       });
     });
   });
