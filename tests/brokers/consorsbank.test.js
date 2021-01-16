@@ -340,7 +340,7 @@ describe('Broker: Consorsbank', () => {
           tax: 0,
           fee: 24.95,
           foreignCurrency: 'USD',
-          fxRate: 1.2128
+          fxRate: 1.2128,
         },
       ]);
     });
