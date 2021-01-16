@@ -224,8 +224,9 @@ const findFee = (textArr, amount, isSell = false, formatId = undefined) => {
 const findTax = (textArr, fxRate, formatId) => {
   let withholdingTax = 0;
   if (formatId === 0 || formatId === 2) {
-    const withholdingTaxIndex = textArr.findIndex(line =>
-      line.includes(' Quellensteuer') && !line.includes('Bei einbehaltener ')
+    const withholdingTaxIndex = textArr.findIndex(
+      line =>
+        line.includes(' Quellensteuer') && !line.includes('Bei einbehaltener ')
     );
     if (withholdingTaxIndex > 0) {
       withholdingTax = parseGermanNum(
