@@ -3,7 +3,7 @@ import {
   allSamples,
   dividendSamples,
   depotStatusSamples,
-  unsupportedSamples,
+  ignoredSamples,
   transactionLogSamples,
 } from './__mocks__/deutscheBank';
 import { deutschebank } from '../../src/brokers';
@@ -136,7 +136,7 @@ describe('Broker: Deutsche Bank', () => {
 
   describe('Check unsupported files from Deutsche Bank', () => {
     test('Every unsupported file is marked as such with status code 7', () => {
-      unsupportedSamples.forEach(sample => {
+      ignoredSamples.forEach(sample => {
         expect(deutschebank.parsePages(sample).status).toEqual(7);
       });
     });

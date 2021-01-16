@@ -15,8 +15,9 @@ export const transactionLogSamples = [
   require('./transactionLog/2020_buy_dividend_transaction_log.json'),
 ];
 
-export const unsupportedSamples = [
-  require('./notSupported/2020_unparsable_buy_operation.json'),
+export const ignoredSamples = [
+  require('./ignored/2020_unparsable_buy_operation.json'),
+  require('./ignored/2020_unparsable_sell_operation.json')
 ];
 
 export const allSamples = buySamples.concat(
