@@ -1,4 +1,5 @@
-For the following brokers and apps we are ready to parse the following documents:
+For the following brokers and apps we are ready to parse the following documents. For some brokers
+a more detailed explanation is given behind brokername.
 
 | Broker / App           | Type of documents                        | Remark                                                                             |
 | ---------------------- | ---------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -7,6 +8,7 @@ For the following brokers and apps we are ready to parse the following documents
 | Consorsbank            | Buy, Sell, Dividend                      |                                                                                    |
 | Degiro (DE)            | Transaction log                          |                                                                                    |
 | DKB                    | Buy, Sell, Dividend                      |                                                                                    |
+| [Deutsche Bank](docs/supportedBrokers/deutschebank.mde)  | Buy, Dividend | Only specific buy/dividend `.pdf` files are supported                       |
 | ebase                  | Transaction log                          | Currenlty only the `.pdf` documents                                                |
 | Erste Bank (AT)        | Buy, Sell, Dividend                      |                                                                                    |
 | flatex / FinTech Group | Buy, Sell, Dividend                      |                                                                                    |
