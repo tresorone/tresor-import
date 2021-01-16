@@ -17,7 +17,7 @@ export const transactionLogSamples = [
 
 export const ignoredSamples = [
   require('./ignored/2020_unparsable_buy_operation.json'),
-  require('./ignored/2020_unparsable_sell_operation.json')
+  require('./ignored/2020_unparsable_sell_operation.json'),
 ];
 
 export const allSamples = buySamples.concat(
