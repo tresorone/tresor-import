@@ -8,7 +8,6 @@ import * as onvista from './onvista';
 
 const findTax = (textArr, fxRate) => {
   let completeTax = Big(0);
-  let witholdingTax = 0;
 
   const capitalTaxIndex = textArr.findIndex(t =>
     t.includes('Kapitalertragsteuer')
@@ -50,10 +49,9 @@ const findTax = (textArr, fxRate) => {
     }
 
     completeTax = completeTax.plus(amount);
-    witholdingTax = +amount;
   }
 
-  return [+completeTax, witholdingTax];
+  return +completeTax;
 };
 
 const findFxRateAndForeignCurrency = content => {
@@ -87,14 +85,15 @@ const findFxRateAndForeignCurrency = content => {
   return [parseGermanNum(regexMatch[2]), regexMatch[1]];
 };
 
-const findPayout = content => {
-  let payoutIndex = content.indexOf('Steuerpflichtiger Ausschüttungsbetrag');
-  if (payoutIndex < 0) {
-    payoutIndex = content.indexOf('ausländische Dividende');
+const findPriceDividend = ( content ) => {
+  let priceIdx = content.indexOf('Dividenden-Betrag pro Stück');
+  if ( priceIdx < 0 ) {
+    priceIdx = content.indexOf('Ausschüttungsbetrag pro Stück');
   }
-
-  return parseGermanNum(content[payoutIndex + 2]);
-};
+  if ( priceIdx >= 0 ) {
+    return parseGermanNum(content[priceIdx + 1].split(/\s+/)[1]);
+  }
+}
 
 const findOrderTime = content => {
   // Extract the time after the line with Handelszeit which contains "17:33*"
@@ -131,7 +130,6 @@ const parseData = textArr => {
   const company = onvista.findCompany(textArr);
   let type, amount, date, time, price, fxRate, foreignCurrency;
   let tax = 0;
-  let witholdingTax = 0;
   let fee = 0;
 
   [fxRate, foreignCurrency] = findFxRateAndForeignCurrency(textArr);
@@ -149,14 +147,13 @@ const parseData = textArr => {
     date = onvista.findDateBuySell(textArr);
     time = findOrderTime(textArr);
     price = onvista.findPrice(textArr);
-    [tax, witholdingTax] = findTax(textArr, fxRate);
+    tax = findTax(textArr, fxRate);
   } else if (onvista.isDividend(textArr)) {
     type = 'Dividend';
-    [tax, witholdingTax] = findTax(textArr, fxRate);
-    // Add the witholding tax to the amount to get the total gross value
-    amount = +Big(findPayout(textArr)).plus(witholdingTax);
+    tax = findTax(textArr, fxRate);
+    price = fxRate === undefined ? findPriceDividend(textArr) : +Big(findPriceDividend(textArr)).div(fxRate);
+    amount = +Big(price).times(shares);
     date = onvista.findDateDividend(textArr);
-    price = +Big(amount).div(shares);
   }
 
   const [parsedDate, parsedDateTime] = createActivityDateTime(date, time);
@@ -182,7 +179,6 @@ const parseData = textArr => {
   if (foreignCurrency !== undefined) {
     activity.foreignCurrency = foreignCurrency;
   }
-
   return validateActivity(activity);
 };
 

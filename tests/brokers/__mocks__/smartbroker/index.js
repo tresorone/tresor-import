@@ -8,4 +8,6 @@ export const dividendSamples = [
   require('./dividend/dividend_stock_usd_2.json'),
   require('./dividend/2020_pan_american_silver.json'),
   require('./dividend/2020_ishares_global_clean_energy.json'),
+  require('./dividend/2021_ish_eo_st.json'),
+  require('./dividend/2021_wp_carey_inc.json'),
 ];
