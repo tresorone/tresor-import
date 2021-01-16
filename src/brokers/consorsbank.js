@@ -170,6 +170,11 @@ const findAmount = (textArr, type) => {
       // Documents before nov 2020 have the currency in a line before the amount.
       offset += 1;
     }
+    if (/^Kurswert in [A-Z]{3}$/.test(textArr[lineNumber + offset + 2])) {
+      // Some documents show the amount in the foreign currency first and than the amount in the base currency.
+      // see 2021_usd_churchill_cap_iv
+      offset += 2;
+    }
 
     return parseGermanNum(textArr[lineNumber + 1 + offset]);
   }
@@ -367,12 +372,17 @@ const parseData = textArr => {
   if (isin !== undefined) {
     activity.isin = isin;
   }
-  let date, time, fxRate, foreignCurrency;
+  let date, time;
 
-  [fxRate, foreignCurrency] = findForeignInformation(
+  const [fxRate, foreignCurrency] = findForeignInformation(
     textArr,
     activity.type === 'Dividend'
   );
+
+  if (fxRate !== undefined) {
+    activity.fxRate = fxRate;
+    activity.foreignCurrency = foreignCurrency;
+  }
 
   switch (activity.type) {
     case 'Buy':
@@ -406,11 +416,6 @@ const parseData = textArr => {
   );
 
   activity.price = +Big(activity.amount).div(Big(activity.shares));
-
-  if (fxRate !== undefined) {
-    activity.fxRate = fxRate;
-    activity.foreignCurrency = foreignCurrency;
-  }
 
   return validateActivity(activity);
 };

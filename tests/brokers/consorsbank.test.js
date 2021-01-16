@@ -321,6 +321,29 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('Should map the document correctly: 2021_usd_churchill_cap_iv', () => {
+      const activity = consorsbank.parsePages(buySamples[14]).activities;
+
+      expect(activity).toEqual([
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'CHURCHILL CAP.IV COMP.UT',
+          date: '8830-12-06',
+          datetime: '8830-12-06T14:57:10.000Z',
+          isin: 'US1714392016',
+          wkn: 'A2QAZC',
+          price: 13.44,
+          shares: 100,
+          amount: 1344,
+          tax: 0,
+          fee: 24.95,
+          foreignCurrency: 'USD',
+          fxRate: 1.2128
+        },
+      ]);
+    });
   });
 
   describe('Sell', () => {

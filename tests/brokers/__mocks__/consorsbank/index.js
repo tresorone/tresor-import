@@ -13,6 +13,7 @@ export const buySamples = [
   require('./buy/2021_allianz_strategy_fond.json'),
   require('./buy/2021_janus_henderson_capital_funds.json'),
   require('./buy/2021_put_citi_gl.json'),
+  require('./buy/2021_usd_churchill_cap_iv.json'),
 ];
 
 export const sellSamples = [
