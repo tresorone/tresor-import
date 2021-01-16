@@ -225,7 +225,7 @@ const findTax = (textArr, fxRate, formatId) => {
   let withholdingTax = 0;
   if (formatId === 0 || formatId === 2) {
     const withholdingTaxIndex = textArr.findIndex(line =>
-      line.includes(' Quellensteuer')
+      line.includes(' Quellensteuer') && !line.includes('Bei einbehaltener ')
     );
     if (withholdingTaxIndex > 0) {
       withholdingTax = parseGermanNum(
@@ -247,7 +247,6 @@ const findTax = (textArr, fxRate, formatId) => {
     } else {
       lineWithTaxValue = textArr[payedTaxIndex + 1].split(/\s+/)[1];
     }
-
     localTax = Math.abs(parseGermanNum(lineWithTaxValue));
   }
 

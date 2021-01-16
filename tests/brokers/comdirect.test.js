@@ -280,6 +280,26 @@ describe('Broker: comdirect', () => {
         tax: 0,
       });
     });
+
+    test('Can parse the sell order: 2020_eur_sma_solar_technology', () => {
+      const result = comdirect.parsePages(sellSamples[4]).activities;
+
+      expect(result.length).toEqual(1);
+      expect(result[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Sell',
+        date: '2021-01-13',
+        datetime: '2021-01-13T14:55:00.000Z',
+        isin: 'US78446M1099',
+        wkn: 'A2QFGD',
+        company: 'SMA Solar Technology AG',
+        shares: 50,
+        price: 6.045,
+        amount: 302.25,
+        fee: 6.8,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate dividends', () => {
