@@ -205,7 +205,6 @@ describe('Smartbroker broker test', () => {
         foreignCurrency: 'USD',
       });
     });
-
   });
 
   beforeEach(() => {

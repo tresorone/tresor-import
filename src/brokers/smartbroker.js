@@ -85,15 +85,15 @@ const findFxRateAndForeignCurrency = content => {
   return [parseGermanNum(regexMatch[2]), regexMatch[1]];
 };
 
-const findPriceDividend = ( content ) => {
+const findPriceDividend = content => {
   let priceIdx = content.indexOf('Dividenden-Betrag pro Stück');
-  if ( priceIdx < 0 ) {
+  if (priceIdx < 0) {
     priceIdx = content.indexOf('Ausschüttungsbetrag pro Stück');
   }
-  if ( priceIdx >= 0 ) {
+  if (priceIdx >= 0) {
     return parseGermanNum(content[priceIdx + 1].split(/\s+/)[1]);
   }
-}
+};
 
 const findOrderTime = content => {
   // Extract the time after the line with Handelszeit which contains "17:33*"
@@ -151,7 +151,10 @@ const parseData = textArr => {
   } else if (onvista.isDividend(textArr)) {
     type = 'Dividend';
     tax = findTax(textArr, fxRate);
-    price = fxRate === undefined ? findPriceDividend(textArr) : +Big(findPriceDividend(textArr)).div(fxRate);
+    price =
+      fxRate === undefined
+        ? findPriceDividend(textArr)
+        : +Big(findPriceDividend(textArr)).div(fxRate);
     amount = +Big(price).times(shares);
     date = onvista.findDateDividend(textArr);
   }
