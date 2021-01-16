@@ -12,10 +12,10 @@ Explanation on the Column _Can be parsed_:
 
 If your file not listed in the table below, please report it at tresor.import.one!
 
-| Type of file                     | Format | Can be parsed |  Notes                                                               |
-| -------------------------------- | ------ | ------------- | -------------------------------------------------------------------------- |
-| Dividendengutschrift             | .pdf   | ✔️            |                                                                            |
-| Ertragsgutschrift                | .pdf   | ✔️            |                                                                            |
-| Abrechnung Kauf von Wertpapieren | .pdf   | ❌            | The .pdf files contains images instead of text and breaks the .pdf parsers |
-| Umsatzliste | .pdf   | ⚠️| Can only parse 'Buy'. No test files for 'Sell', can't be parsed yet, dividends can and will not be parsed.|
-| Depotstatus | .pdf   | ✔️|  |
+| Type of file                     | Format | Can be parsed | Notes                                                                                                      |
+| -------------------------------- | ------ | ------------- | ---------------------------------------------------------------------------------------------------------- |
+| Dividendengutschrift             | .pdf   | ✔️            |                                                                                                            |
+| Ertragsgutschrift                | .pdf   | ✔️            |                                                                                                            |
+| Abrechnung Kauf von Wertpapieren | .pdf   | ❌            | The .pdf files contains images instead of text and breaks the .pdf parsers                                 |
+| Umsatzliste                      | .pdf   | ⚠️            | Can only parse 'Buy'. No test files for 'Sell', can't be parsed yet, dividends can and will not be parsed. |
+| Depotstatus                      | .pdf   | ✔️            |                                                                                                            |
