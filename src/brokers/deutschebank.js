@@ -4,8 +4,110 @@ import {
   findFirstIsinIndexInArray,
   parseGermanNum,
   validateActivity,
+  regexMatchIndex,
 } from '@/helper';
 
+const idStringLong = 'Bitte beachten Sie auch unsere weiteren Erläuterungen zu diesem Report, die Sie auf beiliegender Anlage finden! Bei Fragen sprechen Sie bitte Ihren Berater an.';
+
+
+/////////////////////////////////////////////////
+// Transaction Log Functions
+/////////////////////////////////////////////////
+
+// Takes array of strings <transactionTypes> and returns the next occurrence of one of these strings in array <content>
+const findNextIdx = ( content, transactionTypes, offset = 0 ) => {
+  Array.min = function( array ) {
+    return Math.min.apply(Math, array);
+  };
+
+  let idxArray = [];
+  transactionTypes.forEach(type => {
+    idxArray.push(content.slice(offset).indexOf(type));
+  });
+  const nextIdx = Array.min(idxArray.filter(lineNumber => lineNumber >= 0));
+  return nextIdx !== Infinity ? nextIdx + offset : -1;
+};
+
+const parseTransactionLog = content => {
+
+  const transactionTypes = ['Kauf', 'Dividende /']
+  let txIdx = findNextIdx(content, transactionTypes);
+  let activities = [];
+  while (txIdx >= 0) {
+    switch (content[txIdx]) {
+      // Buy
+      case transactionTypes[0]: {
+        const firstCurrencyIdx = regexMatchIndex(content, /^[A-Z]{3}$/, txIdx + 2);
+        let activity = {
+          broker: 'deutschebank',
+          type: 'Buy',
+          shares: parseGermanNum(content[txIdx + 1]),
+          company: content.slice(txIdx + 2, firstCurrencyIdx - 1).join(' '),
+          wkn: content[firstCurrencyIdx - 1],
+          price: parseGermanNum(content[firstCurrencyIdx + 1]),
+          amount: Math.abs(parseGermanNum(content[firstCurrencyIdx + 2])),
+          tax: 0,
+          fee: 0,
+        };
+        [activity.date, activity.datetime] = createActivityDateTime(content[txIdx-3]);
+        activity = validateActivity(activity);
+        if (activity !== undefined) {
+          activities.push(activity);
+        } else {
+          return undefined;
+        }
+        break;
+      }
+
+      // Dividend
+      case transactionTypes[1]:
+        //This can't be parsed yet.
+        break;
+    }
+    txIdx = findNextIdx(content, transactionTypes, txIdx + 1);
+  }
+  return activities;
+};
+
+/////////////////////////////////////////////////
+// Depot Status parsing
+/////////////////////////////////////////////////
+const parseDepotStatus = ( content ) => {
+  let activities = [];
+  let idx = regexMatchIndex(content, /^[A-Z0-9]{6}$/);
+  const dateTimeLine = content[content.indexOf('Vermögensaufstellung Standard') + 4].split(/\s+/);
+  const [date, datetime] = createActivityDateTime(dateTimeLine[2], dateTimeLine[4])
+  while ( idx >= 0) {
+    if ( /^[A-Z]{3}$/.test(content[idx + 1])) {
+      let activity = {
+        broker: 'deutschebank',
+        type: 'TransferIn',
+        date,
+        datetime,
+        wkn: content[idx],
+        company: content[idx - 1],
+        shares: parseGermanNum(content[idx - 2]),
+        amount: parseGermanNum(content[idx + 3]),
+        price: parseGermanNum(content[idx + 2]),
+        tax: 0,
+        fee: 0,
+      }
+      activity = validateActivity(activity);
+      if ( activity !== undefined ) {
+        activities.push(activity);
+      } else {
+        return undefined;
+      }
+    }
+    idx = regexMatchIndex(content, /[A-Z0-9]{6}/, idx + 1);
+  }
+  return activities;
+};
+
+
+/////////////////////////////////////////////////
+// Individual Transaction Functions
+/////////////////////////////////////////////////
 const findDividendIsin = content => {
   const isinIdx = content.indexOf('ISIN');
   if (isinIdx >= 0) {
@@ -91,7 +193,38 @@ const getDocumentType = content => {
     return 'Dividend';
   } else if (content.includes('_itte überprüfen')) {
     return 'Unsupported';
+  } else if (content.includes('Umsatzliste')) {
+    return 'TransactionLog'
+  } else if (content.includes('Vermögensaufstellung Standard')) {
+    return 'DepotStatus'
   }
+};
+
+const parseDividend = ( pagesFlat, activityType ) => {
+
+  let activity = {
+    broker: 'deutschebank',
+    type: activityType,
+  };
+  const [foreignCurrency, fxRate] = findDividendForeignInformation(
+      pagesFlat
+  );
+  if (foreignCurrency !== undefined && fxRate !== undefined) {
+    activity.foreignCurrency = foreignCurrency;
+    activity.fxRate = fxRate;
+  }
+  activity.isin = findDividendIsin(pagesFlat);
+  activity.wkn = findDividendWKN(pagesFlat);
+  activity.company = findDividendCompany(pagesFlat);
+  [activity.date, activity.datetime] = createActivityDateTime(
+      findDividendDate(pagesFlat)
+  );
+  activity.shares = findDividendShares(pagesFlat);
+  activity.amount = findDividendAmount(pagesFlat, activity.fxRate);
+  activity.price = +Big(activity.amount).div(activity.shares);
+  activity.fee = 0;
+  activity.tax = findDividendTax(pagesFlat, activity.fxRate);
+  return activity
 };
 
 export const canParseDocument = (document, extension) => {
@@ -99,48 +232,48 @@ export const canParseDocument = (document, extension) => {
   // It seems the pdf for Deutsche Bank Buy transactions can't be parsed by pdfjs (_itte überprüfen)
   return (
     (extension === 'pdf' &&
-      documentFlat.includes('www.deutsche-bank.de') &&
-      getDocumentType(documentFlat) !== undefined) ||
-    documentFlat.includes('_itte überprüfen')
-  );
+        ( documentFlat.includes('www.deutsche-bank.de') || documentFlat.includes(idStringLong) &&
+      getDocumentType(documentFlat) !== undefined ) || documentFlat.includes('_itte überprüfen')));
 };
 
 export const parsePages = pages => {
-  const allPages = pages.flat();
-  let activity = {
-    broker: 'deutschebank',
-    type: getDocumentType(allPages),
-  };
-  switch (activity.type) {
-    case 'Unsupported':
-      return {
-        activity: undefined,
-        status: 7,
-      };
+  const pagesFlat = pages.flat();
+  const type = getDocumentType(pagesFlat);
+  let activity;
+  switch (type) {
     case 'Dividend': {
-      const [foreignCurrency, fxRate] = findDividendForeignInformation(
-        allPages
-      );
-      if (foreignCurrency !== undefined && fxRate !== undefined) {
-        activity.foreignCurrency = foreignCurrency;
-        activity.fxRate = fxRate;
-      }
-      activity.isin = findDividendIsin(allPages);
-      activity.wkn = findDividendWKN(allPages);
-      activity.company = findDividendCompany(allPages);
-      [activity.date, activity.datetime] = createActivityDateTime(
-        findDividendDate(allPages)
-      );
-      activity.shares = findDividendShares(allPages);
-      activity.amount = findDividendAmount(allPages, activity.fxRate);
-      activity.price = +Big(activity.amount).div(activity.shares);
-      activity.fee = 0;
-      activity.tax = findDividendTax(allPages, activity.fxRate);
+      activity = parseDividend(pagesFlat, type);
       break;
     }
+    case 'TransactionLog': {
+      const activities = parseTransactionLog(pagesFlat);
+      if ( activities !== undefined ) {
+        return {
+          activities,
+          status: 0
+        };
+      }
+      break;
+    }
+    case 'DepotStatus': {
+      const activities = parseDepotStatus(pagesFlat);
+      if ( activities !== undefined ) {
+        return {
+          activities,
+          status: 0
+        };
+      }
+      break;
+    }
+    case 'Unsupported':
+      return {
+        activities: undefined,
+        status: 7,
+      };
+    // Valid Document but no parsing could happen
     default:
       return {
-        activity: undefined,
+        activities: undefined,
         status: 5,
       };
   }
