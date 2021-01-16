@@ -7,16 +7,16 @@ import {
   regexMatchIndex,
 } from '@/helper';
 
-const idStringLong = 'Bitte beachten Sie auch unsere weiteren Erläuterungen zu diesem Report, die Sie auf beiliegender Anlage finden! Bei Fragen sprechen Sie bitte Ihren Berater an.';
-
+const idStringLong =
+  'Bitte beachten Sie auch unsere weiteren Erläuterungen zu diesem Report, die Sie auf beiliegender Anlage finden! Bei Fragen sprechen Sie bitte Ihren Berater an.';
 
 /////////////////////////////////////////////////
 // Transaction Log Functions
 /////////////////////////////////////////////////
 
 // Takes array of strings <transactionTypes> and returns the next occurrence of one of these strings in array <content>
-const findNextIdx = ( content, transactionTypes, offset = 0 ) => {
-  Array.min = function( array ) {
+const findNextIdx = (content, transactionTypes, offset = 0) => {
+  Array.min = function (array) {
     return Math.min.apply(Math, array);
   };
 
@@ -29,15 +29,18 @@ const findNextIdx = ( content, transactionTypes, offset = 0 ) => {
 };
 
 const parseTransactionLog = content => {
-
-  const transactionTypes = ['Kauf', 'Dividende /']
+  const transactionTypes = ['Kauf', 'Dividende /'];
   let txIdx = findNextIdx(content, transactionTypes);
   let activities = [];
   while (txIdx >= 0) {
     switch (content[txIdx]) {
       // Buy
       case transactionTypes[0]: {
-        const firstCurrencyIdx = regexMatchIndex(content, /^[A-Z]{3}$/, txIdx + 2);
+        const firstCurrencyIdx = regexMatchIndex(
+          content,
+          /^[A-Z]{3}$/,
+          txIdx + 2
+        );
         let activity = {
           broker: 'deutschebank',
           type: 'Buy',
@@ -49,7 +52,9 @@ const parseTransactionLog = content => {
           tax: 0,
           fee: 0,
         };
-        [activity.date, activity.datetime] = createActivityDateTime(content[txIdx-3]);
+        [activity.date, activity.datetime] = createActivityDateTime(
+          content[txIdx - 3]
+        );
         activity = validateActivity(activity);
         if (activity !== undefined) {
           activities.push(activity);
@@ -72,13 +77,18 @@ const parseTransactionLog = content => {
 /////////////////////////////////////////////////
 // Depot Status parsing
 /////////////////////////////////////////////////
-const parseDepotStatus = ( content ) => {
+const parseDepotStatus = content => {
   let activities = [];
   let idx = regexMatchIndex(content, /^[A-Z0-9]{6}$/);
-  const dateTimeLine = content[content.indexOf('Vermögensaufstellung Standard') + 4].split(/\s+/);
-  const [date, datetime] = createActivityDateTime(dateTimeLine[2], dateTimeLine[4])
-  while ( idx >= 0) {
-    if ( /^[A-Z]{3}$/.test(content[idx + 1])) {
+  const dateTimeLine = content[
+    content.indexOf('Vermögensaufstellung Standard') + 4
+  ].split(/\s+/);
+  const [date, datetime] = createActivityDateTime(
+    dateTimeLine[2],
+    dateTimeLine[4]
+  );
+  while (idx >= 0) {
+    if (/^[A-Z]{3}$/.test(content[idx + 1])) {
       let activity = {
         broker: 'deutschebank',
         type: 'TransferIn',
@@ -91,9 +101,9 @@ const parseDepotStatus = ( content ) => {
         price: parseGermanNum(content[idx + 2]),
         tax: 0,
         fee: 0,
-      }
+      };
       activity = validateActivity(activity);
-      if ( activity !== undefined ) {
+      if (activity !== undefined) {
         activities.push(activity);
       } else {
         return undefined;
@@ -103,7 +113,6 @@ const parseDepotStatus = ( content ) => {
   }
   return activities;
 };
-
 
 /////////////////////////////////////////////////
 // Individual Transaction Functions
@@ -194,21 +203,18 @@ const getDocumentType = content => {
   } else if (content.includes('_itte überprüfen')) {
     return 'Unsupported';
   } else if (content.includes('Umsatzliste')) {
-    return 'TransactionLog'
+    return 'TransactionLog';
   } else if (content.includes('Vermögensaufstellung Standard')) {
-    return 'DepotStatus'
+    return 'DepotStatus';
   }
 };
 
-const parseDividend = ( pagesFlat, activityType ) => {
-
+const parseDividend = (pagesFlat, activityType) => {
   let activity = {
     broker: 'deutschebank',
     type: activityType,
   };
-  const [foreignCurrency, fxRate] = findDividendForeignInformation(
-      pagesFlat
-  );
+  const [foreignCurrency, fxRate] = findDividendForeignInformation(pagesFlat);
   if (foreignCurrency !== undefined && fxRate !== undefined) {
     activity.foreignCurrency = foreignCurrency;
     activity.fxRate = fxRate;
@@ -217,14 +223,14 @@ const parseDividend = ( pagesFlat, activityType ) => {
   activity.wkn = findDividendWKN(pagesFlat);
   activity.company = findDividendCompany(pagesFlat);
   [activity.date, activity.datetime] = createActivityDateTime(
-      findDividendDate(pagesFlat)
+    findDividendDate(pagesFlat)
   );
   activity.shares = findDividendShares(pagesFlat);
   activity.amount = findDividendAmount(pagesFlat, activity.fxRate);
   activity.price = +Big(activity.amount).div(activity.shares);
   activity.fee = 0;
   activity.tax = findDividendTax(pagesFlat, activity.fxRate);
-  return activity
+  return activity;
 };
 
 export const canParseDocument = (document, extension) => {
@@ -232,8 +238,11 @@ export const canParseDocument = (document, extension) => {
   // It seems the pdf for Deutsche Bank Buy transactions can't be parsed by pdfjs (_itte überprüfen)
   return (
     (extension === 'pdf' &&
-        ( documentFlat.includes('www.deutsche-bank.de') || documentFlat.includes(idStringLong) &&
-      getDocumentType(documentFlat) !== undefined ) || documentFlat.includes('_itte überprüfen')));
+      (documentFlat.includes('www.deutsche-bank.de') ||
+        (documentFlat.includes(idStringLong) &&
+          getDocumentType(documentFlat) !== undefined))) ||
+    documentFlat.includes('_itte überprüfen')
+  );
 };
 
 export const parsePages = pages => {
@@ -247,20 +256,20 @@ export const parsePages = pages => {
     }
     case 'TransactionLog': {
       const activities = parseTransactionLog(pagesFlat);
-      if ( activities !== undefined ) {
+      if (activities !== undefined) {
         return {
           activities,
-          status: 0
+          status: 0,
         };
       }
       break;
     }
     case 'DepotStatus': {
       const activities = parseDepotStatus(pagesFlat);
-      if ( activities !== undefined ) {
+      if (activities !== undefined) {
         return {
           activities,
-          status: 0
+          status: 0,
         };
       }
       break;

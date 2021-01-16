@@ -3,7 +3,8 @@ import {
   allSamples,
   dividendSamples,
   depotStatusSamples,
-  unsupportedSamples, transactionLogSamples,
+  unsupportedSamples,
+  transactionLogSamples,
 } from './__mocks__/deutscheBank';
 import { deutschebank } from '../../src/brokers';
 
@@ -104,7 +105,7 @@ describe('Broker: Deutsche Bank', () => {
         company: 'ISHSIII-MSCI EM USD(ACC) FUNDS',
         shares: 13.2059,
         price: 34.85558,
-        amount: 460.30,
+        amount: 460.3,
         fee: 0,
         tax: 0,
       });
