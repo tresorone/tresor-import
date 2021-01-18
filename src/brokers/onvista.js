@@ -4,6 +4,7 @@ import {
   validateActivity,
   createActivityDateTime,
   timeRegex,
+  findFirstSearchtermIndexInArray,
 } from '@/helper';
 
 // Both smartbroker and onvista use highly similar parsers due to them both being
@@ -13,8 +14,9 @@ import {
 export const onvistaIdentificationString = 'BELEGDRUCK=J';
 export const smartbrokerIdentificationString = 'Landsberger Straße 300';
 
-export const findISIN = text =>
-  text[text.findIndex(t => t.includes('ISIN')) + 1];
+export const findISIN = text => {
+  return text[text.indexOf('ISIN') + 1];
+};
 
 export const findCompany = text => {
   let company = text[text.findIndex(t => t.includes('ISIN')) - 1];
@@ -39,8 +41,9 @@ export const findDateBuySell = text => {
   return date;
 };
 
-export const findDateDividend = text =>
-  text[text.findIndex(t => t.includes('Zahltag')) + 1];
+export const findDateDividend = text => {
+  return text[text.findIndex(t => t.includes('Zahltag')) + 1];
+};
 
 const findOrderTime = content => {
   // Extract the time after the line with Handelszeit which contains "17:33"
@@ -182,7 +185,10 @@ export const canParseDocument = (pages, extension) => {
       (firstPageContent.some(line =>
         line.includes('Webtrading onvista bank')
       ) &&
-        detectedButIgnoredDocument(firstPageContent)))
+        detectedButIgnoredDocument(firstPageContent)) ||
+        // Account Statements
+        firstPageContent.includes('onvista bank') && firstPageContent.includes('der Sechs-Wochen-Frist.')
+    )
   );
 };
 
@@ -196,6 +202,9 @@ export const isDividend = content =>
   content.some(line => line.includes('Erträgnisgutschrift')) ||
   content.some(line => line.includes('Dividendengutschrift'));
 
+const isAccountStatement = content =>
+    content.some(line => line.startsWith('Kontoauszug Nr. '));
+
 const canParsePage = content =>
   isBuy(content) || isSell(content) || isDividend(content);
 
@@ -206,75 +215,117 @@ const detectedButIgnoredDocument = content => {
   );
 };
 
-const parseData = text => {
+const parseAccountStatement = pdfPages => {
+  const searchTerms = ['Wertpapierkauf']
+  const year = pdfPages[pdfPages.findIndex(line => line.startsWith('Kontoauszug Nr. '))].split(/\s+/)[2];
+  let idx = findFirstSearchtermIndexInArray(pdfPages, searchTerms);
+  let activities = [];
+  while (idx >= 0) {
+    let activity = {
+      broker: 'onvista',
+      company: pdfPages[idx + 1],
+      isin: pdfPages[idx + 3].split(/\s+/)[1],
+      shares: parseGermanNum(pdfPages[idx + 2].split(/\s+/)[1]),
+      amount: Math.abs(parseGermanNum(pdfPages[idx - 1])),
+      tax: 0,
+      fee: 0,
+    };
+    activity.price = +Big(activity.amount).div(activity.shares);
+    [activity.date, activity.datetime] = createActivityDateTime(pdfPages[idx - 3] + year);
+
+    switch ( pdfPages[idx] ) {
+      case searchTerms[0]:
+        activity.type = 'Buy';
+        break;
+    }
+    activity = validateActivity(activity);
+    if (activity !== undefined) {
+      activities.push(activity)
+      idx = findFirstSearchtermIndexInArray(pdfPages, searchTerms, idx + 1);
+    } else {
+      return undefined
+    }
+  }
+  return activities;
+}
+
+const parseSingleTransaction = pdfPage => {
   let activity = {
     broker: 'onvista',
-    isin: findISIN(text),
-    company: findCompany(text),
-    shares: findShares(text),
+    isin: findISIN(pdfPage),
+    company: findCompany(pdfPage),
+    shares: findShares(pdfPage),
   };
-
-  const foreignCurrencyIdx = text.indexOf('Devisenkurs') + 1;
+  const foreignCurrencyIdx = pdfPage.indexOf('Devisenkurs') + 1;
   if (foreignCurrencyIdx > 0) {
-    activity.fxRate = parseGermanNum(text[foreignCurrencyIdx].split(/\s+/)[1]);
-    activity.foreignCurrency = text[foreignCurrencyIdx]
+    activity.fxRate = parseGermanNum(pdfPage[foreignCurrencyIdx].split(/\s+/)[1]);
+    activity.foreignCurrency = pdfPage[foreignCurrencyIdx]
       .split(/\s+/)[0]
       .split(/\//)[1];
   }
-
-  if (isBuy(text)) {
+  if (isBuy(pdfPage)) {
     activity.type = 'Buy';
     [activity.date, activity.datetime] = createActivityDateTime(
-      findDateBuySell(text),
-      findOrderTime(text)
+      findDateBuySell(pdfPage),
+      findOrderTime(pdfPage)
     );
-    activity.amount = findAmount(text, activity.fxRate);
-    activity.fee = findFee(text, activity.fxRate);
+    activity.amount = findAmount(pdfPage, activity.fxRate);
+    activity.fee = findFee(pdfPage, activity.fxRate);
     activity.tax = 0.0;
-    activity.price = findPrice(text, activity.fxRate);
-  } else if (isSell(text)) {
+    activity.price = findPrice(pdfPage, activity.fxRate);
+  } else if (isSell(pdfPage)) {
     activity.type = 'Sell';
     [activity.date, activity.datetime] = createActivityDateTime(
-      findDateBuySell(text),
-      findOrderTime(text)
+      findDateBuySell(pdfPage),
+      findOrderTime(pdfPage)
     );
-    activity.amount = findAmount(text, activity.fxRate);
-    activity.fee = findFee(text, activity.fxRate);
-    activity.tax = findTax(text);
-    activity.price = findPrice(text, activity.fxRate);
-  } else if (isDividend(text)) {
+    activity.amount = findAmount(pdfPage, activity.fxRate);
+    activity.fee = findFee(pdfPage, activity.fxRate);
+    activity.tax = findTax(pdfPage);
+    activity.price = findPrice(pdfPage, activity.fxRate);
+  } else if (isDividend(pdfPage)) {
     activity.type = 'Dividend';
     [activity.date, activity.datetime] = createActivityDateTime(
-      findDateDividend(text),
+      findDateDividend(pdfPage),
       undefined
     );
     activity.fee = 0;
-    activity.tax = findTax(text);
-    activity.amount = findGrossPayout(text, activity.tax);
+    activity.tax = findTax(pdfPage);
+    activity.amount = findGrossPayout(pdfPage, activity.tax);
     activity.price = +Big(activity.amount).div(activity.shares);
   }
   return validateActivity(activity);
 };
 
-export const parsePages = contents => {
-  let activities = [];
+export const parsePages = pdfPages => {
 
-  if (detectedButIgnoredDocument(contents[0])) {
+  let activities = [];
+  if (detectedButIgnoredDocument(pdfPages[0])) {
     // We know this type and we don't want to support it.
     return {
       activities,
       status: 7,
     };
   }
+  if (isAccountStatement(pdfPages.flat())) {
+    activities = parseAccountStatement(pdfPages.flat());
+  } else {
+    for (let content of pdfPages) {
+      if (canParsePage(content)) {
+        activities.push(parseSingleTransaction(content));
+      }
+    }
+  }
 
-  for (let content of contents) {
-    if (canParsePage(content)) {
-      activities.push(parseData(content));
+  if (activities !== undefined) {
+    return {
+      activities,
+      status: 0,
     }
   }
 
   return {
     activities,
-    status: 0,
-  };
+    status: 5,
+  }
 };

@@ -516,6 +516,28 @@ describe('Helper functions', () => {
     });
   });
 
+  describe('findNextLineIndexByRegex is working as intended', () => {
+    test('Find index for two valid entries', () => {
+      const testArray = [
+        'one',
+        'two',
+        'three',
+        'four',
+      ];
+      expect(helper.findFirstSearchtermIndexInArray(testArray, ['three', 'two'] )).toEqual(1);
+    });
+
+    test('Return zero for no valid entries', () => {
+      const testArray = [
+        'one',
+        'two',
+        'three',
+        'four',
+      ];
+      expect(helper.findFirstSearchtermIndexInArray(testArray, ['foo', 'bar'] )).toEqual(-1);
+    });
+  });
+
   beforeEach(() => {
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
   });

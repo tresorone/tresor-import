@@ -286,3 +286,17 @@ export function createActivityDateTime(
 
   return [dateTime.toFormat('yyyy-MM-dd'), dateTime.toUTC().toISO()];
 }
+
+// Takes array of strings <transactionTypes> and returns the next occurrence of one of these strings in array <content>
+export const findFirstSearchtermIndexInArray = (array, searchterms, offset = 0) => {
+  Array.min = function (array) {
+    return Math.min.apply(Math, array);
+  };
+
+  let idxArray = [];
+  searchterms.forEach(type => {
+    idxArray.push(array.slice(offset).indexOf(type));
+  });
+  const nextIdx = Array.min(idxArray.filter(lineNumber => lineNumber >= 0));
+  return nextIdx !== Infinity ? nextIdx + offset : -1;
+};

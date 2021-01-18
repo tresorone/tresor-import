@@ -1,11 +1,13 @@
 import { findImplementation } from '../../src';
 import * as onvista from '../../src/brokers/onvista';
+import Big from 'big.js';
 import {
   buySamples,
   sellSamples,
   dividendsSamples,
   multiPageSamples,
   ignoredSamples,
+  accountStatementSamples,
   allSamples,
 } from './__mocks__/onvista';
 
@@ -433,6 +435,45 @@ describe('Broker: onvista', () => {
           fxRate: 1.1373,
         },
       ]);
+    });
+  });
+
+  describe('Account Statement', () => {
+    test('Can parse 2020_account_satement_1', () => {
+      const result = onvista.parsePages(accountStatementSamples[0]);
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(11);
+      expect(result.activities[0]).toEqual(
+        {
+          broker: 'onvista',
+          type: 'Buy',
+          date: '2020-12-03',
+          datetime: '2020-12-03T' + result.activities[0].datetime.substring(11),
+          isin: 'US09075V1026',
+          company: 'BIONTECH SE SPON. ADRS 1',
+          shares: 4,
+          price: +Big(428.60).div(4),
+          amount: 428.60,
+          fee: 0,
+          tax: 0,
+        },
+      );
+
+      expect(result.activities[10]).toEqual(
+        {
+          broker: 'onvista',
+          type: 'Buy',
+          date: '2020-12-30',
+          datetime: '2020-12-30T' + result.activities[0].datetime.substring(11),
+          isin: 'NL0015436031',
+          company: 'CUREVAC N.V. O.N.',
+          shares: 5,
+          price: +Big(376.60).div(5),
+          amount: 376.60,
+          fee: 0,
+          tax: 0,
+        },
+      );
     });
   });
 

@@ -13,7 +13,7 @@ export const sellSamples = [
   require('./sell/2021_usd_epam_systems.json'),
 ];
 
-export const multiPageSamples = [require('./multi-page.json')];
+export const multiPageSamples = [require('./multipage/multi-page.json')];
 
 export const dividendsSamples = [
   require('./dividend/2020_Vanguard_FTSE_All_World.json'),
@@ -23,10 +23,11 @@ export const dividendsSamples = [
   require('./dividend/2019_MetLife.json'),
 ];
 
+export const accountStatementSamples = [
+  require('./accountStatement/2020_account_statement_1.json'),
+]
+
 export const ignoredSamples = [require('./ignored/2020_cost_information.json')];
 
 export const allSamples = buySamples
-  .concat(sellSamples)
-  .concat(multiPageSamples)
-  .concat(dividendsSamples)
-  .concat(ignoredSamples);
+  .concat(sellSamples, dividendsSamples, multiPageSamples, accountStatementSamples, ignoredSamples);
