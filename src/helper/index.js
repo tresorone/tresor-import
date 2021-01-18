@@ -288,7 +288,11 @@ export function createActivityDateTime(
 }
 
 // Takes array of strings <transactionTypes> and returns the next occurrence of one of these strings in array <content>
-export const findFirstSearchtermIndexInArray = (array, searchterms, offset = 0) => {
+export const findFirstSearchtermIndexInArray = (
+  array,
+  searchterms,
+  offset = 0
+) => {
   Array.min = function (array) {
     return Math.min.apply(Math, array);
   };

@@ -163,14 +163,40 @@ const findTax = text => {
     totalTax = totalTax.plus(parseGermanNum(text[sourceTaxIndex + 2]));
   }
 
+  const witholdingTaxFondInputIdx = text.indexOf('anrechenbare Quellensteuer Fondseingangsseite');
+  if (witholdingTaxFondInputIdx >= 0) {
+    totalTax = totalTax.plus(parseGermanNum(text[witholdingTaxFondInputIdx + 2]));
+  }
+
   return +totalTax;
 };
 
 const findGrossPayout = (text, tax) => {
-  const netPayout =
-    text[text.findIndex(t => t.includes('Betrag zu Ihren Gunsten')) + 2];
-  return +Big(parseGermanNum(netPayout)).plus(tax);
+  const netPayoutIdx = text.findIndex(t => t.includes('Betrag zu Ihren Gunsten'));
+  if ( netPayoutIdx >= 0) {
+    return +Big(parseGermanNum(text[netPayoutIdx + 2])).plus(tax);
+  }
+  const reinvestIdx = text.indexOf('Thesaurierung brutto')
+  if (reinvestIdx >= 0) {
+    return parseGermanNum(text[reinvestIdx + 2]);
+  }
+
 };
+
+const findForeignInformation = pdfPage => {
+
+  const foreignCurrencyIdx = pdfPage.indexOf('Devisenkurs') + 1;
+  if (foreignCurrencyIdx > 0) {
+    const fxRate = parseGermanNum(
+        pdfPage[foreignCurrencyIdx].split(/\s+/)[1]
+    );
+    const foreignCurrency = pdfPage[foreignCurrencyIdx]
+        .split(/\s+/)[0]
+        .split(/\//)[1];
+    return [foreignCurrency, fxRate]
+  }
+  return [undefined, undefined]
+}
 
 export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
@@ -186,9 +212,9 @@ export const canParseDocument = (pages, extension) => {
         line.includes('Webtrading onvista bank')
       ) &&
         detectedButIgnoredDocument(firstPageContent)) ||
-        // Account Statements
-        firstPageContent.includes('onvista bank') && firstPageContent.includes('der Sechs-Wochen-Frist.')
-    )
+      // Account Statements
+      (firstPageContent.includes('onvista bank') &&
+        firstPageContent.includes('der Sechs-Wochen-Frist.')))
   );
 };
 
@@ -203,7 +229,7 @@ export const isDividend = content =>
   content.some(line => line.includes('Dividendengutschrift'));
 
 const isAccountStatement = content =>
-    content.some(line => line.startsWith('Kontoauszug Nr. '));
+  content.some(line => line.startsWith('Kontoauszug Nr. '));
 
 const canParsePage = content =>
   isBuy(content) || isSell(content) || isDividend(content);
@@ -216,8 +242,10 @@ const detectedButIgnoredDocument = content => {
 };
 
 const parseAccountStatement = pdfPages => {
-  const searchTerms = ['Wertpapierkauf']
-  const year = pdfPages[pdfPages.findIndex(line => line.startsWith('Kontoauszug Nr. '))].split(/\s+/)[2];
+  const searchTerms = ['Wertpapierkauf'];
+  const year = pdfPages[
+    pdfPages.findIndex(line => line.startsWith('Kontoauszug Nr. '))
+  ].split(/\s+/)[2];
   let idx = findFirstSearchtermIndexInArray(pdfPages, searchTerms);
   let activities = [];
   while (idx >= 0) {
@@ -231,23 +259,25 @@ const parseAccountStatement = pdfPages => {
       fee: 0,
     };
     activity.price = +Big(activity.amount).div(activity.shares);
-    [activity.date, activity.datetime] = createActivityDateTime(pdfPages[idx - 3] + year);
+    [activity.date, activity.datetime] = createActivityDateTime(
+      pdfPages[idx - 3] + year
+    );
 
-    switch ( pdfPages[idx] ) {
+    switch (pdfPages[idx]) {
       case searchTerms[0]:
         activity.type = 'Buy';
         break;
     }
     activity = validateActivity(activity);
     if (activity !== undefined) {
-      activities.push(activity)
+      activities.push(activity);
       idx = findFirstSearchtermIndexInArray(pdfPages, searchTerms, idx + 1);
     } else {
-      return undefined
+      return undefined;
     }
   }
   return activities;
-}
+};
 
 const parseSingleTransaction = pdfPage => {
   let activity = {
@@ -256,13 +286,12 @@ const parseSingleTransaction = pdfPage => {
     company: findCompany(pdfPage),
     shares: findShares(pdfPage),
   };
-  const foreignCurrencyIdx = pdfPage.indexOf('Devisenkurs') + 1;
-  if (foreignCurrencyIdx > 0) {
-    activity.fxRate = parseGermanNum(pdfPage[foreignCurrencyIdx].split(/\s+/)[1]);
-    activity.foreignCurrency = pdfPage[foreignCurrencyIdx]
-      .split(/\s+/)[0]
-      .split(/\//)[1];
+  const [foreignCurrency, fxRate] = findForeignInformation(pdfPage);
+  if (foreignCurrency !== undefined && fxRate !== undefined) {
+    activity.foreignCurrency = foreignCurrency;
+    activity.fxRate = fxRate;
   }
+
   if (isBuy(pdfPage)) {
     activity.type = 'Buy';
     [activity.date, activity.datetime] = createActivityDateTime(
@@ -298,7 +327,6 @@ const parseSingleTransaction = pdfPage => {
 };
 
 export const parsePages = pdfPages => {
-
   let activities = [];
   if (detectedButIgnoredDocument(pdfPages[0])) {
     // We know this type and we don't want to support it.
@@ -321,11 +349,11 @@ export const parsePages = pdfPages => {
     return {
       activities,
       status: 0,
-    }
+    };
   }
 
   return {
     activities,
     status: 5,
-  }
+  };
 };
