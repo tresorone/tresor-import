@@ -163,40 +163,42 @@ const findTax = text => {
     totalTax = totalTax.plus(parseGermanNum(text[sourceTaxIndex + 2]));
   }
 
-  const witholdingTaxFondInputIdx = text.indexOf('anrechenbare Quellensteuer Fondseingangsseite');
+  const witholdingTaxFondInputIdx = text.indexOf(
+    'anrechenbare Quellensteuer Fondseingangsseite'
+  );
   if (witholdingTaxFondInputIdx >= 0) {
-    totalTax = totalTax.plus(parseGermanNum(text[witholdingTaxFondInputIdx + 2]));
+    totalTax = totalTax.plus(
+      parseGermanNum(text[witholdingTaxFondInputIdx + 2])
+    );
   }
 
   return +totalTax;
 };
 
 const findGrossPayout = (text, tax) => {
-  const netPayoutIdx = text.findIndex(t => t.includes('Betrag zu Ihren Gunsten'));
-  if ( netPayoutIdx >= 0) {
+  const netPayoutIdx = text.findIndex(t =>
+    t.includes('Betrag zu Ihren Gunsten')
+  );
+  if (netPayoutIdx >= 0) {
     return +Big(parseGermanNum(text[netPayoutIdx + 2])).plus(tax);
   }
-  const reinvestIdx = text.indexOf('Thesaurierung brutto')
+  const reinvestIdx = text.indexOf('Thesaurierung brutto');
   if (reinvestIdx >= 0) {
     return parseGermanNum(text[reinvestIdx + 2]);
   }
-
 };
 
 const findForeignInformation = pdfPage => {
-
   const foreignCurrencyIdx = pdfPage.indexOf('Devisenkurs') + 1;
   if (foreignCurrencyIdx > 0) {
-    const fxRate = parseGermanNum(
-        pdfPage[foreignCurrencyIdx].split(/\s+/)[1]
-    );
+    const fxRate = parseGermanNum(pdfPage[foreignCurrencyIdx].split(/\s+/)[1]);
     const foreignCurrency = pdfPage[foreignCurrencyIdx]
-        .split(/\s+/)[0]
-        .split(/\//)[1];
-    return [foreignCurrency, fxRate]
+      .split(/\s+/)[0]
+      .split(/\//)[1];
+    return [foreignCurrency, fxRate];
   }
-  return [undefined, undefined]
-}
+  return [undefined, undefined];
+};
 
 export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
