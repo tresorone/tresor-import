@@ -228,7 +228,7 @@ export function validateActivity(activity, findSecurityAlsoByCompany = false) {
     return undefined;
   }
 
-  if (!['Buy', 'Sell', 'Dividend'].includes(activity.type)) {
+  if (!['Buy', 'Sell', 'Dividend', 'TransferIn', 'TransferOut'].includes(activity.type)) {
     console.error(
       'The activity type for ' +
         activity.broker +

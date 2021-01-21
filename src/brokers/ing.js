@@ -28,6 +28,8 @@ const activityType = content => {
       return 'Dividend';
     case 'Rückzahlung':
       return 'Payback';
+    case 'Dieser Beleg wurde aus dem Internetbanking generiert.':
+      return 'DepotStatement'
   }
 };
 
@@ -278,10 +280,10 @@ const findForeignInformation = textArr => {
   return [textArr[lineNumber - 2], parseGermanNum(match[1])];
 };
 
-const parseData = content => {
+const parseBuySellDividend = ( content, type ) => {
   let activity = {
     broker: 'ing',
-    type: activityType(content),
+    type,
     isin: findISIN(content),
     company: findCompany(content),
     fee: 0,
@@ -325,25 +327,70 @@ const parseData = content => {
       activity.tax = findTaxes(content);
       break;
   }
-
   return validateActivity(activity);
+};
+
+const parseDepotStatement = ( content ) => {
+  let idx = content.indexOf('Stück');
+  let activities = [];
+  const dateIdx = content.indexOf('Einstands- und Bewertungskurse, Gewinn oder Verlust aller Depotpositionen') + 1;
+  if (dateIdx < 1 ){
+    return undefined;
+  }
+  const [date, datetime] = createActivityDateTime(content[dateIdx].split(/\s+/)[0], content[dateIdx].split(/\s+/)[1])
+  while (idx >= 0) {
+    let activity = {
+      broker: 'ing',
+      type: 'TransferIn',
+      isin: content[idx - 2],
+      company: content[idx - 3],
+      date,
+      datetime,
+      shares: parseGermanNum(content[idx - 1]),
+      amount: parseGermanNum(content[idx + 4]),
+      tax: 0,
+      fee: 0,
+    };
+    activity.price = +Big(activity.amount).div(activity.shares);
+    activity = validateActivity(activity);
+    if ( activity === undefined) {
+      return undefined;
+    }
+    activities.push(activity);
+    idx = content.indexOf('Stück', idx + 1);
+  }
+  return activities;
 };
 
 export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
+
   return (
     extension === 'pdf' &&
-    firstPageContent.some(line => line.includes('BIC: INGDDEFFXX')) &&
+    firstPageContent.some(line => line.toLowerCase().includes('ing-diba')) &&
     activityType(firstPageContent) !== undefined
   );
 };
 
 export const parsePages = contents => {
-  // Information regarding dividends can be split across multiple pdf pages
-  const activities = [parseData(contents.flat())];
+  const type = activityType(contents[0])
+  let activities;
 
+  if ( type === 'DepotStatement') {
+    activities  = parseDepotStatement(contents.flat());
+  } else {
+    // Information regarding dividends can be split across multiple pdf pages
+    activities = [parseBuySellDividend(contents.flat(), type)];
+  }
+
+  if (activities !== undefined) {
+    return {
+      activities,
+      status: 0,
+    };
+  }
   return {
-    activities,
-    status: 0,
-  };
+    activities: [],
+    status: 3,
+  }
 };
