@@ -16,7 +16,7 @@ describe('Broker: ING', () => {
     sellSamples,
     dividendsSamples,
     paybackSamples,
-      depotStatement
+    depotStatement
   );
 
   describe('Check all documents', () => {

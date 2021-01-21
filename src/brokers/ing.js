@@ -29,7 +29,7 @@ const activityType = content => {
     case 'Rückzahlung':
       return 'Payback';
     case 'Dieser Beleg wurde aus dem Internetbanking generiert.':
-      return 'DepotStatement'
+      return 'DepotStatement';
   }
 };
 
@@ -280,7 +280,7 @@ const findForeignInformation = textArr => {
   return [textArr[lineNumber - 2], parseGermanNum(match[1])];
 };
 
-const parseBuySellDividend = ( content, type ) => {
+const parseBuySellDividend = (content, type) => {
   let activity = {
     broker: 'ing',
     type,
@@ -330,14 +330,20 @@ const parseBuySellDividend = ( content, type ) => {
   return validateActivity(activity);
 };
 
-const parseDepotStatement = ( content ) => {
+const parseDepotStatement = content => {
   let idx = content.indexOf('Stück');
   let activities = [];
-  const dateIdx = content.indexOf('Einstands- und Bewertungskurse, Gewinn oder Verlust aller Depotpositionen') + 1;
-  if (dateIdx < 1 ){
+  const dateIdx =
+    content.indexOf(
+      'Einstands- und Bewertungskurse, Gewinn oder Verlust aller Depotpositionen'
+    ) + 1;
+  if (dateIdx < 1) {
     return undefined;
   }
-  const [date, datetime] = createActivityDateTime(content[dateIdx].split(/\s+/)[0], content[dateIdx].split(/\s+/)[1])
+  const [date, datetime] = createActivityDateTime(
+    content[dateIdx].split(/\s+/)[0],
+    content[dateIdx].split(/\s+/)[1]
+  );
   while (idx >= 0) {
     let activity = {
       broker: 'ing',
@@ -353,7 +359,7 @@ const parseDepotStatement = ( content ) => {
     };
     activity.price = +Big(activity.amount).div(activity.shares);
     activity = validateActivity(activity);
-    if ( activity === undefined) {
+    if (activity === undefined) {
       return undefined;
     }
     activities.push(activity);
@@ -373,11 +379,11 @@ export const canParseDocument = (pages, extension) => {
 };
 
 export const parsePages = contents => {
-  const type = activityType(contents[0])
+  const type = activityType(contents[0]);
   let activities;
 
-  if ( type === 'DepotStatement') {
-    activities  = parseDepotStatement(contents.flat());
+  if (type === 'DepotStatement') {
+    activities = parseDepotStatement(contents.flat());
   } else {
     // Information regarding dividends can be split across multiple pdf pages
     activities = [parseBuySellDividend(contents.flat(), type)];
@@ -392,5 +398,5 @@ export const parsePages = contents => {
   return {
     activities: [],
     status: 3,
-  }
+  };
 };
