@@ -28,8 +28,9 @@ const activityType = content => {
       return 'Dividend';
     case 'Rückzahlung':
       return 'Payback';
-    case 'Dieser Beleg wurde aus dem Internetbanking generiert.':
-      return 'DepotStatement';
+  }
+  if (content[content.length - 4] === 'Depotbewertung') {
+    return 'DepotStatement';
   }
 };
 
@@ -369,17 +370,15 @@ const parseDepotStatement = content => {
 };
 
 export const canParseDocument = (pages, extension) => {
-  const firstPageContent = pages[0];
-
   return (
     extension === 'pdf' &&
-    firstPageContent.some(line => line.toLowerCase().includes('ing-diba')) &&
-    activityType(firstPageContent) !== undefined
+    pages[0].some(line => line.toLowerCase().includes('ing-diba')) &&
+    activityType(pages.flat()) !== undefined
   );
 };
 
 export const parsePages = contents => {
-  const type = activityType(contents[0]);
+  const type = activityType(contents.flat());
   let activities;
 
   if (type === 'DepotStatement') {
