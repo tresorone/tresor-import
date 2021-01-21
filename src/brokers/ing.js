@@ -29,7 +29,7 @@ const activityType = content => {
     case 'Rückzahlung':
       return 'Payback';
   }
-  if (content[content.length - 4] === 'Depotbewertung') {
+  if (content.includes('Depotbewertung')) {
     return 'DepotStatement';
   }
 };
