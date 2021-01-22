@@ -40,12 +40,16 @@ export default class Stock {
       return undefined;
     }
 
-    if (this.isin !== undefined && Stock.validIsin(this.isin)) {
+    if (this.isin !== undefined && !Stock.validIsin(this.isin)) {
       throw new Error('The ISIN has an invalid scheme.');
     }
 
-    if (this.wkn !== undefined && Stock.validWkn(this.wkn)) {
+    if (this.wkn !== undefined && !Stock.validWkn(this.wkn)) {
       throw new Error('The WKN has an invalid scheme.');
     }
+  }
+
+  label() {
+    return this.isin;
   }
 }

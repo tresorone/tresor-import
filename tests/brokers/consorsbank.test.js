@@ -1,5 +1,6 @@
 import { findImplementation } from '@/index';
 import * as consorsbank from '../../src/brokers/consorsbank';
+import Stock from '@/asset/stock';
 import {
   buySamples,
   sellSamples,
@@ -36,15 +37,13 @@ describe('Broker: Consorsbank', () => {
           broker: 'consorsbank',
           type: 'Buy',
           tax: 0,
-          company: 'ALERIAN MLP ETF',
           date: '2020-02-12',
           datetime: '2020-02-12T14:57:49.000Z',
           fee: 17.46,
-          isin: 'US00162Q8666',
-          wkn: 'A1H99H',
           price: 7.414,
           amount: 5004.45,
           shares: 675,
+          asset: new Stock('US00162Q8666', 'A1H99H', 'ALERIAN MLP ETF'),
         },
       ]);
     });
@@ -56,16 +55,18 @@ describe('Broker: Consorsbank', () => {
         {
           broker: 'consorsbank',
           type: 'Buy',
-          company: 'GLOB.X SUPERDIVIDEND ETF',
           date: '2019-06-24',
           datetime: '2019-06-24T12:17:34.000Z',
           fee: 19.86,
-          isin: 'US37950E5490',
-          wkn: 'A1JJ54',
           price: 14.908,
           shares: 400,
           amount: 5963.2,
           tax: 0,
+          asset: new Stock(
+            'US37950E5490',
+            'A1JJ54',
+            'GLOB.X SUPERDIVIDEND ETF'
+          ),
         },
       ]);
     });

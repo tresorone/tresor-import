@@ -366,7 +366,7 @@ const parseData = textArr => {
     type: activityType(textArr),
     fee: 0,
     tax: 0,
-    stock: new Stock(isin, wkn, company),
+    asset: new Stock(isin, wkn, company),
   };
   console.log(isin);
 
