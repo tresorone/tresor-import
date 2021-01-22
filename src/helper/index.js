@@ -1,9 +1,7 @@
 import every from 'lodash/every';
 import values from 'lodash/values';
 import { DateTime } from 'luxon';
-
-// Regex to match an ISIN-only string. The first two chars represent the country and the last one is the check digit.
-export const isinRegex = /^[A-Z]{2}[0-9A-Z]{9}[0-9]$/;
+import Stock from '../asset/stock';
 
 export const timeRegex = withSeconds => {
   return withSeconds ? /[0-2][0-9]:[0-9]{2}:[0-9]{2}/ : /[0-2][0-9]:[0-9]{2}/;
@@ -64,7 +62,7 @@ export function findPreviousRegexMatchIdx(arr, idx, regex) {
   return -1;
 }
 
-export function validateActivity(activity, findSecurityAlsoByCompany = false) {
+export function validateActivity(activity) {
   // All fields must have a value unequal undefined
   if (!every(values(activity), a => !!a || a === 0)) {
     console.error(
@@ -189,45 +187,6 @@ export function validateActivity(activity, findSecurityAlsoByCompany = false) {
     return undefined;
   }
 
-  // Tresor One will search the security for PDF Documents with ISIN or WKN. For Imports of .csv File from Portfolio Performance
-  // T1 can search the security also by the Company.
-  if (
-    ((findSecurityAlsoByCompany && activity.company === undefined) ||
-      !findSecurityAlsoByCompany) &&
-    activity.isin === undefined &&
-    activity.wkn === undefined
-  ) {
-    console.error(
-      'The activity for ' +
-        activity.broker +
-        ' must have at least a' +
-        (findSecurityAlsoByCompany ? ' company,' : 'n') +
-        ' ISIN or WKN.',
-      activity
-    );
-    return undefined;
-  }
-
-  if (activity.isin !== undefined && !isinRegex.test(activity.isin)) {
-    console.error(
-      'The activity ISIN for ' +
-        activity.broker +
-        " can't be valid with an invalid scheme.",
-      activity
-    );
-    return undefined;
-  }
-
-  if (activity.wkn !== undefined && !/^([A-Z0-9]{6})$/.test(activity.wkn)) {
-    console.error(
-      'The activity WKN for ' +
-        activity.broker +
-        " can't be valid with an invalid scheme.",
-      activity
-    );
-    return undefined;
-  }
-
   if (!['Buy', 'Sell', 'Dividend'].includes(activity.type)) {
     console.error(
       'The activity type for ' +
@@ -237,14 +196,13 @@ export function validateActivity(activity, findSecurityAlsoByCompany = false) {
     );
     return undefined;
   }
-
   return activity;
 }
 
 export function findFirstIsinIndexInArray(array, offset = 0) {
   const isinIndex = array
     .slice(offset)
-    .findIndex(element => isinRegex.test(element));
+    .findIndex(element => Stock.validIsin(element));
   return isinIndex === -1 ? undefined : isinIndex + offset;
 }
 
