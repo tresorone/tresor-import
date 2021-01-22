@@ -109,7 +109,7 @@ const validate = activity => {
     activity.price = +Big(activity.amount).div(Big(activity.shares));
   }
 
-  activity = validateActivity(activity, true);
+  activity = validateActivity(activity);
   if (activity === undefined) {
     return [];
   }

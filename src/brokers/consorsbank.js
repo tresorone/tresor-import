@@ -6,6 +6,7 @@ import {
   createActivityDateTime,
   timeRegex,
 } from '@/helper';
+import Stock from '@/asset/stock';
 
 const findISIN = textArr => {
   return textArr[findFirstIsinIndexInArray(textArr)];
@@ -356,22 +357,19 @@ export const canParseDocument = (pages, extension) => {
 };
 
 const parseData = textArr => {
+  let isin = findISIN(textArr);
+  let wkn = findWKN(textArr);
+  let company = findCompany(textArr);
+
   let activity = {
     broker: 'consorsbank',
     type: activityType(textArr),
-    company: findCompany(textArr),
     fee: 0,
     tax: 0,
+    stock: new Stock(isin, wkn, company),
   };
-  let isin = findISIN(textArr);
-  let wkn = findWKN(textArr);
+  console.log(isin);
 
-  if (wkn !== undefined) {
-    activity.wkn = wkn;
-  }
-  if (isin !== undefined) {
-    activity.isin = isin;
-  }
   let date, time;
 
   const [fxRate, foreignCurrency] = findForeignInformation(
