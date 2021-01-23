@@ -378,14 +378,15 @@ export const canParseDocument = (pages, extension) => {
 };
 
 export const parsePages = contents => {
-  const type = activityType(contents.flat());
+  const contentsFlat = contents.flat()
+  const type = activityType(contentsFlat);
   let activities;
 
   if (type === 'DepotStatement') {
-    activities = parseDepotStatement(contents.flat());
+    activities = parseDepotStatement(contentsFlat);
   } else {
     // Information regarding dividends can be split across multiple pdf pages
-    activities = [parseBuySellDividend(contents.flat(), type)];
+    activities = [parseBuySellDividend(contentsFlat, type)];
   }
 
   if (activities !== undefined) {
