@@ -534,14 +534,14 @@ describe('Helper functions', () => {
     test('Return if the offset is working as intended', () => {
       const testArray = ['one', 'two', 'zero', 'one', 'two'];
       expect(
-          helper.findFirstSearchtermIndexInArray(testArray, ['one', 'two'], 2)
+        helper.findFirstSearchtermIndexInArray(testArray, ['one', 'two'], 2)
       ).toEqual(3);
     });
 
     test('Return if the offset is working as intended', () => {
       const testArray = ['one', 'two', 'zero', 'one', 'two'];
       expect(
-          helper.findFirstSearchtermIndexInArray(testArray, ['one', 'two'], 10)
+        helper.findFirstSearchtermIndexInArray(testArray, ['one', 'two'], 10)
       ).toEqual(-1);
     });
   });
