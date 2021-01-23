@@ -439,7 +439,7 @@ describe('Broker: onvista', () => {
   });
 
   describe('Account Statement', () => {
-    test('Can parse 2020_account_satement_1', () => {
+    test('Can parse 2020_account_statement_1', () => {
       const result = onvista.parsePages(accountStatementSamples[0]);
       expect(result.status).toEqual(0);
       expect(result.activities.length).toEqual(11);
@@ -472,7 +472,7 @@ describe('Broker: onvista', () => {
       });
     });
 
-    test('Can parse 2020_account_satement_2', () => {
+    test('Can parse 2020_account_statement_2', () => {
       const result = onvista.parsePages(accountStatementSamples[1]);
       expect(result.status).toEqual(0);
       expect(result.activities.length).toEqual(3);
@@ -486,6 +486,82 @@ describe('Broker: onvista', () => {
         shares: 40,
         price: +Big(52.96).div(40),
         amount: 52.96,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can parse 2016_account_statement', () => {
+      const result = onvista.parsePages(accountStatementSamples[2]);
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(2);
+      expect(result.activities[0]).toEqual({
+        broker: 'onvista',
+        type: 'Buy',
+        date: '2016-12-12',
+        datetime: '2016-12-12T' + result.activities[0].datetime.substring(11),
+        isin: 'GB00B128C026',
+        company: 'AIR BERLIN PLC',
+        shares: 100,
+        price: +Big(64.5).div(100),
+        amount: 64.5,
+        fee: 0,
+        tax: 0,
+      });
+      expect(result.activities[1]).toEqual({
+        broker: 'onvista',
+        type: 'Sell',
+        date: '2016-12-23',
+        datetime: '2016-12-23T' + result.activities[0].datetime.substring(11),
+        isin: 'GB00B128C026',
+        company: 'AIR BERLIN PLC',
+        shares: 100,
+        price: +Big(51.95).div(100),
+        amount: 51.95,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can parse 2017_account_statement_1', () => {
+      const result = onvista.parsePages(accountStatementSamples[3]);
+      expect(result.status).toEqual(5);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('Can parse 2017_account_statement_2', () => {
+      const result = onvista.parsePages(accountStatementSamples[4]);
+      expect(result.status).toEqual(5);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('Can parse 2020_account_statement_3', () => {
+      const result = onvista.parsePages(accountStatementSamples[5]);
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(7);
+      expect(result.activities[0]).toEqual({
+        broker: 'onvista',
+        type: 'Buy',
+        date: '2020-01-06',
+        datetime: '2020-01-06T' + result.activities[0].datetime.substring(11),
+        isin: 'LU0392494562',
+        company: 'COMS.-MSCI WORL.T.U.ETF I',
+        shares: 4.1985,
+        price: +Big(250).div(4.1985),
+        amount: 250,
+        fee: 0,
+        tax: 0,
+      });
+      expect(result.activities[6]).toEqual({
+        broker: 'onvista',
+        type: 'Dividend',
+        date: '2020-03-16',
+        datetime: '2020-03-16T' + result.activities[0].datetime.substring(11),
+        isin: 'DE000A0F5UF5',
+        company: 'ISHARES NASDAQ-100 U.ETF',
+        shares: 4.9438,
+        price: +Big(0.39).div(4.9438),
+        amount: 0.39,
         fee: 0,
         tax: 0,
       });

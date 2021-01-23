@@ -6,6 +6,7 @@ import {
   timeRegex,
   findFirstSearchtermIndexInArray,
 } from '@/helper';
+import { findFirstRegexIndexInArray } from '../helper';
 
 // Both smartbroker and onvista use highly similar parsers due to them both being
 // daughter companies from BNP Paribas; a french bank. There is no string which
@@ -215,8 +216,10 @@ export const canParseDocument = (pages, extension) => {
       ) &&
         detectedButIgnoredDocument(firstPageContent)) ||
       // Account Statements
-      (firstPageContent.includes('onvista bank') &&
-        firstPageContent.includes('der Sechs-Wochen-Frist.')))
+      (firstPageContent.some(line => line.includes('www.onvista-bank.de')) &&
+        pages
+          .flat()
+          .some(line => line.toLowerCase().startsWith('kontoauszug nr. '))))
   );
 };
 
@@ -231,7 +234,7 @@ export const isDividend = content =>
   content.some(line => line.includes('Dividendengutschrift'));
 
 const isAccountStatement = content =>
-  content.some(line => line.startsWith('Kontoauszug Nr. '));
+  content.some(line => line.toLowerCase().startsWith('kontoauszug nr. '));
 
 const canParsePage = content =>
   isBuy(content) || isSell(content) || isDividend(content);
@@ -244,18 +247,34 @@ const detectedButIgnoredDocument = content => {
 };
 
 const parseAccountStatement = pdfPages => {
-  const searchTerms = ['Wertpapierkauf'];
-  const year = pdfPages[
-    pdfPages.findIndex(line => line.startsWith('Kontoauszug Nr. '))
-  ].split(/\s+/)[2];
+  const searchTerms = [
+    'Wertpapierkauf',
+    'Wertpapierverkauf',
+    'Zinsen/Dividenden',
+  ];
+  const yearLine = pdfPages[
+    pdfPages.findIndex(line =>
+      line.toLowerCase().startsWith('kontoauszug nr. ')
+    )
+  ].split('.');
+  const year = yearLine[yearLine.length - 1];
   let idx = findFirstSearchtermIndexInArray(pdfPages, searchTerms);
   let activities = [];
   while (idx >= 0) {
+    const isinIdx = findFirstRegexIndexInArray(
+      pdfPages,
+      /^ISIN: [A-Z]{2}[0-9A-Z]{9}[0-9]$/,
+      idx
+    );
+    const sharesIdx = findFirstRegexIndexInArray(pdfPages, /^STK: [1-9]+/, idx);
+    const companyIdx = pdfPages[idx + 1].startsWith('ABR: ')
+      ? idx + 4
+      : idx + 1;
     let activity = {
       broker: 'onvista',
-      company: pdfPages[idx + 1],
-      isin: pdfPages[idx + 3].split(/\s+/)[1],
-      shares: parseGermanNum(pdfPages[idx + 2].split(/\s+/)[1]),
+      company: pdfPages[companyIdx],
+      isin: pdfPages[isinIdx].split(/\s+/)[1],
+      shares: parseGermanNum(pdfPages[sharesIdx].split(/\s+/)[1]),
       amount: Math.abs(parseGermanNum(pdfPages[idx - 1])),
       tax: 0,
       fee: 0,
@@ -268,6 +287,12 @@ const parseAccountStatement = pdfPages => {
     switch (pdfPages[idx]) {
       case searchTerms[0]:
         activity.type = 'Buy';
+        break;
+      case searchTerms[1]:
+        activity.type = 'Sell';
+        break;
+      case searchTerms[2]:
+        activity.type = 'Dividend';
         break;
     }
     activity = validateActivity(activity);
@@ -347,15 +372,16 @@ export const parsePages = pdfPages => {
     }
   }
 
-  if (activities !== undefined) {
+  // No valid activities were found
+  if (activities.length === 0) {
     return {
       activities,
-      status: 0,
+      status: 5,
     };
   }
 
   return {
     activities,
-    status: 5,
+    status: activities === undefined ? 3 : 0,
   };
 };

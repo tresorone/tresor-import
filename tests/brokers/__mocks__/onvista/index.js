@@ -26,6 +26,10 @@ export const dividendsSamples = [
 export const accountStatementSamples = [
   require('./accountStatement/2020_account_statement_1.json'),
   require('./accountStatement/2020_account_statement_2.json'),
+  require('./accountStatement/2016_account_statement.json'),
+  require('./accountStatement/2017_account_statement_1.json'),
+  require('./accountStatement/2017_account_statement_2.json'),
+  require('./accountStatement/2020_account_statement_3.json'),
 ];
 
 export const ignoredSamples = [require('./ignored/2020_cost_information.json')];
