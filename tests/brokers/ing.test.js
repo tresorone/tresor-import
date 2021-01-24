@@ -6,6 +6,7 @@ import {
   dividendsSamples,
   invalidSamples,
   paybackSamples,
+  depotStatement,
 } from './__mocks__/ing';
 
 describe('Broker: ING', () => {
@@ -14,7 +15,8 @@ describe('Broker: ING', () => {
   const allSamples = buySamples.concat(
     sellSamples,
     dividendsSamples,
-    paybackSamples
+    paybackSamples,
+    depotStatement
   );
 
   describe('Check all documents', () => {
@@ -492,6 +494,41 @@ describe('Broker: ING', () => {
         shares: 4000,
         price: 0.001,
         amount: 4,
+        fee: 0,
+        tax: 0,
+      });
+    });
+  });
+
+  describe('Depot Statement', () => {
+    test('Can parse 2021_ing_depot_statement', () => {
+      const result = ing.parsePages(depotStatement[0]);
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(13);
+      expect(result.activities[0]).toEqual({
+        broker: 'ing',
+        type: 'TransferIn',
+        date: '2021-01-18',
+        datetime: '2021-01-18T17:20:00.000Z',
+        isin: 'US0378331005',
+        company: 'APPLE INC.',
+        shares: 17,
+        price: 105.9,
+        amount: 1800.3,
+        fee: 0,
+        tax: 0,
+      });
+
+      expect(result.activities[12]).toEqual({
+        broker: 'ing',
+        type: 'TransferIn',
+        date: '2021-01-18',
+        datetime: '2021-01-18T17:20:00.000Z',
+        isin: 'IE00BQ70R696',
+        company: 'IM-I.NASDAQ BIOTECH A',
+        shares: 15,
+        price: 42.385333333333335,
+        amount: 635.78,
         fee: 0,
         tax: 0,
       });

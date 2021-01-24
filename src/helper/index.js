@@ -53,6 +53,12 @@ export function parseGermanNum(n) {
   return parseFloat(n.replace(/\./g, '').replace(',', '.'));
 }
 
+// Gives the index for the first match of a regex within a 2D Array. Search is started at an optional offset
+export function findNextLineIndexByRegex(array, regex, offset = 0) {
+  const nextIdx = array.slice(offset).findIndex(entry => regex.test(entry));
+  return nextIdx >= 0 ? nextIdx + offset : -1;
+}
+
 export function findPreviousRegexMatchIdx(arr, idx, regex) {
   let bckwrdIdx = 1;
   while (idx - bckwrdIdx >= 0) {
@@ -228,7 +234,11 @@ export function validateActivity(activity, findSecurityAlsoByCompany = false) {
     return undefined;
   }
 
-  if (!['Buy', 'Sell', 'Dividend'].includes(activity.type)) {
+  if (
+    !['Buy', 'Sell', 'Dividend', 'TransferIn', 'TransferOut'].includes(
+      activity.type
+    )
+  ) {
     console.error(
       'The activity type for ' +
         activity.broker +

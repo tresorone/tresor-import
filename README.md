@@ -1,6 +1,10 @@
 # Tresor-Import - The File Import of Tresor One
 
-This is the PDF and PP-CSV Import used on [tresor.one](https://tresor.one). All supported brokers and apps are listed [here](docs/implementations.md).
+This is the PDF and PP-CSV Import used on [tresor.one](https://tresor.one).
+
+## Supported Brokers
+
+All brokers supported by tresor-import are listed in the [documentation](docs/implementations.md).
 
 ## Installation
 
