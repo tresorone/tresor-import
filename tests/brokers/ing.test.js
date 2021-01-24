@@ -6,6 +6,7 @@ import {
   dividendsSamples,
   invalidSamples,
   paybackSamples,
+  depotStatement,
 } from './__mocks__/ing';
 
 describe('Broker: ING', () => {
@@ -14,7 +15,8 @@ describe('Broker: ING', () => {
   const allSamples = buySamples.concat(
     sellSamples,
     dividendsSamples,
-    paybackSamples
+    paybackSamples,
+    depotStatement
   );
 
   describe('Check all documents', () => {
@@ -156,6 +158,46 @@ describe('Broker: ING', () => {
         tax: 0,
       });
     });
+
+    test('Can parse statement: 2020_ark_etf', () => {
+      const activities = ing.parsePages(buySamples[6]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ing',
+        type: 'Buy',
+        date: '2020-12-29',
+        datetime: '2020-12-29T16:52:58.000Z',
+        isin: 'US00214Q1040',
+        company: 'ARK ETF Trust - Innovation ETF Registered Shares o.N.',
+        shares: 11,
+        price: 101.86,
+        amount: 1120.46,
+        fee: 13.6,
+        tax: 0,
+      });
+    });
+
+    test('Can parse statement: 2020_newborn_acquisition', () => {
+      const activities = ing.parsePages(buySamples[7]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ing',
+        type: 'Buy',
+        date: '2020-12-28',
+        datetime: '2020-12-28T17:12:00.000Z',
+        isin: 'KYG6463T1067',
+        company: 'Newborn Acquisition Corp. Registered Shares o.N.',
+        shares: 125,
+        price: 16.21140859401755,
+        amount: 2026.4260742521933,
+        fee: 22.47,
+        tax: 0,
+        fxRate: 1.217661,
+        foreignCurrency: 'USD',
+      });
+    });
   });
 
   describe('Sell', () => {
@@ -232,6 +274,25 @@ describe('Broker: ING', () => {
         amount: 1273.2,
         fee: 11.42,
         tax: 53.23,
+      });
+    });
+
+    test('Can parse statement: 2020_deutsche_lufthansa', () => {
+      const activities = ing.parsePages(sellSamples[4]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ing',
+        type: 'Sell',
+        date: '2020-12-21',
+        datetime: '2020-12-21T08:03:52.000Z',
+        isin: 'DE0008232125',
+        company: 'Deutsche Lufthansa AG vink.Namens-Aktien o.N.',
+        shares: 500,
+        price: 9,
+        amount: 4500,
+        fee: 16.15,
+        tax: 156.74,
       });
     });
   });
@@ -433,6 +494,41 @@ describe('Broker: ING', () => {
         shares: 4000,
         price: 0.001,
         amount: 4,
+        fee: 0,
+        tax: 0,
+      });
+    });
+  });
+
+  describe('Depot Statement', () => {
+    test('Can parse 2021_ing_depot_statement', () => {
+      const result = ing.parsePages(depotStatement[0]);
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(13);
+      expect(result.activities[0]).toEqual({
+        broker: 'ing',
+        type: 'TransferIn',
+        date: '2021-01-18',
+        datetime: '2021-01-18T17:20:00.000Z',
+        isin: 'US0378331005',
+        company: 'APPLE INC.',
+        shares: 17,
+        price: 105.9,
+        amount: 1800.3,
+        fee: 0,
+        tax: 0,
+      });
+
+      expect(result.activities[12]).toEqual({
+        broker: 'ing',
+        type: 'TransferIn',
+        date: '2021-01-18',
+        datetime: '2021-01-18T17:20:00.000Z',
+        isin: 'IE00BQ70R696',
+        company: 'IM-I.NASDAQ BIOTECH A',
+        shares: 15,
+        price: 42.385333333333335,
+        amount: 635.78,
         fee: 0,
         tax: 0,
       });

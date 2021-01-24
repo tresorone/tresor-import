@@ -7,13 +7,13 @@ a more detailed explanation is given behind brokername.
 | comdirect                                              | Buy, Sell, Dividend                           |                                                                                    |
 | Consorsbank                                            | Buy, Sell, Dividend                           |                                                                                    |
 | Degiro (DE)                                            | Transaction log                               |                                                                                    |
-| DKB                                                    | Buy, Sell, Dividend                           |                                                                                    |
 | [Deutsche Bank](docs/supportedBrokers/deutschebank.md) | Dividend, Transaction log (Buy and Sell Only) | Only specific buy/dividend `.pdf` files are supported                              |
+| DKB                                                    | Buy, Sell, Dividend                           |                                                                                    |
 | ebase                                                  | Transaction log                               | Currenlty only the `.pdf` documents                                                |
 | Erste Bank (AT)                                        | Buy, Sell, Dividend                           |                                                                                    |
 | flatex / FinTech Group                                 | Buy, Sell, Dividend                           |                                                                                    |
 | Gratisbroker                                           | Buy, Sell, Dividend                           |                                                                                    |
-| ING (DE)                                               | Buy, Sell, Dividend                           |                                                                                    |
+| ING (DE)                                               | Buy, Sell, Dividend, Depot Statement          |                                                                                    |
 | onvista                                                | Buy, Sell, Dividend                           |                                                                                    |
 | Oskar                                                  | Buy, Sell, Dividend                           |                                                                                    |
 | Portfolio Performance                                  | Buy, Sell, Dividend                           | Must be cleared of splits, only `.csv` files generated via menu `File` -> `export` |

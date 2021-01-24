@@ -13,6 +13,7 @@ export const sellSamples = [
   require('./sell/2020_etf_tecdax.json'),
   require('./sell/2020_msci_world.json'),
   require('./sell/2020_data_deposit_box.json'),
+  require('./sell/2020_vapiano.json'),
 ];
 
 export const dividendsSamples = [

@@ -231,6 +231,24 @@ describe('DKB broker', () => {
         foreignCurrency: 'CAD',
       });
     });
+
+    test('Should map the document correctly: 2020_vapiano.json', () => {
+      const activities = dkb.parsePages(sellSamples[7]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Sell',
+        date: '2020-08-31',
+        datetime: '2020-08-31T' + activities[0].datetime.substring(11),
+        isin: 'DE000A0WMNK9',
+        company: 'VAPIANO SE INHABER-AKTIEN O.N.',
+        shares: 100,
+        price: 0.0602,
+        amount: 6.02,
+        fee: 6.02,
+        tax: 0,
+      });
+    });
   });
 
   describe('Dividend', () => {

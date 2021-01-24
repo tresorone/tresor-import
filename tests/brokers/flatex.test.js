@@ -230,6 +230,38 @@ describe('Broker: Flatex', () => {
         foreignCurrency: 'USD',
       });
     });
+
+    test('Can parse statement: 2017_lion_e_mobility', () => {
+      const result = flatex.parsePages(buySamples[10]);
+
+      expect(result.activities.length).toEqual(2);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2017-08-14',
+        datetime: '2017-08-14T07:37:00.000Z',
+        isin: 'CH0132594711',
+        company: 'LION E-MOBILITY AG SF-,13',
+        shares: 129,
+        price: 7.7,
+        amount: 993.3,
+        fee: 7.25,
+        tax: 0,
+      });
+      expect(result.activities[1]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2017-08-14',
+        datetime: '2017-08-14T15:20:00.000Z',
+        isin: 'CH0132594711',
+        company: 'LION E-MOBILITY AG SF-,13',
+        shares: 21,
+        price: 7.7,
+        amount: 161.7,
+        fee: 0.69,
+        tax: 0,
+      });
+    });
   });
 
   describe('Sell', () => {
@@ -411,6 +443,27 @@ describe('Broker: Flatex', () => {
         price: 0.1352,
         fee: 0,
         tax: 0.51,
+      });
+    });
+
+    test('should map pdf data of sample correctly: 2015_williams', () => {
+      const activities = flatex.parsePages(dividendSamples[6]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Dividend',
+        date: '2015-12-28',
+        datetime: '2015-12-28T' + activities[0].datetime.substring(11),
+        isin: 'US9694571004',
+        company: 'WILLIAMS COS INC. DL 1',
+        shares: 250,
+        amount: 145.95876664842183,
+        price: 0.5838350665936873,
+        fee: 0,
+        tax: 37.28876664842182,
+        fxRate: 1.0962,
+        foreignCurrency: 'USD',
       });
     });
   });

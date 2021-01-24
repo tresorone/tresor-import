@@ -29,6 +29,9 @@ const activityType = content => {
     case 'Rückzahlung':
       return 'Payback';
   }
+  if (content.includes('Depotbewertung')) {
+    return 'DepotStatement';
+  }
 };
 
 const findShares = (content, type) => {
@@ -72,67 +75,83 @@ const findDateTime = (content, type) => {
   }
 };
 
-const findPrice = (content, type) => {
+const findPrice = (content, type, baseCurrency, fxRate) => {
+  let amount, currency;
+
   if (['Buy', 'Sell'].includes(type)) {
-    return parseGermanNum(getValueByPreviousElement(content, 'Kurs', 2));
+    amount = parseGermanNum(getValueByPreviousElement(content, 'Kurs', 2));
+    currency = getValueByPreviousElement(content, 'Kurs', 1);
   } else if (type === 'Payback') {
     const priceIdx = content.indexOf('Einlösung zum Kurs von');
     if (priceIdx >= 0) {
       // Example for the price format: 0,0001 EUR
-      return parseGermanNum(content[priceIdx + 1].split(/\s+/)[0]);
-    }
-  }
+      const elements = content[priceIdx + 1].split(/\s+/);
 
-  let amountAndCurrency = getValueByPreviousElement(
-    content,
-    'Zins-/Dividendensatz',
-    1
-  );
-  if (amountAndCurrency === undefined) {
-    // Dividends of ETFs have the label `Ertragsausschüttung per Stück`
-    amountAndCurrency = getValueByPreviousElement(
+      amount = parseGermanNum(elements[0]);
+      currency = elements[1];
+    }
+  } else {
+    // Dividends:
+    let amountAndCurrency = getValueByPreviousElement(
       content,
-      'Ertragsausschüttung per Stück',
+      'Zins-/Dividendensatz',
       1
     );
+    if (amountAndCurrency === undefined) {
+      // Dividends of ETFs have the label `Ertragsausschüttung per Stück`
+      amountAndCurrency = getValueByPreviousElement(
+        content,
+        'Ertragsausschüttung per Stück',
+        1
+      );
+    }
+
+    amountAndCurrency = amountAndCurrency.split(' ');
+    amount = parseGermanNum(amountAndCurrency[0]);
+    currency = amountAndCurrency[1];
   }
 
-  amountAndCurrency = amountAndCurrency.split(' ');
-
-  const amount = parseGermanNum(amountAndCurrency[0]);
-  if (amountAndCurrency[1] === 'EUR') {
+  if (currency === baseCurrency) {
     return amount;
   }
 
-  return +Big(amount).div(findExchangeRate(content));
+  return +Big(amount).div(fxRate);
 };
 
-const findExchangeRate = content => {
-  // Find the value in the line after "Umg. z. Dev.-Kurs"
-  const value = getValueByPreviousElement(content, 'Umg. z. Dev.-Kurs', 1);
-  if (value === undefined) {
-    return 1;
+const findBaseCurrency = content => {
+  let lineNumber = content.findIndex(line =>
+    line.toLowerCase().includes('betrag zu ihren')
+  );
+  if (lineNumber < 0) {
+    lineNumber = content.indexOf('Endbetrag');
   }
 
-  const regexMatch = value.match(/\(([\d,]+)\)/);
-  if (!regexMatch) {
-    return 1;
+  if (lineNumber < 0) {
+    return undefined;
   }
 
-  return Big(parseGermanNum(regexMatch[1]));
+  return content[lineNumber + 1];
 };
 
-const findAmount = (textArr, type) => {
+const findAmount = (textArr, type, baseCurrency, fxRate) => {
   switch (type) {
     case 'Buy':
     case 'Sell':
-    case 'Payback':
-      return parseGermanNum(getValueByPreviousElement(textArr, 'Kurswert', 2));
+    case 'Payback': {
+      const amount = parseGermanNum(
+        getValueByPreviousElement(textArr, 'Kurswert', 2)
+      );
+      if (getValueByPreviousElement(textArr, 'Kurswert', 1) === baseCurrency) {
+        return amount;
+      }
+
+      return +Big(amount).div(fxRate);
+    }
     case 'Dividend': {
       const bruttoIndex = textArr.indexOf('Brutto');
-      if (!(textArr[bruttoIndex + 1] === 'EUR')) {
+      if (!(textArr[bruttoIndex + 1] === baseCurrency)) {
         const foreignPayout = parseGermanNum(textArr[bruttoIndex + 2]);
-        return +Big(foreignPayout).div(findExchangeRate(textArr));
+        return +Big(foreignPayout).div(fxRate);
       } else {
         return +Big(parseGermanNum(textArr[bruttoIndex + 2]));
       }
@@ -146,6 +165,7 @@ const findFee = content => {
   if (provisionIdx >= 0 && parseGermanNum(content[provisionIdx + 2])) {
     totalFee = totalFee.plus(parseGermanNum(content[provisionIdx + 2]));
   }
+
   const discountIdx = content.indexOf('Rabatt');
   if (
     discountIdx >= 0 &&
@@ -155,14 +175,24 @@ const findFee = content => {
       parseGermanNum(content[discountIdx + 2].replace(' ', ''))
     );
   }
+
   const transactionFeeIdx = content.indexOf('Variables Transaktionsentgelt');
   if (transactionFeeIdx >= 0) {
     totalFee = totalFee.plus(parseGermanNum(content[transactionFeeIdx + 2]));
   }
+
   const exchangeFeeIdx = content.indexOf('Handelsplatzgebühr');
   if (exchangeFeeIdx >= 0) {
     totalFee = totalFee.plus(parseGermanNum(content[exchangeFeeIdx + 2]));
   }
+
+  const courtageFeeLineNumber = content.indexOf('Courtage');
+  if (courtageFeeLineNumber >= 0) {
+    totalFee = totalFee.plus(
+      parseGermanNum(content[courtageFeeLineNumber + 2])
+    );
+  }
+
   return +totalFee;
 };
 
@@ -183,18 +213,42 @@ const findTaxes = content => {
         totalTax = totalTax.plus(Big(parseGermanNum(regexMatch[1])));
         continue;
       }
+
       totalTax = totalTax.plus(Big(parseGermanNum(content[lineNumber + 2])));
       lineNumber += 2;
       continue;
     }
 
-    if (!line.includes('steuer ') && !line.includes('zuschlag ')) {
+    if (
+      !line.includes('steuer ') &&
+      !line.includes('zuschlag ') &&
+      !line.includes('st anteilig')
+    ) {
       continue;
     }
 
-    const offset = line.endsWith('%') ? 2 : 3;
-    const lineWithTaxAmount = content[lineNumber + offset];
-    if (!lineWithTaxAmount.includes(',')) {
+    // Normaly the tax amount is in the line after the tax title
+    let offset = 2;
+    if (line.endsWith('%')) {
+      offset = 2;
+    } else if (!line.endsWith('%') && !content[lineNumber + 2].endsWith('%')) {
+      // but sometimes the line after contains only a %
+      // Kapitalertragsteuer 25,00  // <- variable line
+      // %
+      // EUR
+      // 50,46                      // <- tax amount
+      offset = 3;
+    } else if (!line.endsWith('%') && content[lineNumber + 2].endsWith('%')) {
+      // but sometimes the line after contains only a % and the line after this the percentage
+      // KapSt anteilig 50,00      // <- variable line
+      // %
+      // 25,00%
+      // EUR
+      // 74,29                      // <- tax amount
+      offset = 4;
+    }
+
+    if (!content[lineNumber + offset].includes(',')) {
       lineNumber += offset;
       continue;
     }
@@ -205,29 +259,44 @@ const findTaxes = content => {
   return +totalTax;
 };
 
-const findForeignInfoPayout = textArr => {
-  const fxRateIdx = textArr.indexOf('Umg. z. Dev.-Kurs');
-  const fxRate = textArr[fxRateIdx + 1].substr(
-    1,
-    textArr[fxRateIdx].length - 1
-  );
+// Returns an array with [foreignCurrency, fxRate]. Returns undefined when not found.
+const findForeignInformation = textArr => {
+  let lineNumber = textArr.indexOf('Umg. z. Dev.-Kurs');
+  if (lineNumber <= 0) {
+    lineNumber = textArr.indexOf('umger. zum Devisenkurs');
+  }
 
-  return [textArr[fxRateIdx - 2], parseGermanNum(fxRate)];
+  if (lineNumber <= 0) {
+    return [undefined, undefined];
+  }
+
+  // Regex will match fxRate from the following samples:
+  // (USD = 1,217661)
+  // (1,1613)
+  const match = /\(.*?(\d+,\d+)\)/.exec(textArr[lineNumber + 1]);
+  if (!match) {
+    return [undefined, undefined];
+  }
+
+  return [textArr[lineNumber - 2], parseGermanNum(match[1])];
 };
 
-const parseData = content => {
+const parseBuySellDividend = (content, type) => {
   let activity = {
     broker: 'ing',
-    type: activityType(content),
+    type,
     isin: findISIN(content),
     company: findCompany(content),
     fee: 0,
     tax: 0,
   };
 
-  activity.amount = findAmount(content, activity.type);
+  const baseCurrency = findBaseCurrency(content);
+  const [foreignCurrency, fxRate] = findForeignInformation(content);
+
+  activity.amount = findAmount(content, activity.type, baseCurrency, fxRate);
   activity.shares = findShares(content, activity.type);
-  activity.price = findPrice(content, activity.type);
+  activity.price = findPrice(content, activity.type, baseCurrency, fxRate);
 
   const [date, datetime] = findDateTime(content, activity.type);
   [activity.date, activity.datetime] = createActivityDateTime(
@@ -236,6 +305,12 @@ const parseData = content => {
     'dd.MM.yyyy',
     'dd.MM.yyyy HH:mm:ss'
   );
+
+  if (foreignCurrency !== undefined || fxRate !== undefined) {
+    activity.foreignCurrency = foreignCurrency;
+    activity.fxRate = fxRate;
+  }
+
   switch (activity.type) {
     case 'Buy':
       activity.fee = findFee(content);
@@ -246,11 +321,6 @@ const parseData = content => {
       break;
     case 'Dividend':
       activity.tax = findTaxes(content);
-      if (content.includes('Umg. z. Dev.-Kurs')) {
-        [activity.foreignCurrency, activity.fxRate] = findForeignInfoPayout(
-          content
-        );
-      }
       break;
     case 'Payback':
       activity.type = 'Sell';
@@ -261,21 +331,72 @@ const parseData = content => {
   return validateActivity(activity);
 };
 
+const parseDepotStatement = content => {
+  let idx = content.indexOf('Stück');
+  let activities = [];
+  const dateIdx =
+    content.indexOf(
+      'Einstands- und Bewertungskurse, Gewinn oder Verlust aller Depotpositionen'
+    ) + 1;
+  if (dateIdx < 1) {
+    return undefined;
+  }
+  const [date, datetime] = createActivityDateTime(
+    content[dateIdx].split(/\s+/)[0],
+    content[dateIdx].split(/\s+/)[1]
+  );
+  while (idx >= 0) {
+    let activity = {
+      broker: 'ing',
+      type: 'TransferIn',
+      isin: content[idx - 2],
+      company: content[idx - 3],
+      date,
+      datetime,
+      shares: parseGermanNum(content[idx - 1]),
+      amount: parseGermanNum(content[idx + 4]),
+      tax: 0,
+      fee: 0,
+    };
+    activity.price = +Big(activity.amount).div(activity.shares);
+    activity = validateActivity(activity);
+    if (activity === undefined) {
+      return undefined;
+    }
+    activities.push(activity);
+    idx = content.indexOf('Stück', idx + 1);
+  }
+  return activities;
+};
+
 export const canParseDocument = (pages, extension) => {
-  const firstPageContent = pages[0];
   return (
     extension === 'pdf' &&
-    firstPageContent.some(line => line.includes('BIC: INGDDEFFXX')) &&
-    activityType(firstPageContent) !== undefined
+    pages[0].some(line => line.toLowerCase().includes('ing-diba')) &&
+    activityType(pages.flat()) !== undefined
   );
 };
 
 export const parsePages = contents => {
-  // Information regarding dividends can be split across multiple pdf pages
-  const activities = [parseData(contents.flat())];
+  const contentsFlat = contents.flat();
+  const type = activityType(contentsFlat);
+  let activities;
 
+  if (type === 'DepotStatement') {
+    activities = parseDepotStatement(contentsFlat);
+  } else {
+    // Information regarding dividends can be split across multiple pdf pages
+    activities = [parseBuySellDividend(contentsFlat, type)];
+  }
+
+  if (activities !== undefined) {
+    return {
+      activities,
+      status: 0,
+    };
+  }
   return {
-    activities,
-    status: 0,
+    activities: [],
+    status: 3,
   };
 };

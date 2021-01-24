@@ -8,7 +8,6 @@ import * as onvista from './onvista';
 
 const findTax = (textArr, fxRate) => {
   let completeTax = Big(0);
-  let witholdingTax = 0;
 
   const capitalTaxIndex = textArr.findIndex(t =>
     t.includes('Kapitalertragsteuer')
@@ -50,10 +49,9 @@ const findTax = (textArr, fxRate) => {
     }
 
     completeTax = completeTax.plus(amount);
-    witholdingTax = +amount;
   }
 
-  return [+completeTax, witholdingTax];
+  return +completeTax;
 };
 
 const findFxRateAndForeignCurrency = content => {
@@ -87,13 +85,14 @@ const findFxRateAndForeignCurrency = content => {
   return [parseGermanNum(regexMatch[2]), regexMatch[1]];
 };
 
-const findPayout = content => {
-  let payoutIndex = content.indexOf('Steuerpflichtiger Ausschüttungsbetrag');
-  if (payoutIndex < 0) {
-    payoutIndex = content.indexOf('ausländische Dividende');
+const findPriceDividend = content => {
+  let priceIdx = content.indexOf('Dividenden-Betrag pro Stück');
+  if (priceIdx < 0) {
+    priceIdx = content.indexOf('Ausschüttungsbetrag pro Stück');
   }
-
-  return parseGermanNum(content[payoutIndex + 2]);
+  if (priceIdx >= 0) {
+    return parseGermanNum(content[priceIdx + 1].split(/\s+/)[1]);
+  }
 };
 
 const findOrderTime = content => {
@@ -108,6 +107,10 @@ const findOrderTime = content => {
   return content[lineNumber + 1].trim().substr(0, 5);
 };
 
+const detectedButIgnoredDocument = content => {
+  return content.includes('Kostendarstellung');
+};
+
 const canParsePage = content =>
   onvista.isBuy(content) ||
   onvista.isSell(content) ||
@@ -120,60 +123,53 @@ export const canParseDocument = (pages, extension) => {
     firstPageContent.some(line =>
       line.includes(onvista.smartbrokerIdentificationString)
     ) &&
-    canParsePage(firstPageContent)
+    (canParsePage(firstPageContent) ||
+      detectedButIgnoredDocument(firstPageContent))
   );
 };
 
-const parseData = textArr => {
-  const broker = 'smartbroker';
-  const shares = onvista.findShares(textArr);
-  const isin = onvista.findISIN(textArr);
-  const company = onvista.findCompany(textArr);
-  let type, amount, date, time, price, fxRate, foreignCurrency;
-  let tax = 0;
-  let witholdingTax = 0;
-  let fee = 0;
-
-  [fxRate, foreignCurrency] = findFxRateAndForeignCurrency(textArr);
+const parseBuySellDividend = pdfPages => {
+  const textArr = pdfPages.flat();
+  let activity = {
+    broker: 'smartbroker',
+    shares: onvista.findShares(textArr),
+    isin: onvista.findISIN(textArr),
+    company: onvista.findCompany(textArr),
+    tax: 0,
+    fee: 0,
+  };
+  const [fxRate, foreignCurrency] = findFxRateAndForeignCurrency(textArr);
+  let date, time;
 
   if (onvista.isBuy(textArr)) {
-    type = 'Buy';
-    amount = onvista.findAmount(textArr);
+    activity.type = 'Buy';
+    activity.amount = onvista.findAmount(textArr);
+    activity.price = onvista.findPrice(textArr);
+    activity.fee = onvista.findFee(textArr);
+
     date = onvista.findDateBuySell(textArr);
     time = findOrderTime(textArr);
-    price = onvista.findPrice(textArr);
-    fee = onvista.findFee(textArr);
   } else if (onvista.isSell(textArr)) {
-    type = 'Sell';
-    amount = onvista.findAmount(textArr);
+    activity.type = 'Sell';
+    activity.amount = onvista.findAmount(textArr);
+    activity.price = onvista.findPrice(textArr);
+    activity.tax = findTax(textArr, fxRate);
+
     date = onvista.findDateBuySell(textArr);
     time = findOrderTime(textArr);
-    price = onvista.findPrice(textArr);
-    [tax, witholdingTax] = findTax(textArr, fxRate);
   } else if (onvista.isDividend(textArr)) {
-    type = 'Dividend';
-    [tax, witholdingTax] = findTax(textArr, fxRate);
-    // Add the witholding tax to the amount to get the total gross value
-    amount = +Big(findPayout(textArr)).plus(witholdingTax);
+    activity.type = 'Dividend';
+    activity.tax = findTax(textArr, fxRate);
+    activity.price =
+      fxRate === undefined
+        ? findPriceDividend(textArr)
+        : +Big(findPriceDividend(textArr)).div(fxRate);
+    activity.amount = +Big(activity.price).times(activity.shares);
+
     date = onvista.findDateDividend(textArr);
-    price = +Big(amount).div(shares);
   }
 
-  const [parsedDate, parsedDateTime] = createActivityDateTime(date, time);
-
-  let activity = {
-    broker,
-    type,
-    shares,
-    date: parsedDate,
-    datetime: parsedDateTime,
-    isin,
-    company,
-    price,
-    amount,
-    tax,
-    fee,
-  };
+  [activity.date, activity.datetime] = createActivityDateTime(date, time);
 
   if (fxRate !== undefined) {
     activity.fxRate = fxRate;
@@ -182,20 +178,25 @@ const parseData = textArr => {
   if (foreignCurrency !== undefined) {
     activity.foreignCurrency = foreignCurrency;
   }
-
-  return validateActivity(activity);
+  return [validateActivity(activity)];
 };
 
-export const parsePages = contents => {
-  const activities = [];
-  for (let content of contents) {
-    if (canParsePage(content)) {
-      activities.push(parseData(content));
-    }
+export const parsePages = pdfPages => {
+  if (detectedButIgnoredDocument(pdfPages[0])) {
+    return {
+      activities: undefined,
+      status: 7,
+    };
   }
-
+  const activities = parseBuySellDividend(pdfPages);
+  if (activities !== undefined) {
+    return {
+      activities,
+      status: 0,
+    };
+  }
   return {
-    activities,
-    status: 0,
+    activities: undefined,
+    status: 5,
   };
 };
