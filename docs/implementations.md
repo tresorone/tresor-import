@@ -12,7 +12,7 @@ For the following brokers and apps we are ready to parse the following documents
 | flatex / FinTech Group | Buy, Sell, Dividend                                         |                                                                                    |
 | Gratisbroker           | Buy, Sell, Dividend                                         |                                                                                    |
 | ING (DE)               | Buy, Sell, Dividend                                         |                                                                                    |
-| onvista                | Buy, Sell, Dividend, Account Statements (Buy and Sell Only) | Account Statements need more testfiles for Sell and Dividend transactions          |
+| onvista                | Buy, Sell, Dividend, Account Statements                     |                                                                                    |
 | Oskar                  | Buy, Sell, Dividend                                         |                                                                                    |
 | Portfolio Performance  | Buy, Sell, Dividend                                         | Must be cleared of splits, only `.csv` files generated via menu `File` -> `export` |
 | Postbank               | Buy, Sell, Dividend                                         |                                                                                    |
