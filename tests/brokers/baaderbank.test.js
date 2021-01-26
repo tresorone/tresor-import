@@ -5,6 +5,7 @@ import {
   buySamples,
   sellSamples,
   dividendSamples,
+  accountSamples,
 } from './__mocks__/baaderbank';
 
 describe('Broker: scalable.capital', () => {
@@ -257,6 +258,43 @@ describe('Broker: scalable.capital', () => {
         amount: 58.32,
         fee: 0,
         tax: 15.38,
+      });
+    });
+  });
+
+  describe('Validate account statements', () => {
+    test('Can parse statement: 2020_scalable_buy_dividend', () => {
+      const result = baaderBank.parsePages(accountSamples[0]);
+      expect(result.status).toEqual(0);
+
+      const activities = result.activities;
+      expect(activities.length).toEqual(2);
+
+      expect(activities[0]).toEqual({
+        broker: 'scalablecapital',
+        type: 'Buy',
+        date: '2020-10-06',
+        datetime: '2020-10-06T' + activities[0].datetime.substring(11),
+        isin: 'IE00B3RBWM25',
+        company: 'VANG.FTSE A.-WO.U.ETF DLD',
+        shares: 25.265,
+        price: 79.16010290916287,
+        amount: 1999.98,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[1]).toEqual({
+        broker: 'scalablecapital',
+        type: 'Dividend',
+        date: '2020-10-07',
+        datetime: '2020-10-07T' + activities[1].datetime.substring(11),
+        isin: 'IE00B3RBWM25',
+        company: 'VANG.FTSE A.-WO.U.ETF DLD',
+        shares: 67.613,
+        price: 0.30999955629834497,
+        amount: 20.96,
+        fee: 0,
+        tax: 0,
       });
     });
   });

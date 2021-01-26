@@ -17,4 +17,12 @@ export const dividendSamples = [
   require('./dividend/volkswagen_with_taxes_gratisbroker.json'),
 ];
 
-export const allSamples = buySamples.concat(sellSamples, dividendSamples);
+export const accountSamples = [
+  require('./accountStatement/2020_scalable_buy_dividend.json'),
+];
+
+export const allSamples = buySamples.concat(
+  sellSamples,
+  dividendSamples,
+  accountSamples
+);
