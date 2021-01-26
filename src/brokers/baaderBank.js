@@ -4,6 +4,7 @@ import {
   validateActivity,
   createActivityDateTime,
   timeRegex,
+  findFirstRegexIndexInArray,
 } from '@/helper';
 // This broker also handles scalable capital
 
@@ -20,6 +21,9 @@ const isPageTypeDividend = content =>
       line.includes('Dividendenabrechnung')
   );
 
+const isPageTypeAccountStatement = content =>
+  content.indexOf('Perioden-Kontoauszug: EUR-Konto') > 0;
+
 const isBrokerGratisbroker = content =>
   content.some(line => line.includes('GRATISBROKER GmbH'));
 
@@ -32,6 +36,18 @@ const isBrokerScalableCapital = content =>
 
 const isBrokerOskar = content =>
   content.some(line => line.includes('Oskar.de GmbH'));
+
+const getBroker = content => {
+  if (isBrokerGratisbroker(content)) {
+    return 'gratisbroker';
+  }
+
+  if (isBrokerOskar(content)) {
+    return 'oskar';
+  }
+
+  return 'scalablecapital';
+};
 
 const findOrderDate = content => {
   let orderDate =
@@ -254,7 +270,8 @@ const findTax = content => {
 const canParsePage = content =>
   isPageTypeBuy(content) ||
   isPageTypeSell(content) ||
-  isPageTypeDividend(content);
+  isPageTypeDividend(content) ||
+  isPageTypeAccountStatement(content);
 
 export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
@@ -306,13 +323,6 @@ const parsePage = content => {
     console.error('Unknown page type for Baader Bank');
   }
 
-  let broker = 'scalablecapital';
-  if (isBrokerGratisbroker(content)) {
-    broker = 'gratisbroker';
-  } else if (isBrokerOskar(content)) {
-    broker = 'oskar';
-  }
-
   const [parsedDate, parsedDateTime] = createActivityDateTime(
     date,
     time,
@@ -321,7 +331,7 @@ const parsePage = content => {
   );
 
   return validateActivity({
-    broker,
+    broker: getBroker(content),
     type,
     date: parsedDate,
     datetime: parsedDateTime,
@@ -335,10 +345,69 @@ const parsePage = content => {
   });
 };
 
+const parseAccountStatement = content => {
+  const dateRegex = /^\d{2}.\d{2}.\d{4}$/;
+  let startIndex = content.indexOf('Perioden-Kontoauszug: EUR-Konto');
+
+  let activities = [];
+  while (startIndex >= 0) {
+    // Search the next date with an offset of two of the last one. We need the offset of two, because of the credit date the valuta date follows.
+    startIndex = findFirstRegexIndexInArray(content, dateRegex, startIndex + 2);
+    if (startIndex === undefined) {
+      break;
+    }
+
+    let companyLineNumber, type, isin, company, shares, amount;
+    if (content[startIndex + 2] === 'Kauf') {
+      type = 'Buy';
+      amount = parseGermanNum(content[startIndex + 3]);
+      companyLineNumber = startIndex + 5;
+    } else if (content[startIndex + 3] === 'Coupons/Dividende') {
+      type = 'Dividend';
+      amount = parseGermanNum(content[startIndex + 2]);
+      companyLineNumber = startIndex + 4;
+    } else {
+      // This type is not supported (yet).
+      continue;
+    }
+
+    company = content[companyLineNumber];
+    isin = content[companyLineNumber + 1].split(/\s+/)[1];
+    shares = parseGermanNum(content[companyLineNumber + 2].split(/\s+/)[1]);
+
+    const [parsedDate, parsedDateTime] = createActivityDateTime(
+      content[startIndex + 1],
+      undefined,
+      'dd.MM.yyyy'
+    );
+
+    activities.push(
+      validateActivity({
+        broker: getBroker(content),
+        type,
+        date: parsedDate,
+        datetime: parsedDateTime,
+        isin,
+        company,
+        shares,
+        price: +Big(amount).div(shares),
+        amount,
+        fee: 0,
+        tax: 0,
+      })
+    );
+  }
+
+  return activities;
+};
+
 export const parsePages = contents => {
   let activities = [];
   const content = contents.flat();
-  if (canParsePage(content)) {
+
+  if (isPageTypeAccountStatement(contents[0])) {
+    activities.push(...parseAccountStatement(content));
+  } else if (canParsePage(content)) {
     activities.push(parsePage(content));
   }
 
