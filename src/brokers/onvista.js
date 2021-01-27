@@ -265,6 +265,7 @@ const parseOverview = content => {
   ) {
     const shares = content[tableStartLine + 1].trim();
     if (shares === '/') {
+      // The last two lines don't contains securities and are marked with /. We can leave the loop here.
       break;
     }
 
