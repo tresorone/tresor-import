@@ -282,6 +282,7 @@ const parseOverview = content => {
         type: 'TransferIn',
         date: parsedDate,
         datetime: parsedDateTime,
+        wkn: content[tableStartLine + 3].split('/')[0].trim(),
         isin: content[tableStartLine + 3].split('/')[1].trim(),
         company: content[tableStartLine + 2],
         shares: parseGermanNum(shares),
