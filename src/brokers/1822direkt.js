@@ -14,7 +14,11 @@ const isPageTypeBuy = content =>
   );
 
 const isPageTypeSell = content =>
-  content.some(line => line.includes('Wertpapier Abrechnung Verkauf'));
+  content.some(
+    line =>
+      line.includes('Wertpapier Abrechnung Verkauf') ||
+      line.includes('Wertpapier Abrechnung Rücknahme Investmentfonds')
+  );
 
 const isPageTypeDividend = content =>
   content.some(line => line.includes('Ausschüttung Investmentfonds'));
@@ -93,12 +97,16 @@ const formatNumber = value => {
 const findLineNumberByContent = (content, term) =>
   content.findIndex(line => line.includes(term));
 
-export const canParsePage = (content, extension) =>
-  extension === 'pdf' &&
-  content.some(line => line.includes('1822direkt')) &&
-  (isPageTypeBuy(content) ||
-    isPageTypeSell(content) ||
-    isPageTypeDividend(content));
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
+  return (
+    extension === 'pdf' &&
+    firstPageContent.some(line => line.includes('1822direkt')) &&
+    (isPageTypeBuy(firstPageContent) ||
+      isPageTypeSell(firstPageContent) ||
+      isPageTypeDividend(firstPageContent))
+  );
+};
 
 const parsePage = content => {
   let type, date, time, isin, company, shares, price, amount, fee, tax;
@@ -169,20 +177,12 @@ export const parsePages = contents => {
   let activities = [];
 
   for (let content of contents) {
-    try {
-      const activity = parsePage(content);
-      if (activity === undefined) {
-        continue;
-      }
-
-      activities.push(activity);
-    } catch (exception) {
-      console.error(
-        'Error while parsing page (1822direkt)',
-        exception,
-        content
-      );
+    const activity = parsePage(content);
+    if (activity === undefined) {
+      continue;
     }
+
+    activities.push(activity);
   }
 
   return {

@@ -2,15 +2,14 @@ import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import parse from 'date-fns/parse';
 import { de } from 'date-fns/locale';
 // Use the webpack version to ensure, that the published version works fine and not only the src/ one.
-import getActivities, {
-  parseActivitiesFromPages,
-} from '../bundle/tresor-import';
+import { parseFile, parseActivitiesFromPages } from '../bundle/tresor-import';
 // To use the published version, uncomment the following line after running: npm run build
-// import getActivities, { parseActivitiesFromPages } from '../../dist/tresor-import';
+// import { parseFile, parseActivitiesFromPages } from '../../dist/tresor-import';
 
 new Vue({
   el: '#app',
   data: {
+    errors: [],
     activities: [],
     jsonInputActive: false,
     jsonContent: '',
@@ -54,6 +53,7 @@ new Vue({
       }
 
       if (!result.successful) {
+        this.errors.push(result);
         return;
       }
 
@@ -74,19 +74,49 @@ new Vue({
 
       const result = parseActivitiesFromPages(content, this.jsonExtension);
 
+      this.clearResults();
+
       this.handleParserResults({
-        file: 'Json Input',
+        file: 'json.' + this.jsonExtension,
+        content: this.jsonContent,
         activities: result.activities,
         status: result.status,
         successful: result.activities !== undefined && result.status === 0,
       });
     },
-    async fileHandler() {
-      const results = await Promise.all(
-        Array.from(this.$refs.myFiles.files).map(getActivities)
-      );
+    copyContentToClipboard(name) {
+      const copyText = document.getElementById('content-' + name);
 
-      results.forEach(this.handleParserResults);
+      copyText.style.display = 'block';
+
+      copyText.select();
+      copyText.setSelectionRange(0, 99999);
+
+      document.execCommand('copy');
+
+      copyText.style.display = 'none';
+    },
+    async fileHandler() {
+      this.clearResults();
+      Array.from(this.$refs.myFiles.files).forEach(file => {
+        parseFile(file).then(parsedFile => {
+          const result = parseActivitiesFromPages(
+            parsedFile.pages,
+            parsedFile.extension
+          );
+
+          result.file = file.name;
+          result.content = parsedFile.pages;
+          result.successful =
+            result.activities !== undefined && result.status === 0;
+
+          this.handleParserResults(result);
+        });
+      });
+    },
+    clearResults() {
+      this.errors = [];
+      this.activities = [];
     },
   },
 });

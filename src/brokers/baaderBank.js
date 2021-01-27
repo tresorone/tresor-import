@@ -5,6 +5,7 @@ import {
   createActivityDateTime,
   timeRegex,
 } from '@/helper';
+// This broker also handles scalable capital
 
 const isPageTypeBuy = content =>
   content.some(line => line.includes('Wertpapierabrechnung: Kauf'));
@@ -114,8 +115,8 @@ const findLineNumberByCurrentAndPreviousLineContent = (
 const findISIN = content => findByStartingTerm(content, 'ISIN: ');
 
 const findCompany = (content, isDividend) => {
-  let startLineNumber = undefined;
-  let endLineNumber = undefined;
+  let startLineNumber;
+  let endLineNumber;
   if (isDividend) {
     startLineNumber = findLineNumberByContent(content, 'p.STK') + 1;
     endLineNumber = findLineNumberByContent(content, 'Zahlungszeitraum:') - 1;
@@ -186,9 +187,15 @@ const findExchangeRate = (content, currency) => {
 const findTax = content => {
   var totalTax = Big(0);
 
+  // We should only parse the tax amounts before the information about the tax calculation.
+  const lineNumberWithTaxCalculations = findLineNumberByContent(
+    content,
+    'Darstellung der steuerlichen Berechnungsgrundlagen'
+  );
+
   const searchTermTax = 'Kapitalertragsteuer';
   const lineWithTax = findLineNumberByContent(content, searchTermTax);
-  if (lineWithTax > -1) {
+  if (lineWithTax > -1 && lineWithTax < lineNumberWithTaxCalculations) {
     totalTax = totalTax.plus(Big(parseGermanNum(content[lineWithTax + 1])));
   }
 
@@ -197,7 +204,10 @@ const findTax = content => {
     content,
     searchTermChurchTax
   );
-  if (lineWithChurchTax > -1) {
+  if (
+    lineWithChurchTax > -1 &&
+    lineWithChurchTax < lineNumberWithTaxCalculations
+  ) {
     totalTax = totalTax.plus(
       Big(parseGermanNum(content[lineWithChurchTax + 1]))
     );
@@ -208,7 +218,10 @@ const findTax = content => {
     content,
     searchTermSolidarityTax
   );
-  if (lineWithSolidarityTax > -1) {
+  if (
+    lineWithSolidarityTax > -1 &&
+    lineWithSolidarityTax < lineNumberWithTaxCalculations
+  ) {
     totalTax = totalTax.plus(
       Big(parseGermanNum(content[lineWithSolidarityTax + 1]))
     );
@@ -219,23 +232,40 @@ const findTax = content => {
     content,
     searchTermWithholdingTax
   );
-  if (lineWithWithholdingTax > -1) {
+  if (
+    lineWithWithholdingTax > -1 &&
+    lineWithWithholdingTax < lineNumberWithTaxCalculations
+  ) {
     totalTax = totalTax.plus(
       Big(parseGermanNum(content[lineWithWithholdingTax + 1]))
     );
   }
 
+  const financialTaxIdx = content.findIndex(l =>
+    l.endsWith('Finanztransaktionssteuer')
+  );
+  if (financialTaxIdx >= 0) {
+    totalTax = totalTax.plus(Big(parseGermanNum(content[financialTaxIdx + 1])));
+  }
+
   return +totalTax;
 };
 
-export const canParsePage = (content, extension) =>
-  extension === 'pdf' &&
-  (isBrokerGratisbroker(content) ||
-    isBrokerScalableCapital(content) ||
-    isBrokerOskar(content)) &&
-  (isPageTypeBuy(content) ||
-    isPageTypeSell(content) ||
-    isPageTypeDividend(content));
+const canParsePage = content =>
+  isPageTypeBuy(content) ||
+  isPageTypeSell(content) ||
+  isPageTypeDividend(content);
+
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
+  return (
+    extension === 'pdf' &&
+    canParsePage(firstPageContent) &&
+    (isBrokerGratisbroker(firstPageContent) ||
+      isBrokerScalableCapital(firstPageContent) ||
+      isBrokerOskar(firstPageContent))
+  );
+};
 
 const parsePage = content => {
   let type, date, time, isin, company, shares, price, amount, fee, tax;
@@ -307,17 +337,9 @@ const parsePage = content => {
 
 export const parsePages = contents => {
   let activities = [];
-
-  for (let content of contents) {
-    try {
-      activities.push(parsePage(content));
-    } catch (exception) {
-      console.error(
-        'Error while parsing page (Baader Bank)',
-        exception,
-        content
-      );
-    }
+  const content = contents.flat();
+  if (canParsePage(content)) {
+    activities.push(parsePage(content));
   }
 
   return {

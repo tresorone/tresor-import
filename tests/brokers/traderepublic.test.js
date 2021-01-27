@@ -6,6 +6,7 @@ import {
   sellSamples,
   dividendSamples,
   quarterSamples,
+  ignoredSamples,
 } from './__mocks__/traderepublic';
 
 describe('Broker: Trade Republic', () => {
@@ -13,16 +14,14 @@ describe('Broker: Trade Republic', () => {
 
   describe('Check all documents', () => {
     test('Can the document parsed with Trade Republic', () => {
-      allSamples.forEach(samples => {
-        expect(
-          samples.some(item => traderepublic.canParsePage(item, 'pdf'))
-        ).toEqual(true);
+      allSamples.forEach(pages => {
+        expect(traderepublic.canParseDocument(pages, 'pdf')).toEqual(true);
       });
     });
 
     test('Can identify a implementation from the document as Trade Republic', () => {
-      allSamples.forEach(samples => {
-        const implementations = findImplementation(samples, 'pdf');
+      allSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'pdf');
 
         expect(implementations.length).toEqual(1);
         expect(implementations[0]).toEqual(traderepublic);
@@ -81,7 +80,7 @@ describe('Broker: Trade Republic', () => {
         isin: 'FR0000031122',
         company: 'Air France-KLM S.A.',
         shares: 100,
-        price: 5.63,
+        price: 5.632,
         amount: 563.2,
         fee: 1,
         tax: 1.69,
@@ -119,7 +118,7 @@ describe('Broker: Trade Republic', () => {
         isin: 'IE00B1YZSC51',
         company: 'iShsII-Core MSCI Europe U.ETF',
         shares: 1.3404,
-        price: 26.11,
+        price: 26.111608475082065,
         amount: 35.0,
         fee: 0,
         tax: 0,
@@ -193,17 +192,19 @@ describe('Broker: Trade Republic', () => {
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
-        amount: 160.17499384432017,
         broker: 'traderepublic',
+        type: 'Dividend',
+        isin: 'GB00B03MLX29',
         company: 'Royal Dutch Shell',
         date: '2020-03-23',
         datetime: '2020-03-23T' + activities[0].datetime.substring(11),
-        fee: 0,
-        isin: 'GB00B03MLX29',
-        price: 0.41929992970035224,
         shares: 382,
+        amount: 160.17257314553456,
+        price: 0.41929992970035224,
+        fee: 0,
         tax: 41.96499384432018,
-        type: 'Dividend',
+        fxRate: 1.120916,
+        foreignCurrency: 'USD',
       });
     });
 
@@ -220,7 +221,7 @@ describe('Broker: Trade Republic', () => {
         datetime: '2020-07-15T' + activities[0].datetime.substring(11),
         fee: 0,
         isin: 'DE0002635299',
-        price: 0.27,
+        price: 0.2699973159491759,
         shares: 43.9634,
         tax: 2.2,
         type: 'Dividend',
@@ -240,7 +241,7 @@ describe('Broker: Trade Republic', () => {
         datetime: '2020-07-15T' + activities[0].datetime.substring(11),
         fee: 0,
         isin: 'DE0002635281',
-        price: 0.234,
+        price: 0.23434708108454821,
         shares: 43.6532,
         tax: 1.89,
         type: 'Dividend',
@@ -253,17 +254,19 @@ describe('Broker: Trade Republic', () => {
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
-        amount: 24.33,
         broker: 'traderepublic',
+        type: 'Dividend',
+        isin: 'IE00B1FZS350',
         company: 'iShsII-Dev.Mkts Prop.Yld U.ETF',
         date: '2020-02-26',
         datetime: '2020-02-26T' + activities[0].datetime.substring(11),
-        fee: 0,
-        isin: 'IE00B1FZS350',
-        price: 0.17252514069563613,
         shares: 141,
+        amount: 24.328812621090506,
+        price: 0.172544770362344,
+        fee: 0,
         tax: 6.81,
-        type: 'Dividend',
+        fxRate: 1.0839,
+        foreignCurrency: 'USD',
       });
     });
 
@@ -273,17 +276,19 @@ describe('Broker: Trade Republic', () => {
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
-        amount: 15.648939253517566,
         broker: 'traderepublic',
+        type: 'Dividend',
+        isin: 'US3682872078',
         company: 'Gazprom PJSC',
         date: '2020-08-18',
         datetime: '2020-08-18T' + activities[0].datetime.substring(11),
-        fee: 0.7582778667116017,
-        isin: 'US3682872078',
-        price: 0.3479652877243239,
         shares: 45,
+        amount: 15.65422529277951,
+        price: 0.347871673172878,
         tax: 2.350661386805965,
-        type: 'Dividend',
+        fee: 0.7582778667116017,
+        fxRate: 1.1869,
+        foreignCurrency: 'USD',
       });
     });
 
@@ -293,17 +298,19 @@ describe('Broker: Trade Republic', () => {
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
-        amount: 0.9814259274838059,
         broker: 'traderepublic',
+        type: 'Dividend',
+        isin: 'US7561091049',
         company: 'Realty Income Corp.',
         date: '2020-09-15',
         datetime: '2020-09-15T' + activities[0].datetime.substring(11),
-        fee: 0,
-        isin: 'US7561091049',
-        price: 0.1968537057289476,
+        amount: 0.9842685286447379,
         shares: 5,
+        price: 0.1968537057289476,
         tax: 0.15142592748380584,
-        type: 'Dividend',
+        fee: 0,
+        fxRate: 1.1887,
+        foreignCurrency: 'USD',
       });
     });
 
@@ -324,6 +331,72 @@ describe('Broker: Trade Republic', () => {
         shares: 5,
         tax: 0.31,
         type: 'Dividend',
+      });
+    });
+
+    test('New Dividend Date Format starting in 2020: 2020_walgreens_boots_alliance', () => {
+      const activities = traderepublic.parsePages(dividendSamples[7])
+        .activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'traderepublic',
+        type: 'Dividend',
+        isin: 'US9314271084',
+        company: 'Walgreens Boots Alliance Inc.',
+        date: '2020-12-11',
+        datetime: '2020-12-11T' + activities[0].datetime.substring(11),
+        shares: 1,
+        amount: 0.3867357854027812,
+        price: 0.3867357854027812,
+        tax: 0.05759894676211635,
+        fee: 0,
+        fxRate: 1.2153,
+        foreignCurrency: 'USD',
+      });
+    });
+
+    test('New Dividend Date Format starting in 2020: 2020_exxon_mobile_corp', () => {
+      const activities = traderepublic.parsePages(dividendSamples[8])
+        .activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'traderepublic',
+        type: 'Dividend',
+        isin: 'US30231G1022',
+        company: 'Exxon Mobil Corp.',
+        date: '2020-12-10',
+        datetime: '2020-12-10T' + activities[0].datetime.substring(11),
+        amount: 3.5870371897418982,
+        price: 0.7174074379483797,
+        shares: 5,
+        tax: 0.5359940628349963,
+        fee: 0,
+        foreignCurrency: 'USD',
+        fxRate: 1.2127,
+      });
+    });
+
+    test('Should map the pdf data correctly for: 2020_schlumberger', () => {
+      const activities = traderepublic.parsePages(dividendSamples[9])
+        .activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'traderepublic',
+        type: 'Dividend',
+        isin: 'AN8068571086',
+        company: 'Schlumberger N.V. (Ltd.)',
+        date: '2020-10-08',
+        datetime: '2020-10-08T' + activities[0].datetime.substring(11),
+        amount: 13.767686181479284,
+        price: 0.10590527831907141,
+        shares: 130,
+        tax: 3.64,
+        fee: 0,
+        foreignCurrency: 'USD',
+        fxRate: 1.1803,
       });
     });
   });
@@ -365,6 +438,83 @@ describe('Broker: Trade Republic', () => {
         tax: 0,
         type: 'Buy',
       });
+    });
+
+    test('Map a quarter statement with two pages correctly', () => {
+      const activities = traderepublic.parsePages(quarterSamples[2]).activities;
+
+      expect(activities[10]).toEqual({
+        amount: 366.12,
+        broker: 'traderepublic',
+        company: 'VISA Inc.',
+        date: '2020-03-31',
+        datetime: '2020-03-31T' + activities[1].datetime.substring(11),
+        fee: 0,
+        isin: 'US92826C8394',
+        price: 183.06,
+        shares: 2,
+        tax: 0,
+        type: 'Buy',
+      });
+      expect(activities[11]).toEqual({
+        amount: 391,
+        broker: 'traderepublic',
+        company: 'Zoom Video',
+        date: '2020-03-31',
+        datetime: '2020-03-31T' + activities[1].datetime.substring(11),
+        fee: 0,
+        isin: 'US98980L1017',
+        price: 130.33333333333334,
+        shares: 3,
+        tax: 0,
+        type: 'Buy',
+      });
+
+      expect(activities.length).toEqual(15);
+    });
+  });
+
+  describe('Validate all ignored statements', () => {
+    test('The statement should be ignored: cost_information.json', () => {
+      const result = traderepublic.parsePages(ignoredSamples[0]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('The statement should be ignored: reverse_split.json', () => {
+      const result = traderepublic.parsePages(ignoredSamples[1]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('The statement should be ignored: saving_plan_failed.json', () => {
+      const result = traderepublic.parsePages(ignoredSamples[2]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('The statement should be ignored: split.json', () => {
+      const result = traderepublic.parsePages(ignoredSamples[3]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('The statement should be ignored: saving_plan_confirmation.json', () => {
+      const result = traderepublic.parsePages(ignoredSamples[4]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('The statement should be ignored: saving_plan_change_confirmation.json', () => {
+      const result = traderepublic.parsePages(ignoredSamples[5]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
     });
   });
 

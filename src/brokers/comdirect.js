@@ -7,11 +7,22 @@ import {
   timeRegex,
 } from '@/helper';
 
-const findISINAndWKN = (text, spanISIN, spanWKN) => {
+const findISINAndWKN = (pdfPage, spanISIN = 0, spanWKN = 0) => {
   // The line contains either WPKNR/ISIN or WKN/ISIN, depending on the document
-  const isinIndex = text.findIndex(t => t.includes('/ISIN'));
-  const isinLine = text[isinIndex + spanISIN].split(/\s+/);
-  const wknLine = text[isinIndex + spanWKN].split(/\s+/);
+  const isinIndex = pdfPage.findIndex(
+    t => t.includes('/ISIN') || t.includes('/ ISIN')
+  );
+  // For Taxinfo dividends lots of information are in one row
+  if (spanISIN === 0 && spanWKN === 0) {
+    const isinWkn = pdfPage[isinIndex].split(/\s+/);
+    const shares = parseGermanNum(isinWkn[1]);
+    const isin = isinWkn[isinWkn.length - 1];
+    const wkn = isinWkn[isinWkn.length - 3];
+    const company = isinWkn.splice(2, isinWkn.length - 9).join(' ');
+    return [isin, wkn, company, shares];
+  }
+  const isinLine = pdfPage[isinIndex + spanISIN].split(/\s+/);
+  const wknLine = pdfPage[isinIndex + spanWKN].split(/\s+/);
   return [isinLine[isinLine.length - 1], wknLine[wknLine.length - 1]];
 };
 
@@ -40,12 +51,16 @@ const findDateBuySell = textArr => {
   return dateLine.match(/[0-9]{2}.[0-9]{2}.[1-2][0-9]{3}/)[0];
 };
 
-const findDateDividend = textArr => {
-  const dateLine = textArr[
-    textArr.findIndex(t => t.includes('Valuta')) + 1
-  ].split(/\s+/);
-
-  return dateLine[dateLine.length - 3];
+const findDateDividend = (textArr, formatId = false) => {
+  let date;
+  const valutaIdx = textArr.findIndex(t => t.includes('Valuta'));
+  if (formatId === 2) {
+    date = textArr[valutaIdx].split(/\s+/)[5];
+  } else {
+    const dateLine = textArr[valutaIdx + 1].split(/\s+/);
+    date = dateLine[dateLine.length - 3];
+  }
+  return date;
 };
 
 const findOrderTime = content => {
@@ -158,14 +173,39 @@ const findAmount = (textArr, fxRate, foreignCurrency, formatId) => {
 };
 
 const findPayout = (textArr, fxRate) => {
-  const amountLine =
-    textArr[textArr.findIndex(t => t.includes('Bruttobetrag'))];
-  const amountPart = amountLine.split(/\s+/);
-  const amount = parseGermanNum(amountPart[2]);
-  if (fxRate !== undefined) {
-    return +Big(amount).div(fxRate);
+  // In some documents the witholding tax is not listed explicitely but instead
+  // can be calculated as the difference between 'Steuerbemessungsgrundlage[...]'
+  // and the Pre Tax Payout ('Zu Ihren Gunsten')
+
+  let amount, includedWithholdingTax;
+
+  // This is the case for simple dividend files
+  const grossAmountIdx = textArr.findIndex(t => t.includes('Bruttobetrag'));
+  if (grossAmountIdx >= 0) {
+    amount = Big(parseGermanNum(textArr[grossAmountIdx].split(/\s+/)[2]));
+    if (fxRate !== undefined) {
+      amount = amount.div(fxRate);
+    }
+    return [+amount, undefined];
   }
-  return amount;
+
+  const preTaxAmountIdx = textArr.findIndex(
+    t => t === 'Zu Ihren Gunsten vor Steuern:'
+  );
+  if (preTaxAmountIdx >= 0) {
+    amount = Big(parseGermanNum(textArr[preTaxAmountIdx + 1].split(/\s+/)[1]));
+  }
+
+  const taxBasePreLossAmountIdx = textArr.findIndex(
+    t => t === 'Steuerbemessungsgrundlage vor Verlustverrechnung'
+  );
+  if (taxBasePreLossAmountIdx >= 0) {
+    const taxBasePreLossAmount = Big(
+      parseGermanNum(textArr[taxBasePreLossAmountIdx + 1].split(/\s+/)[1])
+    );
+    includedWithholdingTax = +taxBasePreLossAmount.minus(amount);
+  }
+  return [+amount, includedWithholdingTax];
 };
 
 const findFee = (textArr, amount, isSell = false, formatId = undefined) => {
@@ -182,22 +222,24 @@ const findFee = (textArr, amount, isSell = false, formatId = undefined) => {
 };
 
 const findTax = (textArr, fxRate, formatId) => {
-  let payoutTax = Big(0);
-  const withholdingTaxIndex = textArr.findIndex(line =>
-    line.includes('Quellensteuer')
-  );
-  if (withholdingTaxIndex > 0) {
-    const withholdingTax = parseGermanNum(
-      textArr[withholdingTaxIndex].split(/\s+/)[4]
+  let withholdingTax = 0;
+  if (formatId === 0 || formatId === 2) {
+    const withholdingTaxIndex = textArr.findIndex(
+      line =>
+        line.includes(' Quellensteuer') && !line.includes('Bei einbehaltener ')
     );
-    if (fxRate !== undefined && fxRate > 0) {
-      payoutTax = payoutTax.plus(withholdingTax).div(fxRate);
-    } else {
-      payoutTax = payoutTax.plus(withholdingTax);
+    if (withholdingTaxIndex > 0) {
+      withholdingTax = parseGermanNum(
+        textArr[withholdingTaxIndex].split(/\s+/)[4]
+      );
+      if (fxRate !== undefined && fxRate > 0) {
+        withholdingTax = +Big(withholdingTax).div(fxRate);
+      }
     }
   }
 
-  // Relevant for Sell Operations
+  // Relevant for Sell Operations and TaxInfo Dividends
+  let localTax = 0;
   const payedTaxIndex = textArr.indexOf('abgeführte Steuern');
   if (payedTaxIndex >= 0) {
     let lineWithTaxValue;
@@ -206,11 +248,10 @@ const findTax = (textArr, fxRate, formatId) => {
     } else {
       lineWithTaxValue = textArr[payedTaxIndex + 1].split(/\s+/)[1];
     }
-
-    payoutTax = payoutTax.plus(Big(parseGermanNum(lineWithTaxValue)).abs());
+    localTax = Math.abs(parseGermanNum(lineWithTaxValue));
   }
 
-  return +payoutTax;
+  return [+Big(withholdingTax).plus(localTax), withholdingTax];
 };
 
 const findPurchaseReduction = (textArr, fxRate, foreignCurrency) => {
@@ -282,32 +323,66 @@ const findBuyFxRateForeignCurrency = textArr => {
 // for this are different layouts or only minor document structure changes which will end up with
 // an other text format for us...
 const getDocumentFormatId = content => {
-  // There are currently two types of documents:
+  // There are currently three types of documents:
 
   if (content.some(line => line.includes('Wertpapier-Bezeichnung '))) {
     // One with: "Wertpapier-Bezeichnung                                               WPKNR/ISIN"
     return 0;
+  } else if (content.some(line => line === 'Wertpapier-Bezeichnung')) {
+    // One with: "Wertpapier-Bezeichnung"
+    return 1;
+  } else if (
+    content.some(line => line.startsWith('Steuerliche Behandlung: '))
+  ) {
+    // This is the case for tax information files
+    return 2;
   }
-
-  // One with: "Wertpapier-Bezeichnung"
-  return 1;
+  console.error('Unknown Document Type, can not parse');
 };
 
 const isBuy = textArr => textArr.some(t => t.includes('Wertpapierkauf'));
 
 const isSell = textArr => textArr.some(t => t.includes('Wertpapierverkauf'));
 
-const isDividend = textArr =>
-  textArr.some(t => t.includes('Ertragsgutschrift')) ||
-  textArr.some(t => t.includes('Dividendengutschrift'));
+const isDividend = textArr => {
+  return (
+    textArr.some(t => t.includes('Ertragsgutschrift')) ||
+    textArr.some(t => t.includes('Dividendengutschrift'))
+  );
+};
 
-export const canParsePage = (content, extension) =>
+const isTaxinfoDividend = textArr => {
+  return textArr.some(
+    t =>
+      t.includes('Steuerliche Behandlung:') &&
+      (t.includes('Dividende') || t.includes('Investment-Ausschüttung'))
+  );
+};
+
+const detectedButIgnoredDocument = content => {
+  return (
+    // When the document contains one of the following lines, we want to ignore these document.
+    content.some(line => line.includes('Kosteninformation'))
+  );
+};
+
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
   // The defining string used to be 'comdirect bank'. However, this string is
   // not present in every document; 'comdirect' is.
-  extension === 'pdf' &&
-  content.some(line => line.includes('comdirect')) &&
-  content.every(line => !line.includes(onvistaIdentificationString)) &&
-  (isBuy(content) || isSell(content) || isDividend(content));
+  return (
+    extension === 'pdf' &&
+    firstPageContent.some(line => line.includes('comdirect')) &&
+    firstPageContent.every(
+      line => !line.includes(onvistaIdentificationString)
+    ) &&
+    (isBuy(firstPageContent) ||
+      isSell(firstPageContent) ||
+      isDividend(firstPageContent) ||
+      isTaxinfoDividend(firstPageContent) ||
+      detectedButIgnoredDocument(firstPageContent))
+  );
+};
 
 const parseData = textArr => {
   let type,
@@ -319,8 +394,8 @@ const parseData = textArr => {
     shares,
     price,
     amount,
-    fee,
-    tax,
+    fee = 0,
+    tax = 0,
     fxRate,
     foreignCurrency;
 
@@ -337,13 +412,12 @@ const parseData = textArr => {
     shares = findShares(textArr, formatId);
     price = +Big(amount).div(shares);
     fee = +findFee(textArr, amount, false, formatId);
-    tax = 0;
   } else if (isSell(textArr)) {
     type = 'Sell';
     [isin, wkn] = findISINAndWKN(
       textArr,
-      formatId == 1 ? 4 : 2,
-      formatId == 1 ? 2 : 1
+      formatId === 1 ? 4 : 2,
+      formatId === 1 ? 2 : 1
     );
     company = findCompany(textArr, type, formatId);
     date = findDateBuySell(textArr);
@@ -353,7 +427,7 @@ const parseData = textArr => {
     amount = +findAmount(textArr, fxRate, foreignCurrency, formatId);
     price = +Big(amount).div(shares);
     fee = +findFee(textArr, amount, true, formatId);
-    tax = findTax(textArr, fxRate, formatId);
+    tax = findTax(textArr, fxRate, formatId)[0];
   } else if (isDividend(textArr)) {
     [fxRate, foreignCurrency] = findPayoutFxrateForeignCurrency(textArr);
     type = 'Dividend';
@@ -361,12 +435,24 @@ const parseData = textArr => {
     company = findCompany(textArr, type, formatId);
     date = findDateDividend(textArr);
     shares = findDividendShares(textArr);
-    amount = findPayout(textArr, fxRate);
+    amount = findPayout(textArr, fxRate)[0];
     price = +Big(amount).div(shares);
-    fee = 0;
-    tax = findTax(textArr, fxRate, formatId);
+    tax = findTax(textArr, fxRate, formatId)[0];
+  } else if (isTaxinfoDividend(textArr)) {
+    // Still needs handling of Foreign  Rates
+    let payout, withholdingTax, integratedWithholdingTax;
+    type = 'Dividend';
+    [isin, wkn, company, shares] = findISINAndWKN(textArr, 0, 0);
+    date = findDateDividend(textArr, formatId);
+    [tax, withholdingTax] = findTax(textArr, undefined, formatId);
+    [payout, integratedWithholdingTax] = findPayout(textArr);
+    if (integratedWithholdingTax > withholdingTax) {
+      withholdingTax = integratedWithholdingTax;
+      tax = +Big(tax).plus(integratedWithholdingTax);
+    }
+    amount = +Big(payout).plus(withholdingTax);
+    price = +Big(amount).div(shares);
   }
-
   const [parsedDate, parsedDateTime] = createActivityDateTime(date, time);
 
   let activity = {
@@ -391,11 +477,18 @@ const parseData = textArr => {
   if (foreignCurrency !== undefined) {
     activity.foreignCurrency = foreignCurrency;
   }
-
   return validateActivity(activity);
 };
 
 export const parsePages = contents => {
+  if (detectedButIgnoredDocument(contents[0])) {
+    // We know this type and we don't want to support it.
+    return {
+      activities: [],
+      status: 7,
+    };
+  }
+
   // Sometimes information regarding the first transcation (i. e. tax in sell
   // documents) is spread across multiple pdf pages
   const activities = [parseData(contents.flat())];

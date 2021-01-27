@@ -6,9 +6,25 @@ import {
   timeRegex,
 } from '@/helper';
 
-const findISIN = text => text[text.findIndex(t => t === 'ISIN') + 3];
+const findISIN = text => {
+  const isinIdx = text.findIndex(t => t === 'ISIN');
+  if (isinIdx >= 0) {
+    return text[isinIdx + 3];
+  }
+};
 
-const findCompany = text => text[text.findIndex(t => t === 'ISIN') + 1];
+const findCompany = text => {
+  // New format
+  const isinIdx = text.findIndex(t => t === 'ISIN');
+  if (isinIdx >= 0) {
+    return text[isinIdx + 1];
+  }
+  // Old format (Testfile from 2015)
+  const wknIdx = text.findIndex(t => t === 'WKN:');
+  if (wknIdx >= 0) {
+    return text[wknIdx + 2];
+  }
+};
 
 const findDividendCompany = content => {
   let lineNumber = content.findIndex(
@@ -25,7 +41,15 @@ const findDividendCompany = content => {
 };
 
 const findBuySellWKN = content => {
-  return content[content.findIndex(line => line === 'WKN') + 3];
+  const wknIdx = content.findIndex(line => line === 'WKN');
+  if (wknIdx >= 0) {
+    return content[wknIdx + 3];
+  }
+  // Older type of File (Testfile from 2005)
+  const oldWknIdx = content.findIndex(line => line === 'WKN:');
+  if (oldWknIdx >= 0) {
+    return content[oldWknIdx + 1];
+  }
 };
 
 const findDividendWKN = content => {
@@ -72,10 +96,14 @@ const findDateDividend = content => {
 };
 
 const findShares = textArr => {
-  const idx = textArr.findIndex(t => t.toLowerCase() === 'umsatz');
-  const shares = textArr[idx + 2];
-
-  return parseGermanNum(shares);
+  let idx = textArr.findIndex(t => t.toLowerCase() === 'umsatz');
+  if (idx >= 0) {
+    return parseGermanNum(textArr[idx + 2]);
+  }
+  idx = textArr.indexOf('ST');
+  if (idx >= 0) {
+    return parseGermanNum(textArr[idx + 1]);
+  }
 };
 
 const findDividendShares = textArr => {
@@ -85,10 +113,14 @@ const findDividendShares = textArr => {
 };
 
 const findAmount = textArr => {
-  const idx = textArr.findIndex(t => t.toLowerCase() === 'kurswert');
-  const amount = textArr[idx + 2];
-
-  return parseGermanNum(amount);
+  let idx = textArr.findIndex(t => t.toLowerCase() === 'kurswert');
+  if (idx >= 0) {
+    return parseGermanNum(textArr[idx + 2]);
+  }
+  idx = textArr.indexOf('Ges. Preis inkl. Ausgabegeb.');
+  if (idx >= 0) {
+    return parseGermanNum(textArr[idx + 3]);
+  }
 };
 
 const findPayout = content => {
@@ -107,8 +139,7 @@ const findFee = content => {
   // Provision:
   {
     const lineNumber = content.findIndex(line => line.includes('Provision'));
-
-    if (lineNumber > 0) {
+    if (lineNumber >= 0) {
       totalFee = totalFee.plus(parseGermanNum(content[lineNumber + 2]));
     }
   }
@@ -116,8 +147,7 @@ const findFee = content => {
   // Eig. Spesen
   {
     const lineNumber = content.findIndex(line => line.includes('Eig. Spesen'));
-
-    if (lineNumber > 0) {
+    if (lineNumber >= 0) {
       totalFee = totalFee.plus(parseGermanNum(content[lineNumber + 2]));
     }
   }
@@ -125,9 +155,26 @@ const findFee = content => {
   // Grundgebühr
   {
     const lineNumber = content.findIndex(line => line.includes('Grundgebühr'));
-
-    if (lineNumber > 0) {
+    if (lineNumber >= 0) {
       totalFee = totalFee.plus(parseGermanNum(content[lineNumber + 2]));
+    }
+  }
+
+  // Bonifikation
+  {
+    const lineNumber = content.findIndex(line => line.startsWith('BONIFIKAT.'));
+    if (lineNumber >= 0) {
+      totalFee = totalFee.minus(parseGermanNum(content[lineNumber + 2]));
+    }
+  }
+
+  // CortalConsors Discount
+  {
+    const lineNumber = content.findIndex(line =>
+      line.startsWith('abz. CortalConsors Discount')
+    );
+    if (lineNumber >= 0) {
+      totalFee = totalFee.minus(parseGermanNum(content[lineNumber + 2]));
     }
   }
 
@@ -168,7 +215,7 @@ const isBuy = content => {
   const lineNumber = content.findIndex(line =>
     line.includes('WERTPAPIERABRECHNUNG')
   );
-  return lineNumber > 0 && content[lineNumber + 1] === 'KAUF';
+  return lineNumber > 0 && content[lineNumber + 1].toLowerCase() === 'kauf';
 };
 
 const isSell = content => {
@@ -185,75 +232,66 @@ const isDividend = content =>
       line.includes('ERTRAGSGUTSCHRIFT')
   );
 
-export const canParsePage = (content, extension) =>
-  extension === 'pdf' &&
-  content.some(line => line.includes('Cortal Consors')) &&
-  (isBuy(content) || isSell(content) || isDividend(content));
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
+  return (
+    extension === 'pdf' &&
+    firstPageContent.some(line => line.includes('Cortal Consors')) &&
+    (isBuy(firstPageContent) ||
+      isSell(firstPageContent) ||
+      isDividend(firstPageContent))
+  );
+};
 
 const parseData = content => {
-  let type, date, time, isin, wkn, company, shares, price, amount, fee, tax;
-
+  let activity = {
+    broker: 'cortalconsors',
+  };
+  let date, time;
   if (isBuy(content)) {
-    type = 'Buy';
-    wkn = findBuySellWKN(content);
-    isin = findISIN(content);
-    company = findCompany(content);
+    activity.type = 'Buy';
+    activity.wkn = findBuySellWKN(content);
+    const isin = findISIN(content);
+    if (isin !== undefined) {
+      activity.isin = isin;
+    }
+    activity.company = findCompany(content);
+    activity.shares = findShares(content);
+    activity.amount = findAmount(content);
+    activity.price = +Big(activity.amount).div(Big(activity.shares));
+    activity.fee = findFee(content);
+    activity.tax = 0;
     date = findDateBuySell(content);
     time = findOrderTime(content);
-    shares = findShares(content);
-    amount = findAmount(content);
-    price = +Big(amount).div(Big(shares));
-    fee = findFee(content);
-    tax = 0;
   } else if (isSell(content)) {
-    type = 'Sell';
-    wkn = findBuySellWKN(content);
-    isin = findISIN(content);
-    company = findCompany(content);
+    activity.type = 'Sell';
+    activity.wkn = findBuySellWKN(content);
+    activity.isin = findISIN(content);
+    activity.company = findCompany(content);
+    activity.shares = findShares(content);
+    activity.amount = findAmount(content);
+    activity.price = +Big(activity.amount).div(Big(activity.shares));
+    activity.fee = findFee(content);
+    activity.tax = findTax(content);
     date = findDateBuySell(content);
     time = findOrderTime(content);
-    shares = findShares(content);
-    amount = findAmount(content);
-    price = +Big(amount).div(Big(shares));
-    fee = findFee(content);
-    tax = findTax(content);
   } else if (isDividend(content)) {
-    type = 'Dividend';
-    wkn = findDividendWKN(content);
-    company = findDividendCompany(content);
+    activity.type = 'Dividend';
+    activity.wkn = findDividendWKN(content);
+    activity.company = findDividendCompany(content);
+    activity.shares = findDividendShares(content);
+    activity.amount = findPayout(content);
+    activity.price = +Big(activity.amount).div(Big(activity.shares));
+    activity.fee = 0;
+    activity.tax = findDividendTax(content);
     date = findDateDividend(content);
-    shares = findDividendShares(content);
-    amount = findPayout(content);
-    price = +Big(amount).div(Big(shares));
-    fee = 0;
-    tax = findDividendTax(content);
   }
-
-  const [parsedDate, parsedDateTime] = createActivityDateTime(
+  [activity.date, activity.datetime] = createActivityDateTime(
     date,
     time,
     'dd.MM.yyyy',
     'dd.MM.yyyy HH:mm:ss'
   );
-
-  const activity = {
-    broker: 'cortalconsors',
-    type,
-    date: parsedDate,
-    datetime: parsedDateTime,
-    wkn,
-    company,
-    shares,
-    price,
-    amount,
-    fee,
-    tax,
-  };
-
-  if (isin !== undefined) {
-    activity.isin = isin;
-  }
-
   return validateActivity(activity);
 };
 

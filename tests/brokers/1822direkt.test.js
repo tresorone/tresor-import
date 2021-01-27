@@ -12,16 +12,14 @@ describe('Broker: 1822direkt', () => {
 
   describe('Check all documents', () => {
     test('Can the document parsed with 1822direkt', () => {
-      allSamples.forEach(samples => {
-        expect(
-          samples.some(item => _1822direkt.canParsePage(item, 'pdf'))
-        ).toEqual(true);
+      allSamples.forEach(pages => {
+        expect(_1822direkt.canParseDocument(pages, 'pdf')).toEqual(true);
       });
     });
 
     test('Can identify a implementation from the document as 1822direkt', () => {
-      allSamples.forEach(samples => {
-        const implementations = findImplementation(samples, 'pdf');
+      allSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'pdf');
 
         expect(implementations.length).toEqual(1);
         expect(implementations[0]).toEqual(_1822direkt);
@@ -89,7 +87,7 @@ describe('Broker: 1822direkt', () => {
   });
 
   describe('Validate sells', () => {
-    test('Can the order parsed from the document', () => {
+    test('Can the markets order be parsed from the document', () => {
       const activities = _1822direkt.parsePages(sellSamples[0]).activities;
 
       expect(activities.length).toEqual(1);
@@ -104,6 +102,25 @@ describe('Broker: 1822direkt', () => {
         price: 55.25,
         amount: 55.25,
         fee: 2.95,
+        tax: 0,
+      });
+    });
+
+    test('Can the funds redemption order be parsed from the document', () => {
+      const activities = _1822direkt.parsePages(sellSamples[1]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: '1822direkt',
+        type: 'Sell',
+        date: '2020-11-24',
+        datetime: '2020-11-24T' + activities[0].datetime.substring(11),
+        isin: 'LU0392494562',
+        company: 'COMSTAGE-MSCI WORLD TRN U.ETF',
+        shares: 0.8793,
+        price: 60.87797111338565,
+        amount: 53.53,
+        fee: 0,
         tax: 0,
       });
     });

@@ -1,24 +1,27 @@
 import { findImplementation } from '../../src';
 import * as dkb from '../../src/brokers/dkb';
-import { buySamples, sellSamples, dividendsSamples } from './__mocks__/dkb';
+import {
+  buySamples,
+  sellSamples,
+  dividendsSamples,
+  ignoredSamples,
+  savingsplanSamples,
+  allSamples,
+} from './__mocks__/dkb';
 
 describe('DKB broker', () => {
   let consoleErrorSpy;
 
-  const allSamples = buySamples.concat(sellSamples).concat(dividendsSamples);
-
   describe('Check all documents', () => {
     test('Can the document parsed with DKB', () => {
-      allSamples.forEach(samples => {
-        expect(samples.some(item => dkb.canParsePage(item, 'pdf'))).toEqual(
-          true
-        );
+      allSamples.forEach(pages => {
+        expect(dkb.canParseDocument(pages, 'pdf')).toEqual(true);
       });
     });
 
     test('Can identify a implementation from the document as DKB', () => {
-      allSamples.forEach(samples => {
-        const implementations = findImplementation(samples, 'pdf');
+      allSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'pdf');
 
         expect(implementations.length).toEqual(1);
         expect(implementations[0]).toEqual(dkb);
@@ -36,7 +39,7 @@ describe('DKB broker', () => {
         date: '2019-01-25',
         datetime: '2019-01-25T20:34:28.000Z',
         isin: 'US0378331005',
-        company: 'APPLE INC.',
+        company: 'APPLE INC. REGISTERED SHARES O.N.',
         shares: 36,
         price: 123,
         amount: 4428,
@@ -54,7 +57,7 @@ describe('DKB broker', () => {
         date: '2016-10-10',
         datetime: '2016-10-10T06:00:02.000Z',
         isin: 'US88160R1014',
-        company: 'TESLA MOTORS INC.',
+        company: 'TESLA MOTORS INC. REGISTERED SHARES DL-,001',
         shares: 1,
         price: 177.85,
         amount: 177.85,
@@ -72,11 +75,29 @@ describe('DKB broker', () => {
         date: '2016-10-18',
         datetime: '2016-10-18T' + activities[0].datetime.substring(11),
         isin: 'LU0302296495',
-        company: 'DNB FD-DNB TECHNOLOGY',
+        company: 'DNB FD-DNB TECHNOLOGY ACT. NOMINAT. A ACC. O.N.',
         shares: 0.7419,
         price: 353.8346,
         amount: 262.5,
         fee: 1.5,
+        tax: 0,
+      });
+    });
+
+    test('Can parse limit market order for McDonalds', () => {
+      const activities = dkb.parsePages(buySamples[3]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Buy',
+        date: '2020-07-07',
+        datetime: '2020-07-07T' + activities[0].datetime.substring(11),
+        isin: 'US5801351017',
+        company: 'MC DONALD S CORP. SHARES REGISTERED SHARES DL-,01',
+        shares: 8,
+        price: 165.02,
+        amount: 1320.16,
+        fee: 10,
         tax: 0,
       });
     });
@@ -92,7 +113,7 @@ describe('DKB broker', () => {
         date: '2020-01-27',
         datetime: '2020-01-27T07:00:01.000Z',
         isin: 'LU1861132840',
-        company: 'AIS - AMUNDI STOXX GL.ART.INT.',
+        company: 'AIS - AMUNDI STOXX GL.ART.INT. ACT. NOM. AH EUR ACC. ON',
         shares: 36,
         price: 123,
         amount: 4428,
@@ -110,7 +131,7 @@ describe('DKB broker', () => {
         date: '2020-09-10',
         datetime: '2020-09-10T13:39:56.000Z',
         isin: 'IE00B60SX394',
-        company: 'I.M.-I.MSCI WORLD UETF',
+        company: 'I.M.-I.MSCI WORLD UETF REGISTERED SHARES ACC O.N',
         shares: 92,
         price: 58.887,
         amount: 5417.6,
@@ -128,7 +149,7 @@ describe('DKB broker', () => {
         date: '2020-10-14',
         datetime: '2020-10-14T07:04:03.000Z',
         isin: 'IE00B4L5Y983',
-        company: 'ISHSIII-CORE MSCI WORLD U.ETF',
+        company: 'ISHSIII-CORE MSCI WORLD U.ETF REGISTERED SHS USD (ACC) O.N.',
         shares: 60,
         price: 57.104,
         amount: 3426.24,
@@ -146,12 +167,86 @@ describe('DKB broker', () => {
         date: '2020-10-28',
         datetime: '2020-10-28T' + activities[0].datetime.substring(11),
         isin: 'IE00B3RBWM25',
-        company: 'VANGUARD FTSE ALL-WORLD U.ETF',
+        company: 'VANGUARD FTSE ALL-WORLD U.ETF REGISTERED SHARES USD DIS.ON',
         shares: 0.3807,
         price: 78.82,
         amount: 30.01,
         fee: 0,
         tax: 0.37,
+      });
+    });
+
+    test('Should map the document correctly: 2020_etf_tecdax', () => {
+      const activities = dkb.parsePages(sellSamples[4]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Sell',
+        date: '2020-12-09',
+        datetime: '2020-12-09T' + activities[0].datetime.substring(11),
+        isin: 'DE0005933972',
+        company: 'ISHARES TECDAX UCITS ETF DE INHABER-ANTEILE',
+        shares: 100,
+        price: 28.3152,
+        amount: 2831.52,
+        fee: 10,
+        tax: 2.18,
+      });
+    });
+
+    test('Should map the document correctly: 2020_msci_world.json', () => {
+      const activities = dkb.parsePages(sellSamples[5]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Sell',
+        date: '2020-08-11',
+        datetime: '2020-08-11T07:44:24.000Z',
+        isin: 'LU0950674332',
+        company: 'UBS-ETF-MSCI WORLD SOC.RESP. NAMENS-ANTEILE A ACC. USD O.N.',
+        shares: 900,
+        price: 17.6,
+        amount: 15840,
+        fee: 25,
+        tax: 180.68,
+      });
+    });
+
+    test('Should map the document correctly: 2020_data_deposit_box.json', () => {
+      const activities = dkb.parsePages(sellSamples[6]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Sell',
+        date: '2020-04-14',
+        datetime: '2020-04-14T' + activities[0].datetime.substring(11),
+        isin: 'CA2376321048',
+        company: 'DATA DEPOSIT BOX INC. REGISTERED SHARES O.N.',
+        shares: 1712,
+        price: 0.008181556195965417,
+        amount: 14.01,
+        fee: 10,
+        tax: 0,
+        fxRate: 1.5268,
+        foreignCurrency: 'CAD',
+      });
+    });
+
+    test('Should map the document correctly: 2020_vapiano.json', () => {
+      const activities = dkb.parsePages(sellSamples[7]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Sell',
+        date: '2020-08-31',
+        datetime: '2020-08-31T' + activities[0].datetime.substring(11),
+        isin: 'DE000A0WMNK9',
+        company: 'VAPIANO SE INHABER-AKTIEN O.N.',
+        shares: 100,
+        price: 0.0602,
+        amount: 6.02,
+        fee: 6.02,
+        tax: 0,
       });
     });
   });
@@ -166,12 +261,14 @@ describe('DKB broker', () => {
         date: '2020-02-13',
         datetime: '2020-02-13T' + activities[0].datetime.substring(11),
         isin: 'US0378331005',
-        company: 'APPLE INC.',
+        company: 'APPLE INC. REGISTERED SHARES O.N.',
         shares: 36,
         price: 0.7080555555555555,
         amount: 25.49,
         fee: 0,
         tax: 3.82,
+        fxRate: 1.0874,
+        foreignCurrency: 'USD',
       });
     });
 
@@ -184,12 +281,14 @@ describe('DKB broker', () => {
         date: '2016-03-10',
         datetime: '2016-03-10T' + activities[0].datetime.substring(11),
         isin: 'US5949181045',
-        company: 'MICROSOFT CORP.',
+        company: 'MICROSOFT CORP. REGISTERED SHARES DL-,00000625',
         shares: 5,
-        price: 0.32599999999999996,
+        price: 0.326,
         amount: 1.63,
         fee: 0,
         tax: 0.24,
+        fxRate: 1.1011,
+        foreignCurrency: 'USD',
       });
     });
     test('should map pdf data of sample 3 correctly', () => {
@@ -201,14 +300,17 @@ describe('DKB broker', () => {
         date: '2020-04-08',
         datetime: '2020-04-08T' + activities[0].datetime.substring(11),
         isin: 'IE00B3RBWM25',
-        company: 'VANGUARD FTSE ALL-WORLD U.ETF',
+        company: 'VANGUARD FTSE ALL-WORLD U.ETF REGISTERED SHARES USD DIS.ON',
         shares: 12,
         price: 0.375,
         amount: 4.5,
         fee: 0,
         tax: 0,
+        fxRate: 1.0878,
+        foreignCurrency: 'USD',
       });
     });
+
     test('should map pdf data of sample 4 correctly', () => {
       const activities = dkb.parsePages(dividendsSamples[3]).activities;
 
@@ -218,13 +320,143 @@ describe('DKB broker', () => {
         date: '2020-04-08',
         datetime: '2020-04-08T' + activities[0].datetime.substring(11),
         isin: 'IE00B3RBWM25',
-        company: 'VANGUARD FTSE ALL-WORLD U.ETF',
+        company: 'VANGUARD FTSE ALL-WORLD U.ETF REGISTERED SHARES USD DIS.ON',
         shares: 12,
         price: 0.375,
         amount: 4.5,
         fee: 0,
         tax: 0.83,
+        fxRate: 1.0878,
+        foreignCurrency: 'USD',
       });
+    });
+
+    test('Should map the document correctly: 2020_deutsche_telekom.json', () => {
+      const activities = dkb.parsePages(dividendsSamples[4]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Dividend',
+        date: '2020-06-24',
+        datetime: '2020-06-24T' + activities[0].datetime.substring(11),
+        isin: 'DE0005557508',
+        company: 'DEUTSCHE TELEKOM AG NAMENS-AKTIEN O.N.',
+        shares: 32,
+        price: 0.6,
+        amount: 19.2,
+        fee: 0,
+        tax: 0,
+      });
+    });
+  });
+
+  describe('Savings Plan Summary', () => {
+    test('Can parse a 2019 half-yearly savings plan summary', () => {
+      const result = dkb.parsePages(savingsplanSamples[0]);
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(3);
+      expect(result.activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Buy',
+        date: '2019-10-09',
+        datetime: '2019-10-09T' + result.activities[0].datetime.substring(11),
+        isin: 'IE00B4L5Y983',
+        wkn: 'A0RPWH',
+        company: 'ISHSIII-CORE MSCI WORLD U.ETF REGISTERED SHS USD (ACC) O.N.',
+        shares: 1.9091,
+        price: 52.38,
+        amount: 100,
+        fee: 1.5,
+        tax: 0,
+      });
+
+      expect(result.activities[1]).toEqual({
+        broker: 'dkb',
+        type: 'Buy',
+        date: '2019-11-07',
+        datetime: '2019-11-07T' + result.activities[1].datetime.substring(11),
+        isin: 'IE00B4L5Y983',
+        wkn: 'A0RPWH',
+        company: 'ISHSIII-CORE MSCI WORLD U.ETF REGISTERED SHS USD (ACC) O.N.',
+        shares: 1.8354,
+        price: 54.483,
+        amount: 100,
+        fee: 1.5,
+        tax: 0,
+      });
+
+      expect(result.activities[2]).toEqual({
+        broker: 'dkb',
+        type: 'Buy',
+        date: '2019-12-09',
+        datetime: '2019-12-09T' + result.activities[2].datetime.substring(11),
+        isin: 'IE00B4L5Y983',
+        wkn: 'A0RPWH',
+        company: 'ISHSIII-CORE MSCI WORLD U.ETF REGISTERED SHS USD (ACC) O.N.',
+        shares: 1.8148,
+        price: 55.104,
+        amount: 100,
+        fee: 1.5,
+        tax: 0,
+      });
+    });
+
+    test('Can parse a 2020 half-yearly savings plan summary', () => {
+      const result = dkb.parsePages(savingsplanSamples[1]);
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(6);
+      expect(result.activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Buy',
+        date: '2020-07-08',
+        datetime: '2020-07-08T' + result.activities[0].datetime.substring(11),
+        isin: 'IE00B53SZB19',
+        wkn: 'A0YEDL',
+        company: 'ISHSVII-NASDAQ 100 UCITS ETF REG. SHARES USD (ACC) O.N.',
+        shares: 0.1148,
+        price: 522.8,
+        amount: 60,
+        fee: 1.5,
+        tax: 0,
+      });
+
+      expect(result.activities[5]).toEqual({
+        broker: 'dkb',
+        type: 'Buy',
+        date: '2020-12-09',
+        datetime: '2020-12-09T' + result.activities[5].datetime.substring(11),
+        isin: 'IE00B53SZB19',
+        wkn: 'A0YEDL',
+        company: 'ISHSVII-NASDAQ 100 UCITS ETF REG. SHARES USD (ACC) O.N.',
+        shares: 0.103,
+        price: 582.4,
+        amount: 60,
+        fee: 1.5,
+        tax: 0,
+      });
+    });
+  });
+
+  describe('Validate all ignored statements', () => {
+    test('The statement should be ignored: order_confirmation.json', () => {
+      const result = dkb.parsePages(ignoredSamples[0]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('The statement should be ignored: order_cancelation.json', () => {
+      const result = dkb.parsePages(ignoredSamples[1]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('The statement should be ignored: execution_information.json', () => {
+      const result = dkb.parsePages(ignoredSamples[2]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
     });
   });
 

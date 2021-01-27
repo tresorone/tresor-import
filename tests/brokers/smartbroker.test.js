@@ -1,22 +1,20 @@
 import { findImplementation } from '../../src';
 import * as smartbroker from '../../src/brokers/smartbroker';
 import {
+  allSamples,
   buySamples,
   sellSamples,
   dividendSamples,
+  ignoredSamples,
 } from './__mocks__/smartbroker';
 
 describe('Smartbroker broker test', () => {
   let consoleErrorSpy;
 
-  const allSamples = buySamples.concat(sellSamples).concat(dividendSamples);
-
   describe('Check all documents', () => {
     test('Can the document parsed with smartbroker', () => {
-      allSamples.forEach(sample => {
-        expect(
-          sample.some(item => smartbroker.canParsePage(item, 'pdf'))
-        ).toEqual(true);
+      allSamples.forEach(pages => {
+        expect(smartbroker.canParseDocument(pages, 'pdf')).toEqual(true);
       });
     });
 
@@ -81,10 +79,12 @@ describe('Smartbroker broker test', () => {
         isin: 'IE00BZ163L38',
         company: 'Vang.USD Em.Mkts Gov.Bd U.ETF Registered Shares USD Dis.oN',
         shares: 445,
-        price: 0.16415730337078652,
-        amount: 73.05,
+        price: 0.16416553710606574,
+        amount: 73.05366401219925,
         fee: 0,
         tax: 20.45,
+        foreignCurrency: 'USD',
+        fxRate: 1.1804,
       });
     });
 
@@ -99,10 +99,12 @@ describe('Smartbroker broker test', () => {
         isin: 'US7134481081',
         company: 'PepsiCo Inc. Registered Shares DL -,0166',
         shares: 9,
-        price: 0.8755555555555555,
-        amount: 7.88,
+        price: 0.8755030396438052,
+        amount: 7.879527356794247,
         fee: 0,
-        tax: 2.07,
+        tax: 2.0716080143847933,
+        foreignCurrency: 'USD',
+        fxRate: 1.1679,
       });
     });
 
@@ -117,10 +119,98 @@ describe('Smartbroker broker test', () => {
         isin: 'US5021751020',
         company: 'LTC Properties Inc. Registered Shares DL -,01',
         shares: 32,
-        price: 0.160625,
-        amount: 5.14,
+        price: 0.16073090263091108,
+        amount: 5.143388884189155,
         fee: 0,
-        tax: 1.34,
+        tax: 1.339816428390153,
+        foreignCurrency: 'USD',
+        fxRate: 1.1821,
+      });
+    });
+
+    test('Should parse the document correctly: 2020_pan_american_silver', () => {
+      const activities = smartbroker.parsePages(dividendSamples[3]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'smartbroker',
+        type: 'Dividend',
+        date: '2020-11-27',
+        datetime: '2020-11-27T' + activities[0].datetime.substring(11),
+        isin: 'CA6979001089',
+        company: 'Pan American Silver Corp. Registered Shares o.N.',
+        shares: 25,
+        price: 0.05879388543591466,
+        amount: 1.4698471358978664,
+        fee: 0,
+        tax: 0.5295615655971779,
+        foreignCurrency: 'USD',
+        fxRate: 1.1906,
+      });
+    });
+
+    test('Should parse the document correctly: 2020_ishares_global_clean_energy', () => {
+      const activities = smartbroker.parsePages(dividendSamples[4]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'smartbroker',
+        type: 'Dividend',
+        date: '2020-11-25',
+        datetime: '2020-11-25T' + activities[0].datetime.substring(11),
+        isin: 'IE00B1XNHC34',
+        company: 'iShsII-Gl.Clean Energy U.ETF Registered Shares o.N.',
+        shares: 140,
+        price: 0.03461166883689671,
+        amount: 4.845633637165539,
+        fee: 0,
+        tax: 1.09,
+        foreignCurrency: 'USD',
+        fxRate: 1.19035,
+      });
+    });
+
+    test('Should parse the document correctly: 2021_ish_eo_st.json', () => {
+      const activities = smartbroker.parsePages(dividendSamples[5]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'smartbroker',
+        type: 'Dividend',
+        date: '2021-01-15',
+        datetime: '2021-01-15T' + activities[0].datetime.substring(11),
+        isin: 'DE0002635281',
+        company: 'iSh.EO ST.Sel.Div.30 U.ETF DE Inhaber-Anteile',
+        shares: 260,
+        price: 0.074652,
+        amount: 19.40952,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Should parse the document correctly: 2021_wp_carey_inc.json', () => {
+      const activities = smartbroker.parsePages(dividendSamples[6]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'smartbroker',
+        type: 'Dividend',
+        date: '2021-01-15',
+        datetime: '2021-01-15T' + activities[0].datetime.substring(11),
+        isin: 'US92936U1097',
+        company: 'W.P. Carey Inc. Registered Shares DL -,01',
+        shares: 55,
+        price: 0.8531810766721044,
+        amount: 46.92495921696574,
+        fee: 0,
+        tax: 7.039151712887439,
+        fxRate: 1.226,
+        foreignCurrency: 'USD',
+      });
+    });
+  });
+
+  describe('Validate all ignored statements', () => {
+    test('The statement should be ignored: 2020_cost_information.json', () => {
+      ignoredSamples.forEach(pages => {
+        expect(smartbroker.parsePages(pages).status).toEqual(7);
       });
     });
   });

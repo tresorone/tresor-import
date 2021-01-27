@@ -12,16 +12,14 @@ describe('Broker: scalable.capital', () => {
 
   describe('Check all documents', () => {
     test('Can the document parsed with scalable.capital', () => {
-      allSamples.forEach(samples => {
-        expect(
-          samples.some(item => baaderBank.canParsePage(item, 'pdf'))
-        ).toEqual(true);
+      allSamples.forEach(pages => {
+        expect(baaderBank.canParseDocument(pages, 'pdf')).toEqual(true);
       });
     });
 
     test('Can identify a implementation from the document as scalable.capital', () => {
-      allSamples.forEach(samples => {
-        const implementations = findImplementation(samples, 'pdf');
+      allSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'pdf');
 
         expect(implementations.length).toEqual(1);
         expect(implementations[0]).toEqual(baaderBank);
@@ -160,6 +158,25 @@ describe('Broker: scalable.capital', () => {
         amount: 6.19,
         fee: 0,
         tax: 0,
+      });
+    });
+
+    test('Can parse 2021_azioni_nom containing an italian financial tax', () => {
+      const activities = baaderBank.parsePages(buySamples[7]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'scalablecapital',
+        type: 'Buy',
+        date: '2021-01-04',
+        datetime: '2021-01-04T09:01:36.000Z',
+        isin: 'IT0003128367',
+        company: 'ENEL S.p.A. Azioni nom. EO 1',
+        shares: 31,
+        price: 8.33,
+        amount: 258.23,
+        fee: 0,
+        tax: 0.26,
       });
     });
   });

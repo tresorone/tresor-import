@@ -10,9 +10,10 @@ export const sellSamples = [
   require('./sell/2018_Deutsche_Beteiligungs_AG.json'),
   require('./sell/2018_iShsII-J.P.M..json'),
   require('./sell/2018_Deutsche_EuroShop_AG.json'),
+  require('./sell/2021_usd_epam_systems.json'),
 ];
 
-export const multiPageSamples = [require('./multi-page.json')];
+export const multiPageSamples = [require('./multipage/multi-page.json')];
 
 export const dividendsSamples = [
   require('./dividend/2020_Vanguard_FTSE_All_World.json'),
@@ -22,6 +23,26 @@ export const dividendsSamples = [
   require('./dividend/2019_MetLife.json'),
 ];
 
-export const portfolioOverviewSamples = [
-  require('./portfolioOverview/overview.json'),
+export const accountStatementSamples = [
+  require('./accountStatement/2020_account_statement_1.json'),
+  require('./accountStatement/2020_account_statement_2.json'),
+  require('./accountStatement/2016_account_statement.json'),
+  require('./accountStatement/2017_account_statement_1.json'),
+  require('./accountStatement/2017_account_statement_2.json'),
+  require('./accountStatement/2020_account_statement_3.json'),
 ];
+
+export const portfolioOverviewSamples = [
+  require('./portfolioOverview/2020_overview.json'),
+];
+
+export const ignoredSamples = [require('./ignored/2020_cost_information.json')];
+
+export const allSamples = buySamples.concat(
+  sellSamples,
+  dividendsSamples,
+  multiPageSamples,
+  accountStatementSamples,
+  portfolioOverviewSamples,
+  ignoredSamples
+);

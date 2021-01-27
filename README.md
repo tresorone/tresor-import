@@ -1,6 +1,10 @@
 # Tresor-Import - The File Import of Tresor One
 
-This is the PDF and PP-CSV Import used on [tresor.one](https://tresor.one)
+This is the PDF and PP-CSV Import used on [tresor.one](https://tresor.one).
+
+## Supported Brokers
+
+All brokers supported by tresor-import are listed in the [documentation](docs/implementations.md).
 
 ## Installation
 
@@ -26,19 +30,15 @@ The function `getActivities` returns an objects with the following fields:
 | Name       | Description                                                                                                                    |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | file       | The file name of the input file.                                                                                               |
-| activities | All activity which was parsed from the input file.                                                                             |
+| activities | List of activities which was parsed from the input file. The activity object is broken down [here](docs/activity.md).          |
 | status     | The status code which contains the information about the reason why no activities was found. For Details see the status table. |
 | successful | The simple way to check if at least one activity was found and the status code is equals zero.                                 |
 
-The status field can contains one of the following values:
+The status field can contains one of the following values, described [here](docs/status_code.md).
 
-| Status-Code | Description                                                              |
-| ----------- | ------------------------------------------------------------------------ |
-| 0           | All pages can parsed each with one or more activities                    |
-| 1           | Unable to identifiy an implementation with the content of the first page |
-| 2           | More than one implementation was found for the first page                |
-| 4           | Unable to parse given file type                                          |
-| 5           | No activities found for a valid document                                 |
+## How to calculate the amount
+
+To understand the amount calculation please read the amount documentation [here (in German)](docs/amount.md).
 
 ## Contribute
 

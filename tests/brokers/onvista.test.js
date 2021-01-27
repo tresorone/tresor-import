@@ -1,35 +1,32 @@
 import { findImplementation } from '../../src';
 import * as onvista from '../../src/brokers/onvista';
+import Big from 'big.js';
 import {
   buySamples,
   sellSamples,
   dividendsSamples,
   multiPageSamples,
+  ignoredSamples,
+  accountStatementSamples,
   portfolioOverviewSamples,
+  allSamples,
 } from './__mocks__/onvista';
 
 console.error = jest.fn();
 
 describe('Broker: onvista', () => {
   let multiPageResult;
-  const allSamples = buySamples
-    .concat(dividendsSamples)
-    .concat(multiPageSamples)
-    .concat(sellSamples)
-    .concat(portfolioOverviewSamples);
 
   describe('Check all documents', () => {
     test('Can the document parsed with onvista', () => {
-      allSamples.forEach(samples => {
-        expect(samples.some(item => onvista.canParsePage(item, 'pdf'))).toEqual(
-          true
-        );
+      allSamples.forEach(pages => {
+        expect(onvista.canParseDocument(pages, 'pdf')).toEqual(true);
       });
     });
 
     test('Can identify a implementation from the document as onvista', () => {
-      allSamples.forEach(samples => {
-        const implementations = findImplementation(samples, 'pdf');
+      allSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'pdf');
 
         expect(implementations.length).toEqual(1);
         expect(implementations[0]).toEqual(onvista);
@@ -41,12 +38,11 @@ describe('Broker: onvista', () => {
     test('should parse a PDF with multiple bills', () => {
       multiPageResult = onvista.parsePages(multiPageSamples[0]);
       expect(multiPageResult.activities.length).toEqual(2);
-      expect(console.error).toHaveBeenCalled();
     });
   });
 
   describe('Buy', () => {
-    test('should map pdf data of sample 1 correctly', () => {
+    test('Can parse ComSta MSCI EM 2019', () => {
       const result = onvista.parsePages(buySamples[0]);
 
       expect(result.activities).toEqual([
@@ -66,7 +62,7 @@ describe('Broker: onvista', () => {
       ]);
     });
 
-    test('should map pdf data of sample 2 correctly', () => {
+    test('Can parse Vanguard FTSE All-World 2020', () => {
       const result = onvista.parsePages(buySamples[1]);
 
       expect(result.activities).toEqual([
@@ -86,7 +82,7 @@ describe('Broker: onvista', () => {
       ]);
     });
 
-    test('should map pdf data of sample 3 correctly', () => {
+    test('Can parse 2018 ComStage MSCI World', () => {
       const result = onvista.parsePages(buySamples[2]);
 
       expect(result.activities).toEqual([
@@ -106,7 +102,7 @@ describe('Broker: onvista', () => {
       ]);
     });
 
-    test('should map pdf data of sample 4 correctly', () => {
+    test('Can parse 2010 Münchener Rück', () => {
       const result = onvista.parsePages(buySamples[3]);
 
       expect(result.activities).toEqual([
@@ -280,28 +276,48 @@ describe('Broker: onvista', () => {
         },
       ]);
     });
-  });
 
-  test('should map pdf data of sample 4 correctly', () => {
-    expect(onvista.parsePages(sellSamples[3]).activities).toEqual([
-      {
+    test('should map pdf data of sample 4 correctly', () => {
+      expect(onvista.parsePages(sellSamples[3]).activities).toEqual([
+        {
+          broker: 'onvista',
+          type: 'Sell',
+          date: '2018-11-27',
+          datetime: '2018-11-27T16:22:00.000Z',
+          isin: 'DE0007480204',
+          company: 'Deutsche EuroShop AG Namens-Aktien o.N.',
+          shares: 84,
+          price: 28.16,
+          amount: 2365.44,
+          fee: 6.5,
+          tax: 0,
+        },
+      ]);
+    });
+
+    test('Can parse Sell in USD from epam systems', () => {
+      const activities = onvista.parsePages(sellSamples[4]).activities;
+
+      expect(activities[0]).toEqual({
         broker: 'onvista',
         type: 'Sell',
-        date: '2018-11-27',
-        datetime: '2018-11-27T16:22:00.000Z',
-        isin: 'DE0007480204',
-        company: 'Deutsche EuroShop AG Namens-Aktien o.N.',
-        shares: 84,
-        price: 28.16,
-        amount: 2365.44,
-        fee: 6.5,
+        date: '2021-01-04',
+        datetime: '2021-01-04T' + activities[0].datetime.substring(11),
+        isin: 'US29414B1044',
+        company: 'EPAM Systems Inc. Registered Shares DL -,001',
+        shares: 10,
+        price: 277.60741822903987,
+        amount: 2776.0733706679653,
+        fee: 14.998782566350133,
         tax: 0,
-      },
-    ]);
+        fxRate: 1.2321,
+        foreignCurrency: 'USD',
+      });
+    });
   });
 
   describe('Dividend', () => {
-    test('should map pdf data of sample 1 correctly', () => {
+    test('Can parse dividend for 2020_Vanguard_FTSE_All_World', () => {
       const activities = onvista.parsePages(dividendsSamples[0]).activities;
 
       expect(activities).toEqual([
@@ -317,11 +333,13 @@ describe('Broker: onvista', () => {
           amount: 83.8,
           fee: 0,
           tax: 0,
+          foreignCurrency: 'USD',
+          fxRate: 1.0864,
         },
       ]);
     });
 
-    test('should map pdf data of sample 2 correctly', () => {
+    test('Can parse dividend for 2019_iShare.NASDAQ-100', () => {
       const activities = onvista.parsePages(dividendsSamples[1]).activities;
 
       expect(activities).toEqual([
@@ -337,11 +355,13 @@ describe('Broker: onvista', () => {
           amount: 0.14,
           fee: 0,
           tax: 0.03,
+          foreignCurrency: 'USD',
+          fxRate: 1.1078,
         },
       ]);
     });
 
-    test('should map pdf data of sample 3 correctly', () => {
+    test('Can parse dividend for 2019_ComSta._MSCI_Em.Mkts', () => {
       const activities = onvista.parsePages(dividendsSamples[2]).activities;
 
       expect(activities).toEqual([
@@ -357,11 +377,13 @@ describe('Broker: onvista', () => {
           amount: 49.11,
           fee: 0,
           tax: 4.14,
+          foreignCurrency: 'USD',
+          fxRate: 1.1129,
         },
       ]);
     });
 
-    test('should map pdf data of sample 4 correctly', () => {
+    test('Can parse dividend for 2019_iSh.EO_ST.Sel.Div.30', () => {
       const activities = onvista.parsePages(dividendsSamples[3]).activities;
 
       expect(activities).toEqual([
@@ -410,8 +432,140 @@ describe('Broker: onvista', () => {
           amount: 2.32,
           fee: 0,
           tax: 0.38,
+          foreignCurrency: 'USD',
+          fxRate: 1.1373,
         },
       ]);
+    });
+  });
+
+  describe('Account Statement', () => {
+    test('Can parse 2020_account_statement_1', () => {
+      const result = onvista.parsePages(accountStatementSamples[0]);
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(11);
+      expect(result.activities[0]).toEqual({
+        broker: 'onvista',
+        type: 'Buy',
+        date: '2020-12-03',
+        datetime: '2020-12-03T' + result.activities[0].datetime.substring(11),
+        isin: 'US09075V1026',
+        company: 'BIONTECH SE SPON. ADRS 1',
+        shares: 4,
+        price: +Big(428.6).div(4),
+        amount: 428.6,
+        fee: 0,
+        tax: 0,
+      });
+
+      expect(result.activities[10]).toEqual({
+        broker: 'onvista',
+        type: 'Buy',
+        date: '2020-12-30',
+        datetime: '2020-12-30T' + result.activities[0].datetime.substring(11),
+        isin: 'NL0015436031',
+        company: 'CUREVAC N.V. O.N.',
+        shares: 5,
+        price: +Big(376.6).div(5),
+        amount: 376.6,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can parse 2020_account_statement_2', () => {
+      const result = onvista.parsePages(accountStatementSamples[1]);
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(3);
+      expect(result.activities[0]).toEqual({
+        broker: 'onvista',
+        type: 'Buy',
+        date: '2020-03-06',
+        datetime: '2020-03-06T' + result.activities[0].datetime.substring(11),
+        isin: 'NO0010081235',
+        company: 'NEL ASA NK-,20',
+        shares: 40,
+        price: +Big(52.96).div(40),
+        amount: 52.96,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can parse 2016_account_statement', () => {
+      const result = onvista.parsePages(accountStatementSamples[2]);
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(2);
+      expect(result.activities[0]).toEqual({
+        broker: 'onvista',
+        type: 'Buy',
+        date: '2016-12-12',
+        datetime: '2016-12-12T' + result.activities[0].datetime.substring(11),
+        isin: 'GB00B128C026',
+        company: 'AIR BERLIN PLC',
+        shares: 100,
+        price: +Big(64.5).div(100),
+        amount: 64.5,
+        fee: 0,
+        tax: 0,
+      });
+      expect(result.activities[1]).toEqual({
+        broker: 'onvista',
+        type: 'Sell',
+        date: '2016-12-23',
+        datetime: '2016-12-23T' + result.activities[0].datetime.substring(11),
+        isin: 'GB00B128C026',
+        company: 'AIR BERLIN PLC',
+        shares: 100,
+        price: +Big(51.95).div(100),
+        amount: 51.95,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can parse 2017_account_statement_1', () => {
+      const result = onvista.parsePages(accountStatementSamples[3]);
+      expect(result.status).toEqual(5);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('Can parse 2017_account_statement_2', () => {
+      const result = onvista.parsePages(accountStatementSamples[4]);
+      expect(result.status).toEqual(5);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('Can parse 2020_account_statement_3', () => {
+      const result = onvista.parsePages(accountStatementSamples[5]);
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(7);
+      expect(result.activities[0]).toEqual({
+        broker: 'onvista',
+        type: 'Buy',
+        date: '2020-01-06',
+        datetime: '2020-01-06T' + result.activities[0].datetime.substring(11),
+        isin: 'LU0392494562',
+        company: 'COMS.-MSCI WORL.T.U.ETF I',
+        shares: 4.1985,
+        price: +Big(250).div(4.1985),
+        amount: 250,
+        fee: 0,
+        tax: 0,
+      });
+      expect(result.activities[6]).toEqual({
+        broker: 'onvista',
+        type: 'Dividend',
+        date: '2020-03-16',
+        datetime: '2020-03-16T' + result.activities[0].datetime.substring(11),
+        isin: 'DE000A0F5UF5',
+        company: 'ISHARES NASDAQ-100 U.ETF',
+        shares: 4.9438,
+        price: +Big(0.39).div(4.9438),
+        amount: 0.39,
+        fee: 0,
+        tax: 0,
+      });
     });
   });
 
@@ -432,6 +586,8 @@ describe('Broker: onvista', () => {
           shares: 3,
           price: 139.12,
           amount: 417.36,
+          fee: 0,
+          tax: 0,
         },
         {
           broker: 'onvista',
@@ -443,8 +599,11 @@ describe('Broker: onvista', () => {
           shares: 30,
           price: 30.5527,
           amount: 916.58,
+          fee: 0,
+          tax: 0,
         },
       ]);
+
       expect(activities[activities.length - 1]).toEqual({
         broker: 'onvista',
         type: 'TransferIn',
@@ -455,7 +614,18 @@ describe('Broker: onvista', () => {
         shares: 4.1283,
         price: 23.9808,
         amount: 99,
+        fee: 0,
+        tax: 0,
       });
+    });
+  });
+
+  describe('Validate all ignored statements', () => {
+    test('The statement should be ignored: 2020_cost_information.json', () => {
+      const result = onvista.parsePages(ignoredSamples[0]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
     });
   });
 });

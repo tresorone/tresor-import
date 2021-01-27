@@ -17,7 +17,10 @@ export const buySamples = [
   require('./buy/saving_plan.json'),
 ];
 
-export const sellSamples = [require('./sell/market_order.json')];
+export const sellSamples = [
+  require('./sell/market_order.json'),
+  require('./sell/funds_redemption.json'),
+];
 
 export const dividendSamples = [
   require('./dividend/etf110_without_taxes.json'),

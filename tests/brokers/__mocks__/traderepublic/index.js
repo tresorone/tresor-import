@@ -20,15 +20,29 @@ export const dividendSamples = [
   require('./dividend/gazprom_third_party_expenses_and_withholding_tax.json'),
   require('./dividend/realty_income_with_other_withholding_tax_format.json'),
   require('./dividend/unilever_withholding_tax.json'),
+  require('./dividend/2020_walgreens_boots_alliance.json'),
+  require('./dividend/2020_exxon_mobile_corp.json'),
+  require('./dividend/2020_schlumberger.json'),
 ];
 
 export const quarterSamples = [
   require('./quarter_statement/without_stocks.json'),
   require('./quarter_statement/with_stocks.json'),
+  require('./quarter_statement/two_pages.json'),
+];
+
+export const ignoredSamples = [
+  require('./ignored/cost_information.json'),
+  require('./ignored/reverse_split.json'),
+  require('./ignored/saving_plan_failed.json'),
+  require('./ignored/split.json'),
+  require('./ignored/saving_plan_confirmation.json'),
+  require('./ignored/saving_plan_change_confirmation.json'),
 ];
 
 export const allSamples = buySamples.concat(
   sellSamples,
   dividendSamples,
-  quarterSamples
+  quarterSamples,
+  ignoredSamples
 );

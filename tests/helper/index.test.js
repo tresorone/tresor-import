@@ -296,7 +296,7 @@ describe('Helper functions', () => {
 
       expect(helper.validateActivity(activity)).toEqual(undefined);
       expect(console.error).toHaveBeenLastCalledWith(
-        'The price in activity for comdirect must be a number greater than 0.',
+        'The price in activity for comdirect must be a number greater or equal 0.',
         activity
       );
     });
@@ -318,7 +318,7 @@ describe('Helper functions', () => {
 
       expect(helper.validateActivity(activity)).toEqual(undefined);
       expect(console.error).toHaveBeenLastCalledWith(
-        'The price in activity for comdirect must be a number greater than 0.',
+        'The price in activity for comdirect must be a number greater or equal 0.',
         activity
       );
     });
@@ -340,7 +340,7 @@ describe('Helper functions', () => {
 
       expect(helper.validateActivity(activity)).toEqual(undefined);
       expect(console.error).toHaveBeenLastCalledWith(
-        'The amount in activity for comdirect must be a number greater than 0.',
+        'The amount in activity for comdirect must be a number greater or equal than 0.',
         activity
       );
     });
@@ -362,7 +362,7 @@ describe('Helper functions', () => {
 
       expect(helper.validateActivity(activity)).toEqual(undefined);
       expect(console.error).toHaveBeenLastCalledWith(
-        'The amount in activity for comdirect must be a number greater than 0.',
+        'The amount in activity for comdirect must be a number greater or equal than 0.',
         activity
       );
     });
@@ -493,7 +493,12 @@ describe('Helper functions', () => {
 
   describe('Regex: isinRegex works as expected', () => {
     test('Matches for valid ISINs', () => {
-      const validIsinValues = ['US0005141111', 'DE0005140008', 'GB0011140008'];
+      const validIsinValues = [
+        'US0005141111',
+        'DE0005140008',
+        'GB0011140008',
+        'AU0000XVGZA3',
+      ];
       validIsinValues.forEach(isin =>
         expect(helper.isinRegex.test(isin)).toEqual(true)
       );
@@ -508,6 +513,36 @@ describe('Helper functions', () => {
       invalidIsinValues.forEach(isin =>
         expect(helper.isinRegex.test(isin)).toEqual(false)
       );
+    });
+  });
+
+  describe('findNextLineIndexByRegex is working as intended', () => {
+    test('Find index for two valid entries', () => {
+      const testArray = ['one', 'two', 'three', 'four'];
+      expect(
+        helper.findFirstSearchtermIndexInArray(testArray, ['three', 'two'])
+      ).toEqual(1);
+    });
+
+    test('Return zero for no valid entries', () => {
+      const testArray = ['one', 'two', 'three', 'four'];
+      expect(
+        helper.findFirstSearchtermIndexInArray(testArray, ['foo', 'bar'])
+      ).toEqual(-1);
+    });
+
+    test('Return if the offset is working as intended', () => {
+      const testArray = ['one', 'two', 'zero', 'one', 'two'];
+      expect(
+        helper.findFirstSearchtermIndexInArray(testArray, ['one', 'two'], 2)
+      ).toEqual(3);
+    });
+
+    test('Return if the offset is working as intended', () => {
+      const testArray = ['one', 'two', 'zero', 'one', 'two'];
+      expect(
+        helper.findFirstSearchtermIndexInArray(testArray, ['one', 'two'], 10)
+      ).toEqual(-1);
     });
   });
 

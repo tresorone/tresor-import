@@ -3,31 +3,26 @@ import { findImplementation } from '../../src';
 import {
   buySamples,
   sellSamples,
-  dividendsSamples,
+  dividendSamples,
   mixedPageSamples,
+  ignoredSamples,
+  allSamples,
 } from './__mocks__/flatex';
 import Big from 'big.js';
 
 describe('Broker: Flatex', () => {
   let consoleErrorSpy;
 
-  const allSamples = buySamples
-    .concat(sellSamples)
-    .concat(dividendsSamples)
-    .concat(mixedPageSamples);
-
   describe('Check all documents', () => {
     test('Can the document parsed with Flatex', () => {
-      allSamples.forEach(samples => {
-        expect(samples.some(item => flatex.canParsePage(item, 'pdf'))).toEqual(
-          true
-        );
+      allSamples.forEach(pages => {
+        expect(flatex.canParseDocument(pages, 'pdf')).toEqual(true);
       });
     });
 
     test('Can identify a implementation from the document as Flatex', () => {
-      allSamples.forEach(samples => {
-        const implementations = findImplementation(samples, 'pdf');
+      allSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'pdf');
 
         expect(implementations.length).toEqual(1);
         expect(implementations[0]).toEqual(flatex);
@@ -35,27 +30,30 @@ describe('Broker: Flatex', () => {
     });
   });
 
-  describe('canParsePage', () => {
+  describe('canParseDocument', () => {
     test('should accept Buy, Sell, Div Flatex PDFs only', () => {
-      expect(flatex.canParsePage(['flatex Bank AG', 'Kauf'], 'pdf')).toEqual(
-        true
-      );
       expect(
-        flatex.canParsePage(['FinTech Group Bank AG', 'Kauf'], 'pdf')
+        flatex.canParseDocument([['flatex Bank AG', 'Kauf']], 'pdf')
+      ).toEqual(true);
+      expect(
+        flatex.canParseDocument([['FinTech Group Bank AG', 'Kauf']], 'pdf')
       ).toEqual(true); // old bank name
-      expect(flatex.canParsePage(['flatex Bank AG', 'Verkauf'], 'pdf')).toEqual(
-        true
-      );
       expect(
-        flatex.canParsePage(['flatex Bank AG', 'Dividendengutschrift'], 'pdf')
+        flatex.canParseDocument([['flatex Bank AG', 'Verkauf']], 'pdf')
+      ).toEqual(true);
+      expect(
+        flatex.canParseDocument(
+          [['flatex Bank AG', 'Dividendengutschrift']],
+          'pdf'
+        )
       ).toEqual(true);
     });
 
     test('should not accept any PDFs', () => {
-      expect(flatex.canParsePage(['42'], 'pdf')).toEqual(false);
-      expect(flatex.canParsePage(['flatex Bank AG', 'Kauf'], 'csv')).toEqual(
-        false
-      );
+      expect(flatex.canParseDocument([['42']], 'pdf')).toEqual(false);
+      expect(
+        flatex.canParseDocument([['flatex Bank AG', 'Kauf']], 'csv')
+      ).toEqual(false);
     });
   });
 
@@ -108,7 +106,7 @@ describe('Broker: Flatex', () => {
         date: '2019-10-17',
         datetime: '2019-10-17T14:52:00.000Z',
         isin: 'US5949181045',
-        company: 'MICROSOFT',
+        company: 'MICROSOFT DL-,00000625',
         shares: 12,
         price: 125.5,
         amount: 1506,
@@ -127,11 +125,140 @@ describe('Broker: Flatex', () => {
         date: '2018-04-03',
         datetime: '2018-04-03T09:29:00.000Z',
         isin: 'US88160R1014',
-        company: 'TESLA INC.',
+        company: 'TESLA INC. DL -,001',
         shares: 1,
         price: 207.83,
         amount: 207.83,
         fee: +Big(5.9).plus(Big(0.71)),
+        tax: 0,
+      });
+    });
+
+    test('Can parse buy of chinese stock BYD Co Ltd', () => {
+      const result = flatex.parsePages(buySamples[5]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2020-11-05',
+        datetime: '2020-11-05T13:18:00.000Z',
+        isin: 'CNE100000296',
+        company: 'BYD CO. LTD H YC 1',
+        shares: 25,
+        price: 21.25,
+        amount: 531.25,
+        fee: 8.41,
+        tax: 0,
+      });
+    });
+
+    test('Can parse three buys across two pdf pages', () => {
+      const result = flatex.parsePages(buySamples[6]);
+
+      expect(result.activities.length).toEqual(3);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2020-10-13',
+        datetime: '2020-10-13T13:55:00.000Z',
+        isin: 'LU2237380790',
+        company: 'ALLEGRO.EU ZY -,01',
+        shares: 30,
+        price: 17.7,
+        amount: 531,
+        fee: 6.75,
+        tax: 0,
+      });
+    });
+
+    test('Can parse statement: 2018_etf_ishares_tecdax', () => {
+      const result = flatex.parsePages(buySamples[7]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2018-01-02',
+        datetime: '2018-01-01T23:00:00.000Z',
+        isin: 'DE0005933972',
+        company: 'ISHARES TECDAX UCITS ETF',
+        shares: 2.649551,
+        price: 23.5889,
+        amount: 62.5,
+        fee: 1.5,
+        tax: 0,
+      });
+    });
+
+    test('Can parse statement: 2016_old_bank_name', () => {
+      const result = flatex.parsePages(buySamples[8]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2016-05-17',
+        datetime: '2016-05-17T07:04:00.000Z',
+        isin: 'IE00B4L5Y983',
+        company: 'ISHSIII-C.MSCI W.U.E.ACDL',
+        shares: 15,
+        price: 36.54,
+        amount: 548.1,
+        fee: 7.88,
+        tax: 0,
+      });
+    });
+
+    test('Can parse statement: 2020_dropbox', () => {
+      const result = flatex.parsePages(buySamples[9]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2020-12-02',
+        datetime: '2020-12-02T18:31:00.000Z',
+        isin: 'US26210C1045',
+        company: 'DROPBOX INC CL. A',
+        shares: 60,
+        price: 16.60067896776978,
+        amount: 996.04,
+        fee: 15.9,
+        tax: 0,
+        fxRate: 1.20477,
+        foreignCurrency: 'USD',
+      });
+    });
+
+    test('Can parse statement: 2017_lion_e_mobility', () => {
+      const result = flatex.parsePages(buySamples[10]);
+
+      expect(result.activities.length).toEqual(2);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2017-08-14',
+        datetime: '2017-08-14T07:37:00.000Z',
+        isin: 'CH0132594711',
+        company: 'LION E-MOBILITY AG SF-,13',
+        shares: 129,
+        price: 7.7,
+        amount: 993.3,
+        fee: 7.25,
+        tax: 0,
+      });
+      expect(result.activities[1]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2017-08-14',
+        datetime: '2017-08-14T15:20:00.000Z',
+        isin: 'CH0132594711',
+        company: 'LION E-MOBILITY AG SF-,13',
+        shares: 21,
+        price: 7.7,
+        amount: 161.7,
+        fee: 0.69,
         tax: 0,
       });
     });
@@ -148,7 +275,7 @@ describe('Broker: Flatex', () => {
         date: '2019-05-20',
         datetime: '2019-05-20T09:16:00.000Z',
         isin: 'US30303M1027',
-        company: 'FACEBOOK INC.A',
+        company: 'FACEBOOK INC.A DL-,000006',
         shares: 4,
         price: 164.5,
         amount: 658,
@@ -175,13 +302,31 @@ describe('Broker: Flatex', () => {
         tax: 17.17,
       });
     });
+
+    test('Can parse statement: 2018_ishares_global_corporate', () => {
+      const result = flatex.parsePages(sellSamples[2]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Sell',
+        date: '2018-12-11',
+        datetime: '2018-12-11T20:47:00.000Z',
+        isin: 'IE00B7J7TB45',
+        company: 'IS GBL CORP BD U.ETF DLD',
+        shares: 2,
+        price: 82.106,
+        amount: 164.21,
+        fee: 6.54,
+        tax: -0.21,
+      });
+    });
   });
 
   describe('Dividend', () => {
-    test('should map pdf data of sample 1 correctly', () => {
-      const activities = flatex.parsePages(dividendsSamples[0]).activities;
+    test('should map pdf data of sample correctly: 2020_apple', () => {
+      const activities = flatex.parsePages(dividendSamples[0]).activities;
 
-      // stock
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
         broker: 'flatex',
@@ -191,17 +336,18 @@ describe('Broker: Flatex', () => {
         isin: 'US0378331005',
         company: 'APPLE INC.',
         shares: 7,
-        amount: 4.96,
-        price: 4.96 / 7,
+        amount: 4.95997055305052,
+        price: 0.7085672218643599,
         fee: 0,
-        tax: +Big(4.96).minus(Big(3.6)), // calculate from Bemessungsgrundlage - Endbetrag#
+        tax: 1.35997055305052,
+        fxRate: 1.0867,
+        foreignCurrency: 'USD',
       });
     });
 
-    test('should map pdf data of sample 2 correctly', () => {
-      const activities = flatex.parsePages(dividendsSamples[1]).activities;
+    test('should map pdf data of sample correctly: 2019_microsoft', () => {
+      const activities = flatex.parsePages(dividendSamples[1]).activities;
 
-      // stock
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
         broker: 'flatex',
@@ -209,19 +355,20 @@ describe('Broker: Flatex', () => {
         date: '2019-12-12',
         datetime: '2019-12-12T' + activities[0].datetime.substring(11),
         isin: 'US5949181045',
-        company: 'MICROSOFT',
+        company: 'MICROSOFT DL-,00000625',
         shares: 16,
-        amount: 7.326928257160815, // only available in USD, thus using net dividend in EUR
-        price: 7.326928257160815 / 16,
+        amount: 7.326928257160815,
+        price: 0.45793301607255094,
         fee: 0,
-        tax: 0, // skip bc only available in USD
+        tax: 1.0969282571608152,
+        fxRate: 1.1137,
+        foreignCurrency: 'USD',
       });
     });
 
-    test('should map pdf data of sample 3 correctly', () => {
-      const activities = flatex.parsePages(dividendsSamples[2]).activities;
+    test('should map pdf data of sample correctly: 2018_msci_world', () => {
+      const activities = flatex.parsePages(dividendSamples[2]).activities;
 
-      // index fund
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({
         broker: 'flatex',
@@ -231,10 +378,92 @@ describe('Broker: Flatex', () => {
         isin: 'DE000A1C9KL8',
         company: 'HSBC MSCI WORLD UC.ETF DZ',
         shares: 36,
-        amount: 3.02,
-        price: 3.02 / 36,
+        amount: 3.0142781597038604,
+        price: 0.08372994888066279,
         fee: 0,
-        tax: +Big(3.02).minus(Big(2.18)), // calculate from Bemessungsgrundlage - Endbetrag (note: diff in pdf is wrong by 0,01)
+        tax: 0.8342781597038604,
+        fxRate: 1.1346,
+        foreignCurrency: 'USD',
+      });
+    });
+
+    test('should map pdf data of sample correctly: 2018_etf_001', () => {
+      const activities = flatex.parsePages(dividendSamples[3]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Dividend',
+        date: '2018-08-23',
+        datetime: '2018-08-23T' + activities[0].datetime.substring(11),
+        isin: 'LU0378449770',
+        company: 'COMST.-NASDAQ-100 U.ETF I',
+        shares: 25.28,
+        amount: 9.2235944382071,
+        price: 0.36485737492907827,
+        fee: 0,
+        tax: 0,
+        fxRate: 1.1579,
+        foreignCurrency: 'USD',
+      });
+    });
+
+    test('should map pdf data of sample correctly: 2020_ishare_msci_eu', () => {
+      const activities = flatex.parsePages(dividendSamples[4]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Dividend',
+        date: '2020-11-25',
+        datetime: '2020-11-25T' + activities[0].datetime.substring(11),
+        isin: 'IE00BYYHSM20',
+        company: 'ISHSII-MSCI EU.QUA.DV.EOD',
+        shares: 709.25,
+        amount: 58.44,
+        price: 0.08239689813182939,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('should map pdf data of sample correctly: 2020_royal_dutch_shell', () => {
+      const activities = flatex.parsePages(dividendSamples[5]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Dividend',
+        date: '2020-09-22',
+        datetime: '2020-09-22T' + activities[0].datetime.substring(11),
+        isin: 'GB00B03MLX29',
+        company: 'ROYAL DUTCH SHELL A EO-07',
+        shares: 25,
+        amount: 3.38,
+        price: 0.1352,
+        fee: 0,
+        tax: 0.51,
+      });
+    });
+
+    test('should map pdf data of sample correctly: 2015_williams', () => {
+      const activities = flatex.parsePages(dividendSamples[6]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Dividend',
+        date: '2015-12-28',
+        datetime: '2015-12-28T' + activities[0].datetime.substring(11),
+        isin: 'US9694571004',
+        company: 'WILLIAMS COS INC. DL 1',
+        shares: 250,
+        amount: 145.95876664842183,
+        price: 0.5838350665936873,
+        fee: 0,
+        tax: 37.28876664842182,
+        fxRate: 1.0962,
+        foreignCurrency: 'USD',
       });
     });
   });
@@ -283,6 +512,22 @@ describe('Broker: Flatex', () => {
         tax: 0,
         type: 'Sell',
       });
+    });
+  });
+
+  describe('Validate all ignored statements', () => {
+    test('The statement should be ignored: 2020_order_confirmation', () => {
+      const result = flatex.parsePages(ignoredSamples[0]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
+    });
+
+    test('The statement should be ignored: 2020_saving_plan_confirmation', () => {
+      const result = flatex.parsePages(ignoredSamples[1]);
+
+      expect(result.status).toEqual(7);
+      expect(result.activities.length).toEqual(0);
     });
   });
 

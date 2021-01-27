@@ -9,16 +9,14 @@ describe('Broker: Erste Bank', () => {
 
   describe('Check all documents', () => {
     test('Can the document parsed with Erste Bank', () => {
-      allSamples.forEach(samples => {
-        expect(
-          samples.some(item => ersteBank.canParsePage(item, 'pdf'))
-        ).toEqual(true);
+      allSamples.forEach(pages => {
+        expect(ersteBank.canParseDocument(pages, 'pdf')).toEqual(true);
       });
     });
 
     test('Can identify a implementation from the document as Erste Bank', () => {
-      allSamples.forEach(samples => {
-        const implementations = findImplementation(samples, 'pdf');
+      allSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'pdf');
 
         expect(implementations.length).toEqual(1);
         expect(implementations[0]).toEqual(ersteBank);
@@ -471,6 +469,67 @@ describe('Broker: Erste Bank', () => {
         amount: 345,
         fee: 0,
         tax: 142.42,
+      });
+    });
+
+    test('Can parse 2020 3m_co dividend', () => {
+      const activities = ersteBank.parsePages(dividendSamples[3]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ersteBank',
+        type: 'Dividend',
+        date: '2020-12-16',
+        datetime: '2020-12-16T' + activities[0].datetime.substring(11),
+        isin: 'US88579Y1010',
+        company: '3M CO.',
+        shares: 11,
+        price: 1.2054545454545456,
+        amount: 13.26,
+        fee: 0,
+        tax: 3.65,
+        fxRate: 1.2193,
+        foreignCurrency: 'USD',
+      });
+    });
+
+    test('Can parse 2020 Coca Cola dividend', () => {
+      const activities = ersteBank.parsePages(dividendSamples[4]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ersteBank',
+        type: 'Dividend',
+        date: '2020-12-16',
+        datetime: '2020-12-16T' + activities[0].datetime.substring(11),
+        isin: 'US1912161007',
+        company: 'COCA-COLA CO.',
+        shares: 24,
+        price: 0.33625,
+        amount: 8.07,
+        fee: 0,
+        tax: 2.22,
+        fxRate: 1.2193,
+        foreignCurrency: 'USD',
+      });
+    });
+
+    test('Can parse 2020 Royal Dutch Shell dividend', () => {
+      const activities = ersteBank.parsePages(dividendSamples[5]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'ersteBank',
+        type: 'Dividend',
+        date: '2020-12-17',
+        datetime: '2020-12-17T' + activities[0].datetime.substring(11),
+        isin: 'GB00B03MLX29',
+        company: 'ROYAL DUTCH SHELL',
+        shares: 72,
+        price: 0.1386111111111111,
+        amount: 9.98,
+        fee: 0,
+        tax: 2.75,
       });
     });
   });
