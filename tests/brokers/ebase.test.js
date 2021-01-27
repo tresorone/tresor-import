@@ -294,7 +294,6 @@ describe('Broker: ebase', () => {
   });
 
   describe('Validate transaction logs being parsed', () => {
-
     test('Can parse an ebase multi-page pdf with mixed transactions', () => {
       const activities = ebase.parsePages(transactionLogSamples[0]).activities;
       expect(activities.length).toEqual(327);

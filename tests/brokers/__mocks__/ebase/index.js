@@ -25,7 +25,10 @@ export const invalidSamples = [
   require('./invalid/entgelt_verkauf_nan_single_pdfpage.json'),
 ];
 
-export const allValidSamples = buySamples.concat(sellSamples, transactionLogSamples);
+export const allValidSamples = buySamples.concat(
+  sellSamples,
+  transactionLogSamples
+);
 /*
 As of yet no dividend containing samples can be implemented due to a lack of
 pdfs containing them
