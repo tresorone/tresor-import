@@ -172,7 +172,7 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('Can parse statement: 2018_etf_ishares_tecdax.json', () => {
+    test('Can parse statement: 2018_etf_ishares_tecdax', () => {
       const result = flatex.parsePages(buySamples[7]);
 
       expect(result.activities.length).toEqual(1);
@@ -191,7 +191,7 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('Can parse statement: 2016_old_bank_name.json', () => {
+    test('Can parse statement: 2016_old_bank_name', () => {
       const result = flatex.parsePages(buySamples[8]);
 
       expect(result.activities.length).toEqual(1);
@@ -210,7 +210,7 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('Can parse statement: 2020_dropbox.json', () => {
+    test('Can parse statement: 2020_dropbox', () => {
       const result = flatex.parsePages(buySamples[9]);
 
       expect(result.activities.length).toEqual(1);
@@ -228,6 +228,38 @@ describe('Broker: Flatex', () => {
         tax: 0,
         fxRate: 1.20477,
         foreignCurrency: 'USD',
+      });
+    });
+
+    test('Can parse statement: 2017_lion_e_mobility', () => {
+      const result = flatex.parsePages(buySamples[10]);
+
+      expect(result.activities.length).toEqual(2);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2017-08-14',
+        datetime: '2017-08-14T07:37:00.000Z',
+        isin: 'CH0132594711',
+        company: 'LION E-MOBILITY AG SF-,13',
+        shares: 129,
+        price: 7.7,
+        amount: 993.3,
+        fee: 7.25,
+        tax: 0,
+      });
+      expect(result.activities[1]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2017-08-14',
+        datetime: '2017-08-14T15:20:00.000Z',
+        isin: 'CH0132594711',
+        company: 'LION E-MOBILITY AG SF-,13',
+        shares: 21,
+        price: 7.7,
+        amount: 161.7,
+        fee: 0.69,
+        tax: 0,
       });
     });
   });
@@ -270,10 +302,29 @@ describe('Broker: Flatex', () => {
         tax: 17.17,
       });
     });
+
+    test('Can parse statement: 2018_ishares_global_corporate', () => {
+      const result = flatex.parsePages(sellSamples[2]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Sell',
+        date: '2018-12-11',
+        datetime: '2018-12-11T20:47:00.000Z',
+        isin: 'IE00B7J7TB45',
+        company: 'IS GBL CORP BD U.ETF DLD',
+        shares: 2,
+        price: 82.106,
+        amount: 164.21,
+        fee: 6.54,
+        tax: -0.21,
+      });
+    });
   });
 
   describe('Dividend', () => {
-    test('should map pdf data of sample correctly: 2020_apple.json', () => {
+    test('should map pdf data of sample correctly: 2020_apple', () => {
       const activities = flatex.parsePages(dividendSamples[0]).activities;
 
       expect(activities.length).toEqual(1);
@@ -294,7 +345,7 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('should map pdf data of sample correctly: 2019_microsoft.json', () => {
+    test('should map pdf data of sample correctly: 2019_microsoft', () => {
       const activities = flatex.parsePages(dividendSamples[1]).activities;
 
       expect(activities.length).toEqual(1);
@@ -315,7 +366,7 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('should map pdf data of sample correctly: 2018_msci_world.json', () => {
+    test('should map pdf data of sample correctly: 2018_msci_world', () => {
       const activities = flatex.parsePages(dividendSamples[2]).activities;
 
       expect(activities.length).toEqual(1);
@@ -336,7 +387,7 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('should map pdf data of sample correctly: 2018_etf_001.json', () => {
+    test('should map pdf data of sample correctly: 2018_etf_001', () => {
       const activities = flatex.parsePages(dividendSamples[3]).activities;
 
       expect(activities.length).toEqual(1);
@@ -357,7 +408,7 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('should map pdf data of sample correctly: 2020_ishare_msci_eu.json', () => {
+    test('should map pdf data of sample correctly: 2020_ishare_msci_eu', () => {
       const activities = flatex.parsePages(dividendSamples[4]).activities;
 
       expect(activities.length).toEqual(1);
@@ -376,7 +427,7 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('should map pdf data of sample correctly: 2020_royal_dutch_shell.json', () => {
+    test('should map pdf data of sample correctly: 2020_royal_dutch_shell', () => {
       const activities = flatex.parsePages(dividendSamples[5]).activities;
 
       expect(activities.length).toEqual(1);
@@ -392,6 +443,27 @@ describe('Broker: Flatex', () => {
         price: 0.1352,
         fee: 0,
         tax: 0.51,
+      });
+    });
+
+    test('should map pdf data of sample correctly: 2015_williams', () => {
+      const activities = flatex.parsePages(dividendSamples[6]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Dividend',
+        date: '2015-12-28',
+        datetime: '2015-12-28T' + activities[0].datetime.substring(11),
+        isin: 'US9694571004',
+        company: 'WILLIAMS COS INC. DL 1',
+        shares: 250,
+        amount: 145.95876664842183,
+        price: 0.5838350665936873,
+        fee: 0,
+        tax: 37.28876664842182,
+        fxRate: 1.0962,
+        foreignCurrency: 'USD',
       });
     });
   });
@@ -444,14 +516,14 @@ describe('Broker: Flatex', () => {
   });
 
   describe('Validate all ignored statements', () => {
-    test('The statement should be ignored: 2020_order_confirmation.json', () => {
+    test('The statement should be ignored: 2020_order_confirmation', () => {
       const result = flatex.parsePages(ignoredSamples[0]);
 
       expect(result.status).toEqual(7);
       expect(result.activities.length).toEqual(0);
     });
 
-    test('The statement should be ignored: 2020_saving_plan_confirmation.json', () => {
+    test('The statement should be ignored: 2020_saving_plan_confirmation', () => {
       const result = flatex.parsePages(ignoredSamples[1]);
 
       expect(result.status).toEqual(7);

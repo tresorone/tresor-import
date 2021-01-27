@@ -160,6 +160,25 @@ describe('Broker: scalable.capital', () => {
         tax: 0,
       });
     });
+
+    test('Can parse 2021_azioni_nom containing an italian financial tax', () => {
+      const activities = baaderBank.parsePages(buySamples[7]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'scalablecapital',
+        type: 'Buy',
+        date: '2021-01-04',
+        datetime: '2021-01-04T09:01:36.000Z',
+        isin: 'IT0003128367',
+        company: 'ENEL S.p.A. Azioni nom. EO 1',
+        shares: 31,
+        price: 8.33,
+        amount: 258.23,
+        fee: 0,
+        tax: 0.26,
+      });
+    });
   });
 
   describe('Validate sells', () => {

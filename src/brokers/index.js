@@ -6,6 +6,7 @@ import * as consorsbank from './consorsbank';
 import * as cortalconsors from './cortalconsors';
 import * as degiro from './degiro.js';
 import * as dkb from './dkb';
+import * as deutschebank from './deutschebank';
 import * as ebase from './ebase';
 import * as ersteBank from './ersteBank';
 import * as flatex from './flatex';
@@ -25,6 +26,7 @@ export {
   cortalconsors,
   degiro,
   dkb,
+  deutschebank,
   ebase,
   ersteBank,
   flatex,

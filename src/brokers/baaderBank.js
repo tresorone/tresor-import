@@ -5,6 +5,7 @@ import {
   createActivityDateTime,
   timeRegex,
 } from '@/helper';
+// This broker also handles scalable capital
 
 const isPageTypeBuy = content =>
   content.some(line => line.includes('Wertpapierabrechnung: Kauf'));
@@ -114,8 +115,8 @@ const findLineNumberByCurrentAndPreviousLineContent = (
 const findISIN = content => findByStartingTerm(content, 'ISIN: ');
 
 const findCompany = (content, isDividend) => {
-  let startLineNumber = undefined;
-  let endLineNumber = undefined;
+  let startLineNumber;
+  let endLineNumber;
   if (isDividend) {
     startLineNumber = findLineNumberByContent(content, 'p.STK') + 1;
     endLineNumber = findLineNumberByContent(content, 'Zahlungszeitraum:') - 1;
@@ -238,6 +239,13 @@ const findTax = content => {
     totalTax = totalTax.plus(
       Big(parseGermanNum(content[lineWithWithholdingTax + 1]))
     );
+  }
+
+  const financialTaxIdx = content.findIndex(l =>
+    l.endsWith('Finanztransaktionssteuer')
+  );
+  if (financialTaxIdx >= 0) {
+    totalTax = totalTax.plus(Big(parseGermanNum(content[financialTaxIdx + 1])));
   }
 
   return +totalTax;

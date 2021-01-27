@@ -182,6 +182,28 @@ textarea {
   clear: both;
 }
 
+.drop-zone {
+  width: 100%;
+  border: 3px dashed #00d1b2;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 20px;
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.drop-zone-label {
+  margin: 10%
+}
+
+input[type=file] {
+  cursor: pointer;
+  font-size: 0
+}
+
 /* ==========================================================================
    EXAMPLE Media Queries for Responsive Design.
    These examples override the primary ('mobile first') styles.

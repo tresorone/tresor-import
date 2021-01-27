@@ -9,11 +9,13 @@ export const buySamples = [
   require('./buy/2018_etf_ishares_tecdax.json'),
   require('./buy/2016_old_bank_name.json'),
   require('./buy/2020_dropbox.json'),
+  require('./buy/2017_lion_e_mobility.json'),
 ];
 
 export const sellSamples = [
   require('./sell/sell1.json'),
   require('./sell/sell2.json'),
+  require('./sell/2018_ishares_global_corporate.json'),
 ];
 
 export const dividendSamples = [
@@ -23,6 +25,7 @@ export const dividendSamples = [
   require('./dividend/2018_etf_001.json'),
   require('./dividend/2020_ishare_msci_eu.json'),
   require('./dividend/2020_royal_dutch_shell.json'),
+  require('./dividend/2015_williams.json'),
 ];
 
 export const mixedPageSamples = [require('./mixed-pages/0.json')];

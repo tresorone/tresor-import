@@ -110,15 +110,40 @@ const findOrderTime = (textArr, startLineNumber) => {
 };
 
 const findShares = (textArr, startLineNumber) => {
-  return parseGermanNum(
-    getTableValueByKey(textArr, startLineNumber, 'Ordervolumen')
-      ? getTableValueByKey(textArr, startLineNumber, 'Ordervolumen').split(
-          ' '
-        )[0] // stock
-      : getTableValueByKey(textArr, startLineNumber, 'Ausgeführt')
-      ? getTableValueByKey(textArr, startLineNumber, 'Ausgeführt').split(' ')[0] // etf
-      : getTableValueByKey(textArr, startLineNumber, 'St.').split(' ')[0] // dividend
+  const partialExecution = getTableValueByKey(
+    textArr,
+    startLineNumber,
+    'davon ausgef.'
   );
+  if (partialExecution) {
+    return parseGermanNum(partialExecution);
+  }
+
+  const numberOrder = getTableValueByKey(
+    textArr,
+    startLineNumber,
+    'Ordervolumen'
+  );
+  if (numberOrder) {
+    return parseGermanNum(numberOrder);
+  }
+
+  // ETFs
+  const executed = getTableValueByKey(textArr, startLineNumber, 'Ausgeführt');
+  if (executed) {
+    return parseGermanNum(executed);
+  }
+
+  // Dividends
+  let numberDividends = getTableValueByKey(textArr, startLineNumber, 'St.');
+  if (numberDividends === null || numberDividends.trim().length === 0) {
+    // For old documents (e.g. from 2015) we need to get the number of shares from group 2
+    numberDividends = getTableValueByKey(textArr, startLineNumber, 'St.', 2);
+  }
+
+  if (numberDividends) {
+    return parseGermanNum(numberDividends);
+  }
 };
 
 const findPrice = (content, startLineNumber) => {
@@ -210,20 +235,29 @@ const findFee = (textArr, startLineNumber) => {
   return +Big(provision).plus(Big(ownExpenses)).plus(Big(foreignExpenses));
 };
 
-const findTax = (textArr, startLineNumber) =>
-  getTableValueByKey(textArr, startLineNumber, 'Einbeh. Steuer')
-    ? parseGermanNum(
-        getTableValueByKey(textArr, startLineNumber, 'Einbeh. Steuer').split(
-          ' '
-        )[0]
-      )
-    : getTableValueByKey(textArr, startLineNumber, 'Einbeh. KESt')
-    ? parseGermanNum(
-        getTableValueByKey(textArr, startLineNumber, 'Einbeh. KESt').split(
-          ' '
-        )[0]
-      )
-    : 0;
+const findTax = (textArr, startLineNumber) => {
+  let totalTax = Big(0);
+
+  const tax = findTableValueByKeyWithDocumentFormat(
+    textArr,
+    startLineNumber,
+    'Einbeh. Steuer'
+  );
+  if (tax) {
+    totalTax = totalTax.plus(parseGermanNum(tax));
+  }
+
+  const kest = findTableValueByKeyWithDocumentFormat(
+    textArr,
+    startLineNumber,
+    'Einbeh. KESt'
+  );
+  if (kest) {
+    totalTax = totalTax.plus(parseGermanNum(kest));
+  }
+
+  return +totalTax;
+};
 
 const findNetPayout = (content, startLineNumber) =>
   parseGermanNum(getTableValueByKey(content, startLineNumber, 'Endbetrag', 1));

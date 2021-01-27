@@ -13,6 +13,7 @@ export const sellSamples = [
   require('./sell/2020_etf_tecdax.json'),
   require('./sell/2020_msci_world.json'),
   require('./sell/2020_data_deposit_box.json'),
+  require('./sell/2020_vapiano.json'),
 ];
 
 export const dividendsSamples = [
@@ -21,6 +22,11 @@ export const dividendsSamples = [
   require('./dividend/dividend_taxed_usd_3.json'),
   require('./dividend/dividend_taxed_usd_4.json'),
   require('./dividend/2020_deutsche_telekom.json'),
+];
+
+export const savingsplanSamples = [
+  require('./savingsplan/2019_half_yearly_savings_plan_summary.json'),
+  require('./savingsplan/2020_half_yearly_savings_plan_summary.json'),
 ];
 
 export const ignoredSamples = [
@@ -32,5 +38,6 @@ export const ignoredSamples = [
 export const allSamples = buySamples.concat(
   sellSamples,
   dividendsSamples,
+  savingsplanSamples,
   ignoredSamples
 );
