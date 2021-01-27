@@ -170,17 +170,6 @@ const findAmount = (textArr, fxRate, foreignCurrency, formatId) => {
     }
   }
 
-  {
-    // Bonifikation like:
-    // 2,49400% Bonifikation                : EUR                1,28-
-    const lineNumber = textArr.findIndex(line => line.includes('Bonifikation'));
-    if (lineNumber >= 0) {
-      amount = amount.minus(
-        parseGermanNum(textArr[lineNumber].split(/\s+/)[4])
-      );
-    }
-  }
-
   return isInForeignCurrency ? amount.div(fxRate) : amount;
 };
 
@@ -221,19 +210,31 @@ const findPayout = (textArr, fxRate) => {
 };
 
 const findFee = (textArr, amount, isSell = false, formatId = undefined) => {
+  let totalFee = Big(0);
   const span = formatId === undefined || formatId === 1 ? 8 : 1;
 
   const lineNumberGross = textArr.findIndex(t => t.includes('vor Steuern'));
-  if (lineNumberGross < 0) {
-    return 0;
+  if (lineNumberGross >= 0) {
+    const preTaxLine = textArr[lineNumberGross + span].split(/\s+/);
+    const preTaxAmount = parseGermanNum(preTaxLine[preTaxLine.length - 1]);
+
+    totalFee = isSell
+      ? Big(amount).minus(preTaxAmount)
+      : Big(preTaxAmount).minus(amount);
   }
 
-  const preTaxLine = textArr[lineNumberGross + span].split(/\s+/);
-  const preTaxAmount = parseGermanNum(preTaxLine[preTaxLine.length - 1]);
+  {
+    // Bonifikation like:
+    // 2,49400% Bonifikation                : EUR                1,28-
+    const lineNumber = textArr.findIndex(line => line.includes('Bonifikation'));
+    if (lineNumber >= 0) {
+      totalFee = totalFee.minus(
+        parseGermanNum(textArr[lineNumber].split(/\s+/)[4])
+      );
+    }
+  }
 
-  return +(isSell
-    ? Big(amount).minus(preTaxAmount)
-    : Big(preTaxAmount).minus(amount));
+  return +totalFee;
 };
 
 const findTax = (textArr, fxRate, formatId) => {

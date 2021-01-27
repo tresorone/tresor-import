@@ -210,9 +210,9 @@ describe('Broker: comdirect', () => {
         wkn: '973270',
         company: 'Fidelity Fds-Europ. Growth Fd.',
         shares: 6.818,
-        price: 7.332062188325022,
-        amount: 49.99,
-        fee: 0,
+        price: 7.5198005280140805,
+        amount: 51.27,
+        fee: -1.28,
         tax: 0,
       });
     });
