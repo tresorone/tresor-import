@@ -423,7 +423,7 @@ describe('Broker: Trade Republic', () => {
         price: 13.296,
         shares: 10,
         tax: 0,
-        type: 'Buy',
+        type: 'TransferIn',
       });
       expect(activities[1]).toEqual({
         amount: 210.79,
@@ -436,13 +436,14 @@ describe('Broker: Trade Republic', () => {
         price: 4.684222222222222,
         shares: 45,
         tax: 0,
-        type: 'Buy',
+        type: 'TransferIn',
       });
     });
 
     test('Map a quarter statement with two pages correctly', () => {
       const activities = traderepublic.parsePages(quarterSamples[2]).activities;
 
+      expect(activities.length).toEqual(15);
       expect(activities[10]).toEqual({
         amount: 366.12,
         broker: 'traderepublic',
@@ -454,7 +455,7 @@ describe('Broker: Trade Republic', () => {
         price: 183.06,
         shares: 2,
         tax: 0,
-        type: 'Buy',
+        type: 'TransferIn',
       });
       expect(activities[11]).toEqual({
         amount: 391,
@@ -467,10 +468,9 @@ describe('Broker: Trade Republic', () => {
         price: 130.33333333333334,
         shares: 3,
         tax: 0,
-        type: 'Buy',
+        type: 'TransferIn',
       });
 
-      expect(activities.length).toEqual(15);
     });
   });
 

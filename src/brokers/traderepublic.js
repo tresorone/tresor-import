@@ -241,7 +241,7 @@ const parsePositionAsActivity = (content, startLineNumber) => {
 
   return validateActivity({
     broker: 'traderepublic',
-    type: 'Buy',
+    type: 'TransferIn',
     date: parsedDate,
     datetime: parsedDateTime,
     isin: content[lineNumberOfISIN].split(' ')[1],
