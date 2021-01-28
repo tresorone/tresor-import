@@ -238,9 +238,13 @@ const parsePositionAsActivity = (content, startLineNumber) => {
     numberOfSharesLine = content[startLineNumber - 1];
   }
 
-  // In the Q4 2020 document the number format has changed (once?) from the german one to the english one. We simply replace the dot with a comma.
-  const numberOfShares = parseGermanNum(numberOfSharesLine.replace('.', ','));
+  if (!numberOfSharesLine.includes(',') && numberOfSharesLine.includes('.')) {
+    // In the Q4 2020 document the number format has changed (once?) from the german one to the english one.
+    // We simply replace the dot with a comma.
+    numberOfSharesLine = numberOfSharesLine.replace('.', ',');
+  }
 
+  const numberOfShares = parseGermanNum(numberOfSharesLine);
   let toalAmount = parseGermanNum(content[lineOfDate + 1]);
 
   if (lineNumberOfISIN - startLineNumber > 5) {
