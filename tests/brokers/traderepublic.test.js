@@ -477,6 +477,20 @@ describe('Broker: Trade Republic', () => {
       const activities = traderepublic.parsePages(quarterSamples[3]).activities;
       expect(activities.length).toEqual(56);
 
+      expect(activities[2]).toEqual({
+        amount: 234.8,
+        broker: 'traderepublic',
+        company: 'Manganese X Energy',
+        date: '2020-12-30',
+        datetime: '2020-12-30T' + activities[2].datetime.substring(11),
+        fee: 0,
+        isin: 'CA5626781028',
+        price: 0.2348,
+        shares: 1000,
+        tax: 0,
+        type: 'TransferIn',
+      });
+
       expect(activities[3]).toEqual({
         amount: 80,
         broker: 'traderepublic',
