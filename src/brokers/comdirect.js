@@ -214,6 +214,8 @@ const findFee = (textArr, amount, isSell = false, formatId = undefined) => {
   const span = formatId === undefined || formatId === 1 ? 8 : 1;
 
   const lineNumberGross = textArr.findIndex(t => t.includes('vor Steuern'));
+  const lineNumberValuta =
+    textArr.findIndex(t => t.includes('Verrechnung über Konto')) + 1;
   if (lineNumberGross >= 0) {
     const preTaxLine = textArr[lineNumberGross + span].split(/\s+/);
     const preTaxAmount = parseGermanNum(preTaxLine[preTaxLine.length - 1]);
@@ -221,17 +223,9 @@ const findFee = (textArr, amount, isSell = false, formatId = undefined) => {
     totalFee = isSell
       ? Big(amount).minus(preTaxAmount)
       : Big(preTaxAmount).minus(amount);
-  }
-
-  {
-    // Bonifikation like:
-    // 2,49400% Bonifikation                : EUR                1,28-
-    const lineNumber = textArr.findIndex(line => line.includes('Bonifikation'));
-    if (lineNumber >= 0) {
-      totalFee = totalFee.minus(
-        parseGermanNum(textArr[lineNumber].split(/\s+/)[4])
-      );
-    }
+  } else if (lineNumberValuta > 0) {
+    const elements = textArr[lineNumberValuta].split(/\s+/);
+    totalFee = Big(parseGermanNum(elements[elements.length - 1])).minus(amount);
   }
 
   return +totalFee;
@@ -356,7 +350,10 @@ const getDocumentFormatId = content => {
   console.error('Unknown Document Type, can not parse');
 };
 
-const isBuy = textArr => textArr.some(t => t.includes('Wertpapierkauf'));
+const isBuy = textArr =>
+  textArr.some(
+    t => t.includes('Wertpapierkauf') || t.includes('Wertpapierbezug')
+  );
 
 const isSell = textArr => textArr.some(t => t.includes('Wertpapierverkauf'));
 
