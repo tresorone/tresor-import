@@ -8,6 +8,7 @@ export const buySamples = [
   require('./buy/purchase_eur_alibaba_group.json'),
   require('./buy/2020_usd_epr_properties.json'),
   require('./buy/2004_fidelity_fds_europ.json'),
+  require('./buy/2003_jenoptik.json'),
 ];
 
 export const sellSamples = [

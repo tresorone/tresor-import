@@ -216,6 +216,26 @@ describe('Broker: comdirect', () => {
         tax: 0,
       });
     });
+
+    test('Can parse the buy order: 2003_jenoptik', () => {
+      const result = comdirect.parsePages(buySamples[9]).activities;
+
+      expect(result.length).toEqual(1);
+      expect(result[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Buy',
+        date: '2003-10-20',
+        datetime: '2003-10-20T' + result[0].datetime.substring(11),
+        isin: 'DE0006229107',
+        wkn: '622910',
+        company: 'JENOPTIK AG',
+        shares: 22,
+        price: 6,
+        amount: 132,
+        fee: 9.9,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate Sells', () => {
