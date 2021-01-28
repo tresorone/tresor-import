@@ -169,6 +169,7 @@ const findAmount = (textArr, fxRate, foreignCurrency, formatId) => {
       );
     }
   }
+
   return isInForeignCurrency ? amount.div(fxRate) : amount;
 };
 
@@ -209,16 +210,31 @@ const findPayout = (textArr, fxRate) => {
 };
 
 const findFee = (textArr, amount, isSell = false, formatId = undefined) => {
+  let totalFee = Big(0);
   const span = formatId === undefined || formatId === 1 ? 8 : 1;
 
-  const preTaxLine = textArr[
-    textArr.findIndex(t => t.includes('vor Steuern')) + span
-  ].split(/\s+/);
-  const preTaxAmount = parseGermanNum(preTaxLine[preTaxLine.length - 1]);
+  const lineNumberGross = textArr.findIndex(t => t.includes('vor Steuern'));
+  if (lineNumberGross >= 0) {
+    const preTaxLine = textArr[lineNumberGross + span].split(/\s+/);
+    const preTaxAmount = parseGermanNum(preTaxLine[preTaxLine.length - 1]);
 
-  return isSell
-    ? Big(amount).minus(preTaxAmount)
-    : Big(preTaxAmount).minus(amount);
+    totalFee = isSell
+      ? Big(amount).minus(preTaxAmount)
+      : Big(preTaxAmount).minus(amount);
+  }
+
+  {
+    // Bonifikation like:
+    // 2,49400% Bonifikation                : EUR                1,28-
+    const lineNumber = textArr.findIndex(line => line.includes('Bonifikation'));
+    if (lineNumber >= 0) {
+      totalFee = totalFee.minus(
+        parseGermanNum(textArr[lineNumber].split(/\s+/)[4])
+      );
+    }
+  }
+
+  return +totalFee;
 };
 
 const findTax = (textArr, fxRate, formatId) => {
@@ -411,7 +427,7 @@ const parseData = textArr => {
     amount = +findAmount(textArr, fxRate, foreignCurrency, formatId);
     shares = findShares(textArr, formatId);
     price = +Big(amount).div(shares);
-    fee = +findFee(textArr, amount, false, formatId);
+    fee = findFee(textArr, amount, false, formatId);
   } else if (isSell(textArr)) {
     type = 'Sell';
     [isin, wkn] = findISINAndWKN(
@@ -426,7 +442,7 @@ const parseData = textArr => {
     shares = findShares(textArr, formatId);
     amount = +findAmount(textArr, fxRate, foreignCurrency, formatId);
     price = +Big(amount).div(shares);
-    fee = +findFee(textArr, amount, true, formatId);
+    fee = findFee(textArr, amount, true, formatId);
     tax = findTax(textArr, fxRate, formatId)[0];
   } else if (isDividend(textArr)) {
     [fxRate, foreignCurrency] = findPayoutFxrateForeignCurrency(textArr);

@@ -4,7 +4,9 @@ import {
   validateActivity,
   createActivityDateTime,
   timeRegex,
+  findFirstSearchtermIndexInArray,
 } from '@/helper';
+import { findFirstRegexIndexInArray } from '../helper';
 
 // Both smartbroker and onvista use highly similar parsers due to them both being
 // daughter companies from BNP Paribas; a french bank. There is no string which
@@ -13,8 +15,9 @@ import {
 export const onvistaIdentificationString = 'BELEGDRUCK=J';
 export const smartbrokerIdentificationString = 'Landsberger Straße 300';
 
-export const findISIN = text =>
-  text[text.findIndex(t => t.includes('ISIN')) + 1];
+export const findISIN = text => {
+  return text[text.indexOf('ISIN') + 1];
+};
 
 export const findCompany = text => {
   let company = text[text.findIndex(t => t.includes('ISIN')) - 1];
@@ -39,8 +42,9 @@ export const findDateBuySell = text => {
   return date;
 };
 
-export const findDateDividend = text =>
-  text[text.findIndex(t => t.includes('Zahltag')) + 1];
+export const findDateDividend = text => {
+  return text[text.findIndex(t => t.includes('Zahltag')) + 1];
+};
 
 const findOrderTime = content => {
   // Extract the time after the line with Handelszeit which contains "17:33"
@@ -160,17 +164,47 @@ const findTax = text => {
     totalTax = totalTax.plus(parseGermanNum(text[sourceTaxIndex + 2]));
   }
 
+  const witholdingTaxFondInputIdx = text.indexOf(
+    'anrechenbare Quellensteuer Fondseingangsseite'
+  );
+  if (witholdingTaxFondInputIdx >= 0) {
+    totalTax = totalTax.plus(
+      parseGermanNum(text[witholdingTaxFondInputIdx + 2])
+    );
+  }
+
   return +totalTax;
 };
 
 const findGrossPayout = (text, tax) => {
-  const netPayout =
-    text[text.findIndex(t => t.includes('Betrag zu Ihren Gunsten')) + 2];
-  return +Big(parseGermanNum(netPayout)).plus(tax);
+  const netPayoutIdx = text.findIndex(t =>
+    t.includes('Betrag zu Ihren Gunsten')
+  );
+  if (netPayoutIdx >= 0) {
+    return +Big(parseGermanNum(text[netPayoutIdx + 2])).plus(tax);
+  }
+  const reinvestIdx = text.indexOf('Thesaurierung brutto');
+  if (reinvestIdx >= 0) {
+    return parseGermanNum(text[reinvestIdx + 2]);
+  }
+};
+
+const findForeignInformation = pdfPage => {
+  const foreignCurrencyIdx = pdfPage.indexOf('Devisenkurs') + 1;
+  if (foreignCurrencyIdx > 0) {
+    const fxRate = parseGermanNum(pdfPage[foreignCurrencyIdx].split(/\s+/)[1]);
+    const foreignCurrency = pdfPage[foreignCurrencyIdx]
+      .split(/\s+/)[0]
+      .split(/\//)[1];
+    return [foreignCurrency, fxRate];
+  }
+  return [undefined, undefined];
 };
 
 export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
+  const allPagesFlat = pages.flat();
+
   return (
     extension === 'pdf' &&
     ((firstPageContent.some(line =>
@@ -182,7 +216,14 @@ export const canParseDocument = (pages, extension) => {
       (firstPageContent.some(line =>
         line.includes('Webtrading onvista bank')
       ) &&
-        detectedButIgnoredDocument(firstPageContent)))
+        detectedButIgnoredDocument(firstPageContent)) ||
+      // Account Statements
+      (firstPageContent.some(line => line.includes('www.onvista-bank.de')) &&
+        isAccountStatement(allPagesFlat)) ||
+      // Depotübersicht
+      (allPagesFlat[allPagesFlat.length - 1] ===
+        'Powered by TCPDF (www.tcpdf.org)' &&
+        isOverviewPage(allPagesFlat)))
   );
 };
 
@@ -196,8 +237,14 @@ export const isDividend = content =>
   content.some(line => line.includes('Erträgnisgutschrift')) ||
   content.some(line => line.includes('Dividendengutschrift'));
 
+const isAccountStatement = content =>
+  content.some(line => line.toLowerCase().startsWith('kontoauszug nr. '));
+
 const canParsePage = content =>
   isBuy(content) || isSell(content) || isDividend(content);
+
+const isOverviewPage = content =>
+  content.some(line => line.includes('Depotübersicht Wertpapiere'));
 
 const detectedButIgnoredDocument = content => {
   return (
@@ -206,60 +253,167 @@ const detectedButIgnoredDocument = content => {
   );
 };
 
-const parseData = text => {
-  let activity = {
-    broker: 'onvista',
-    isin: findISIN(text),
-    company: findCompany(text),
-    shares: findShares(text),
-  };
+const parseOverview = content => {
+  let activities = [];
 
-  const foreignCurrencyIdx = text.indexOf('Devisenkurs') + 1;
-  if (foreignCurrencyIdx > 0) {
-    activity.fxRate = parseGermanNum(text[foreignCurrencyIdx].split(/\s+/)[1]);
-    activity.foreignCurrency = text[foreignCurrencyIdx]
-      .split(/\s+/)[0]
-      .split(/\//)[1];
+  for (
+    let tableStartLine = content.findIndex(line =>
+      line.includes('Aktueller Wert')
+    );
+    tableStartLine < content.length;
+    tableStartLine += 16
+  ) {
+    const shares = content[tableStartLine + 1].trim();
+    if (shares === '/') {
+      // The last two lines don't contains securities and are marked with /. We can leave the loop here.
+      break;
+    }
+
+    const [parsedDate, parsedDateTime] = createActivityDateTime(
+      content[tableStartLine + 5],
+      content[tableStartLine + 6],
+      'dd.MM.yyyy',
+      'dd.MM.yyyy HH:mm:ss'
+    );
+
+    const activity = validateActivity(
+      {
+        broker: 'onvista',
+        type: 'TransferIn',
+        date: parsedDate,
+        datetime: parsedDateTime,
+        wkn: content[tableStartLine + 3].split('/')[0].trim(),
+        isin: content[tableStartLine + 3].split('/')[1].trim(),
+        company: content[tableStartLine + 2],
+        shares: parseGermanNum(shares),
+        price: parseGermanNum(content[tableStartLine + 9].split(' ')[0]),
+        amount: parseGermanNum(content[tableStartLine + 10].split(' ')[0]),
+        fee: 0,
+        tax: 0,
+      },
+      true
+    );
+
+    if (activity === undefined) {
+      continue;
+    }
+
+    activities.push(activity);
   }
 
-  if (isBuy(text)) {
+  return activities;
+};
+
+const parseAccountStatement = pdfPages => {
+  const searchTerms = [
+    'Wertpapierkauf',
+    'Wertpapierverkauf',
+    'Zinsen/Dividenden',
+  ];
+  const yearLine = pdfPages[
+    pdfPages.findIndex(line =>
+      line.toLowerCase().startsWith('kontoauszug nr. ')
+    )
+  ].split('.');
+  const year = yearLine[yearLine.length - 1];
+  let idx = findFirstSearchtermIndexInArray(pdfPages, searchTerms);
+  let activities = [];
+  while (idx >= 0) {
+    const isinIdx = findFirstRegexIndexInArray(
+      pdfPages,
+      /^ISIN: [A-Z]{2}[0-9A-Z]{9}[0-9]$/,
+      idx
+    );
+    const sharesIdx = findFirstRegexIndexInArray(pdfPages, /^STK: [1-9]+/, idx);
+    const companyIdx = pdfPages[idx + 1].startsWith('ABR: ')
+      ? idx + 4
+      : idx + 1;
+    let activity = {
+      broker: 'onvista',
+      company: pdfPages[companyIdx],
+      isin: pdfPages[isinIdx].split(/\s+/)[1],
+      shares: parseGermanNum(pdfPages[sharesIdx].split(/\s+/)[1]),
+      amount: Math.abs(parseGermanNum(pdfPages[idx - 1])),
+      tax: 0,
+      fee: 0,
+    };
+    activity.price = +Big(activity.amount).div(activity.shares);
+    [activity.date, activity.datetime] = createActivityDateTime(
+      pdfPages[idx - 3] + year
+    );
+
+    switch (pdfPages[idx]) {
+      case searchTerms[0]:
+        activity.type = 'Buy';
+        break;
+      case searchTerms[1]:
+        activity.type = 'Sell';
+        break;
+      case searchTerms[2]:
+        activity.type = 'Dividend';
+        break;
+    }
+    activity = validateActivity(activity);
+    if (activity !== undefined) {
+      activities.push(activity);
+      idx = findFirstSearchtermIndexInArray(pdfPages, searchTerms, idx + 1);
+    } else {
+      return undefined;
+    }
+  }
+  return activities;
+};
+
+const parseSingleTransaction = pdfPage => {
+  let activity = {
+    broker: 'onvista',
+    isin: findISIN(pdfPage),
+    company: findCompany(pdfPage),
+    shares: findShares(pdfPage),
+  };
+  const [foreignCurrency, fxRate] = findForeignInformation(pdfPage);
+  if (foreignCurrency !== undefined && fxRate !== undefined) {
+    activity.foreignCurrency = foreignCurrency;
+    activity.fxRate = fxRate;
+  }
+
+  if (isBuy(pdfPage)) {
     activity.type = 'Buy';
     [activity.date, activity.datetime] = createActivityDateTime(
-      findDateBuySell(text),
-      findOrderTime(text)
+      findDateBuySell(pdfPage),
+      findOrderTime(pdfPage)
     );
-    activity.amount = findAmount(text, activity.fxRate);
-    activity.fee = findFee(text, activity.fxRate);
+    activity.amount = findAmount(pdfPage, activity.fxRate);
+    activity.fee = findFee(pdfPage, activity.fxRate);
     activity.tax = 0.0;
-    activity.price = findPrice(text, activity.fxRate);
-  } else if (isSell(text)) {
+    activity.price = findPrice(pdfPage, activity.fxRate);
+  } else if (isSell(pdfPage)) {
     activity.type = 'Sell';
     [activity.date, activity.datetime] = createActivityDateTime(
-      findDateBuySell(text),
-      findOrderTime(text)
+      findDateBuySell(pdfPage),
+      findOrderTime(pdfPage)
     );
-    activity.amount = findAmount(text, activity.fxRate);
-    activity.fee = findFee(text, activity.fxRate);
-    activity.tax = findTax(text);
-    activity.price = findPrice(text, activity.fxRate);
-  } else if (isDividend(text)) {
+    activity.amount = findAmount(pdfPage, activity.fxRate);
+    activity.fee = findFee(pdfPage, activity.fxRate);
+    activity.tax = findTax(pdfPage);
+    activity.price = findPrice(pdfPage, activity.fxRate);
+  } else if (isDividend(pdfPage)) {
     activity.type = 'Dividend';
     [activity.date, activity.datetime] = createActivityDateTime(
-      findDateDividend(text),
+      findDateDividend(pdfPage),
       undefined
     );
     activity.fee = 0;
-    activity.tax = findTax(text);
-    activity.amount = findGrossPayout(text, activity.tax);
+    activity.tax = findTax(pdfPage);
+    activity.amount = findGrossPayout(pdfPage, activity.tax);
     activity.price = +Big(activity.amount).div(activity.shares);
   }
   return validateActivity(activity);
 };
 
-export const parsePages = contents => {
+export const parsePages = pdfPages => {
   let activities = [];
-
-  if (detectedButIgnoredDocument(contents[0])) {
+  if (detectedButIgnoredDocument(pdfPages[0])) {
     // We know this type and we don't want to support it.
     return {
       activities,
@@ -267,14 +421,29 @@ export const parsePages = contents => {
     };
   }
 
-  for (let content of contents) {
-    if (canParsePage(content)) {
-      activities.push(parseData(content));
+  const allPagesFlat = pdfPages.flat();
+  if (isAccountStatement(allPagesFlat)) {
+    activities = parseAccountStatement(allPagesFlat);
+  } else if (isOverviewPage(allPagesFlat)) {
+    activities = parseOverview(allPagesFlat);
+  } else {
+    for (let content of pdfPages) {
+      if (canParsePage(content)) {
+        activities.push(parseSingleTransaction(content));
+      }
     }
+  }
+
+  // No valid activities were found
+  if (activities.length === 0) {
+    return {
+      activities,
+      status: 5,
+    };
   }
 
   return {
     activities,
-    status: 0,
+    status: activities === undefined ? 3 : 0,
   };
 };

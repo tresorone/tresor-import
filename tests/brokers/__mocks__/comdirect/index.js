@@ -7,6 +7,7 @@ export const buySamples = [
   require('./buy/purchase_usd_lordstown_motors_usd.json'),
   require('./buy/purchase_eur_alibaba_group.json'),
   require('./buy/2020_usd_epr_properties.json'),
+  require('./buy/2004_fidelity_fds_europ.json'),
 ];
 
 export const sellSamples = [

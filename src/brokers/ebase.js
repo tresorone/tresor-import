@@ -37,20 +37,26 @@ const parseNumberBeforeSpace = input => {
 };
 
 const isBuy = txString => {
+  if (txString === undefined) {
+    return false;
+  }
   return (
     txString === 'Ansparplan' ||
     txString === 'Kauf' ||
     txString === 'Wiederanlage Fondsertrag' ||
-    txString === 'Fondsumschichtung (Zugang)' ||
+    txString.includes('Fondsumschichtung (Zugang)') ||
     txString === 'Neuabrechnung Kauf'
   );
 };
 
 const isSell = txString => {
+  if (txString === undefined) {
+    return false;
+  }
   return (
     txString === 'Entgelt Verkauf' ||
     txString === 'Verkauf' ||
-    txString === 'Fondsumschichtung (Abgang)'
+    txString.includes('Fondsumschichtung (Abgang)')
   );
 };
 
@@ -96,11 +102,10 @@ function parseBaseAction(pdfArray, pdfOffset, actionType) {
   activity.amount = parseNumberBeforeSpace(
     pdfArray[pdfOffset + 7 + foreignCurrencyOffset]
   );
-
   return validateActivity(activity);
 }
 
-const parseData = pdfPages => {
+const parseTransactionLog = pdfPages => {
   // Action can be: Fondsertrag (Ausschüttung), Ansparplan, Wiederanlage Fondsertrag, Entgelt Verkauf
   let actions = [];
   for (const pdfPage of pdfPages) {
@@ -151,7 +156,7 @@ export const canParseDocument = (pages, extension) => {
     extension === 'pdf' &&
     firstPageContent.some(
       line =>
-        line.includes('ebase Depot') ||
+        line.startsWith('ebase Depot') ||
         line.includes('finvesto Depot') ||
         line.includes('VL-FondsDepot')
     ) &&
@@ -160,7 +165,7 @@ export const canParseDocument = (pages, extension) => {
 };
 
 export const parsePages = contents => {
-  const activities = parseData(contents);
+  const activities = parseTransactionLog(contents);
   const status = activities !== undefined ? 0 : 6;
   return {
     activities,

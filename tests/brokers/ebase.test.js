@@ -3,12 +3,11 @@ import * as ebase from '@/brokers/ebase';
 import {
   buySamples,
   invalidSamples,
-  mixedSamples,
+  transactionLogSamples,
   sellSamples,
 } from './__mocks__/ebase';
 import { allValidSamples } from './__mocks__/ebase';
 
-// David Holin: No dividend samples test yet, as no example document is available
 describe('Broker: ebase', () => {
   let consoleErrorSpy;
 
@@ -294,9 +293,9 @@ describe('Broker: ebase', () => {
     });
   });
 
-  describe('Mixed Sells, buys and everything in between', () => {
+  describe('Validate transaction logs being parsed', () => {
     test('Can parse an ebase multi-page pdf with mixed transactions', () => {
-      const activities = ebase.parsePages(mixedSamples[0]).activities;
+      const activities = ebase.parsePages(transactionLogSamples[0]).activities;
       expect(activities.length).toEqual(327);
       expect(activities[11]).toEqual({
         broker: 'ebase',
@@ -314,7 +313,7 @@ describe('Broker: ebase', () => {
     });
 
     test('Can parse buy and sell orders from a finvesto file', () => {
-      const activities = ebase.parsePages(mixedSamples[1]).activities;
+      const activities = ebase.parsePages(transactionLogSamples[1]).activities;
       expect(activities.length).toEqual(34);
       expect(activities[33]).toEqual({
         broker: 'ebase',
@@ -350,7 +349,7 @@ describe('Broker: ebase', () => {
     });
 
     test('Can parse an ebase single-page pdf with mixed transactions', () => {
-      const result = ebase.parsePages(mixedSamples[2]);
+      const result = ebase.parsePages(transactionLogSamples[2]);
       expect(result.activities === undefined && result.status === 6);
 
       //There is one activity in this list of activites that cant be parsed yet
@@ -432,8 +431,9 @@ describe('Broker: ebase', () => {
       });
     */
     });
+
     test('Can parse an ebase fond redeployment transactions', () => {
-      const result = ebase.parsePages(mixedSamples[3]);
+      const result = ebase.parsePages(transactionLogSamples[3]);
       expect(result.activities === undefined && result.status === 6);
       /*
       expect(activities.length).toEqual(6);
@@ -472,7 +472,7 @@ describe('Broker: ebase', () => {
     });
 
     test('Can parse an ebase buy recalculation transactions', () => {
-      const result = ebase.parsePages(mixedSamples[4]);
+      const result = ebase.parsePages(transactionLogSamples[4]);
       expect(result.activities === undefined && result.status === 6);
       //This testcase is still an issue without any soltion atm.
       /*
@@ -521,6 +521,39 @@ describe('Broker: ebase', () => {
         fee: 0.0,
       });
       */
+    });
+
+    test('Can parse 2021_transaction_log_1 containing recalulation of redeployments', () => {
+      const result = ebase.parsePages(transactionLogSamples[5]);
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(80);
+      expect(result.activities[37]).toEqual({
+        broker: 'ebase',
+        type: 'Sell',
+        date: '2020-11-02',
+        datetime: '2020-11-02T' + result.activities[43].datetime.substring(11),
+        isin: 'DE000A1JGBT2',
+        company: 'ASSETS Defensive Opportunities UI B',
+        shares: 0.671216,
+        price: 89.39,
+        amount: 60,
+        tax: 0.0,
+        fee: 0.0,
+      });
+
+      expect(result.activities[43]).toEqual({
+        broker: 'ebase',
+        type: 'Buy',
+        date: '2020-11-02',
+        datetime: '2020-11-02T' + result.activities[43].datetime.substring(11),
+        isin: 'LU0386885296',
+        company: 'Pictet - Global Megatrend Selection-P dy EUR',
+        shares: 0.204623,
+        price: 293.22,
+        amount: 60,
+        tax: 0.0,
+        fee: 0.0,
+      });
     });
   });
 

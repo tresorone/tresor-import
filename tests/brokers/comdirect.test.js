@@ -196,6 +196,26 @@ describe('Broker: comdirect', () => {
         fxRate: 1.1458,
       });
     });
+
+    test('Can parse the buy order: 2004_fidelity_fds_europ', () => {
+      const result = comdirect.parsePages(buySamples[8]).activities;
+
+      expect(result.length).toEqual(1);
+      expect(result[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Buy',
+        date: '2004-01-02',
+        datetime: '2004-01-02T' + result[0].datetime.substring(11),
+        isin: 'LU0048578792',
+        wkn: '973270',
+        company: 'Fidelity Fds-Europ. Growth Fd.',
+        shares: 6.818,
+        price: 7.5198005280140805,
+        amount: 51.27,
+        fee: -1.28,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate Sells', () => {
@@ -631,7 +651,7 @@ describe('Broker: comdirect', () => {
   });
 
   describe('Validate all ignored statements', () => {
-    test('The statement should be ignored: 2020_cost_information.json', () => {
+    test('The statement should be ignored: 2020_cost_information', () => {
       const result = comdirect.parsePages(ignoredSamples[0]);
 
       expect(result.status).toEqual(7);

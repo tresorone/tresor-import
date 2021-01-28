@@ -251,11 +251,14 @@ export function validateActivity(activity, findSecurityAlsoByCompany = false) {
   return activity;
 }
 
+// Finds next regex match starting at the given offset
+export function findFirstRegexIndexInArray(array, regex, offset = 0) {
+  const idx = array.slice(offset).findIndex(element => regex.test(element));
+  return idx === -1 ? undefined : idx + offset;
+}
+
 export function findFirstIsinIndexInArray(array, offset = 0) {
-  const isinIndex = array
-    .slice(offset)
-    .findIndex(element => isinRegex.test(element));
-  return isinIndex === -1 ? undefined : isinIndex + offset;
+  return findFirstRegexIndexInArray(array, isinRegex, offset);
 }
 
 // This function will convert a date (reuqired) and a time (can be undefined) to a formatted date and datetime.
@@ -296,3 +299,21 @@ export function createActivityDateTime(
 
   return [dateTime.toFormat('yyyy-MM-dd'), dateTime.toUTC().toISO()];
 }
+
+// Takes array of strings <transactionTypes> and returns the next occurrence of one of these strings in array <content>
+export const findFirstSearchtermIndexInArray = (
+  array,
+  searchterms,
+  offset = 0
+) => {
+  Array.min = function (array) {
+    return Math.min.apply(Math, array);
+  };
+
+  let idxArray = [];
+  searchterms.forEach(type => {
+    idxArray.push(array.slice(offset).indexOf(type));
+  });
+  const nextIdx = Array.min(idxArray.filter(lineNumber => lineNumber >= 0));
+  return nextIdx !== Infinity ? nextIdx + offset : -1;
+};
