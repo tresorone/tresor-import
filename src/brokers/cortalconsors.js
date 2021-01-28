@@ -113,13 +113,22 @@ const findDividendShares = textArr => {
 };
 
 const findAmount = textArr => {
-  let idx = textArr.findIndex(t => t.toLowerCase() === 'kurswert');
-  if (idx >= 0) {
-    return parseGermanNum(textArr[idx + 2]);
+  let lineNumber = textArr.findIndex(line => line.toLowerCase() === 'kurswert');
+  if (lineNumber >= 0) {
+    return parseGermanNum(textArr[lineNumber + 2]);
   }
-  idx = textArr.indexOf('Ges. Preis inkl. Ausgabegeb.');
-  if (idx >= 0) {
-    return parseGermanNum(textArr[idx + 3]);
+
+  lineNumber = textArr.indexOf('Ges. Preis inkl. Ausgabegeb.');
+  if (lineNumber >= 0) {
+    return parseGermanNum(textArr[lineNumber + 3]);
+  }
+
+  // Sometimes the offset is two because the discount is on the same line.
+  lineNumber = textArr.findIndex(line =>
+    line.startsWith('Ges. Preis inkl. Ausgabegeb.')
+  );
+  if (lineNumber >= 0) {
+    return parseGermanNum(textArr[lineNumber + 2]);
   }
 };
 
