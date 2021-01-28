@@ -216,7 +216,7 @@ const parsePositionAsActivity = (content, startLineNumber) => {
     lineNumber++
   ) {
     const line = content[lineNumber];
-    if (line.includes('ISIN:') && lineNumberOfISIN === undefined) {
+    if (line.startsWith('ISIN:') && lineNumberOfISIN === undefined) {
       lineNumberOfISIN = lineNumber;
     }
 
@@ -226,7 +226,21 @@ const parsePositionAsActivity = (content, startLineNumber) => {
     }
   }
 
-  const numberOfShares = parseGermanNum(content[startLineNumber].split(' ')[0]);
+  let numberOfSharesLine;
+  if (content[startLineNumber].includes(' ')) {
+    // Normaly the number of shares are listed in a line with Stk.:
+    // 1000 Stk.
+    numberOfSharesLine = content[startLineNumber].split(' ')[0];
+  } else {
+    // But sometimes before:
+    // 61.1149
+    // Stk.
+    numberOfSharesLine = content[startLineNumber - 1];
+  }
+
+  // In the Q4 2020 document the number format has changed (once?) from the german one to the english one. We simply replace the dot with a comma.
+  const numberOfShares = parseGermanNum(numberOfSharesLine.replace('.', ','));
+
   let toalAmount = parseGermanNum(content[lineOfDate + 1]);
 
   if (lineNumberOfISIN - startLineNumber > 5) {
@@ -259,7 +273,7 @@ const parseOverviewStatement = content => {
   const foundActivities = [];
 
   for (let lineNumber = 0; lineNumber < content.length; lineNumber++) {
-    if (!content[lineNumber].includes(' Stk.')) {
+    if (!content[lineNumber].includes('Stk.')) {
       continue;
     }
 
