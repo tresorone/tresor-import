@@ -471,6 +471,51 @@ describe('Broker: Trade Republic', () => {
         type: 'TransferIn',
       });
 
+    test('Should map the pdf data correctly for: 2020_year_end_statement', () => {
+      const activities = traderepublic.parsePages(quarterSamples[3]).activities;
+      expect(activities.length).toEqual(56);
+
+      expect(activities[3]).toEqual({
+        amount: 80,
+        broker: 'traderepublic',
+        company: 'Standard Lithium Ltd.',
+        date: '2020-12-30',
+        datetime: '2020-12-30T' + activities[3].datetime.substring(11),
+        fee: 0,
+        isin: 'CA8536061010',
+        price: 1.309009750486379,
+        shares: 61.1149,
+        tax: 0,
+        type: 'TransferIn',
+      });
+
+      expect(activities[7]).toEqual({
+        amount: 149.96,
+        broker: 'traderepublic',
+        company: 'VARTA AG',
+        date: '2020-12-30',
+        datetime: '2020-12-30T' + activities[7].datetime.substring(11),
+        fee: 0,
+        isin: 'DE000A0TGJ55',
+        price: 112.58258258258259,
+        shares: 1.332,
+        tax: 0,
+        type: 'TransferIn',
+      });
+
+      expect(activities[54]).toEqual({
+        amount: 3200,
+        broker: 'traderepublic',
+        company: 'iShsIII-Core MSCI World',
+        date: '2020-12-30',
+        datetime: '2020-12-30T' + activities[54].datetime.substring(11),
+        fee: 0,
+        isin: 'IE00B4L5Y983',
+        price: 54.997181394453534,
+        shares: 58.1848,
+        tax: 0,
+        type: 'TransferIn',
+      });
     });
   });
 
