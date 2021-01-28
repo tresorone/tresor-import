@@ -3,6 +3,7 @@ export const buySamples = [
   require('./buy/2014_allianz.json'),
   require('./buy/2014_ishares_etf_with_commission.json'),
   require('./buy/2007_acatis_akt.json'),
+  require('./buy/2007_acatis.json'),
 ];
 
 export const sellSamples = [require('./sell/2014_allianz.json')];

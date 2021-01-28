@@ -90,7 +90,7 @@ describe('Broker: Cortal Consors', () => {
       ]);
     });
 
-    test('Can parse 2007 Acatis buy', () => {
+    test('Should map the document correctly: 2007_acatis_akt', () => {
       const activities = cortalconsors.parsePages(buySamples[3]).activities;
 
       expect(activities).toEqual([
@@ -103,6 +103,26 @@ describe('Broker: Cortal Consors', () => {
           company: 'ACATIS AKT. GLO. FDS UI A',
           shares: 0.27399,
           price: 186.94112923829337,
+          amount: 51.22,
+          fee: -1.22,
+          tax: 0,
+        },
+      ]);
+    });
+
+    test('Should map the document correctly: 2007_acatis', () => {
+      const activities = cortalconsors.parsePages(buySamples[4]).activities;
+
+      expect(activities).toEqual([
+        {
+          broker: 'cortalconsors',
+          type: 'Buy',
+          date: '2007-12-17',
+          datetime: '2007-12-17T' + activities[0].datetime.substr(11),
+          wkn: '978174',
+          company: 'ACATIS AKT. GLO. FDS UI A',
+          shares: 0.2868,
+          price: 178.5913528591353,
           amount: 51.22,
           fee: -1.22,
           tax: 0,
