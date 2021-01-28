@@ -440,16 +440,16 @@ describe('Broker: Trade Republic', () => {
       });
     });
 
-    test('Map a quarter statement with two pages correctly', () => {
+    test('Should map the pdf data correctly for: two_pages', () => {
       const activities = traderepublic.parsePages(quarterSamples[2]).activities;
+      expect(activities.length).toEqual(16);
 
-      expect(activities.length).toEqual(15);
       expect(activities[10]).toEqual({
         amount: 366.12,
         broker: 'traderepublic',
         company: 'VISA Inc.',
         date: '2020-03-31',
-        datetime: '2020-03-31T' + activities[1].datetime.substring(11),
+        datetime: '2020-03-31T' + activities[10].datetime.substring(11),
         fee: 0,
         isin: 'US92826C8394',
         price: 183.06,
@@ -457,12 +457,13 @@ describe('Broker: Trade Republic', () => {
         tax: 0,
         type: 'TransferIn',
       });
+
       expect(activities[11]).toEqual({
         amount: 391,
         broker: 'traderepublic',
         company: 'Zoom Video',
         date: '2020-03-31',
-        datetime: '2020-03-31T' + activities[1].datetime.substring(11),
+        datetime: '2020-03-31T' + activities[11].datetime.substring(11),
         fee: 0,
         isin: 'US98980L1017',
         price: 130.33333333333334,
@@ -470,6 +471,7 @@ describe('Broker: Trade Republic', () => {
         tax: 0,
         type: 'TransferIn',
       });
+    });
 
     test('Should map the pdf data correctly for: 2020_year_end_statement', () => {
       const activities = traderepublic.parsePages(quarterSamples[3]).activities;
