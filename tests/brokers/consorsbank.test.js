@@ -344,6 +344,29 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('Should map the document correctly: 2019_cloudflare', () => {
+      const activity = consorsbank.parsePages(buySamples[15]).activities;
+
+      expect(activity).toEqual([
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'CLOUDFLARE INC. A DL-,001',
+          date: '2019-09-25',
+          datetime: '2019-09-25T13:31:25.000Z',
+          isin: 'US18915M1071',
+          wkn: 'A2PQMN',
+          price: 19.113877700476017,
+          shares: 50,
+          amount: 955.6938850238008,
+          tax: 0,
+          fee: 24.95,
+          foreignCurrency: 'USD',
+          fxRate: 1.0924,
+        },
+      ]);
+    });
   });
 
   describe('Sell', () => {
