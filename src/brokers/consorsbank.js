@@ -141,9 +141,15 @@ const findDividendShares = textArr => {
   }
 };
 
-const findAmount = (textArr, type) => {
+// Returns an array with amount and amountCurrency
+const findAmount = (textArr, type, baseCurrency) => {
   if (type === 'Buy' || type === 'Sell') {
-    let lineNumber = textArr.findIndex(line => line.includes('Kurswert'));
+    let lineNumber = textArr.findIndex(line =>
+      line.includes('Kurswert in ' + baseCurrency)
+    );
+    if (lineNumber <= 0) {
+      lineNumber = textArr.findIndex(line => line.includes('Kurswert'));
+    }
     if (lineNumber <= 0) {
       lineNumber = textArr.indexOf('Nettoinventarwert');
     }
@@ -154,33 +160,40 @@ const findAmount = (textArr, type) => {
         lineNumber >= 0 &&
         parseGermanNum(textArr[lineNumber].split(/\s+/)[2])
       ) {
-        return parseGermanNum(textArr[lineNumber].split(/\s+/)[2]);
+        return [
+          parseGermanNum(textArr[lineNumber].split(/\s+/)[2]),
+          textArr[lineNumber].split(/\s+/)[1],
+        ];
       } else {
-        return undefined;
+        return [undefined, undefined];
       }
     }
 
     let offset = 0;
+    let offsetCurrency = 1;
     if (textArr[lineNumber + 1] === '') {
       // Documents before 12/2015 have an empty line after 'Kurswert'
       offset += 1;
+      offsetCurrency += 1;
     }
 
     if (/^[A-Z]{3}$/.test(textArr[lineNumber + 1 + offset])) {
       // Documents before nov 2020 have the currency in a line before the amount.
       offset += 1;
     }
-    if (/^Kurswert in [A-Z]{3}$/.test(textArr[lineNumber + offset + 2])) {
-      // Some documents show the amount in the foreign currency first and than the amount in the base currency.
-      // see 2021_usd_churchill_cap_iv
-      offset += 2;
+
+    // Parse the amount currency from the line with the offsetCurrency. When the line contains a space, we take the last element.
+    let amountCurrency = textArr[lineNumber + offsetCurrency];
+    if (amountCurrency.includes(' ')) {
+      const elements = amountCurrency.split(/\s+/);
+      amountCurrency = elements[elements.length - 1];
     }
 
-    return parseGermanNum(textArr[lineNumber + 1 + offset]);
+    return [parseGermanNum(textArr[lineNumber + 1 + offset]), amountCurrency];
   }
 
   if (type === 'Dividend') {
-    let amount, idx;
+    let amount, idx, currency;
 
     const oldDividendFile = textArr.some(
       line => line.includes('IBAN') && line !== 'IBAN'
@@ -194,15 +207,17 @@ const findAmount = (textArr, type) => {
       }
       if (idx >= 0) {
         amount = textArr[idx + 1].split(' ')[0];
+        currency = textArr[idx + 1].split(' ')[1];
       }
     } else {
       idx = textArr.findIndex(line => line.includes('BRUTTO'));
       if (idx >= 0) {
         amount = textArr[idx].split(/\s+/)[2];
+        currency = textArr[idx].split(/\s+/)[1];
       }
     }
 
-    return parseGermanNum(amount);
+    return [parseGermanNum(amount), currency];
   }
 };
 
@@ -294,16 +309,31 @@ const findDividendTax = (textArr, amount) => {
   }
 };
 
+// Returns an array with fxRate, foreignCurrency and baseCurrency
 const findForeignInformation = (content, isDividend) => {
-  const foreignInfo = content.findIndex(line => line.includes('Devisenkurs'));
+  let foreignInfo = content.indexOf('Devisenkurs');
   if (foreignInfo >= 0) {
     const foreignInfoLine = content[foreignInfo + 1].split(/\s+/);
     return [
       parseGermanNum(foreignInfoLine[0]),
       foreignInfoLine[isDividend ? 1 : 3],
+      foreignInfoLine[isDividend ? 3 : 1],
     ];
   }
-  return [undefined, undefined];
+
+  // Sometimes the fxRate is on the same line:
+  // umger. zum Devisenkurs USD 1,092400
+  foreignInfo = content.findIndex(line => line.includes('Devisenkurs'));
+  if (foreignInfo >= 0) {
+    const foreignInfoLine = content[foreignInfo].split(/\s+/);
+    return [
+      parseGermanNum(foreignInfoLine[foreignInfoLine.length - 1]),
+      foreignInfoLine[foreignInfoLine.length - 2],
+      content[foreignInfo + 1],
+    ];
+  }
+
+  return [undefined, undefined, undefined];
 };
 
 const activityType = content => {
@@ -372,9 +402,10 @@ const parseData = textArr => {
   if (isin !== undefined) {
     activity.isin = isin;
   }
-  let date, time;
 
-  const [fxRate, foreignCurrency] = findForeignInformation(
+  let date, time, amountCurrency;
+
+  const [fxRate, foreignCurrency, baseCurrency] = findForeignInformation(
     textArr,
     activity.type === 'Dividend'
   );
@@ -389,21 +420,35 @@ const parseData = textArr => {
       date = findDateBuySell(textArr);
       time = findOrderTime(textArr);
       activity.shares = findShares(textArr);
-      activity.amount = findAmount(textArr, 'Buy');
+      [activity.amount, amountCurrency] = findAmount(
+        textArr,
+        'Buy',
+        baseCurrency
+      );
       activity.fee = findFee(textArr);
       break;
+
     case 'Sell':
       date = findDateBuySell(textArr);
       time = findOrderTime(textArr);
       activity.shares = findShares(textArr);
-      activity.amount = findAmount(textArr, 'Sell');
+      [activity.amount, amountCurrency] = findAmount(
+        textArr,
+        'Sell',
+        baseCurrency
+      );
       activity.fee = findFee(textArr);
       activity.tax = findTax(textArr);
       break;
+
     case 'Dividend':
       date = findDateDividend(textArr);
       activity.shares = findDividendShares(textArr);
-      activity.amount = findAmount(textArr, 'Dividend');
+      [activity.amount, amountCurrency] = findAmount(
+        textArr,
+        'Dividend',
+        baseCurrency
+      );
       activity.tax = findDividendTax(textArr, activity.amount);
       break;
   }
@@ -414,6 +459,15 @@ const parseData = textArr => {
     'dd.MM.yyyy',
     'dd.MM.yyyy HH:mm:ss'
   );
+
+  if (
+    amountCurrency !== undefined &&
+    baseCurrency !== undefined &&
+    amountCurrency !== baseCurrency &&
+    fxRate !== undefined
+  ) {
+    activity.amount = +Big(activity.amount).div(fxRate);
+  }
 
   activity.price = +Big(activity.amount).div(Big(activity.shares));
 
