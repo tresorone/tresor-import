@@ -53,8 +53,8 @@ const parseTransaction = (content, index, numberParser, offset) => {
   }
   const amount = Big(numberParser(content[isinIdx + 8])).abs();
   // There is the case where the amount is 0, might be a transfer out or a knockout certificate
-  const currency = content[isinIdx + 3 + (offset * 2)];
-  const baseCurrency = content[isinIdx + 7 + (offset * 2)];
+  const currency = content[isinIdx + 3 + offset * 2];
+  const baseCurrency = content[isinIdx + 7 + offset * 2];
 
   let fxRate = undefined;
   if (currency !== baseCurrency) {
@@ -127,7 +127,7 @@ const parseTransactionLog = pdfPages => {
           content,
           transactionIndex,
           numberParser,
-          offset,
+          offset
         );
         activities.push(transaction);
       } catch (exception) {
