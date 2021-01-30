@@ -37,14 +37,15 @@ const isAccountStatement = pdfPage => {
   return pdfPage[0].some(line => line.startsWith('Kontoauszug von'));
 };
 
-const parseTransaction = (content, index, numberParser) => {
+const parseTransaction = (content, index, numberParser, offset) => {
   // Is it possible that the transaction logs contains dividends?
 
+  let totalOffset = offset;
   const isinIdx =
     content.slice(index).findIndex(line => isinRegex.test(line)) + index;
   const company = content.slice(index + 2, isinIdx).join(' ');
   const isin = content[isinIdx];
-  const shares = Big(numberParser(content[isinIdx + 2]));
+  const shares = Big(numberParser(content[isinIdx + 2 + offset]));
   if (+shares === 0) {
     throw new zeroSharesTransaction(
       'Transaction with ISIN ' + isin + ' has no shares.'
@@ -52,24 +53,23 @@ const parseTransaction = (content, index, numberParser) => {
   }
   const amount = Big(numberParser(content[isinIdx + 8])).abs();
   // There is the case where the amount is 0, might be a transfer out or a knockout certificate
-  const currency = content[isinIdx + 5];
-  const baseCurrency = content[isinIdx + 7];
+  const currency = content[isinIdx + 3 + (offset * 2)];
+  const baseCurrency = content[isinIdx + 7 + (offset * 2)];
 
   let fxRate = undefined;
-  let fxOffset = 0;
   if (currency !== baseCurrency) {
-    fxRate = numberParser(content[isinIdx + 9]);
+    fxRate = numberParser(content[isinIdx + 9 + offset]);
     // For foreign currency we need to go one line ahead for the following fields.
-    fxOffset = 1;
+    totalOffset = 1;
   }
   const type = shares > 0 ? 'Buy' : 'Sell';
   const price = amount.div(shares.abs());
   let tax = 0;
   let fee = 0;
   if (type === 'Buy') {
-    fee = Math.abs(numberParser(content[isinIdx + fxOffset + 10]));
+    fee = Math.abs(numberParser(content[isinIdx + totalOffset + 10]));
   } else if (type === 'Sell') {
-    tax = Math.abs(numberParser(content[isinIdx + fxOffset + 10]));
+    tax = Math.abs(numberParser(content[isinIdx + totalOffset + 10]));
   }
 
   const [parsedDate, parsedDateTime] = createActivityDateTime(
@@ -100,7 +100,6 @@ const parseTransaction = (content, index, numberParser) => {
   if (currency !== baseCurrency) {
     activity.foreignCurrency = currency;
   }
-
   return validateActivity(activity);
 };
 
@@ -108,6 +107,11 @@ const parseTransactionLog = pdfPages => {
   let activities = [];
   // Set another parser if foreign Degiros such as degiro.ch come into place, they will have other number formats.
   const numberParser = parseGermanNum;
+  // Sometimes a reference exchange is given which causes an offset of 1
+  let offset = 0;
+  if (pdfPages.flat().includes('Ausführungso')) {
+    offset += 1;
+  }
   for (let content of pdfPages) {
     let transactionIndex = content.indexOf('Gesamt') + 1;
     while (transactionIndex > 0 && content.length - transactionIndex > 15) {
@@ -122,7 +126,8 @@ const parseTransactionLog = pdfPages => {
         const transaction = parseTransaction(
           content,
           transactionIndex,
-          numberParser
+          numberParser,
+          offset,
         );
         activities.push(transaction);
       } catch (exception) {
