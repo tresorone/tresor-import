@@ -169,7 +169,7 @@ describe('Broker: DEGIRO', () => {
       });
     });
 
-    test('Can parse 2021_transaction_log_chf_1', () => {
+    test('Can parse 2021_transaction_log_1', () => {
       const activities = degiro.parsePages(transactionLog[4]).activities;
       expect(activities.length).toEqual(4);
       expect(
@@ -205,6 +205,27 @@ describe('Broker: DEGIRO', () => {
         tax: 0,
         fxRate: 1.0766,
         foreignCurrency: 'CHF',
+      });
+    });
+
+    test('Can parse 2021_transaction_log_2', () => {
+      const activities = degiro.parsePages(transactionLog[5]).activities;
+      expect(activities.length).toEqual(1);
+      expect(
+        activities.filter(activity => activity !== undefined).length
+      ).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'degiro',
+        type: 'Buy',
+        date: '2021-01-26',
+        datetime: '2021-01-26T13:54:00.000Z',
+        isin: 'DE000TR6T1W3',
+        company: 'CALL 15.12.21 NOKIA 8',
+        shares: 207,
+        price: 0.48,
+        amount: 99.36,
+        fee: 2.11,
+        tax: 0,
       });
     });
   });

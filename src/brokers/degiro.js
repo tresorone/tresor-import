@@ -61,7 +61,10 @@ const parseTransaction = (content, index, numberParser, offset) => {
     fxRate = numberParser(content[isinIdx + 9 + offset]);
     // For foreign currency we need to go one line ahead for the following fields.
     totalOffset = 1;
+  } else {
+    totalOffset = 0;
   }
+
   const type = shares > 0 ? 'Buy' : 'Sell';
   const price = amount.div(shares.abs());
   let tax = 0;
@@ -100,6 +103,7 @@ const parseTransaction = (content, index, numberParser, offset) => {
   if (currency !== baseCurrency) {
     activity.foreignCurrency = currency;
   }
+  console.log(activity);
   return validateActivity(activity);
 };
 
