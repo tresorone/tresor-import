@@ -244,7 +244,7 @@ const findFee = content => {
   const bonificationIdx = content.findIndex(line =>
     line.startsWith('BONIFIKAT')
   );
-  const exchangeFeeIdx = content.indexOf('Börsenplatzgebühr');
+  const exchangeFee = getNumberAfterTermWithOffset(content, 'börsenplatzgebühr');
   let feeIssue = 0;
   if (!content.some(line => line.includes('Ausgabegebühr 0,00%'))) {
     feeIssue = getNumberAfterTermWithOffset(content, 'ausgabegebühr');
@@ -269,10 +269,9 @@ const findFee = content => {
     );
   }
 
-  if (exchangeFeeIdx >= 0) {
-    totalFee = totalFee.plus(
-      parseGermanNum(content[exchangeFeeIdx + 1].split(/\s+/)[0])
-    );
+  if (exchangeFee !== undefined) {
+    totalFee = totalFee.plus(exchangeFee);
+  }
   }
 
   return +totalFee;
