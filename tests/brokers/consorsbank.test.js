@@ -388,6 +388,27 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('Should map the document correctly: 2020_palantir', () => {
+      const activity = consorsbank.parsePages(buySamples[17]).activities;
+
+      expect(activity).toEqual([
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'PALANTIR TECHNOLOGIES INC',
+          date: '2020-12-04',
+          datetime: '2020-12-04T10:21:02.000Z',
+          isin: 'US69608A1088',
+          wkn: 'A2QA4J',
+          price: 20.2,
+          shares: 300,
+          amount: 6060,
+          tax: 0,
+          fee: 29.28,
+        },
+      ]);
+    });
   });
 
   describe('Sell', () => {
