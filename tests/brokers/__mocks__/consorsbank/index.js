@@ -15,6 +15,7 @@ export const buySamples = [
   require('./buy/2021_put_citi_gl.json'),
   require('./buy/2021_usd_churchill_cap_iv.json'),
   require('./buy/2019_cloudflare.json'),
+  require('./buy/2020_fraport.json'),
 ];
 
 export const sellSamples = [

@@ -367,6 +367,27 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('Should map the document correctly: 2020_fraport', () => {
+      const activity = consorsbank.parsePages(buySamples[16]).activities;
+
+      expect(activity).toEqual([
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'FRAPORT AG FFM.AIRPORT',
+          date: '2020-04-06',
+          datetime: '2020-04-06T13:29:58.000Z',
+          isin: 'DE0005773303',
+          wkn: '577330',
+          price: 40.16,
+          shares: 3,
+          amount: 120.48,
+          tax: 0,
+          fee: 15.45,
+        },
+      ]);
+    });
   });
 
   describe('Sell', () => {
