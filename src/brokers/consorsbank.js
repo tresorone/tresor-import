@@ -249,6 +249,7 @@ const findFee = content => {
     'börsenplatzgebühr'
   );
   const tradingFee = getNumberAfterTermWithOffset(content, 'handelsentgelt');
+  const transactionFee = getNumberAfterTermWithOffset(content, 'transaktionsentgelt');
   let feeIssue = 0;
   if (!content.some(line => line.includes('Ausgabegebühr 0,00%'))) {
     feeIssue = getNumberAfterTermWithOffset(content, 'ausgabegebühr');
@@ -279,6 +280,10 @@ const findFee = content => {
 
   if (tradingFee !== undefined) {
     totalFee = totalFee.plus(tradingFee);
+  }
+
+  if (transactionFee !== undefined) {
+    totalFee = totalFee.plus(transactionFee);
   }
 
   return +totalFee;
