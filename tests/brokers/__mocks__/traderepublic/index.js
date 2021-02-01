@@ -23,6 +23,7 @@ export const dividendSamples = [
   require('./dividend/2020_walgreens_boots_alliance.json'),
   require('./dividend/2020_exxon_mobile_corp.json'),
   require('./dividend/2020_schlumberger.json'),
+  require('./dividend/2021_reinvest_main_street_capital.json'),
 ];
 
 export const quarterSamples = [
@@ -39,6 +40,7 @@ export const ignoredSamples = [
   require('./ignored/split.json'),
   require('./ignored/saving_plan_confirmation.json'),
   require('./ignored/saving_plan_change_confirmation.json'),
+  require('./ignored/account_statement.json'),
 ];
 
 export const allSamples = buySamples.concat(

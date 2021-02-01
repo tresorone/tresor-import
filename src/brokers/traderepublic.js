@@ -18,7 +18,11 @@ const findISIN = text => {
 };
 
 const findCompany = text => {
-  return text[text.findIndex(t => t.includes('BETRAG')) + 1];
+  let companyIdx = text.indexOf('Reinvestierung');
+  if (companyIdx < 0) {
+    companyIdx = text.indexOf('BETRAG');
+  }
+  return text[companyIdx + 1];
 };
 
 const findDateSingleBuy = textArr => {
@@ -67,13 +71,13 @@ const findShares = textArr => {
 };
 
 const findAmount = (textArr, fxRate) => {
-  const searchTerm = 'GESAMT';
-  let totalAmountLine = textArr[textArr.indexOf(searchTerm) + 1];
-  const totalAmount = totalAmountLine.split(' ')[0].trim();
-  if (fxRate !== undefined) {
-    return +Big(parseGermanNum(totalAmount)).div(fxRate);
+  let amountIdx = textArr.indexOf('Bruttoertrag');
+  if (amountIdx < 0) {
+    amountIdx = textArr.indexOf('GESAMT');
   }
-  return parseGermanNum(totalAmount);
+  const totalAmountLine = textArr[amountIdx + 1];
+  const amount = parseGermanNum(totalAmountLine.split(' ')[0].trim());
+  return fxRate !== undefined ? +Big(amount).div(fxRate) : amount;
 };
 
 const findForeignInformation = textArr => {
@@ -156,53 +160,43 @@ const findTax = (textArr, fxRate) => {
   return +totalTax;
 };
 
-const isBuySingle = textArr => textArr.some(t => t.includes('Kauf am'));
-
-const isBuySavingsPlan = textArr =>
-  textArr.some(t => t.includes('Sparplanausführung am'));
-
-const isSell = textArr => textArr.some(t => t.includes('Verkauf am'));
-
-const isDividend = textArr => textArr.some(t => t.includes('mit dem Ex-Tag'));
-
-const isOverviewStatement = content =>
-  content.some(
-    line =>
-      line.includes('DEPOTAUSZUG') || line.includes('JAHRESDEPOTABSTIMMUNG')
-  );
-
-const detectedButIgnoredDocument = content => {
-  return (
-    // When the document contains one of the following lines, we want to ignore these document.
-    content.some(line => line.includes('KOSTENINFORMATION')) ||
-    content.some(line => line.includes('SPLIT')) ||
-    content.some(line => line.includes('AUFTRAGSBESTÄTIGUNG')) ||
-    content.some(line => line.includes('ÄNDERUNGSBESTÄTIGUNG')) ||
-    content.some(line => line === 'SPARPLANAUSFÜHRUNG FEHLGESCHLAGEN')
-  );
-};
-
-const isSupportedDocument = content => {
-  return (
-    isBuySingle(content) ||
-    isBuySavingsPlan(content) ||
-    isSell(content) ||
-    isDividend(content) ||
-    isOverviewStatement(content)
-  );
-};
-
-export const canParseDocument = (pages, extension) => {
-  const firstPageContent = pages[0];
-  return (
-    extension === 'pdf' &&
-    firstPageContent.some(
+const getDocumentType = content => {
+  if (
+    content.some(
       line =>
-        line.includes('TRADE REPUBLIC BANK GMBH') &&
-        (isSupportedDocument(firstPageContent) ||
-          detectedButIgnoredDocument(firstPageContent))
+        line.includes('KOSTENINFORMATION') ||
+        line.includes('SPLIT') ||
+        line.includes('AUFTRAGSBESTÄTIGUNG') ||
+        line.includes('ÄNDERUNGSBESTÄTIGUNG') ||
+        line.includes('SPARPLANAUSFÜHRUNG FEHLGESCHLAGEN') ||
+        line.includes('KONTOAUSZUG')
     )
-  );
+  ) {
+    return 'Ignored';
+  } else if (
+    content.some(
+      line =>
+        line.includes('DEPOTAUSZUG') || line.includes('JAHRESDEPOTABSTIMMUNG')
+    )
+  ) {
+    return 'DepotStatement';
+  } else if (
+    content.some(
+      line => line.includes('mit dem Ex-Tag') || line.includes('REINVESTIERUNG')
+    )
+  ) {
+    return 'Dividend';
+  } else if (
+    content.some(
+      line => line.includes('Sparplanausführung am') || line.includes('Kauf am')
+    )
+  ) {
+    return 'Buy';
+  } else if (content.some(line => line.includes('Verkauf am'))) {
+    return 'Sell';
+  }
+  console.log(content);
+  return undefined;
 };
 
 // Functions to parse an overview Statement
@@ -288,19 +282,25 @@ const parseOverviewStatement = content => {
 };
 
 // Individual transaction file
-const parseTransaction = textArr => {
+const parseBuySellDividend = (textArr, docType) => {
   const [fxRate, foreignCurrency] = findForeignInformation(textArr);
   let activity = {
     broker: 'traderepublic',
+    type: docType,
     isin: findISIN(textArr),
     company: findCompany(textArr),
     shares: findShares(textArr),
     tax: findTax(textArr, fxRate),
     fee: findFee(textArr, fxRate),
   };
-  if (isBuySingle(textArr) || isBuySavingsPlan(textArr)) {
-    activity.type = 'Buy';
-    const date = isBuySavingsPlan(textArr)
+
+  if (fxRate !== undefined && foreignCurrency !== undefined) {
+    activity.fxRate = fxRate;
+    activity.foreignCurrency = foreignCurrency;
+  }
+
+  if (activity.type === 'Buy') {
+    const date = textArr.some(line => line.includes('Sparplanausführung am'))
       ? findDateBuySavingsPlan(textArr)
       : findDateSingleBuy(textArr);
     [activity.date, activity.datetime] = createActivityDateTime(
@@ -308,15 +308,13 @@ const parseTransaction = textArr => {
       findOrderTime(textArr)
     );
     activity.amount = findAmount(textArr, fxRate);
-  } else if (isSell(textArr)) {
-    activity.type = 'Sell';
+  } else if (activity.type === 'Sell') {
     [activity.date, activity.datetime] = createActivityDateTime(
       findDateSell(textArr),
       findOrderTime(textArr)
     );
     activity.amount = +findAmount(textArr);
-  } else if (isDividend(textArr)) {
-    activity.type = 'Dividend';
+  } else if (activity.type === 'Dividend') {
     const dateFormat = findDateDividend(textArr).includes('-')
       ? 'yyyy-MM-dd'
       : 'dd.MM.yyyy';
@@ -327,20 +325,25 @@ const parseTransaction = textArr => {
     );
     activity.amount = +Big(findAmount(textArr, fxRate));
   }
-
   activity.price = +Big(activity.amount).div(activity.shares);
-  if (fxRate !== undefined && foreignCurrency !== undefined) {
-    activity.fxRate = fxRate;
-    activity.foreignCurrency = foreignCurrency;
-  }
   return validateActivity(activity);
+};
+
+// FUnctions to be exported
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
+  return (
+    extension === 'pdf' &&
+    firstPageContent.includes('TRADE REPUBLIC BANK GMBH') &&
+    getDocumentType(firstPageContent) !== undefined
+  );
 };
 
 export const parsePages = contents => {
   let activities = [];
   const allPagesFlat = contents.flat();
-
-  if (detectedButIgnoredDocument(allPagesFlat)) {
+  const docType = getDocumentType(allPagesFlat);
+  if (docType === 'Ignored') {
     // We know this type and we don't want to support it.
     return {
       activities,
@@ -348,13 +351,13 @@ export const parsePages = contents => {
     };
   }
 
-  if (isOverviewStatement(contents[0])) {
+  if (docType === 'DepotStatement') {
     parseOverviewStatement(allPagesFlat).forEach(activity => {
       activities.push(activity);
     });
   } else {
     for (let content of contents) {
-      activities.push(parseTransaction(content));
+      activities.push(parseBuySellDividend(content, docType));
     }
   }
 

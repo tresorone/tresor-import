@@ -399,6 +399,28 @@ describe('Broker: Trade Republic', () => {
         fxRate: 1.1803,
       });
     });
+
+    test('Should map the pdf data correctly for: 2021_reinvest_main_street_capital', () => {
+      const activities = traderepublic.parsePages(dividendSamples[10])
+        .activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'traderepublic',
+        type: 'Dividend',
+        isin: 'US56035L1044',
+        company: 'Main Street Capital Corp.',
+        date: '2021-01-15',
+        datetime: '2021-01-15T' + activities[0].datetime.substring(11),
+        amount: 2.527262433228578,
+        price: 0.16848416221523854,
+        shares: 15,
+        tax: 0.37744828548219017,
+        fee: 0,
+        foreignCurrency: 'USD',
+        fxRate: 1.21871,
+      });
+    });
   });
 
   describe('Validate quarter statement', () => {
