@@ -195,7 +195,6 @@ const getDocumentType = content => {
   } else if (content.some(line => line.includes('Verkauf am'))) {
     return 'Sell';
   }
-  console.log(content);
   return undefined;
 };
 

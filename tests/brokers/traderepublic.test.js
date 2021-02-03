@@ -426,7 +426,6 @@ describe('Broker: Trade Republic', () => {
   describe('Validate quarter statement', () => {
     test('Map a empty quarter statement correctly', () => {
       const activities = traderepublic.parsePages(quarterSamples[0]).activities;
-
       expect(activities.length).toEqual(0);
     });
 
@@ -558,46 +557,12 @@ describe('Broker: Trade Republic', () => {
   });
 
   describe('Validate all ignored statements', () => {
-    test('The statement should be ignored: cost_information.json', () => {
-      const result = traderepublic.parsePages(ignoredSamples[0]);
-
-      expect(result.status).toEqual(7);
-      expect(result.activities.length).toEqual(0);
-    });
-
-    test('The statement should be ignored: reverse_split.json', () => {
-      const result = traderepublic.parsePages(ignoredSamples[1]);
-
-      expect(result.status).toEqual(7);
-      expect(result.activities.length).toEqual(0);
-    });
-
-    test('The statement should be ignored: saving_plan_failed.json', () => {
-      const result = traderepublic.parsePages(ignoredSamples[2]);
-
-      expect(result.status).toEqual(7);
-      expect(result.activities.length).toEqual(0);
-    });
-
-    test('The statement should be ignored: split.json', () => {
-      const result = traderepublic.parsePages(ignoredSamples[3]);
-
-      expect(result.status).toEqual(7);
-      expect(result.activities.length).toEqual(0);
-    });
-
-    test('The statement should be ignored: saving_plan_confirmation.json', () => {
-      const result = traderepublic.parsePages(ignoredSamples[4]);
-
-      expect(result.status).toEqual(7);
-      expect(result.activities.length).toEqual(0);
-    });
-
-    test('The statement should be ignored: saving_plan_change_confirmation.json', () => {
-      const result = traderepublic.parsePages(ignoredSamples[5]);
-
-      expect(result.status).toEqual(7);
-      expect(result.activities.length).toEqual(0);
+    test('All ignored statements return status 7 and no activities', () => {
+      ignoredSamples.forEach(pages => {
+        const result = traderepublic.parsePages(pages);
+        expect(result.status).toEqual(7);
+        expect(result.activities.length).toEqual(0);
+      });
     });
   });
 
