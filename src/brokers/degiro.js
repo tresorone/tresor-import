@@ -103,7 +103,6 @@ const parseTransaction = (content, index, numberParser, offset) => {
   if (currency !== baseCurrency) {
     activity.foreignCurrency = currency;
   }
-  console.log(activity);
   return validateActivity(activity);
 };
 
