@@ -29,18 +29,18 @@ const findISINAndWKN = (pdfPage, spanISIN = 0, spanWKN = 0) => {
 const findCompany = (text, type, formatId) => {
   const companyLineIndex = text.findIndex(t => t.includes('/ISIN'));
   // span = 2 means its a dividend PDF - dividends dont have the WKN in the same line
-  switch( type ) {
+  switch (type) {
     case 'Buy': {
       return text[companyLineIndex + 1].split(/\s+/).slice(0, -1).join(' ');
     }
     case 'Sell': {
-        const lineContent = text[companyLineIndex + 1].trim();
-        if (formatId === 0) {
-          // In this format, the name is one the same line as the WKN. We need only the first element before multiple spaces. Example:
-          // Arcimoto Inc.                                                            A2JN1H
-          return lineContent.split(/\s{2,}/)[0].trim();
-        }
-        return lineContent;
+      const lineContent = text[companyLineIndex + 1].trim();
+      if (formatId === 0) {
+        // In this format, the name is one the same line as the WKN. We need only the first element before multiple spaces. Example:
+        // Arcimoto Inc.                                                            A2JN1H
+        return lineContent.split(/\s{2,}/)[0].trim();
+      }
+      return lineContent;
     }
     case 'Dividend': {
       return text[companyLineIndex + 2].trim();
@@ -353,20 +353,28 @@ const getDocumentFormatId = content => {
 };
 
 const getDocumentType = content => {
-  if( content.includes('Wertpapierkauf') || content.includes('Wertpapierbezug'))
-  {
-    return 'Buy'
+  if (
+    content.includes('Wertpapierkauf') ||
+    content.includes('Wertpapierbezug')
+  ) {
+    return 'Buy';
   } else if (content.includes('Wertpapierverkauf')) {
-    return 'Sell'
-  } else if (content.includes('Ertragsgutschrift') || content.includes('Dividendengutschrift')) {
-    return 'Dividend'
-  } else if (content.some(
-    t =>
-      t.includes('Steuerliche Behandlung:') &&
-      (t.includes('Dividende') || t.includes('Investment-Ausschüttung')))) {
-    return 'TaxDividend'
+    return 'Sell';
+  } else if (
+    content.includes('Ertragsgutschrift') ||
+    content.includes('Dividendengutschrift')
+  ) {
+    return 'Dividend';
+  } else if (
+    content.some(
+      t =>
+        t.includes('Steuerliche Behandlung:') &&
+        (t.includes('Dividende') || t.includes('Investment-Ausschüttung'))
+    )
+  ) {
+    return 'TaxDividend';
   } else if (content.some(line => line.includes('Kosteninformation'))) {
-    return 'Ignored'
+    return 'Ignored';
   }
   return undefined;
 };
@@ -380,11 +388,12 @@ export const canParseDocument = (pages, extension) => {
     firstPageContent.some(line => line.includes('comdirect')) &&
     firstPageContent.every(
       line => !line.includes(onvistaIdentificationString)
-    ) && getDocumentType(firstPageContent) !== undefined
+    ) &&
+    getDocumentType(firstPageContent) !== undefined
   );
 };
 
-const parseData = ( textArr, type ) => {
+const parseData = (textArr, type) => {
   let activity = {
     broker: 'comdirect',
     type: getDocumentType(textArr),
@@ -392,14 +401,11 @@ const parseData = ( textArr, type ) => {
     tax: 0,
   };
 
-  let date,
-    time,
-    fxRate,
-    foreignCurrency;
+  let date, time, fxRate, foreignCurrency;
 
   const formatId = getDocumentFormatId(textArr);
 
-  switch(activity.type) {
+  switch (activity.type) {
     case 'Buy': {
       date = findDateBuySell(textArr);
       time = findOrderTime(textArr);
@@ -444,7 +450,12 @@ const parseData = ( textArr, type ) => {
       // Still needs handling of Foreign  Rates
       let payout, withholdingTax, integratedWithholdingTax;
       activity.type = 'Dividend';
-      [activity.isin, activity.wkn, activity.company, activity.shares] = findISINAndWKN(textArr, 0, 0);
+      [
+        activity.isin,
+        activity.wkn,
+        activity.company,
+        activity.shares,
+      ] = findISINAndWKN(textArr, 0, 0);
       date = findDateDividend(textArr, formatId);
       [activity.tax, withholdingTax] = findTax(textArr, undefined, formatId);
       [payout, integratedWithholdingTax] = findPayout(textArr);
@@ -466,9 +477,9 @@ const parseData = ( textArr, type ) => {
 };
 
 export const parsePages = contents => {
-  const type = getDocumentType(contents[0])
+  const type = getDocumentType(contents[0]);
 
-  if ( type === 'Ignored' ) {
+  if (type === 'Ignored') {
     // We know this type and we don't want to support it.
     return {
       activities: [],

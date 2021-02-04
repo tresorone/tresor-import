@@ -10,6 +10,7 @@ export const buySamples = [
   require('./buy/2004_fidelity_fds_europ.json'),
   require('./buy/2003_jenoptik.json'),
   require('./buy/2021_tui_rewrite.json'),
+  require('./buy/2003_dws_vermoegen.json'),
 ];
 
 export const sellSamples = [
