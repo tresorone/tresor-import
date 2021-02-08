@@ -19,7 +19,6 @@ const parseTransactionLog = content => {
   let txIdx = findFirstSearchtermIndexInArray(content, transactionTypes);
   let activities = [];
   while (txIdx >= 0) {
-
     const firstCurrencyIdx = findNextLineIndexByRegex(
       content,
       /^[A-Z]{3}$/,
@@ -41,12 +40,12 @@ const parseTransactionLog = content => {
     switch (content[txIdx]) {
       // Buy
       case transactionTypes[0]: {
-        activity.type = 'Buy'
+        activity.type = 'Buy';
         break;
       }
       // Sell
       case transactionTypes[1]: {
-        activity.type = 'Sell'
+        activity.type = 'Sell';
         break;
       }
     }
@@ -56,7 +55,11 @@ const parseTransactionLog = content => {
     } else {
       return undefined;
     }
-    txIdx = findFirstSearchtermIndexInArray(content, transactionTypes, txIdx + 1);
+    txIdx = findFirstSearchtermIndexInArray(
+      content,
+      transactionTypes,
+      txIdx + 1
+    );
   }
   return activities;
 };

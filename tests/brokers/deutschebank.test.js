@@ -165,7 +165,6 @@ describe('Broker: Deutsche Bank', () => {
         fee: 0,
         tax: 0,
       });
-
     });
   });
 
