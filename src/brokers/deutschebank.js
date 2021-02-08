@@ -7,6 +7,7 @@ import {
   findNextLineIndexByRegex,
   findFirstSearchtermIndexInArray,
 } from '@/helper';
+import { findPreviousRegexMatchIdx } from '../helper';
 
 const idStringLong =
   'Bitte beachten Sie auch unsere weiteren Erläuterungen zu diesem Report, die Sie auf beiliegender Anlage finden! Bei Fragen sprechen Sie bitte Ihren Berater an.';
@@ -71,13 +72,16 @@ const parseDepotStatus = content => {
   let activities = [];
   let idx = findNextLineIndexByRegex(content, /^[A-Z0-9]{6}$/);
   const dateTimeLine = content[
-    content.indexOf('Vermögensaufstellung Standard') + 4
+    content.findIndex( line => line.startsWith('Vermögensaufstellung ')) + 4
   ].split(/\s+/);
   const [date, datetime] = createActivityDateTime(
     dateTimeLine[2],
     dateTimeLine[4]
   );
+  // There are two kinds of depot statements with slightly different formatting
+  const offset = content.includes('Vermögensaufstellung mit Einstandskursen')? 1 : 0;
   while (idx >= 0) {
+    const sharesIdx = findPreviousRegexMatchIdx(content, idx, /^\d+(,\d+)?$/);
     if (/^[A-Z]{3}$/.test(content[idx + 1])) {
       let activity = {
         broker: 'deutschebank',
@@ -85,9 +89,9 @@ const parseDepotStatus = content => {
         date,
         datetime,
         wkn: content[idx],
-        company: content[idx - 1],
-        shares: parseGermanNum(content[idx - 2]),
-        amount: parseGermanNum(content[idx + 3]),
+        company: content[sharesIdx + 1],
+        shares: parseGermanNum(content[sharesIdx]),
+        amount: parseGermanNum(content[idx + 3 + 4 * offset]),
         price: parseGermanNum(content[idx + 2]),
         tax: 0,
         fee: 0,
@@ -194,7 +198,7 @@ const getDocumentType = content => {
     return 'Unsupported';
   } else if (content.includes('Umsatzliste')) {
     return 'TransactionLog';
-  } else if (content.includes('Vermögensaufstellung Standard')) {
+  } else if (content.some(line => line.startsWith('Vermögensaufstellung '))) {
     return 'DepotStatus';
   }
 };

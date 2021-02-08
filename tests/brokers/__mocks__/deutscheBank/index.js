@@ -9,6 +9,7 @@ export const dividendSamples = [
 
 export const depotStatusSamples = [
   require('./depotStatus/2021_depot_status_standard.json'),
+  require('./depotStatus/2021_depot_status_with_prices.json')
 ];
 
 export const transactionLogSamples = [
