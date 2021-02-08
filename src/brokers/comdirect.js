@@ -396,7 +396,7 @@ export const canParseDocument = (pages, extension) => {
 const parseData = (textArr, type) => {
   let activity = {
     broker: 'comdirect',
-    type: getDocumentType(textArr),
+    type,
     fee: 0,
     tax: 0,
   };
