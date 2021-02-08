@@ -13,6 +13,7 @@ export const depotStatusSamples = [
 
 export const transactionLogSamples = [
   require('./transactionLog/2020_buy_dividend_transaction_log.json'),
+  require('./transactionLog/2019_sell_transaction_log.json'),
 ];
 
 export const ignoredSamples = [

@@ -5,6 +5,7 @@ import {
   parseGermanNum,
   validateActivity,
   findNextLineIndexByRegex,
+  findFirstSearchtermIndexInArray,
 } from '@/helper';
 
 const idStringLong =
@@ -13,58 +14,49 @@ const idStringLong =
 /////////////////////////////////////////////////
 // Transaction Log Functions
 /////////////////////////////////////////////////
-
-// Takes array of strings <transactionTypes> and returns the next occurrence of one of these strings in array <content>
-const findNextIdx = (content, transactionTypes, offset = 0) => {
-  Array.min = function (array) {
-    return Math.min.apply(Math, array);
-  };
-
-  let idxArray = [];
-  transactionTypes.forEach(type => {
-    idxArray.push(content.slice(offset).indexOf(type));
-  });
-  const nextIdx = Array.min(idxArray.filter(lineNumber => lineNumber >= 0));
-  return nextIdx !== Infinity ? nextIdx + offset : -1;
-};
-
 const parseTransactionLog = content => {
-  const transactionTypes = ['Kauf'];
-  let txIdx = 0;
+  const transactionTypes = ['Kauf', 'Verkauf'];
+  let txIdx = findFirstSearchtermIndexInArray(content, transactionTypes);
   let activities = [];
   while (txIdx >= 0) {
-    txIdx = findNextIdx(content, transactionTypes, txIdx + 1);
+
+    const firstCurrencyIdx = findNextLineIndexByRegex(
+      content,
+      /^[A-Z]{3}$/,
+      txIdx + 2
+    );
+    let activity = {
+      broker: 'deutschebank',
+      shares: Math.abs(parseGermanNum(content[txIdx + 1])),
+      company: content.slice(txIdx + 2, firstCurrencyIdx - 1).join(' '),
+      wkn: content[firstCurrencyIdx - 1],
+      price: parseGermanNum(content[firstCurrencyIdx + 1]),
+      amount: Math.abs(parseGermanNum(content[firstCurrencyIdx + 2])),
+      tax: 0,
+      fee: 0,
+    };
+    [activity.date, activity.datetime] = createActivityDateTime(
+      content[txIdx - 3]
+    );
     switch (content[txIdx]) {
       // Buy
       case transactionTypes[0]: {
-        const firstCurrencyIdx = findNextLineIndexByRegex(
-          content,
-          /^[A-Z]{3}$/,
-          txIdx + 2
-        );
-        let activity = {
-          broker: 'deutschebank',
-          type: 'Buy',
-          shares: parseGermanNum(content[txIdx + 1]),
-          company: content.slice(txIdx + 2, firstCurrencyIdx - 1).join(' '),
-          wkn: content[firstCurrencyIdx - 1],
-          price: parseGermanNum(content[firstCurrencyIdx + 1]),
-          amount: Math.abs(parseGermanNum(content[firstCurrencyIdx + 2])),
-          tax: 0,
-          fee: 0,
-        };
-        [activity.date, activity.datetime] = createActivityDateTime(
-          content[txIdx - 3]
-        );
-        activity = validateActivity(activity);
-        if (activity !== undefined) {
-          activities.push(activity);
-        } else {
-          return undefined;
-        }
+        activity.type = 'Buy'
+        break;
+      }
+      // Sell
+      case transactionTypes[1]: {
+        activity.type = 'Sell'
         break;
       }
     }
+    activity = validateActivity(activity);
+    if (activity !== undefined) {
+      activities.push(activity);
+    } else {
+      return undefined;
+    }
+    txIdx = findFirstSearchtermIndexInArray(content, transactionTypes, txIdx + 1);
   }
   return activities;
 };

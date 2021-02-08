@@ -132,6 +132,41 @@ describe('Broker: Deutsche Bank', () => {
         tax: 0,
       });
     });
+
+    test('Can the Transaction Logs be parsed from: 2019_sell_transaction_log.json', () => {
+      const result = deutschebank.parsePages(transactionLogSamples[1]);
+
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(3);
+      expect(result.activities[0]).toEqual({
+        broker: 'deutschebank',
+        type: 'Sell',
+        date: '2019-04-08',
+        datetime: '2019-04-08T' + result.activities[0].datetime.substr(11),
+        wkn: 'DBX1MW',
+        company: 'XTRACKERS MSCI WORLD SWAP INH.ANT.1C O.N.',
+        shares: 14,
+        price: 54.31,
+        amount: 738.94,
+        fee: 0,
+        tax: 0,
+      });
+
+      expect(result.activities[1]).toEqual({
+        broker: 'deutschebank',
+        type: 'Sell',
+        date: '2019-04-08',
+        datetime: '2019-04-08T' + result.activities[1].datetime.substr(11),
+        wkn: 'DBX1ET',
+        company: 'XTRACKERS EURO STOXX 50 INH.ANT. 1C O.N.',
+        shares: 14,
+        price: 49.34,
+        amount: 669.36,
+        fee: 0,
+        tax: 0,
+      });
+
+    });
   });
 
   describe('Check unsupported files from Deutsche Bank', () => {
