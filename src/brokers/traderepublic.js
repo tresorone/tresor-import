@@ -3,6 +3,7 @@ import {
   parseGermanNum,
   validateActivity,
   createActivityDateTime,
+  findFirstRegexIndexInArray
 } from '@/helper';
 
 const findISIN = text => {
@@ -200,70 +201,48 @@ const getDocumentType = content => {
 
 // Functions to parse an overview Statement
 const parsePositionAsActivity = (content, startLineNumber) => {
-  // Find the line with ISIN and the next line with the date
-  let lineNumberOfISIN;
-  let lineOfDate;
-  for (
-    let lineNumber = startLineNumber;
-    lineNumber < content.length;
-    lineNumber++
-  ) {
-    const line = content[lineNumber];
-    if (line.startsWith('ISIN:') && lineNumberOfISIN === undefined) {
-      lineNumberOfISIN = lineNumber;
-    }
 
-    if (lineNumberOfISIN !== undefined && /^\d{2}\.\d{2}\.\d{4}$/.test(line)) {
-      lineOfDate = lineNumber;
-      break;
-    }
-  }
-
-  let numberOfSharesLine;
+  const isinIdx = findFirstRegexIndexInArray(content, /ISIN: .+/ ,startLineNumber);
+  const dateIdx = findFirstRegexIndexInArray(content, /^\d{2}\.\d{2}\.\d{4}$/, isinIdx);
+  // Edge-case: On a pages change, the total amount are located under the company name.
+  const amountIdx = isinIdx - startLineNumber > 5 ? startLineNumber + 3 : dateIdx + 1;
+  let sharesLine;
   if (content[startLineNumber].includes(' ')) {
     // Normaly the number of shares are listed in a line with Stk.:
     // 1000 Stk.
-    numberOfSharesLine = content[startLineNumber].split(' ')[0];
+    sharesLine = content[startLineNumber].split(' ')[0];
   } else {
     // But sometimes before:
     // 61.1149
     // Stk.
-    numberOfSharesLine = content[startLineNumber - 1];
+    sharesLine = content[startLineNumber - 1];
   }
 
-  if (!numberOfSharesLine.includes(',') && numberOfSharesLine.includes('.')) {
+  if (!sharesLine.includes(',') && sharesLine.includes('.')) {
     // In the Q4 2020 document the number format has changed (once?) from the german one to the english one.
     // We simply replace the dot with a comma.
-    numberOfSharesLine = numberOfSharesLine.replace('.', ',');
+    sharesLine = sharesLine.replace('.', ',');
   }
 
-  const numberOfShares = parseGermanNum(numberOfSharesLine);
-  let toalAmount = parseGermanNum(content[lineOfDate + 1]);
+  let activity = {
+    broker: 'traderepublic',
+    type: 'TransferIn',
+    isin: content[isinIdx].split(' ')[1],
+    company: content[startLineNumber + 1],
+    shares: parseGermanNum(sharesLine),
+    amount: parseGermanNum(content[amountIdx]),
+    fee: 0,
+    tax: 0,
+  };
 
-  if (lineNumberOfISIN - startLineNumber > 5) {
-    // Edge-case: On a pages change, the total amount are located under the company name.
-    toalAmount = parseGermanNum(content[startLineNumber + 3]);
-  }
-
-  const [parsedDate, parsedDateTime] = createActivityDateTime(
-    content[lineOfDate],
+  [activity.date, activity.datetime] = createActivityDateTime(
+    content[dateIdx],
     undefined
   );
 
-  return validateActivity({
-    broker: 'traderepublic',
-    type: 'TransferIn',
-    date: parsedDate,
-    datetime: parsedDateTime,
-    isin: content[lineNumberOfISIN].split(' ')[1],
-    company: content[startLineNumber + 1],
-    shares: numberOfShares,
-    // We need to calculate the buy-price per share because in the overview is only the current price per share available.
-    price: +Big(toalAmount).div(Big(numberOfShares)),
-    amount: toalAmount,
-    fee: 0,
-    tax: 0,
-  });
+  // We need to calculate the buy-price per share because in the overview is only the current price per share available.
+  activity.price = +Big(activity.amount).div(Big(activity.shares));
+  return validateActivity(activity);
 };
 
 const parseOverviewStatement = content => {

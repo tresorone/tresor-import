@@ -5,7 +5,7 @@ import {
   buySamples,
   sellSamples,
   dividendSamples,
-  quarterSamples,
+  depotStatement,
   ignoredSamples,
 } from './__mocks__/traderepublic';
 
@@ -423,14 +423,14 @@ describe('Broker: Trade Republic', () => {
     });
   });
 
-  describe('Validate quarter statement', () => {
-    test('Map a empty quarter statement correctly', () => {
-      const activities = traderepublic.parsePages(quarterSamples[0]).activities;
+  describe('Validate depotStatements', () => {
+    test('Map a empty depot statement correctly', () => {
+      const activities = traderepublic.parsePages(depotStatement[0]).activities;
       expect(activities.length).toEqual(0);
     });
 
-    test('Map a quarter statement with two positions correctly', () => {
-      const activities = traderepublic.parsePages(quarterSamples[1]).activities;
+    test('Map a quarter depot statement with two positions correctly', () => {
+      const activities = traderepublic.parsePages(depotStatement[1]).activities;
 
       expect(activities.length).toEqual(2);
       expect(activities[0]).toEqual({
@@ -462,7 +462,7 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Should map the pdf data correctly for: two_pages', () => {
-      const activities = traderepublic.parsePages(quarterSamples[2]).activities;
+      const activities = traderepublic.parsePages(depotStatement[2]).activities;
       expect(activities.length).toEqual(16);
 
       expect(activities[10]).toEqual({
@@ -495,7 +495,7 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Should map the pdf data correctly for: 2020_year_end_statement', () => {
-      const activities = traderepublic.parsePages(quarterSamples[3]).activities;
+      const activities = traderepublic.parsePages(depotStatement[3]).activities;
       expect(activities.length).toEqual(56);
 
       expect(activities[2]).toEqual({
@@ -552,6 +552,25 @@ describe('Broker: Trade Republic', () => {
         shares: 58.1848,
         tax: 0,
         type: 'TransferIn',
+      });
+    });
+
+    test('Should parse depot statement: 2020_depotStatement_single_etf', () => {
+      const activities = traderepublic.parsePages(depotStatement[4]).activities;
+      expect(activities.length).toEqual(1);
+
+      expect(activities[0]).toEqual({
+        type: 'TransferIn',
+        broker: 'traderepublic',
+        company: 'iShsV-S&P 500 Inf.Te.',
+        date: '2020-06-30',
+        datetime: '2020-06-30T' + activities[0].datetime.substring(11),
+        isin: 'IE00B3WJKG14',
+        amount: 100,
+        price: 11.243408551736545,
+        shares: 8.8941,
+        tax: 0,
+        fee: 0,
       });
     });
   });

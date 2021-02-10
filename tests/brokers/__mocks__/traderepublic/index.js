@@ -26,11 +26,12 @@ export const dividendSamples = [
   require('./dividend/2021_reinvest_main_street_capital.json'),
 ];
 
-export const quarterSamples = [
-  require('./quarter_statement/without_stocks.json'),
-  require('./quarter_statement/with_stocks.json'),
-  require('./quarter_statement/two_pages.json'),
-  require('./quarter_statement/2020_year_end_statement.json'),
+export const depotStatement = [
+  require('./depotStatement/without_stocks.json'),
+  require('./depotStatement/with_stocks.json'),
+  require('./depotStatement/two_pages.json'),
+  require('./depotStatement/2020_year_end_statement.json'),
+  require('./depotStatement/2020_depotStatement_single_etf.json')
 ];
 
 export const ignoredSamples = [
@@ -46,6 +47,6 @@ export const ignoredSamples = [
 export const allSamples = buySamples.concat(
   sellSamples,
   dividendSamples,
-  quarterSamples,
+  depotStatement,
   ignoredSamples
 );
