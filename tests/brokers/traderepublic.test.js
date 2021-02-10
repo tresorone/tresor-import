@@ -6,6 +6,7 @@ import {
   sellSamples,
   dividendSamples,
   depotStatement,
+  options,
   ignoredSamples,
 } from './__mocks__/traderepublic';
 
@@ -571,6 +572,28 @@ describe('Broker: Trade Republic', () => {
         shares: 8.8941,
         tax: 0,
         fee: 0,
+      });
+    });
+  });
+
+  describe('Validate options', () => {
+    test('Can parse a repayment of an unused call 2021_call_apple_tilgung', () => {
+      const activities = traderepublic.parsePages(options[0])
+        .activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'traderepublic',
+        type: 'Sell',
+        isin: 'DE000TT3CJX8',
+        company: 'HSBC Trinkaus & Burkhardt AG Call 13.01.21 Apple 130',
+        date: '2021-01-20',
+        datetime: '2021-01-20T' + activities[0].datetime.substring(11),
+        shares: 5,
+        amount: 1.47,
+        price: 0.294,
+        fee: 0,
+        tax: 0,
       });
     });
   });

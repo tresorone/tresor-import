@@ -4,6 +4,7 @@ import {
   validateActivity,
   createActivityDateTime,
   findFirstRegexIndexInArray,
+  findFirstIsinIndexInArray,
 } from '@/helper';
 
 const findISIN = text => {
@@ -195,12 +196,14 @@ const getDocumentType = content => {
     return 'Buy';
   } else if (content.some(line => line.includes('Verkauf am'))) {
     return 'Sell';
+  } else if (content.includes('TILGUNG')) {
+    return 'callRepayment';
   }
   return undefined;
 };
 
 // Functions to parse an overview Statement
-const parsePositionAsActivity = (content, startLineNumber) => {
+const parseDepotStatementEntry = (content, startLineNumber) => {
   const isinIdx = findFirstRegexIndexInArray(
     content,
     /ISIN: .+/,
@@ -261,7 +264,7 @@ const parseOverviewStatement = content => {
       continue;
     }
 
-    foundActivities.push(parsePositionAsActivity(content, lineNumber));
+    foundActivities.push(parseDepotStatementEntry(content, lineNumber));
   }
 
   return foundActivities;
@@ -315,6 +318,28 @@ const parseBuySellDividend = (textArr, docType) => {
   return validateActivity(activity);
 };
 
+const parseOption = content => {
+  const activityIdx = content.indexOf('Tilgung');
+  const isinIdx = findFirstIsinIndexInArray(content);
+  const amountIdx = content.indexOf('Kurswert') + 1;
+  let activity = {
+    broker: 'traderepublic',
+    type: 'Sell',
+    company: content.slice(activityIdx + 1, isinIdx).join(' '),
+    isin: content[isinIdx],
+    shares: parseGermanNum(content[isinIdx + 1].split(/\s+/)[0]),
+    amount: parseGermanNum(content[amountIdx]),
+    tax: 0,
+    fee: 0,
+  };
+  activity.price = +Big(activity.amount).div(activity.shares);
+  [activity.date, activity.datetime] = createActivityDateTime(
+    content[content.indexOf('VALUTA') + 3],
+    undefined
+  );
+  return validateActivity(activity);
+};
+
 // FUnctions to be exported
 export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
@@ -341,12 +366,13 @@ export const parsePages = contents => {
     parseOverviewStatement(allPagesFlat).forEach(activity => {
       activities.push(activity);
     });
+  } else if (docType === 'callRepayment') {
+    activities.push(parseOption(allPagesFlat));
   } else {
     for (let content of contents) {
       activities.push(parseBuySellDividend(content, docType));
     }
   }
-
   return {
     activities,
     status: 0,
