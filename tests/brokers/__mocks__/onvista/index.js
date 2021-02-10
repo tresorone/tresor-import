@@ -36,7 +36,10 @@ export const portfolioOverviewSamples = [
   require('./portfolioOverview/2020_overview.json'),
 ];
 
-export const ignoredSamples = [require('./ignored/2020_cost_information.json')];
+export const ignoredSamples = [
+  require('./ignored/2020_cost_information.json'),
+  require('./ignored/2020_multiple_dividend_cancellations.json')
+];
 
 export const allSamples = buySamples.concat(
   sellSamples,

@@ -84,6 +84,7 @@ export const findAmount = (text, fxRate = undefined) => {
   let amount = parseGermanNum(
     text[text.findIndex(t => t.includes('Kurswert')) + 2]
   );
+  console.log
   return fxRate === undefined ? amount : +Big(amount).div(fxRate);
 };
 
@@ -187,11 +188,16 @@ const findGrossPayout = (text, tax) => {
   if (reinvestIdx >= 0) {
     return parseGermanNum(text[reinvestIdx + 2]);
   }
+  const foreignDividend = text.indexOf('ausländische Dividende');
+  if (foreignDividend >= 0) {
+    return parseGermanNum(text[foreignDividend + 2]);
+  }
 };
 
 const findForeignInformation = pdfPage => {
   const foreignCurrencyIdx = pdfPage.indexOf('Devisenkurs') + 1;
   if (foreignCurrencyIdx > 0) {
+    console.log(1)
     const fxRate = parseGermanNum(pdfPage[foreignCurrencyIdx].split(/\s+/)[1]);
     const foreignCurrency = pdfPage[foreignCurrencyIdx]
       .split(/\s+/)[0]
@@ -249,7 +255,7 @@ const isOverviewPage = content =>
 const detectedButIgnoredDocument = content => {
   return (
     // When the document contains one of the following lines, we want to ignore these document.
-    content.some(line => line.includes('Kostenausweis'))
+    content.some(line => line.includes('Kostenausweis') || line === 'Storno - Erträgnisgutschrift' || line.startsWith('Stornierung und '))
   );
 };
 
