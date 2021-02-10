@@ -578,8 +578,7 @@ describe('Broker: Trade Republic', () => {
 
   describe('Validate options', () => {
     test('Can parse a repayment of an unused call 2021_call_apple_tilgung', () => {
-      const activities = traderepublic.parsePages(options[0])
-        .activities;
+      const activities = traderepublic.parsePages(options[0]).activities;
 
       expect(activities.length).toEqual(1);
       expect(activities[0]).toEqual({

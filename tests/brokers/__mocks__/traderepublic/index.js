@@ -34,9 +34,7 @@ export const depotStatement = [
   require('./depotStatement/2020_depotStatement_single_etf.json'),
 ];
 
-export const options = [
-  require('./options/2021_call_apple_tilgung.json'),
-];
+export const options = [require('./options/2021_call_apple_tilgung.json')];
 
 export const ignoredSamples = [
   require('./ignored/cost_information.json'),
@@ -54,5 +52,4 @@ export const allSamples = buySamples.concat(
   depotStatement,
   options,
   ignoredSamples
-
 );
