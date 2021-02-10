@@ -31,7 +31,7 @@ export const depotStatement = [
   require('./depotStatement/with_stocks.json'),
   require('./depotStatement/two_pages.json'),
   require('./depotStatement/2020_year_end_statement.json'),
-  require('./depotStatement/2020_depotStatement_single_etf.json')
+  require('./depotStatement/2020_depotStatement_single_etf.json'),
 ];
 
 export const ignoredSamples = [

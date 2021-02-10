@@ -3,7 +3,7 @@ import {
   parseGermanNum,
   validateActivity,
   createActivityDateTime,
-  findFirstRegexIndexInArray
+  findFirstRegexIndexInArray,
 } from '@/helper';
 
 const findISIN = text => {
@@ -201,11 +201,19 @@ const getDocumentType = content => {
 
 // Functions to parse an overview Statement
 const parsePositionAsActivity = (content, startLineNumber) => {
-
-  const isinIdx = findFirstRegexIndexInArray(content, /ISIN: .+/ ,startLineNumber);
-  const dateIdx = findFirstRegexIndexInArray(content, /^\d{2}\.\d{2}\.\d{4}$/, isinIdx);
+  const isinIdx = findFirstRegexIndexInArray(
+    content,
+    /ISIN: .+/,
+    startLineNumber
+  );
+  const dateIdx = findFirstRegexIndexInArray(
+    content,
+    /^\d{2}\.\d{2}\.\d{4}$/,
+    isinIdx
+  );
   // Edge-case: On a pages change, the total amount are located under the company name.
-  const amountIdx = isinIdx - startLineNumber > 5 ? startLineNumber + 3 : dateIdx + 1;
+  const amountIdx =
+    isinIdx - startLineNumber > 5 ? startLineNumber + 3 : dateIdx + 1;
   let sharesLine;
   if (content[startLineNumber].includes(' ')) {
     // Normaly the number of shares are listed in a line with Stk.:
