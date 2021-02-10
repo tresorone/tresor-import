@@ -125,6 +125,25 @@ describe('Broker: Trade Republic', () => {
         tax: 0,
       });
     });
+
+    test('Parse a prefered buy: 2021_tui_preferred_buy.json', () => {
+      const activities = traderepublic.parsePages(buySamples[5]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'traderepublic',
+        type: 'Buy',
+        date: '2021-01-26',
+        datetime: '2021-01-26T' + activities[0].datetime.substring(11),
+        isin: 'DE000TUAG000',
+        company: 'TUI AG',
+        shares: 75,
+        price: 1.07,
+        amount: 80.25,
+        fee: 5,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate sells', () => {

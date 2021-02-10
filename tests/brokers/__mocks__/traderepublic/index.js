@@ -4,6 +4,7 @@ export const buySamples = [
   require('./buy/limit_order_financial_transaction_tax.json'),
   require('./buy/market_order_without_explicit_ISIN.json'),
   require('./buy/saving_plan.json'),
+  require('./buy/2021_tui_preferred_buy.json'),
 ];
 
 export const sellSamples = [

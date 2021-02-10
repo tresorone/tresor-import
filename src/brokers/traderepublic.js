@@ -22,16 +22,25 @@ const findISIN = text => {
 const findCompany = text => {
   let companyIdx = text.indexOf('Reinvestierung');
   if (companyIdx < 0) {
+    companyIdx = text.indexOf('Umtausch/Bezug');
+  }
+  if (companyIdx < 0) {
     companyIdx = text.indexOf('BETRAG');
   }
   return text[companyIdx + 1];
 };
 
-const findDateSingleBuy = textArr => {
+const findDateSingleBuy = content => {
   // Extract the date from a string like this: "Market-Order Kauf am 04.02.2020, um 14:02 Uhr an der Lang & Schwarz Exchange."
   const searchTerm = 'Kauf am ';
-  const dateLine = textArr[textArr.findIndex(t => t.includes(searchTerm))];
-  return dateLine.split(searchTerm)[1].trim().substr(0, 10);
+  const dateIdx = content.findIndex(t => t.includes(searchTerm));
+  if ( dateIdx >= 0) {
+    const dateLine = content[dateIdx];
+    return dateLine.split(searchTerm)[1].trim().substr(0, 10);
+  }
+
+  // For some special buys as part of capital increases there is no dateline
+  return content[content.indexOf('VALUTA') + 3]
 };
 
 const findOrderTime = content => {
@@ -75,11 +84,14 @@ const findShares = textArr => {
 const findAmount = (textArr, fxRate) => {
   let amountIdx = textArr.indexOf('Bruttoertrag');
   if (amountIdx < 0) {
+    amountIdx = textArr.indexOf('Kurswert');
+  }
+  if (amountIdx < 0) {
     amountIdx = textArr.indexOf('GESAMT');
   }
   const totalAmountLine = textArr[amountIdx + 1];
   const amount = parseGermanNum(totalAmountLine.split(' ')[0].trim());
-  return fxRate !== undefined ? +Big(amount).div(fxRate) : amount;
+  return fxRate !== undefined ? +Big(amount).div(fxRate).abs() : Math.abs(amount);
 };
 
 const findForeignInformation = textArr => {
@@ -104,7 +116,11 @@ const findFee = (textArr, fxRate) => {
   if (textArr.indexOf('Fremdkostenzuschlag') > -1) {
     const feeLine = textArr[textArr.indexOf('Fremdkostenzuschlag') + 1];
     const feeNumberString = feeLine.split(/\s+/)[0];
-
+    totalFee = totalFee.minus(parseGermanNum(feeNumberString));
+  }
+  if (textArr.indexOf('Gebühr Kundenweisung') > -1) {
+    const feeLine = textArr[textArr.indexOf('Gebühr Kundenweisung') + 1];
+    const feeNumberString = feeLine.split(/\s+/)[0];
     totalFee = totalFee.minus(parseGermanNum(feeNumberString));
   }
 
@@ -190,7 +206,7 @@ const getDocumentType = content => {
     return 'Dividend';
   } else if (
     content.some(
-      line => line.includes('Sparplanausführung am') || line.includes('Kauf am')
+      line => line.includes('Sparplanausführung am') || line.includes('Kauf am') || line === 'UMTAUSCH/BEZUG'
     )
   ) {
     return 'Buy';
