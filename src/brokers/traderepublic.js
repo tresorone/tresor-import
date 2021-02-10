@@ -350,7 +350,7 @@ const parseOption = content => {
     isin: content[isinIdx],
     shares: parseGermanNum(content[isinIdx + 1].split(/\s+/)[0]),
     amount: parseGermanNum(content[amountIdx]),
-    tax: 0,
+    tax: findTax(content),
     fee: 0,
   };
   activity.price = +Big(activity.amount).div(activity.shares);

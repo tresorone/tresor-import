@@ -614,6 +614,25 @@ describe('Broker: Trade Republic', () => {
         tax: 0,
       });
     });
+
+    test('Parse a prefered buy: 2021_turbo_varta_knockout_repayment.json', () => {
+      const activities = traderepublic.parsePages(options[1]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'traderepublic',
+        type: 'Sell',
+        date: '2021-02-05',
+        datetime: '2021-02-05T' + activities[0].datetime.substring(11),
+        isin: 'DE000TT5RSM5',
+        company: 'HSBC Trinkaus & Burkhardt AG TurboC O.End Varta',
+        shares: 500,
+        price: 0.001,
+        amount: 0.5,
+        fee: 0,
+        tax: -200.08,
+      });
+    });
   });
 
   describe('Validate all ignored statements', () => {

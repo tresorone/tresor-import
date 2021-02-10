@@ -35,7 +35,10 @@ export const depotStatement = [
   require('./depotStatement/2020_depotStatement_single_etf.json'),
 ];
 
-export const options = [require('./options/2021_call_apple_tilgung.json')];
+export const options = [
+  require('./options/2021_call_apple_tilgung.json'),
+  require('./options/2021_turbo_varta_knockout_repayment.json'),
+];
 
 export const ignoredSamples = [
   require('./ignored/cost_information.json'),
