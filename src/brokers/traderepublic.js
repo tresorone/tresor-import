@@ -34,13 +34,13 @@ const findDateSingleBuy = content => {
   // Extract the date from a string like this: "Market-Order Kauf am 04.02.2020, um 14:02 Uhr an der Lang & Schwarz Exchange."
   const searchTerm = 'Kauf am ';
   const dateIdx = content.findIndex(t => t.includes(searchTerm));
-  if ( dateIdx >= 0) {
+  if (dateIdx >= 0) {
     const dateLine = content[dateIdx];
     return dateLine.split(searchTerm)[1].trim().substr(0, 10);
   }
 
   // For some special buys as part of capital increases there is no dateline
-  return content[content.indexOf('VALUTA') + 3]
+  return content[content.indexOf('VALUTA') + 3];
 };
 
 const findOrderTime = content => {
@@ -91,7 +91,9 @@ const findAmount = (textArr, fxRate) => {
   }
   const totalAmountLine = textArr[amountIdx + 1];
   const amount = parseGermanNum(totalAmountLine.split(' ')[0].trim());
-  return fxRate !== undefined ? +Big(amount).div(fxRate).abs() : Math.abs(amount);
+  return fxRate !== undefined
+    ? +Big(amount).div(fxRate).abs()
+    : Math.abs(amount);
 };
 
 const findForeignInformation = textArr => {
@@ -206,7 +208,10 @@ const getDocumentType = content => {
     return 'Dividend';
   } else if (
     content.some(
-      line => line.includes('Sparplanausführung am') || line.includes('Kauf am') || line === 'UMTAUSCH/BEZUG'
+      line =>
+        line.includes('Sparplanausführung am') ||
+        line.includes('Kauf am') ||
+        line === 'UMTAUSCH/BEZUG'
     )
   ) {
     return 'Buy';
