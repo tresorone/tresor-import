@@ -6,8 +6,8 @@ import {
   validateActivity,
   findNextLineIndexByRegex,
   findFirstSearchtermIndexInArray,
+  findPreviousRegexMatchIdx
 } from '@/helper';
-import { findPreviousRegexMatchIdx } from '../helper';
 
 const idStringLong =
   'Bitte beachten Sie auch unsere weiteren Erläuterungen zu diesem Report, die Sie auf beiliegender Anlage finden! Bei Fragen sprechen Sie bitte Ihren Berater an.';
