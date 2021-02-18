@@ -337,7 +337,10 @@ const getDocumentType = content => {
   // Before 12/2015 the headline is 'Wertpapierabrechnung'
   const lineNumber = findBuySellLineNumber(content);
   if (lineNumber >= 0) {
-    if (content[lineNumber + 1].toLowerCase().startsWith('kauf') || content[lineNumber + 1] === 'BEZUG') {
+    if (
+      content[lineNumber + 1].toLowerCase().startsWith('kauf') ||
+      content[lineNumber + 1] === 'BEZUG'
+    ) {
       return 'Buy';
     } else if (content[lineNumber + 1].toLowerCase() === 'verkauf') {
       return 'Sell';
@@ -350,11 +353,14 @@ const getDocumentType = content => {
     return 'Dividend';
   } else if (
     content.some(
-      line => line.includes('Kostenausweis') ||
-      line.includes('Aktiensplit') ||
-      line.includes('Vorabpauschale')) ||
-    content.includes('Kumulierter Gewinn/Verlust')) {
-    return 'ignoredDocument'
+      line =>
+        line.includes('Kostenausweis') ||
+        line.includes('Aktiensplit') ||
+        line.includes('Vorabpauschale')
+    ) ||
+    content.includes('Kumulierter Gewinn/Verlust')
+  ) {
+    return 'ignoredDocument';
   }
 };
 
@@ -368,18 +374,19 @@ export const canParseDocument = (pages, extension) => {
   const isConsors =
     firstPageContent.some(
       line => line.toLowerCase && line.toLowerCase().includes('consorsbank')
-    ) || firstPageContent[1] === 'POSTFACH 17 43' ||
+    ) ||
+    firstPageContent[1] === 'POSTFACH 17 43' ||
     // For depotStatements. The only file we have is quite heavily anonymized.
     // Maybe better strings exist
-    (firstPageContent.includes('Kumulierter Gewinn/Verlust') && firstPageContent.includes('Entwicklung seit:'))
+    (firstPageContent.includes('Kumulierter Gewinn/Verlust') &&
+      firstPageContent.includes('Entwicklung seit:'));
   if (!isConsors) {
     return false;
   }
-  return getDocumentType(firstPageContent) !== undefined
-
+  return getDocumentType(firstPageContent) !== undefined;
 };
 
-const parseData = ( textArr, type ) => {
+const parseData = (textArr, type) => {
   let activity = {
     broker: 'consorsbank',
     type,
@@ -469,7 +476,7 @@ const parseData = ( textArr, type ) => {
 
 export const parsePages = contents => {
   const documentType = getDocumentType(contents[0]);
-  if ( documentType === 'ignoredDocument' ) {
+  if (documentType === 'ignoredDocument') {
     // We know this type and we don't want to support it.
     return {
       activities: [],

@@ -413,22 +413,20 @@ describe('Broker: Consorsbank', () => {
     test('Should map the document correctly: 2021_tui_special_buy', () => {
       const result = consorsbank.parsePages(buySamples[18]);
       expect(result.status).toEqual(0);
-      expect(result.activities[0]).toEqual(
-        {
-          broker: 'consorsbank',
-          type: 'Buy',
-          company: 'TUI AG NA O.N.',
-          date: '2021-01-29',
-          datetime: '2021-01-29'+result.activities[0].datetime.substr(10),
-          isin: 'XX000XXXX000',
-          wkn: 'TUAG00',
-          price: 1.07,
-          shares: 50,
-          amount: 53.50,
-          tax: 0,
-          fee: 4.45,
-        },
-      );
+      expect(result.activities[0]).toEqual({
+        broker: 'consorsbank',
+        type: 'Buy',
+        company: 'TUI AG NA O.N.',
+        date: '2021-01-29',
+        datetime: '2021-01-29' + result.activities[0].datetime.substr(10),
+        isin: 'XX000XXXX000',
+        wkn: 'TUAG00',
+        price: 1.07,
+        shares: 50,
+        amount: 53.5,
+        tax: 0,
+        fee: 4.45,
+      });
     });
   });
 
@@ -841,7 +839,6 @@ describe('Broker: Consorsbank', () => {
   });
 
   describe('Validate all ignored statements', () => {
-
     test('All ignored statements return status 7 and no activities', () => {
       ignoredSamples.forEach(pages => {
         const result = consorsbank.parsePages(pages);
