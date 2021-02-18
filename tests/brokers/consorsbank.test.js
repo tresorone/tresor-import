@@ -480,7 +480,7 @@ describe('Broker: Consorsbank', () => {
           broker: 'consorsbank',
           company: 'TUI AG BZR',
           date: '2021-01-19',
-          datetime: '2021-01-19'+result.activities[0].datetime.substr(10),
+          datetime: '2021-01-19' + result.activities[0].datetime.substr(10),
           fee: 2.5,
           isin: 'DE000TUAG109',
           wkn: 'TUAG10',

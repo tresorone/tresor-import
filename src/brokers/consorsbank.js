@@ -342,7 +342,10 @@ const getDocumentType = content => {
       content[lineNumber + 1] === 'BEZUG'
     ) {
       return 'Buy';
-    } else if (content[lineNumber + 1].toLowerCase() === 'verkauf' || content[lineNumber + 1] === 'VERK. TEIL-/BEZUGSR.') {
+    } else if (
+      content[lineNumber + 1].toLowerCase() === 'verkauf' ||
+      content[lineNumber + 1] === 'VERK. TEIL-/BEZUGSR.'
+    ) {
       return 'Sell';
     }
   } else if (
