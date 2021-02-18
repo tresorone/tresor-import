@@ -341,6 +341,11 @@ const parseTransactionReport = pdfPages => {
 // BLOCK 3
 // GENERAL PARSING FUNCTIONS
 //===========================
+
+const detectedButIgnoredDocument = content => {
+  return content.includes('Umsatzdetails');
+};
+
 export const canParseDocument = (pages, extension) => {
   // The first PDF Page does not always contain "Commerzbank", thus this ugly
   // workaround. e. G. dividend_IE00B3RBWM25_1.json
@@ -364,11 +369,19 @@ export const canParseDocument = (pages, extension) => {
         )
       ) &&
       (isBuy(firstPageContent) || isDividend(firstPageContent))) ||
-      isTransactionReport(firstPageContent))
+      isTransactionReport(firstPageContent) || 
+	  detectedButIgnoredDocument(firstPageContent))
   );
 };
 
 export const parsePages = contents => {
+  if (detectedButIgnoredDocument(contents[0])) {
+    return {
+	  activities: undefined,
+	  status: 7,
+	};
+  }
+
   // Transaction Reports need to be handled completely different from individual
   // transaction documents
   let activities;
