@@ -470,6 +470,27 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('Should parse 2021 TUI priority Sell correctly', () => {
+      const result = consorsbank.parsePages(sellSamples[2]);
+      expect(result.status).toEqual(0);
+      expect(result.activities).toEqual([
+        {
+          amount: 41.99,
+          broker: 'consorsbank',
+          company: 'TUI AG BZR',
+          date: '2021-01-19',
+          datetime: '2021-01-19'+result.activities[0].datetime.substr(10),
+          fee: 2.5,
+          isin: 'DE000TUAG109',
+          wkn: 'TUAG10',
+          price: 2.999285714285714,
+          shares: 14,
+          tax: 0,
+          type: 'Sell',
+        },
+      ]);
+    });
   });
 
   describe('Dividend', () => {

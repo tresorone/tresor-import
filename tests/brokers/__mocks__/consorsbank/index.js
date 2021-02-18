@@ -23,6 +23,7 @@ export const buySamples = [
 export const sellSamples = [
   require('./sell/sell1.json'),
   require('./sell/sell2.json'),
+  require('./sell/2021_tui_priority_sell.json'),
 ];
 
 export const dividendsSamples = [
