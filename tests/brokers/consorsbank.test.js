@@ -409,6 +409,27 @@ describe('Broker: Consorsbank', () => {
         },
       ]);
     });
+
+    test('Should map the document correctly: 2021_tui_special_buy', () => {
+      const result = consorsbank.parsePages(buySamples[18]);
+      expect(result.status).toEqual(0);
+      expect(result.activities[0]).toEqual(
+        {
+          broker: 'consorsbank',
+          type: 'Buy',
+          company: 'TUI AG NA O.N.',
+          date: '2021-01-29',
+          datetime: '2021-01-29'+result.activities[0].datetime.substr(10),
+          isin: 'XX000XXXX000',
+          wkn: 'TUAG00',
+          price: 1.07,
+          shares: 50,
+          amount: 53.50,
+          tax: 0,
+          fee: 4.45,
+        },
+      );
+    });
   });
 
   describe('Sell', () => {
@@ -820,25 +841,13 @@ describe('Broker: Consorsbank', () => {
   });
 
   describe('Validate all ignored statements', () => {
-    test('The statement should be ignored: 2020_cost_information.json', () => {
-      const result = consorsbank.parsePages(ignoredSamples[0]);
 
-      expect(result.status).toEqual(7);
-      expect(result.activities.length).toEqual(0);
-    });
-
-    test('The statement should be ignored: 2020_stock_split.json', () => {
-      const result = consorsbank.parsePages(ignoredSamples[1]);
-
-      expect(result.status).toEqual(7);
-      expect(result.activities.length).toEqual(0);
-    });
-
-    test('The statement should be ignored: 2021_advance_flat_rate.json', () => {
-      const result = consorsbank.parsePages(ignoredSamples[2]);
-
-      expect(result.status).toEqual(7);
-      expect(result.activities.length).toEqual(0);
+    test('All ignored statements return status 7 and no activities', () => {
+      ignoredSamples.forEach(pages => {
+        const result = consorsbank.parsePages(pages);
+        expect(result.status).toEqual(7);
+        expect(result.activities.length).toEqual(0);
+      });
     });
   });
 });
