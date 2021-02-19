@@ -375,16 +375,17 @@ export const canParseDocument = (pages, extension) => {
 };
 
 export const parsePages = contents => {
+  let activities = [];
   if (detectedButIgnoredDocument(contents[0])) {
     return {
-	  activities: undefined,
+	  activities,
 	  status: 7,
 	};
   }
 
   // Transaction Reports need to be handled completely different from individual
   // transaction documents
-  let activities;
+  //let activities;
   if (isTransactionReport(contents[0])) {
     activities = parseTransactionReport(contents);
   } else {
