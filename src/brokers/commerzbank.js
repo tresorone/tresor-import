@@ -385,7 +385,6 @@ export const parsePages = contents => {
 
   // Transaction Reports need to be handled completely different from individual
   // transaction documents
-  //let activities;
   if (isTransactionReport(contents[0])) {
     activities = parseTransactionReport(contents);
   } else {
