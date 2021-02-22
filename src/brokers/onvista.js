@@ -99,11 +99,11 @@ export const findFee = (content, fxRate = undefined) => {
     'Orderprovision',
     'Provision',
     'Maklercourtage',
-    'Fremde Spesen Xontro'
-  ]
+    'Fremde Spesen Xontro',
+  ];
   potentialFees.forEach(feeString => {
     const feeIdx = content.indexOf(feeString);
-    if(feeIdx >= 0) {
+    if (feeIdx >= 0) {
       fee = fee.plus(Big(parseGermanNum(content[feeIdx + 2])));
     }
   });

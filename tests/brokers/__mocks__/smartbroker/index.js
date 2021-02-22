@@ -1,6 +1,6 @@
 export const buySamples = [
   require('./buy/buy_stock_US0028241000.json'),
-  require('./buy/2021_advanced_blockchain.json')
+  require('./buy/2021_advanced_blockchain.json'),
 ];
 
 export const sellSamples = [require('./sell/sell_comission_vanguard.json')];

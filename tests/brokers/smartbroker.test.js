@@ -48,22 +48,23 @@ describe('Smartbroker broker test', () => {
 
     test('should map pdf data of sample 1 correctly', () => {
       const activities = smartbroker.parsePages(buySamples[1]);
-      expect(activities).toEqual(
-      {
+      expect(activities).toEqual({
         status: 0,
-        activities: [{
-          broker: 'smartbroker',
-          type: 'Buy',
-          date: '2021-02-18',
-          datetime: '2021-02-18T08:28:00.000Z',
-          isin: 'DE000A0M93V6',
-          company: 'Advanced Blockchain AG Inhaber-Aktien o.N.',
-          shares: 25,
-          price: 20.8,
-          amount: 520,
-          fee: 6.3,
-          tax: 0,
-        }]
+        activities: [
+          {
+            broker: 'smartbroker',
+            type: 'Buy',
+            date: '2021-02-18',
+            datetime: '2021-02-18T08:28:00.000Z',
+            isin: 'DE000A0M93V6',
+            company: 'Advanced Blockchain AG Inhaber-Aktien o.N.',
+            shares: 25,
+            price: 20.8,
+            amount: 520,
+            fee: 6.3,
+            tax: 0,
+          },
+        ],
       });
     });
   });
