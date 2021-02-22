@@ -92,22 +92,21 @@ export const findAmount = (text, fxRate = undefined) => {
 
 export const findFee = (content, fxRate = undefined) => {
   let fee = Big(0);
-  const stockFeeIdx = content.indexOf('Börsengebühr') + 2;
-  if (stockFeeIdx > 1) {
-    fee = fee.plus(parseGermanNum(content[stockFeeIdx]));
-  }
-  const foreignFeeIdx = content.indexOf('Fremdspesen') + 2;
-  if (foreignFeeIdx > 1) {
-    fee = fee.plus(parseGermanNum(content[foreignFeeIdx]));
-  }
-  const exchangeFeeIdx = content.indexOf('Handelsplatzgebühr') + 2;
-  if (exchangeFeeIdx > 1) {
-    fee = fee.plus(parseGermanNum(content[exchangeFeeIdx]));
-  }
-  const orderProvisionIdx = content.indexOf('Orderprovision') + 2;
-  if (orderProvisionIdx > 1) {
-    fee = fee.plus(Big(parseGermanNum(content[orderProvisionIdx])));
-  }
+  const potentialFees = [
+    'Börsengebühr',
+    'Fremdspesen',
+    'Handelsplatzgebühr',
+    'Orderprovision',
+    'Provision',
+    'Maklercourtage',
+    'Fremde Spesen Xontro'
+  ]
+  potentialFees.forEach(feeString => {
+    const feeIdx = content.indexOf(feeString);
+    if(feeIdx >= 0) {
+      fee = fee.plus(Big(parseGermanNum(content[feeIdx + 2])));
+    }
+  });
   return fxRate === undefined ? +fee : +fee.div(fxRate);
 };
 
