@@ -864,7 +864,7 @@ describe('Broker: Consorsbank', () => {
       const ignoredResult = {
         activities: [],
         status: 7,
-      }
+      };
       ignoredSamples.forEach(pages => {
         const result = consorsbank.parsePages(pages);
         expect(result).toEqual(ignoredResult);
