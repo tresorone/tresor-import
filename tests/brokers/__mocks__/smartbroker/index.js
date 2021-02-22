@@ -12,7 +12,10 @@ export const dividendSamples = [
   require('./dividend/2021_wp_carey_inc.json'),
 ];
 
-export const ignoredSamples = [require('./ignored/2020_ex_ante_cost.json')];
+export const ignoredSamples = [
+  require('./ignored/2020_ex_ante_cost.json'),
+  require('./ignored/2021_portfolio_overview.json'),
+];
 
 export const allSamples = buySamples.concat(
   sellSamples,

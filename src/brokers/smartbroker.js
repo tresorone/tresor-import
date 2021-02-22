@@ -108,7 +108,10 @@ const findOrderTime = content => {
 };
 
 const detectedButIgnoredDocument = content => {
-  return content.includes('Kostendarstellung');
+  return (
+    content.includes('Kostendarstellung') ||
+    content.includes('Vermˆgensbericht')
+  );
 };
 
 const canParsePage = content =>
@@ -120,8 +123,10 @@ export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
   return (
     extension === 'pdf' &&
-    firstPageContent.some(line =>
-      line.includes(onvista.smartbrokerIdentificationString)
+    firstPageContent.some(
+      line =>
+        line.includes(onvista.smartbrokerIdentificationStrings[0]) ||
+        line.includes(onvista.smartbrokerIdentificationStrings[1])
     ) &&
     (canParsePage(firstPageContent) ||
       detectedButIgnoredDocument(firstPageContent))

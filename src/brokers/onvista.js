@@ -13,7 +13,10 @@ import { findFirstRegexIndexInArray } from '../helper';
 // uniquely identifies onvista files so we have to construct a multistring
 // identifcation scheme.
 export const onvistaIdentificationString = 'BELEGDRUCK=J';
-export const smartbrokerIdentificationString = 'Landsberger Straße 300';
+export const smartbrokerIdentificationStrings = [
+  'Landsberger Straße 300',
+  'Landsberger Straˇe 300',
+];
 
 export const findISIN = text => {
   return text[text.indexOf('ISIN') + 1];
@@ -210,8 +213,10 @@ export const canParseDocument = (pages, extension) => {
     ((firstPageContent.some(line =>
       line.includes(onvistaIdentificationString)
     ) &&
-      !firstPageContent.some(line =>
-        line.includes(smartbrokerIdentificationString)
+      !firstPageContent.some(
+        line =>
+          line.includes(smartbrokerIdentificationStrings[0]) ||
+          line.includes(smartbrokerIdentificationStrings[1])
       )) ||
       (firstPageContent.some(line =>
         line.includes('Webtrading onvista bank')
