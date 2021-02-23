@@ -124,7 +124,8 @@ describe('Smartbroker broker test', () => {
             date: '2020-12-10',
             datetime: '2020-12-10T16:18:00.000Z',
             isin: 'DE000GF3VUV0',
-            company: 'Goldman Sachs Wertpapier GmbH FaktL O.End Bayer 46,24619999',
+            company:
+              'Goldman Sachs Wertpapier GmbH FaktL O.End Bayer 46,24619999',
             shares: 100,
             price: 0.65,
             amount: 65,
@@ -293,7 +294,7 @@ describe('Smartbroker broker test', () => {
             fee: 0,
             tax: 0.5753739930955121,
             fxRate: 1.2166,
-            foreignCurrency: 'USD'
+            foreignCurrency: 'USD',
           },
         ],
       });
