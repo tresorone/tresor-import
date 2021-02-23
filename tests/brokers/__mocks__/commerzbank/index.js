@@ -9,6 +9,10 @@ export const buySamples = [
   require('./buy/savings_plan_eur_2020_agif_all.json'),
 ];
 
+export const sellSamples = [
+  require('./sell/2021-DWS_Inv.json'),
+];
+
 export const dividendSamples = [
   require('./dividend/dividend_IE00B3RBWM25_1.json'),
   require('./dividend/dividend_IE00B3RBWM25_2.json'),
@@ -32,4 +36,4 @@ export const ignoredSamples = [
   require('./ignored/umsatzdetails.json')
 ];
 
-export const allSamples = buySamples.concat(dividendSamples, transactionReport, ignoredSamples);
+export const allSamples = buySamples.concat(sellSamples, dividendSamples, transactionReport, ignoredSamples);

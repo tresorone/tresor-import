@@ -38,8 +38,11 @@ const findSharesDividend = textArr => {
   );
 };
 
-const findDateBuy = textArr =>
+const findDateBuySell = textArr =>
   textArr[textArr.findIndex(t => t.includes('Geschäftstag')) + 2];
+
+const findTimeSell = textArr =>
+  textArr[textArr.findIndex(t => t.includes('Handelszeit')) + 2];
 
 const findDateDividend = (textArr, foreignDividend = false) => {
   if (foreignDividend) {
@@ -109,6 +112,8 @@ const findCompanyDividend = (textArr, foreignDividend = false) => {
 
 const isBuy = textArr => textArr.some(t => t.includes('Wertpapierkauf'));
 
+const isSell = textArr => textArr.some(t => t.includes('Wertpapierverkauf'));
+
 const isDividend = textArr =>
   textArr.some(
     t => t === 'Investment-Ausschüttung' || t === 'Ertragsgutschrift'
@@ -128,16 +133,27 @@ const parseSingleTransaction = textArr => {
   let fee = 0;
   let tax = 0;
   let activity;
+  let time;
   if (isBuy(textArr)) {
     type = 'Buy';
-    date = findDateBuy(textArr);
+    date = findDateBuySell(textArr);
     wkn = findWknBuy(textArr);
     company = findCompanyBuy(textArr);
     shares = +findSharesBuy(textArr);
     amount = findAmountBuy(textArr);
     price = findPriceBuy(textArr);
     fee = findFeeBuy(textArr, amount);
-  } else if (isDividend(textArr)) {
+  } else if (isSell(textArr)) { 
+    type = 'Sell';
+    date = findDateBuySell(textArr);
+	time = findTimeSell(textArr);
+    wkn = findWknBuy(textArr);
+    company = findCompanyBuy(textArr);
+    shares = +findSharesBuy(textArr);
+    amount = findAmountBuy(textArr);
+    price = findPriceBuy(textArr);
+    fee = findFeeBuy(textArr, amount);
+  }	else if (isDividend(textArr)) {
     const foreignCurrencyIndex = textArr.indexOf('Devisenkurs:');
     const foreignDividend = foreignCurrencyIndex >= 0;
     type = 'Dividend';
@@ -156,7 +172,7 @@ const parseSingleTransaction = textArr => {
   }
   // sadly, no exact times can be extracted as they are not given in any of the
   // files
-  const [parsedDate, parsedDateTime] = createActivityDateTime(date, undefined);
+  const [parsedDate, parsedDateTime] = createActivityDateTime(date, time);
   activity = {
     broker: 'commerzbank',
     type,
@@ -368,7 +384,7 @@ export const canParseDocument = (pages, extension) => {
           joinedContent.toLowerCase().includes('onvista')
         )
       ) &&
-      (isBuy(firstPageContent) || isDividend(firstPageContent))) ||
+      (isBuy(firstPageContent) || isDividend(firstPageContent) || isSell(firstPageContent))) ||
       isTransactionReport(firstPageContent) || 
 	  detectedButIgnoredDocument(firstPageContent))
   );
