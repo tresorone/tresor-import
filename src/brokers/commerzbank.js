@@ -379,9 +379,9 @@ export const canParseDocument = (pages, extension) => {
           joinedContent.toLowerCase().includes('onvista')
         )
       ) &&
-      (isBuy(firstPageContent) || isDividend(firstPageContent))) ||
+      (isBuy(firstPageContent) || isDividend(firstPageContent) || isSell(firstPageContent))) ||
       isTransactionReport(firstPageContent) || 
-	  detectedButIgnoredDocument(firstPageContent) || isSell(firstPageContent))
+	  detectedButIgnoredDocument(firstPageContent))
   );
 };
 

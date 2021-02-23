@@ -36,4 +36,4 @@ export const ignoredSamples = [
   require('./ignored/umsatzdetails.json')
 ];
 
-export const allSamples = buySamples.concat(dividendSamples, transactionReport, ignoredSamples, sellSamples);
+export const allSamples = buySamples.concat(sellSamples, dividendSamples, transactionReport, ignoredSamples);
