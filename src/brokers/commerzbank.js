@@ -77,7 +77,11 @@ const findIsinDividend = (textArr, foreignDividend) => {
     isinIdx = textArr.findIndex(t => t.includes('STK')) + 2;
   } else {
     if (textArr.indexOf('WKN/ISIN') > 0) {
-	  isinIdx = textArr.findIndex(t => t.includes('Inhaber-Anteile')) - 1;
+	  if (textArr.indexOf('Inhaber-Anteile') > 0) {
+	    isinIdx = textArr.findIndex(t => t.includes('Inhaber-Anteile')) - 1;
+	  } else if (textArr.indexOf('Namens-Aktien') > 0) {
+		isinIdx = textArr.findIndex(t => t.includes('Namens-Aktien')) - 1;
+	  }
 	}
 	else {
       isinIdx = textArr.findIndex(t => t.includes('ISIN')) + 3;
@@ -125,14 +129,13 @@ const findCompanyDividend = (textArr, foreignDividend = false) => {
     if (textArr.indexOf('Investment-Ausschüttung') > 0) {
       const startCompanyName = textArr.findIndex(t => t.includes('Investment-Ausschüttung')) + 5;
 	  return textArr.slice(startCompanyName, startCompanyName + 2).join(' ');
-	}
-	else {
-      return textArr[textArr.findIndex(t => t.includes('Inhaber-Anteile')) + 1]
+	} else if (textArr.indexOf('Inhaber-Anteile') > 0) {
+	  return textArr[textArr.findIndex(t => t.includes('Inhaber-Anteile')) + 1]
+	} else if (textArr.indexOf('Wertpapier-Bezeichnung') > 0) {
+	  const startCompanyName = textArr.findIndex(t => t.includes('Wertpapier-Bezeichnung')) + 5;
+      return textArr.slice(startCompanyName, startCompanyName + 2).join(' ');
 	}
   }
-  const startCompanyName =
-    textArr.findIndex(t => t.includes('Investment-Ausschüttung')) + 5;
-  return textArr.slice(startCompanyName, startCompanyName + 2).join(' ');
 };
 
 const isBuy = textArr => textArr.some(t => t.includes('Wertpapierkauf'));
