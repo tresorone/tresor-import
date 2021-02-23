@@ -41,8 +41,11 @@ const findSharesDividend = textArr => {
   );
 };
 
-const findDateBuy = textArr =>
+const findDateBuySell = textArr =>
   textArr[textArr.findIndex(t => t.includes('Geschäftstag')) + 2];
+
+const findTimeSell = textArr =>
+  textArr[textArr.findIndex(t => t.includes('Handelszeit')) + 2];
 
 const findDateDividend = (textArr, foreignDividend = false) => {
   if (foreignDividend) {
@@ -161,9 +164,10 @@ const parseSingleTransaction = textArr => {
   let fee = 0;
   let tax = 0;
   let activity;
+  let time;
   if (isBuy(textArr)) {
     type = 'Buy';
-    date = findDateBuy(textArr);
+    date = findDateBuySell(textArr);
     wkn = findWknBuy(textArr);
     company = findCompanyBuy(textArr);
     shares = +findSharesBuy(textArr);
@@ -172,7 +176,8 @@ const parseSingleTransaction = textArr => {
     fee = findFeeBuy(textArr, amount);
   } else if (isSell(textArr)) { 
     type = 'Sell';
-    date = findDateBuy(textArr);
+    date = findDateBuySell(textArr);
+	time = findTimeSell(textArr);
     wkn = findWknBuy(textArr);
     company = findCompanyBuy(textArr);
     shares = +findSharesBuy(textArr);
@@ -198,7 +203,7 @@ const parseSingleTransaction = textArr => {
   }
   // sadly, no exact times can be extracted as they are not given in any of the
   // files
-  const [parsedDate, parsedDateTime] = createActivityDateTime(date, undefined);
+  const [parsedDate, parsedDateTime] = createActivityDateTime(date, time);
   activity = {
     broker: 'commerzbank',
     type,
