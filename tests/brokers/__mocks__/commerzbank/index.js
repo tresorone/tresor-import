@@ -27,6 +27,7 @@ export const dividendSamples = [
   require('./dividend/dividend_foreign_currency_IE00B8GKDB10_1.json'),
   require('./dividend/dividend_foreign_currency_IE00B8GKDB10_2.json'),
   require('./dividend/dividend_foreign_currency_US5949181045_1.json'),
+  require('./dividend/dividend_DE0009848119_1.json'),
 ];
 
 export const transactionReport = [

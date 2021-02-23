@@ -302,6 +302,26 @@ describe('Broker: commerzbank', () => {
         fxRate: 1.212,
       });
     });
+
+    test('Can the foreign dividend for DE0009848119_1 be parsed', () => {
+      const result = commerzbank.parsePages(dividendSamples[13]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'commerzbank',
+        type: 'Dividend',
+        date: '2019-11-21',
+        datetime: '2019-11-21T' + result.activities[0].datetime.substring(11),
+        isin: 'DE0009848119',
+        wkn: '984811',
+        company: 'LD',
+        shares: 1.544,
+        price: 3.6010362694300517,
+        amount: 5.56,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate transaction records', () => {
