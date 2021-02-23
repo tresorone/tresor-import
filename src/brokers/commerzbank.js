@@ -386,8 +386,7 @@ export const canParseDocument = (pages, extension) => {
       ) &&
 
       (isBuy(firstPageContent) || isDividend(firstPageContent) || isSell(firstPageContent))) ||
-      isTransactionReport(firstPageContent) || 
-	  detectedButIgnoredDocument(firstPageContent))
+      isTransactionReport(firstPageContent) || detectedButIgnoredDocument(firstPageContent))
   );
 };
 
