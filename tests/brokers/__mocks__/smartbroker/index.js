@@ -19,7 +19,8 @@ export const dividendSamples = [
 ];
 
 export const transferInSamples = [
-  require('./tansferIn/2020_ado_properties.json'),
+  require('./transferIn/2020_ado_properties.json'),
+  require('./transferIn/2020_caterpillar_transferIn_revsion.json'),
 ];
 
 export const ignoredSamples = [

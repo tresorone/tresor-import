@@ -116,11 +116,14 @@ const getDocumentType = content => {
     return 'Dividend';
   } else if (content.includes('Einlösung zu:')) {
     return 'TurboKO';
-  } else if (content.includes('Umtausch/Bezug')) {
+  } else if (
+    content.includes('Umtausch/Bezug') ||
+    content.includes('Wir haben für Sie folgende Anschaffungsdaten')
+  ) {
     return 'TransferIn';
   } else if (
-    content.includes('Kostendarstellung') ||
-    content.includes('Vermˆgensbericht')
+    content.includes('Vermˆgensbericht') ||
+    content.includes('Kostendarstellung')
   ) {
     return 'Ignored';
   }
@@ -204,10 +207,11 @@ const parseTurboKO = pdfPages => {
   [activity.date, activity.datetime] = createActivityDateTime(
     pdfPages[pdfPages.indexOf('Wert') + 1]
   );
-  return [activity];
+  return [validateActivity(activity)];
 };
 
 const parseTransferIn = pdfPages => {
+  const isRevision = pdfPages.includes('Anpassung Anschaffungsdaten');
   let activity = {
     broker: 'smartbroker',
     type: 'TransferIn',
@@ -219,10 +223,23 @@ const parseTransferIn = pdfPages => {
     tax: 0,
     fee: onvista.findFee(pdfPages),
   };
+
+  if (isRevision) {
+    activity.amount = parseGermanNum(
+      pdfPages[pdfPages.indexOf('Anschaffungswert') + 4]
+    );
+    activity.fee = parseGermanNum(
+      pdfPages[pdfPages.indexOf('Anschaffungsnebenkosten') + 4]
+    );
+    activity.price = +Big(activity.amount).div(activity.shares);
+  }
+  const dateIdx = isRevision
+    ? pdfPages.indexOf('Anschaffungsdatum') + 3
+    : pdfPages.indexOf('Wert') + 1;
   [activity.date, activity.datetime] = createActivityDateTime(
-    pdfPages[pdfPages.indexOf('Wert') + 1]
+    pdfPages[dateIdx]
   );
-  return [activity];
+  return [validateActivity(activity)];
 };
 
 export const parsePages = pdfPages => {

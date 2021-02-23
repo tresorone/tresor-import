@@ -254,7 +254,7 @@ describe('Smartbroker broker test', () => {
   });
 
   describe('TransferIn', () => {
-    test('Should parse TransferIn correctly', () => {
+    test('Should parse ADO properties TransferIn correctly', () => {
       const result = smartbroker.parsePages(transferInSamples[0]);
       expect(result).toEqual({
         status: 0,
@@ -270,6 +270,28 @@ describe('Smartbroker broker test', () => {
             price: 14.6,
             amount: 73,
             fee: 0.5,
+            tax: 0,
+          },
+        ],
+      });
+    });
+
+    test('Should parse caterpillar TransferIn correctly', () => {
+      const result = smartbroker.parsePages(transferInSamples[1]);
+      expect(result).toEqual({
+        status: 0,
+        activities: [
+          {
+            broker: 'smartbroker',
+            type: 'TransferIn',
+            date: '2020-03-18',
+            datetime: '2020-03-18' + result.activities[0].datetime.substr(10),
+            isin: 'US1491231015',
+            company: 'Caterpillar Inc. Registered Shares DL 1',
+            shares: 2,
+            price: 84.49,
+            amount: 168.98,
+            fee: 9.3,
             tax: 0,
           },
         ],
