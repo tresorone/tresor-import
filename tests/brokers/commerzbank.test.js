@@ -6,6 +6,7 @@ import {
   dividendSamples,
   transactionReport,
   ignoredSamples,
+  sellSamples,
 } from './__mocks__/commerzbank';
 
 describe('Broker: commerzbank', () => {
@@ -169,6 +170,27 @@ describe('Broker: commerzbank', () => {
         price: 212.331,
         amount: 51.17,
         fee: -1.22,
+        tax: 0,
+      });
+    });
+  });
+
+  describe('Validate sells', () => {
+    test('Can a sell order for DWS2NY be parsed', () => {
+      const result = commerzbank.parsePages(sellSamples[0]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'commerzbank',
+        type: 'Sell',
+        date: '2021-02-04',
+        datetime: '2021-02-04T' + result.activities[0].datetime.substring(11),
+        wkn: 'DWS2NY',
+        company: 'DWS Inv.- ESG Equity Income',
+        shares: 0.4,
+        price: 119.51,
+        amount: 47.8,
+        fee: 0,
         tax: 0,
       });
     });
