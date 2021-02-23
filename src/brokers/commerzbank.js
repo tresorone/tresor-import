@@ -369,8 +369,7 @@ export const canParseDocument = (pages, extension) => {
         )
       ) &&
       (isBuy(firstPageContent) || isDividend(firstPageContent))) ||
-      isTransactionReport(firstPageContent) || 
-	  detectedButIgnoredDocument(firstPageContent))
+      isTransactionReport(firstPageContent) || detectedButIgnoredDocument(firstPageContent))
   );
 };
 
@@ -378,8 +377,8 @@ export const parsePages = contents => {
   let activities = [];
   if (detectedButIgnoredDocument(contents[0])) {
     return {
-	  activities,
-	  status: 7,
+      activities,
+      status: 7,
 	};
   }
 
