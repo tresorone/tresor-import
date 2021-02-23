@@ -111,6 +111,29 @@ describe('Smartbroker broker test', () => {
         ],
       });
     });
+
+    test('Should parse a goldman Sachs Bayer sell from 2020', () => {
+      const result = smartbroker.parsePages(sellSamples[2]);
+
+      expect(result).toEqual({
+        status: 0,
+        activities: [
+          {
+            broker: 'smartbroker',
+            type: 'Sell',
+            date: '2020-12-10',
+            datetime: '2020-12-10T16:18:00.000Z',
+            isin: 'DE000GF3VUV0',
+            company: 'Goldman Sachs Wertpapier GmbH FaktL O.End Bayer 46,24619999',
+            shares: 100,
+            price: 0.65,
+            amount: 65,
+            fee: 4,
+            tax: -25.04,
+          },
+        ],
+      });
+    });
   });
 
   describe('Dividend', () => {
@@ -249,6 +272,30 @@ describe('Smartbroker broker test', () => {
         tax: 7.039151712887439,
         fxRate: 1.226,
         foreignCurrency: 'USD',
+      });
+    });
+
+    test('Can parse 2020_realty_income USD dividend', () => {
+      const result = smartbroker.parsePages(dividendSamples[7]);
+      expect(result).toEqual({
+        status: 0,
+        activities: [
+          {
+            broker: 'smartbroker',
+            type: 'Dividend',
+            date: '2020-12-15',
+            datetime: '2020-12-15' + result.activities[0].datetime.substr(10),
+            isin: 'US7561091049',
+            company: 'Realty Income Corp. Registered Shares DL 1',
+            shares: 20,
+            price: 0.1923393062633569,
+            amount: 3.846786125267138,
+            fee: 0,
+            tax: 0.5753739930955121,
+            fxRate: 1.2166,
+            foreignCurrency: 'USD'
+          },
+        ],
       });
     });
   });

@@ -6,6 +6,7 @@ export const buySamples = [
 export const sellSamples = [
   require('./sell/sell_comission_vanguard.json'),
   require('./sell/2021_turbo_knockout.json'),
+  require('./sell/2020_goldman_sachs_bayer.json'),
 ];
 
 export const dividendSamples = [
@@ -16,6 +17,7 @@ export const dividendSamples = [
   require('./dividend/2020_ishares_global_clean_energy.json'),
   require('./dividend/2021_ish_eo_st.json'),
   require('./dividend/2021_wp_carey_inc.json'),
+  require('./dividend/2020_realty_income.json'),
 ];
 
 export const transferInSamples = [

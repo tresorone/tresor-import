@@ -8,6 +8,7 @@ import * as onvista from './onvista';
 
 const findTax = (textArr, fxRate) => {
   let completeTax = Big(0);
+  const isTaxReturn = textArr.includes('Steuerausgleich nach § 43a EStG:');
 
   const capitalTaxIndex = textArr.findIndex(t =>
     t.includes('Kapitalertragsteuer')
@@ -33,6 +34,10 @@ const findTax = (textArr, fxRate) => {
   );
   if (churchTaxIndex > 0) {
     completeTax = completeTax.plus(parseGermanNum(textArr[churchTaxIndex + 2]));
+  }
+
+  if (isTaxReturn) {
+    completeTax = completeTax.times(-1);
   }
 
   const witholdingTaxIndex = textArr.findIndex(
@@ -166,6 +171,7 @@ const parseBuySellDividend = (pdfPages, type) => {
     activity.amount = onvista.findAmount(textArr);
     activity.price = onvista.findPrice(textArr);
     activity.tax = findTax(textArr, fxRate);
+    activity.fee = onvista.findFee(textArr);
     date = onvista.findDateBuySell(textArr);
     time = findOrderTime(textArr);
   } else if (activity.type === 'Dividend') {
