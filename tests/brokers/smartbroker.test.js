@@ -5,6 +5,7 @@ import {
   buySamples,
   sellSamples,
   dividendSamples,
+  transferInSamples,
   ignoredSamples,
 } from './__mocks__/smartbroker';
 
@@ -47,8 +48,8 @@ describe('Smartbroker broker test', () => {
     });
 
     test('should map pdf data of sample 1 correctly', () => {
-      const activities = smartbroker.parsePages(buySamples[1]);
-      expect(activities).toEqual({
+      const result = smartbroker.parsePages(buySamples[1]);
+      expect(result).toEqual({
         status: 0,
         activities: [
           {
@@ -85,6 +86,27 @@ describe('Smartbroker broker test', () => {
         amount: 2139.8,
         fee: 0,
         tax: 27.57,
+      });
+    });
+
+    test('Should parse a knocked out turbo from 2021', () => {
+      const result = smartbroker.parsePages(sellSamples[1]);
+
+      expect(result).toEqual({
+        status: 0,
+        activities: [{
+          broker: 'smartbroker',
+          type: 'Sell',
+          date: '2021-02-04',
+          datetime: '2021-02-04'+result.activities[0].datetime.substr(10),
+          isin: 'DE000LS8Z9Z4',
+          company: 'Lang & Schwarz AG TurboC O.End XinyiSol',
+          shares: 100,
+          price: 0.001,
+          amount: 0.10,
+          fee: 0,
+          tax: 0,
+        }]
       });
     });
   });
@@ -227,6 +249,29 @@ describe('Smartbroker broker test', () => {
         foreignCurrency: 'USD',
       });
     });
+  });
+
+  describe('TransferIn', () => {
+    test('Should parse TransferIn correctly', () => {
+      const result = smartbroker.parsePages(transferInSamples[0]);
+      expect(result).toEqual({
+        status: 0,
+        activities: [{
+          broker: 'smartbroker',
+          type: 'TransferIn',
+          date: '2020-07-21',
+          datetime: '2020-07-21'+result.activities[0].datetime.substr(10),
+          isin: 'LU1250154413',
+          company: 'ADO Properties S.A. Actions Nominatives o.N.',
+          shares: 5,
+          price: 14.6,
+          amount: 73,
+          fee: 0.5,
+          tax: 0,
+        }]
+      });
+    });
+
   });
 
   describe('Validate all ignored statements', () => {

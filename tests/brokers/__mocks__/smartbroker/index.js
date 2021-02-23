@@ -3,7 +3,10 @@ export const buySamples = [
   require('./buy/2021_advanced_blockchain.json'),
 ];
 
-export const sellSamples = [require('./sell/sell_comission_vanguard.json')];
+export const sellSamples = [
+  require('./sell/sell_comission_vanguard.json'),
+  require('./sell/2021_turbo_knockout.json')
+];
 
 export const dividendSamples = [
   require('./dividend/dividend_etf_usd.json'),
@@ -15,6 +18,10 @@ export const dividendSamples = [
   require('./dividend/2021_wp_carey_inc.json'),
 ];
 
+export const transferInSamples = [
+  require('./tansferIn/2020_ado_properties.json'),
+]
+
 export const ignoredSamples = [
   require('./ignored/2020_ex_ante_cost.json'),
   require('./ignored/2021_portfolio_overview.json'),
@@ -23,5 +30,6 @@ export const ignoredSamples = [
 export const allSamples = buySamples.concat(
   sellSamples,
   dividendSamples,
+  transferInSamples,
   ignoredSamples
 );
