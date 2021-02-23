@@ -322,6 +322,26 @@ describe('Broker: commerzbank', () => {
         tax: 0,
       });
     });
+
+    test('Can the foreign dividend for DE000BASF111_1 be parsed', () => {
+      const result = commerzbank.parsePages(dividendSamples[14]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'commerzbank',
+        type: 'Dividend',
+        date: '2020-06-18',
+        datetime: '2020-06-18T' + result.activities[0].datetime.substring(11),
+        isin: 'DE000BASF111',
+        wkn: 'BASF11',
+        company: 'BASF SE',
+        shares: 20,
+        price: 3.3,
+        amount: 66,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate transaction records', () => {
