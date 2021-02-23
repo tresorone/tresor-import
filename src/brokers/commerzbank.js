@@ -109,6 +109,8 @@ const findCompanyDividend = (textArr, foreignDividend = false) => {
 
 const isBuy = textArr => textArr.some(t => t.includes('Wertpapierkauf'));
 
+const isSell = textArr => textArr.some(t => t.includes('Wertpapierverkauf'));
+
 const isDividend = textArr =>
   textArr.some(
     t => t === 'Investment-Ausschüttung' || t === 'Ertragsgutschrift'
@@ -137,7 +139,16 @@ const parseSingleTransaction = textArr => {
     amount = findAmountBuy(textArr);
     price = findPriceBuy(textArr);
     fee = findFeeBuy(textArr, amount);
-  } else if (isDividend(textArr)) {
+  } else if (isSell(textArr)) { 
+    type = 'Sell';
+    date = findDateBuy(textArr);
+    wkn = findWknBuy(textArr);
+    company = findCompanyBuy(textArr);
+    shares = +findSharesBuy(textArr);
+    amount = findAmountBuy(textArr);
+    price = findPriceBuy(textArr);
+    fee = findFeeBuy(textArr, amount);
+  }	else if (isDividend(textArr)) {
     const foreignCurrencyIndex = textArr.indexOf('Devisenkurs:');
     const foreignDividend = foreignCurrencyIndex >= 0;
     type = 'Dividend';
@@ -368,7 +379,7 @@ export const canParseDocument = (pages, extension) => {
           joinedContent.toLowerCase().includes('onvista')
         )
       ) &&
-      (isBuy(firstPageContent) || isDividend(firstPageContent))) ||
+      (isBuy(firstPageContent) || isDividend(firstPageContent) || isSell(firstPageContent))) ||
       isTransactionReport(firstPageContent) || 
 	  detectedButIgnoredDocument(firstPageContent))
   );
