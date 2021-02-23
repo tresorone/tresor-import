@@ -109,21 +109,22 @@ const findOrderTime = content => {
 
 const getDocumentType = content => {
   if (onvista.isBuy(content)) {
-    return 'Buy'
-  } else if ( onvista.isSell(content)) {
-    return 'Sell'
-  } else if ( onvista.isDividend(content)) {
-    return 'Dividend'
+    return 'Buy';
+  } else if (onvista.isSell(content)) {
+    return 'Sell';
+  } else if (onvista.isDividend(content)) {
+    return 'Dividend';
   } else if (content.includes('Einlösung zu:')) {
-    return 'TurboKO'
+    return 'TurboKO';
   } else if (content.includes('Umtausch/Bezug')) {
-    return 'TransferIn'
+    return 'TransferIn';
   } else if (
     content.includes('Kostendarstellung') ||
-    content.includes('Vermˆgensbericht')) {
-    return 'Ignored'
+    content.includes('Vermˆgensbericht')
+  ) {
+    return 'Ignored';
   }
-}
+};
 
 export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
@@ -138,7 +139,7 @@ export const canParseDocument = (pages, extension) => {
   );
 };
 
-const parseBuySellDividend = ( pdfPages, type ) => {
+const parseBuySellDividend = (pdfPages, type) => {
   const textArr = pdfPages.flat();
   let activity = {
     broker: 'smartbroker',
@@ -186,7 +187,7 @@ const parseBuySellDividend = ( pdfPages, type ) => {
   return [validateActivity(activity)];
 };
 
-const parseTurboKO = ( pdfPages ) => {
+const parseTurboKO = pdfPages => {
   let activity = {
     broker: 'smartbroker',
     type: 'Sell',
@@ -197,12 +198,16 @@ const parseTurboKO = ( pdfPages ) => {
     tax: 0,
     fee: 0,
   };
-  activity.price = parseGermanNum(pdfPages[pdfPages.indexOf('Einlösung zu:') + 1].split(/\s+/)[1]);
-  [activity.date, activity.datetime] = createActivityDateTime(pdfPages[pdfPages.indexOf('Wert') + 1]);
+  activity.price = parseGermanNum(
+    pdfPages[pdfPages.indexOf('Einlösung zu:') + 1].split(/\s+/)[1]
+  );
+  [activity.date, activity.datetime] = createActivityDateTime(
+    pdfPages[pdfPages.indexOf('Wert') + 1]
+  );
   return [activity];
 };
 
-const parseTransferIn = ( pdfPages ) => {
+const parseTransferIn = pdfPages => {
   let activity = {
     broker: 'smartbroker',
     type: 'TransferIn',
@@ -214,7 +219,9 @@ const parseTransferIn = ( pdfPages ) => {
     tax: 0,
     fee: onvista.findFee(pdfPages),
   };
-  [activity.date, activity.datetime] = createActivityDateTime(pdfPages[pdfPages.indexOf('Wert') + 1]);
+  [activity.date, activity.datetime] = createActivityDateTime(
+    pdfPages[pdfPages.indexOf('Wert') + 1]
+  );
   return [activity];
 };
 
@@ -231,18 +238,18 @@ export const parsePages = pdfPages => {
     case 'Dividend':
       return {
         activities: parseBuySellDividend(pdfPages, type),
-        status: 0
-      }
+        status: 0,
+      };
     case 'TurboKO':
       return {
         activities: parseTurboKO(pdfPages.flat()),
-        status: 0
-      }
+        status: 0,
+      };
     case 'TransferIn':
       return {
         activities: parseTransferIn(pdfPages.flat()),
-        status: 0
-      }
+        status: 0,
+      };
     default:
       return {
         activities: undefined,

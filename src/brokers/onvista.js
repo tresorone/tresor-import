@@ -27,6 +27,7 @@ export const findCompany = text => {
   if (company === 'Gattungsbezeichnung') {
     company = text[text.findIndex(t => t.includes('ISIN')) - 2];
   }
+  if (company)
 
   return company;
 };
@@ -84,8 +85,12 @@ export const findPrice = (text, fxRate = undefined) => {
 };
 
 export const findAmount = (text, fxRate = undefined) => {
+  let amountIdx = text.findIndex(t => t.includes('Kurswert'))
+  if (amountIdx < 0) {
+    amountIdx = text.findIndex(t => t.includes('Bezugspreis'))
+  }
   let amount = parseGermanNum(
-    text[text.findIndex(t => t.includes('Kurswert')) + 2]
+    text[amountIdx + 2]
   );
   return fxRate === undefined ? amount : +Big(amount).div(fxRate);
 };
@@ -100,6 +105,7 @@ export const findFee = (content, fxRate = undefined) => {
     'Provision',
     'Maklercourtage',
     'Fremde Spesen Xontro',
+    'Gebühr',
   ];
   potentialFees.forEach(feeString => {
     const feeIdx = content.indexOf(feeString);

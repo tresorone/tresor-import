@@ -5,7 +5,7 @@ export const buySamples = [
 
 export const sellSamples = [
   require('./sell/sell_comission_vanguard.json'),
-  require('./sell/2021_turbo_knockout.json')
+  require('./sell/2021_turbo_knockout.json'),
 ];
 
 export const dividendSamples = [
@@ -20,7 +20,7 @@ export const dividendSamples = [
 
 export const transferInSamples = [
   require('./tansferIn/2020_ado_properties.json'),
-]
+];
 
 export const ignoredSamples = [
   require('./ignored/2020_ex_ante_cost.json'),

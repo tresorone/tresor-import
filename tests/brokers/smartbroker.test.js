@@ -94,19 +94,21 @@ describe('Smartbroker broker test', () => {
 
       expect(result).toEqual({
         status: 0,
-        activities: [{
-          broker: 'smartbroker',
-          type: 'Sell',
-          date: '2021-02-04',
-          datetime: '2021-02-04'+result.activities[0].datetime.substr(10),
-          isin: 'DE000LS8Z9Z4',
-          company: 'Lang & Schwarz AG TurboC O.End XinyiSol',
-          shares: 100,
-          price: 0.001,
-          amount: 0.10,
-          fee: 0,
-          tax: 0,
-        }]
+        activities: [
+          {
+            broker: 'smartbroker',
+            type: 'Sell',
+            date: '2021-02-04',
+            datetime: '2021-02-04' + result.activities[0].datetime.substr(10),
+            isin: 'DE000LS8Z9Z4',
+            company: 'Lang & Schwarz AG TurboC O.End XinyiSol',
+            shares: 100,
+            price: 0.001,
+            amount: 0.1,
+            fee: 0,
+            tax: 0,
+          },
+        ],
       });
     });
   });
@@ -256,22 +258,23 @@ describe('Smartbroker broker test', () => {
       const result = smartbroker.parsePages(transferInSamples[0]);
       expect(result).toEqual({
         status: 0,
-        activities: [{
-          broker: 'smartbroker',
-          type: 'TransferIn',
-          date: '2020-07-21',
-          datetime: '2020-07-21'+result.activities[0].datetime.substr(10),
-          isin: 'LU1250154413',
-          company: 'ADO Properties S.A. Actions Nominatives o.N.',
-          shares: 5,
-          price: 14.6,
-          amount: 73,
-          fee: 0.5,
-          tax: 0,
-        }]
+        activities: [
+          {
+            broker: 'smartbroker',
+            type: 'TransferIn',
+            date: '2020-07-21',
+            datetime: '2020-07-21' + result.activities[0].datetime.substr(10),
+            isin: 'LU1250154413',
+            company: 'ADO Properties S.A. Actions Nominatives o.N.',
+            shares: 5,
+            price: 14.6,
+            amount: 73,
+            fee: 0.5,
+            tax: 0,
+          },
+        ],
       });
     });
-
   });
 
   describe('Validate all ignored statements', () => {
