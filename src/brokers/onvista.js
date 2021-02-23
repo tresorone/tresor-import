@@ -27,9 +27,7 @@ export const findCompany = text => {
   if (company === 'Gattungsbezeichnung') {
     company = text[text.findIndex(t => t.includes('ISIN')) - 2];
   }
-  if (company)
-
-  return company;
+  if (company) return company;
 };
 
 export const findDateBuySell = text => {
@@ -85,13 +83,11 @@ export const findPrice = (text, fxRate = undefined) => {
 };
 
 export const findAmount = (text, fxRate = undefined) => {
-  let amountIdx = text.findIndex(t => t.includes('Kurswert'))
+  let amountIdx = text.findIndex(t => t.includes('Kurswert'));
   if (amountIdx < 0) {
-    amountIdx = text.findIndex(t => t.includes('Bezugspreis'))
+    amountIdx = text.findIndex(t => t.includes('Bezugspreis'));
   }
-  let amount = parseGermanNum(
-    text[amountIdx + 2]
-  );
+  let amount = parseGermanNum(text[amountIdx + 2]);
   return fxRate === undefined ? amount : +Big(amount).div(fxRate);
 };
 
