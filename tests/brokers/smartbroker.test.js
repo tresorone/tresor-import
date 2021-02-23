@@ -145,10 +145,9 @@ describe('Smartbroker broker test', () => {
             broker: 'smartbroker',
             type: 'Sell',
             date: '2020-12-09',
-            datetime: '2020-12-09'+result.activities[0].datetime.substr(10),
+            datetime: '2020-12-09' + result.activities[0].datetime.substr(10),
             isin: 'DE000SB73VN1',
-            company:
-              'Société Générale Effekten GmbH TurboL O.End TUI 5,452667',
+            company: 'Société Générale Effekten GmbH TurboL O.End TUI 5,452667',
             shares: 150,
             price: 0.001,
             amount: 0.15,
