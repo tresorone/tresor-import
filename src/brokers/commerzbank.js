@@ -113,7 +113,7 @@ const isSell = textArr => textArr.some(t => t.includes('Wertpapierverkauf'));
 
 const isDividend = textArr =>
   textArr.some(
-    t => t === 'Investment-Ausschüttung' || t === 'Ertragsgutschrift'
+    t => t === 'Investment-Ausschüttung' || t === 'Ertragsgutschrift' || t === 'Dividendengutschrift'
   );
 
 const parseSingleTransaction = textArr => {
