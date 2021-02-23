@@ -197,14 +197,16 @@ const parseBuySellDividend = (pdfPages, type) => {
 };
 
 const parseTurboKO = pdfPages => {
+  const companyStartIdx = pdfPages.indexOf('Gattungsbezeichnung') + 1;
+  const companyEndIdx = pdfPages.indexOf('Fälligkeit');
   let activity = {
     broker: 'smartbroker',
     type: 'Sell',
     shares: onvista.findShares(pdfPages),
     isin: onvista.findISIN(pdfPages),
-    company: pdfPages[pdfPages.indexOf('Gattungsbezeichnung') + 1],
+    company: pdfPages.slice(companyStartIdx, companyEndIdx).join(' '),
     amount: onvista.findAmount(pdfPages),
-    tax: 0,
+    tax: findTax(pdfPages),
     fee: 0,
   };
   activity.price = parseGermanNum(

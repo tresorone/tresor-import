@@ -7,6 +7,7 @@ export const sellSamples = [
   require('./sell/sell_comission_vanguard.json'),
   require('./sell/2021_turbo_knockout.json'),
   require('./sell/2020_goldman_sachs_bayer.json'),
+  require('./sell/2020_tax_repayment_societe_generale_tui_turbo.json')
 ];
 
 export const dividendSamples = [

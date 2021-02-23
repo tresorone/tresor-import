@@ -101,12 +101,12 @@ describe('Smartbroker broker test', () => {
             date: '2021-02-04',
             datetime: '2021-02-04' + result.activities[0].datetime.substr(10),
             isin: 'DE000LS8Z9Z4',
-            company: 'Lang & Schwarz AG TurboC O.End XinyiSol',
+            company: 'Lang & Schwarz AG TurboC O.End XinyiSol 1,8',
             shares: 100,
             price: 0.001,
             amount: 0.1,
             fee: 0,
-            tax: 0,
+            tax: -13.16,
           },
         ],
       });
@@ -131,6 +131,29 @@ describe('Smartbroker broker test', () => {
             amount: 65,
             fee: 4,
             tax: -25.04,
+          },
+        ],
+      });
+    });
+
+    test('Should parse a societe generale TUI turbo Sell that contains tax returns', () => {
+      const result = smartbroker.parsePages(sellSamples[3]);
+      expect(result).toEqual({
+        status: 0,
+        activities: [
+          {
+            broker: 'smartbroker',
+            type: 'Sell',
+            date: '2020-12-09',
+            datetime: '2020-12-09'+result.activities[0].datetime.substr(10),
+            isin: 'DE000SB73VN1',
+            company:
+              'Société Générale Effekten GmbH TurboL O.End TUI 5,452667',
+            shares: 150,
+            price: 0.001,
+            amount: 0.15,
+            fee: 0,
+            tax: -17.76,
           },
         ],
       });
