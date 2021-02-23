@@ -280,6 +280,28 @@ describe('Broker: commerzbank', () => {
         fxRate: 1.0901,
       });
     });
+
+    test('Can the foreign dividend for US5949181045_1 be parsed', () => {
+      const result = commerzbank.parsePages(dividendSamples[12]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'commerzbank',
+        type: 'Dividend',
+        date: '2020-12-14',
+        datetime: '2020-12-14T' + result.activities[0].datetime.substring(11),
+        isin: 'US5949181045',
+        wkn: '870747',
+        company: 'Microsoft Corp.',
+        shares: 40,
+        price: 0.39275,
+        amount: 15.71,
+        fee: 0,
+        tax: 0,
+        foreignCurrency: 'USD',
+        fxRate: 1.212,
+      });
+    });
   });
 
   describe('Validate transaction records', () => {
