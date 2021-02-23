@@ -41,6 +41,9 @@ const findSharesDividend = textArr => {
 const findDateBuy = textArr =>
   textArr[textArr.findIndex(t => t.includes('Geschäftstag')) + 2];
 
+const findDateSell = textArr =>
+  textArr[textArr.findIndex(t => t.includes('Geschäftstag')) + 2];
+
 const findDateDividend = (textArr, foreignDividend = false) => {
   if (foreignDividend) {
     return textArr[textArr.findIndex(t => t.includes('Information')) - 3];
@@ -141,7 +144,7 @@ const parseSingleTransaction = textArr => {
     fee = findFeeBuy(textArr, amount);
   } else if (isSell(textArr)) { 
     type = 'Sell';
-    date = findDateBuy(textArr);
+    date = findDateSell(textArr);
     wkn = findWknBuy(textArr);
     company = findCompanyBuy(textArr);
     shares = +findSharesBuy(textArr);
