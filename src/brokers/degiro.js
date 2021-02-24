@@ -3,9 +3,9 @@ import {
   parseGermanNum,
   validateActivity,
   createActivityDateTime,
-  isinRegex,
   findFirstIsinIndexInArray,
 } from '@/helper';
+import { findFirstRegexIndexInArray } from '../helper';
 
 const allowedDegiroCountries = [
   'www.degiro.de',
@@ -31,71 +31,59 @@ class zeroSharesTransaction extends Error {
 }
 
 const parseTransaction = (content, index, numberParser, offset) => {
-  // Is it possible that the transaction logs contains dividends?
-
-  let totalOffset = offset;
-  const isinIdx =
-    content.slice(index).findIndex(line => isinRegex.test(line)) + index;
-  const company = content.slice(index + 2, isinIdx).join(' ');
-  const isin = content[isinIdx];
-  const shares = Big(numberParser(content[isinIdx + 2 + offset]));
-  if (+shares === 0) {
+  let foreignCurrencyIndex;
+  const numberRegex = /^-?\d+(,\d+)?$/;
+  const isinIdx = findFirstIsinIndexInArray(content, index);
+  const sharesIdx = findFirstRegexIndexInArray(content, numberRegex , isinIdx);
+  const transactionEndIdx = findFirstRegexIndexInArray(content, /(DEGIRO B\.V\. ist als)|\d{2}-\d{2}-\d{4}/ , sharesIdx);
+  // Sometimes the currency comes first; sometimes the value comes first
+  const amountOffset = numberRegex.test((content[sharesIdx + 1])) ? 5 : 6;
+  let activity = {
+    broker: 'degiro',
+    company: content.slice(index + 2, isinIdx).join(' '),
+    isin: content[isinIdx],
+    shares: numberParser(content[sharesIdx]),
+    amount: Math.abs(numberParser(content[sharesIdx + amountOffset])),
+    tax: 0,
+    fee: 0
+  }
+  if (activity.shares === 0) {
     throw new zeroSharesTransaction(
-      'Transaction with ISIN ' + isin + ' has no shares.'
+      'Transaction with ISIN ' + activity.isin + ' has no shares.'
     );
   }
-  const amount = Big(numberParser(content[isinIdx + 8])).abs();
   // There is the case where the amount is 0, might be a transfer out or a knockout certificate
   const currency = content[isinIdx + 3 + offset * 2];
   const baseCurrency = content[isinIdx + 7 + offset * 2];
 
-  let fxRate = undefined;
   if (currency !== baseCurrency) {
-    fxRate = numberParser(content[isinIdx + 9 + offset]);
+    activity.foreignCurrency = currency;
+    activity.fxRate = numberParser(content[isinIdx + 9 + offset]);
     // For foreign currency we need to go one line ahead for the following fields.
-    totalOffset = 1;
+    foreignCurrencyIndex = 1;
   } else {
-    totalOffset = 0;
+    foreignCurrencyIndex = 0;
   }
 
-  const type = shares > 0 ? 'Buy' : 'Sell';
-  const price = amount.div(shares.abs());
-  let tax = 0;
-  let fee = 0;
-  if (type === 'Buy') {
-    fee = Math.abs(numberParser(content[isinIdx + totalOffset + 10]));
-  } else if (type === 'Sell') {
-    tax = Math.abs(numberParser(content[isinIdx + totalOffset + 10]));
+  activity.type = activity.shares > 0 ? 'Buy' : 'Sell';
+  activity.price = +Big(activity.amount).div(activity.shares).abs();
+  if (activity.type === 'Buy') {
+    activity.fee = Math.abs(numberParser(content[isinIdx + foreignCurrencyIndex + 10]));
+  } else if (activity.type === 'Sell') {
+    if (transactionEndIdx - sharesIdx >= 10) {
+      activity.tax = Math.abs(numberParser(content[isinIdx + foreignCurrencyIndex + 10]));
+    } else {
+      activity.tax = 0;
+    }
+    activity.shares = Math.abs(activity.shares)
   }
 
-  const [parsedDate, parsedDateTime] = createActivityDateTime(
+  [activity.date, activity.datetime] = createActivityDateTime(
     content[index],
     content[index + 1],
     'dd-MM-yyyy',
     'dd-MM-yyyy HH:mm'
   );
-
-  const activity = {
-    broker: 'degiro',
-    date: parsedDate,
-    datetime: parsedDateTime,
-    company,
-    isin,
-    shares: +shares.abs(),
-    amount: +amount,
-    type,
-    price: +price,
-    fee,
-    tax,
-  };
-
-  if (fxRate !== undefined) {
-    activity.fxRate = fxRate;
-  }
-
-  if (currency !== baseCurrency) {
-    activity.foreignCurrency = currency;
-  }
   return validateActivity(activity);
 };
 

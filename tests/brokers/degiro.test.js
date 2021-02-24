@@ -60,8 +60,10 @@ describe('Broker: DEGIRO', () => {
 
     test('Can the transactions be parsed from: buy_sell_and_call_transactions', () => {
       const activities = degiro.parsePages(transactionLog[1]).activities;
-
       expect(activities.length).toEqual(28);
+      expect(
+        activities.filter(activity => activity !== undefined).length
+      ).toEqual(28);
       expect(activities[5]).toEqual({
         broker: 'degiro',
         type: 'Buy',
@@ -223,6 +225,41 @@ describe('Broker: DEGIRO', () => {
         price: 0.48,
         amount: 99.36,
         fee: 2.11,
+        tax: 0,
+      });
+    });
+
+    test('Can parse 2020_transaction_log_1', () => {
+      const activities = degiro.parsePages(transactionLog[6]).activities;
+      expect(activities.length).toEqual(24);
+      expect(
+        activities.filter(activity => activity !== undefined).length
+      ).toEqual(24);
+      expect(activities[0]).toEqual({
+        broker: 'degiro',
+        type: 'Buy',
+        date: '2020-11-23',
+        datetime: '2020-11-23T11:13:00.000Z',
+        isin: 'DE000KA5U0Z1',
+        company: 'CALL 16.12.21 ASMLHOLD 340',
+        shares: 307,
+        price: 5.2,
+        amount: 1596.40,
+        fee: 3.76,
+        tax: 0,
+      });
+
+      expect(activities[23]).toEqual({
+        broker: 'degiro',
+        type: 'Sell',
+        date: '2020-10-28',
+        datetime: '2020-10-28T08:57:00.000Z',
+        isin: 'DE000GF2AT89',
+        company: 'TUBULL O.ENDMASTERC.303,301861',
+        shares: 100,
+        price: 0.001,
+        amount: 0.1,
+        fee: 0,
         tax: 0,
       });
     });

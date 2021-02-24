@@ -5,6 +5,7 @@ export const transactionLog = [
   require('./transactionLog/mixed_transaction_log_2.json'),
   require('./transactionLog/2021_transaction_log_1.json'),
   require('./transactionLog/2021_transaction_log_2.json'),
+  require('./transactionLog/2020_transaction_log_1.json'),
 ];
 
 export const depotOverview = [

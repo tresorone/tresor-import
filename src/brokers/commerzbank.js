@@ -380,7 +380,7 @@ export const parsePages = contents => {
     return {
       activities,
       status: 7,
-	};
+    };
   }
 
   // Transaction Reports need to be handled completely different from individual
