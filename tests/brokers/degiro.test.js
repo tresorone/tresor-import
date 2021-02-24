@@ -1,9 +1,7 @@
 import { findImplementation } from '@/index';
 import * as degiro from '../../src/brokers/degiro';
 import Big from 'big.js';
-import { transactionLog } from './__mocks__/degiro';
-
-const allSamples = transactionLog; //.concat(futureSamples);
+import { transactionLog, depotOverview, allSamples } from './__mocks__/degiro';
 
 describe('Broker: DEGIRO', () => {
   let consoleErrorSpy;
@@ -225,6 +223,40 @@ describe('Broker: DEGIRO', () => {
         price: 0.48,
         amount: 99.36,
         fee: 2.11,
+        tax: 0,
+      });
+    });
+  });
+
+  describe('Validate Depot Overviews', () => {
+    test('Can parse a Depot Overview from 2021', () => {
+      const result = degiro.parsePages(depotOverview[0]);
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(6);
+      expect(result.activities[0]).toEqual({
+        broker: 'degiro',
+        type: 'TransferIn',
+        date: '2021-02-23',
+        datetime: '2021-02-23T' + result.activities[0].datetime.substr(11),
+        isin: 'GB00B18S7B29',
+        company: 'AFC ENERGY PLC   LS -,001',
+        shares: 17,
+        price: 0.67,
+        amount: 11.41,
+        fee: 0,
+        tax: 0,
+      });
+      expect(result.activities[5]).toEqual({
+        broker: 'degiro',
+        type: 'TransferIn',
+        date: '2021-02-23',
+        datetime: '2021-02-23T' + result.activities[0].datetime.substr(11),
+        isin: 'DE000WACK012',
+        company: 'WACKER NEUSON SE',
+        shares: 2,
+        price: 16.67,
+        amount: 33.34,
+        fee: 0,
         tax: 0,
       });
     });

@@ -4,6 +4,7 @@ import {
   validateActivity,
   createActivityDateTime,
   isinRegex,
+  findFirstIsinIndexInArray,
 } from '@/helper';
 
 const allowedDegiroCountries = [
@@ -28,14 +29,6 @@ class zeroSharesTransaction extends Error {
     }
   }
 }
-
-const isTransactionOverview = pdfPage => {
-  return pdfPage.some(line => line.startsWith('Transaktionsübersicht von'));
-};
-
-const isAccountStatement = pdfPage => {
-  return pdfPage[0].some(line => line.startsWith('Kontoauszug von'));
-};
 
 const parseTransaction = (content, index, numberParser, offset) => {
   // Is it possible that the transaction logs contains dividends?
@@ -148,32 +141,92 @@ const parseTransactionLog = pdfPages => {
   return activities;
 };
 
-export const canParseDocument = (pages, extension) => {
-  const firstPageContent = pages[0];
+const parseDepotStatement = pdfPages => {
+  const flattendPages = pdfPages.flat();
+  const dateline =
+    flattendPages[
+      flattendPages.findIndex(line =>
+        line.startsWith('Portfolioübersicht per ')
+      )
+    ];
+  const [date, datetime] = createActivityDateTime(
+    dateline.split(/\s+/)[2],
+    undefined,
+    'dd-MM-yyyy'
+  );
+  let activities = [];
+  let isinIdx = findFirstIsinIndexInArray(flattendPages);
+  while (isinIdx >= 0) {
+    const activity = {
+      broker: 'degiro',
+      type: 'TransferIn',
+      isin: flattendPages[isinIdx],
+      company: flattendPages[isinIdx - 1],
+      date,
+      datetime,
+      shares: parseGermanNum(flattendPages[isinIdx + 1]),
+      price: parseGermanNum(flattendPages[isinIdx + 2]),
+      amount: parseGermanNum(flattendPages[isinIdx + 4]),
+      tax: 0,
+      fee: 0,
+    };
+    if (validateActivity(activity)) {
+      activities.push(activity);
+    } else {
+      return undefined;
+    }
+
+    isinIdx = findFirstIsinIndexInArray(flattendPages, isinIdx + 1);
+  }
+  return activities;
+};
+
+const getDocumentType = pdfPages => {
+  if (pdfPages[0].some(line => line.startsWith('Kontoauszug von'))) {
+    return 'AccountStatement';
+  } else if (
+    pdfPages[0].some(line => line.startsWith('Transaktionsübersicht von'))
+  ) {
+    return 'TransactionLog';
+  } else if (pdfPages[0].some(line => line.startsWith('Portfolioübersicht'))) {
+    return 'DepotOverview';
+  }
+};
+
+export const canParseDocument = (pdfPages, extension) => {
   return (
     extension === 'pdf' &&
-    firstPageContent.some(line => allowedDegiroCountries.includes(line)) &&
-    isTransactionOverview(firstPageContent)
+    pdfPages[0].some(line => allowedDegiroCountries.includes(line)) &&
+    getDocumentType(pdfPages) !== undefined
   );
 };
 
 export const parsePages = pdfPages => {
+  const documentType = getDocumentType(pdfPages);
   let activities;
+  switch (documentType) {
+    // This type of file contains Dividends and other information. Only dividends are processed. This is not implemented
+    // yet as the dividends lack the information how many shares are in the account
+    case 'AccountStatement':
+      return {
+        activities: [],
+        status: 5,
+      };
 
-  // This type of file contains Buy and Sell operations
-  if (isTransactionOverview(pdfPages[0])) {
-    activities = parseTransactionLog(pdfPages);
+    // This type of file contains Buy and Sell operations
+    case 'TransactionLog': {
+      activities = parseTransactionLog(pdfPages);
+      break;
+    }
+
+    case 'DepotOverview': {
+      activities = parseDepotStatement(pdfPages);
+      break;
+    }
   }
-  // This type of file contains Dividends and other information. Only dividends are processed. This is not implemented
-  // yet as the dividends lack the information how many shares are in the account
-  else if (isAccountStatement(pdfPages[0])) {
-    return {
-      undefined,
-      status: 5,
-    };
-  }
+
   return {
     activities,
-    status: 0,
+    status: activities === undefined ? 1 : 0,
   };
 };
