@@ -24,7 +24,7 @@
     "import"
   ],
   "author": "Sumit Kumar",
-  "license": "MIT",
+  "license": "AGPLv3",
   "dependencies": {
     "big.js": "^5.2.2",
     "lodash": "^4.17.19",

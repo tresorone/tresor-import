@@ -55,18 +55,19 @@ To contribute:
 # Licensing
 
 Usage of this codebase is permitted according to the GNU Affero General Public License v3 (AGPL-3.0).
+
 **HERE'S AN INCOMPLETE SUMMARY. READ THE [FULL LICENSE](LICENSE) BEFORE USING**
 
 - You are permitted to:
   - Use this codebase in any way you want including commercially
   - Modify and distribute the codebase in any way you want
 - You MUST:
-  - respect the copyright which is held by the maintainers of this project
-  - disclose all changes you made to the code and also publish any code directly based on this code
-  - give attribution to the orignal maintainers when using this project (especially when used commercially)
+  - Respect the copyright which is held by the maintainers of this project
+  - Disclose all changes you made to the code and also publish any code directly based on this code
+  - Give attribution to the orignal maintainers when using this project (especially when used commercially)
 - You can not
   - Sublicense this codebase
-  - expect any liability, warranty or similar by the original maintainers. However, we want to improve
+  - Expect any liability, warranty or similar by the original maintainers. However, we want to improve
     this project as much as possible so feedback is heard!
 
 See also the following image, taken from [TL;DR Legal](https://www.tldrlegal.com/l/agpl3).
