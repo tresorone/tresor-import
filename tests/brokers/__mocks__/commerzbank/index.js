@@ -11,6 +11,7 @@ export const buySamples = [
 
 export const sellSamples = [
   require('./sell/2021-DWS_Inv.json'),
+  require('./sell/sell_NL0000235190_1.json'),
 ];
 
 export const dividendSamples = [

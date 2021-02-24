@@ -194,6 +194,25 @@ describe('Broker: commerzbank', () => {
         tax: 0,
       });
     });
+
+    test('Can a sell order for 938914 be parsed', () => {
+      const result = commerzbank.parsePages(sellSamples[1]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'commerzbank',
+        type: 'Sell',
+        date: '2020-12-23',
+        datetime: '2020-12-23T' + result.activities[0].datetime.substring(11),
+        wkn: '938914',
+        company: 'Airbus SE',
+        shares: 12,
+        price: 90.09,
+        amount: 1081.08,
+        fee: 9.9,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate dividends', () => {

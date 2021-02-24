@@ -99,8 +99,12 @@ const findPriceBuy = textArr => {
 };
 
 const findFeeBuy = (textArr, amount) => {
-  const payedAmountIdx = textArr.findIndex(t => t.includes('Valuta')) + 15;
-  return +Big(parseGermanNum(textArr[payedAmountIdx])).minus(amount);
+  if (textArr.indexOf('Minimumprovision') > 0) {
+    return +Big(parseGermanNum(textArr[textArr.findIndex(t => t.includes('Minimumprovision')) + 3]));
+  } else {
+    const payedAmountIdx = textArr.findIndex(t => t.includes('Valuta')) + 15;
+    return +Big(parseGermanNum(textArr[payedAmountIdx])).minus(amount);
+  }
 };
 
 const findTaxDividend = textArr => {
