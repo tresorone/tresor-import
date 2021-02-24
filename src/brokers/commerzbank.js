@@ -10,7 +10,7 @@ import {
 // BLOCK 1
 // SINGLE TRANSACTIONS
 //===========================
-const findAmountBuy = textArr => {
+const findAmountBuySell = textArr => {
   const amountIdx = textArr.findIndex(t => t.includes('Kurswert'));
   return parseGermanNum(textArr[amountIdx + 3]);
 };
@@ -29,7 +29,7 @@ const findAmountDividend = (textArr, foreignDividend) => {
   return parseGermanNum(textArr[amountIndex]);
 };
 
-const findSharesBuy = textArr => {
+const findSharesBuySell = textArr => {
   return Big(
     parseGermanNum(textArr[textArr.findIndex(t => t.includes('St.')) + 1])
   );
@@ -65,7 +65,7 @@ const findDateDividend = (textArr, foreignDividend = false) => {
   }
 };
 
-const findWknBuy = textArr => {
+const findWknBuySell = textArr => {
   const wknRoughIdx = textArr.indexOf('Wertpapierkennnummer');
   const slicedArry = textArr.slice(wknRoughIdx);
   return slicedArry[slicedArry.findIndex(t => /^[0-9A-Z]{6}$/.test(t))];
@@ -93,12 +93,12 @@ const findIsinDividend = (textArr, foreignDividend) => {
   return textArr[isinIdx];
 };
 
-const findPriceBuy = textArr => {
+const findPriceBuySell = textArr => {
   const priceIdx = textArr.findIndex(t => t.includes('Kurswert')) - 1;
   return parseGermanNum(textArr[priceIdx]);
 };
 
-const findFeeBuy = (textArr, amount) => {
+const findFeeBuySell = (textArr, amount) => {
   if (textArr.indexOf('Minimumprovision') > 0) {
     return +Big(parseGermanNum(textArr[textArr.findIndex(t => t.includes('Minimumprovision')) + 3]));
   } else {
@@ -115,7 +115,7 @@ const findTaxDividend = textArr => {
   return 0;
 };
 
-const findCompanyBuy = textArr => {
+const findCompanyBuySell = textArr => {
   const startCompanyName =
     textArr.findIndex(t => t.includes('Wertpapierkennnummer')) + 1;
   const companyLength = textArr
@@ -172,22 +172,22 @@ const parseSingleTransaction = textArr => {
   if (isBuy(textArr)) {
     type = 'Buy';
     date = findDateBuySell(textArr);
-    wkn = findWknBuy(textArr);
-    company = findCompanyBuy(textArr);
-    shares = +findSharesBuy(textArr);
-    amount = findAmountBuy(textArr);
-    price = findPriceBuy(textArr);
-    fee = findFeeBuy(textArr, amount);
+    wkn = findWknBuySell(textArr);
+    company = findCompanyBuySell(textArr);
+    shares = +findSharesBuySell(textArr);
+    amount = findAmountBuySell(textArr);
+    price = findPriceBuySell(textArr);
+    fee = findFeeBuySell(textArr, amount);
   } else if (isSell(textArr)) { 
     type = 'Sell';
     date = findDateBuySell(textArr);
 	time = findTimeSell(textArr);
-    wkn = findWknBuy(textArr);
-    company = findCompanyBuy(textArr);
-    shares = +findSharesBuy(textArr);
-    amount = findAmountBuy(textArr);
-    price = findPriceBuy(textArr);
-    fee = findFeeBuy(textArr, amount);
+    wkn = findWknBuySell(textArr);
+    company = findCompanyBuySell(textArr);
+    shares = +findSharesBuySell(textArr);
+    amount = findAmountBuySell(textArr);
+    price = findPriceBuySell(textArr);
+    fee = findFeeBuySell(textArr, amount);
   }	else if (isDividend(textArr)) {
     const foreignCurrencyIndex = textArr.indexOf('Devisenkurs:');
     const foreignDividend = foreignCurrencyIndex >= 0;
