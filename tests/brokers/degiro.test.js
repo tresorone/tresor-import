@@ -244,7 +244,7 @@ describe('Broker: DEGIRO', () => {
         company: 'CALL 16.12.21 ASMLHOLD 340',
         shares: 307,
         price: 5.2,
-        amount: 1596.40,
+        amount: 1596.4,
         fee: 3.76,
         tax: 0,
       });

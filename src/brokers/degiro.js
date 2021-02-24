@@ -34,10 +34,14 @@ const parseTransaction = (content, index, numberParser, offset) => {
   let foreignCurrencyIndex;
   const numberRegex = /^-?\d+(,\d+)?$/;
   const isinIdx = findFirstIsinIndexInArray(content, index);
-  const sharesIdx = findFirstRegexIndexInArray(content, numberRegex , isinIdx);
-  const transactionEndIdx = findFirstRegexIndexInArray(content, /(DEGIRO B\.V\. ist als)|\d{2}-\d{2}-\d{4}/ , sharesIdx);
+  const sharesIdx = findFirstRegexIndexInArray(content, numberRegex, isinIdx);
+  const transactionEndIdx = findFirstRegexIndexInArray(
+    content,
+    /(DEGIRO B\.V\. ist als)|\d{2}-\d{2}-\d{4}/,
+    sharesIdx
+  );
   // Sometimes the currency comes first; sometimes the value comes first
-  const amountOffset = numberRegex.test((content[sharesIdx + 1])) ? 5 : 6;
+  const amountOffset = numberRegex.test(content[sharesIdx + 1]) ? 5 : 6;
   let activity = {
     broker: 'degiro',
     company: content.slice(index + 2, isinIdx).join(' '),
@@ -45,8 +49,8 @@ const parseTransaction = (content, index, numberParser, offset) => {
     shares: numberParser(content[sharesIdx]),
     amount: Math.abs(numberParser(content[sharesIdx + amountOffset])),
     tax: 0,
-    fee: 0
-  }
+    fee: 0,
+  };
   if (activity.shares === 0) {
     throw new zeroSharesTransaction(
       'Transaction with ISIN ' + activity.isin + ' has no shares.'
@@ -68,14 +72,18 @@ const parseTransaction = (content, index, numberParser, offset) => {
   activity.type = activity.shares > 0 ? 'Buy' : 'Sell';
   activity.price = +Big(activity.amount).div(activity.shares).abs();
   if (activity.type === 'Buy') {
-    activity.fee = Math.abs(numberParser(content[isinIdx + foreignCurrencyIndex + 10]));
+    activity.fee = Math.abs(
+      numberParser(content[isinIdx + foreignCurrencyIndex + 10])
+    );
   } else if (activity.type === 'Sell') {
     if (transactionEndIdx - sharesIdx >= 10) {
-      activity.tax = Math.abs(numberParser(content[isinIdx + foreignCurrencyIndex + 10]));
+      activity.tax = Math.abs(
+        numberParser(content[isinIdx + foreignCurrencyIndex + 10])
+      );
     } else {
       activity.tax = 0;
     }
-    activity.shares = Math.abs(activity.shares)
+    activity.shares = Math.abs(activity.shares);
   }
 
   [activity.date, activity.datetime] = createActivityDateTime(
