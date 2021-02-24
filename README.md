@@ -55,7 +55,8 @@ To contribute:
 # Licensing
 
 Usage of this codebase is permitted according to the GNU Affero General Public License v3 (AGPL-3.0).
-**HERE'S AN INCOMPLETE SUMMARY. READ THE [FULL LICENSE](LICENSE) BEFORE USING**
+
+**HERE'S AN INCOMPLETE SUMMARY. READ THE [FULL LICENSE](LICENSE) BEFORE USING.**
 
 - You are permitted to:
   - Use this codebase in any way you want including commercially
