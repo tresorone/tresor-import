@@ -5,6 +5,7 @@ import {
   buySamples,
   sellSamples,
   dividendSamples,
+  transferInSamples,
   ignoredSamples,
 } from './__mocks__/smartbroker';
 
@@ -45,6 +46,28 @@ describe('Smartbroker broker test', () => {
         tax: 0,
       });
     });
+
+    test('should map pdf data of sample 1 correctly', () => {
+      const result = smartbroker.parsePages(buySamples[1]);
+      expect(result).toEqual({
+        status: 0,
+        activities: [
+          {
+            broker: 'smartbroker',
+            type: 'Buy',
+            date: '2021-02-18',
+            datetime: '2021-02-18T08:28:00.000Z',
+            isin: 'DE000A0M93V6',
+            company: 'Advanced Blockchain AG Inhaber-Aktien o.N.',
+            shares: 25,
+            price: 20.8,
+            amount: 520,
+            fee: 6.3,
+            tax: 0,
+          },
+        ],
+      });
+    });
   });
 
   describe('Sell', () => {
@@ -63,6 +86,75 @@ describe('Smartbroker broker test', () => {
         amount: 2139.8,
         fee: 0,
         tax: 27.57,
+      });
+    });
+
+    test('Should parse a knocked out turbo from 2021', () => {
+      const result = smartbroker.parsePages(sellSamples[1]);
+
+      expect(result).toEqual({
+        status: 0,
+        activities: [
+          {
+            broker: 'smartbroker',
+            type: 'Sell',
+            date: '2021-02-04',
+            datetime: '2021-02-04' + result.activities[0].datetime.substr(10),
+            isin: 'DE000LS8Z9Z4',
+            company: 'Lang & Schwarz AG TurboC O.End XinyiSol 1,8',
+            shares: 100,
+            price: 0.001,
+            amount: 0.1,
+            fee: 0,
+            tax: -13.16,
+          },
+        ],
+      });
+    });
+
+    test('Should parse a goldman Sachs Bayer sell from 2020', () => {
+      const result = smartbroker.parsePages(sellSamples[2]);
+
+      expect(result).toEqual({
+        status: 0,
+        activities: [
+          {
+            broker: 'smartbroker',
+            type: 'Sell',
+            date: '2020-12-10',
+            datetime: '2020-12-10T16:18:00.000Z',
+            isin: 'DE000GF3VUV0',
+            company:
+              'Goldman Sachs Wertpapier GmbH FaktL O.End Bayer 46,24619999',
+            shares: 100,
+            price: 0.65,
+            amount: 65,
+            fee: 4,
+            tax: -25.04,
+          },
+        ],
+      });
+    });
+
+    test('Should parse a societe generale TUI turbo Sell that contains tax returns', () => {
+      const result = smartbroker.parsePages(sellSamples[3]);
+      expect(result).toEqual({
+        status: 0,
+        activities: [
+          {
+            broker: 'smartbroker',
+            type: 'Sell',
+            date: '2020-12-09',
+            datetime: '2020-12-09' + result.activities[0].datetime.substr(10),
+            isin: 'DE000SB73VN1',
+            company: 'Société Générale Effekten GmbH TurboL O.End TUI 5,452667',
+            shares: 150,
+            price: 0.001,
+            amount: 0.15,
+            fee: 0,
+            tax: -17.76,
+          },
+        ],
       });
     });
   });
@@ -203,6 +295,76 @@ describe('Smartbroker broker test', () => {
         tax: 7.039151712887439,
         fxRate: 1.226,
         foreignCurrency: 'USD',
+      });
+    });
+
+    test('Can parse 2020_realty_income USD dividend', () => {
+      const result = smartbroker.parsePages(dividendSamples[7]);
+      expect(result).toEqual({
+        status: 0,
+        activities: [
+          {
+            broker: 'smartbroker',
+            type: 'Dividend',
+            date: '2020-12-15',
+            datetime: '2020-12-15' + result.activities[0].datetime.substr(10),
+            isin: 'US7561091049',
+            company: 'Realty Income Corp. Registered Shares DL 1',
+            shares: 20,
+            price: 0.1923393062633569,
+            amount: 3.846786125267138,
+            fee: 0,
+            tax: 0.5753739930955121,
+            fxRate: 1.2166,
+            foreignCurrency: 'USD',
+          },
+        ],
+      });
+    });
+  });
+
+  describe('TransferIn', () => {
+    test('Should parse ADO properties TransferIn correctly', () => {
+      const result = smartbroker.parsePages(transferInSamples[0]);
+      expect(result).toEqual({
+        status: 0,
+        activities: [
+          {
+            broker: 'smartbroker',
+            type: 'TransferIn',
+            date: '2020-07-21',
+            datetime: '2020-07-21' + result.activities[0].datetime.substr(10),
+            isin: 'LU1250154413',
+            company: 'ADO Properties S.A. Actions Nominatives o.N.',
+            shares: 5,
+            price: 14.6,
+            amount: 73,
+            fee: 0.5,
+            tax: 0,
+          },
+        ],
+      });
+    });
+
+    test('Should parse caterpillar TransferIn correctly', () => {
+      const result = smartbroker.parsePages(transferInSamples[1]);
+      expect(result).toEqual({
+        status: 0,
+        activities: [
+          {
+            broker: 'smartbroker',
+            type: 'TransferIn',
+            date: '2020-03-18',
+            datetime: '2020-03-18' + result.activities[0].datetime.substr(10),
+            isin: 'US1491231015',
+            company: 'Caterpillar Inc. Registered Shares DL 1',
+            shares: 2,
+            price: 84.49,
+            amount: 168.98,
+            fee: 9.3,
+            tax: 0,
+          },
+        ],
       });
     });
   });

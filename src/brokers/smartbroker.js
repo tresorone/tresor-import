@@ -8,6 +8,7 @@ import * as onvista from './onvista';
 
 const findTax = (textArr, fxRate) => {
   let completeTax = Big(0);
+  const isTaxReturn = textArr.includes('Steuerausgleich nach § 43a EStG:');
 
   const capitalTaxIndex = textArr.findIndex(t =>
     t.includes('Kapitalertragsteuer')
@@ -33,6 +34,10 @@ const findTax = (textArr, fxRate) => {
   );
   if (churchTaxIndex > 0) {
     completeTax = completeTax.plus(parseGermanNum(textArr[churchTaxIndex + 2]));
+  }
+
+  if (isTaxReturn) {
+    completeTax = completeTax.times(-1);
   }
 
   const witholdingTaxIndex = textArr.findIndex(
@@ -107,31 +112,46 @@ const findOrderTime = content => {
   return content[lineNumber + 1].trim().substr(0, 5);
 };
 
-const detectedButIgnoredDocument = content => {
-  return content.includes('Kostendarstellung');
+const getDocumentType = content => {
+  if (onvista.isBuy(content)) {
+    return 'Buy';
+  } else if (onvista.isSell(content)) {
+    return 'Sell';
+  } else if (onvista.isDividend(content)) {
+    return 'Dividend';
+  } else if (content.includes('Einlösung zu:')) {
+    return 'TurboKO';
+  } else if (
+    content.includes('Umtausch/Bezug') ||
+    content.includes('Wir haben für Sie folgende Anschaffungsdaten')
+  ) {
+    return 'TransferIn';
+  } else if (
+    content.includes('Vermˆgensbericht') ||
+    content.includes('Kostendarstellung')
+  ) {
+    return 'Ignored';
+  }
 };
-
-const canParsePage = content =>
-  onvista.isBuy(content) ||
-  onvista.isSell(content) ||
-  onvista.isDividend(content);
 
 export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
   return (
     extension === 'pdf' &&
-    firstPageContent.some(line =>
-      line.includes(onvista.smartbrokerIdentificationString)
+    firstPageContent.some(
+      line =>
+        line.includes(onvista.smartbrokerIdentificationStrings[0]) ||
+        line.includes(onvista.smartbrokerIdentificationStrings[1])
     ) &&
-    (canParsePage(firstPageContent) ||
-      detectedButIgnoredDocument(firstPageContent))
+    getDocumentType(firstPageContent) !== undefined
   );
 };
 
-const parseBuySellDividend = pdfPages => {
+const parseBuySellDividend = (pdfPages, type) => {
   const textArr = pdfPages.flat();
   let activity = {
     broker: 'smartbroker',
+    type,
     shares: onvista.findShares(textArr),
     isin: onvista.findISIN(textArr),
     company: onvista.findCompany(textArr),
@@ -141,24 +161,20 @@ const parseBuySellDividend = pdfPages => {
   const [fxRate, foreignCurrency] = findFxRateAndForeignCurrency(textArr);
   let date, time;
 
-  if (onvista.isBuy(textArr)) {
-    activity.type = 'Buy';
+  if (activity.type === 'Buy') {
     activity.amount = onvista.findAmount(textArr);
     activity.price = onvista.findPrice(textArr);
     activity.fee = onvista.findFee(textArr);
-
     date = onvista.findDateBuySell(textArr);
     time = findOrderTime(textArr);
-  } else if (onvista.isSell(textArr)) {
-    activity.type = 'Sell';
+  } else if (activity.type === 'Sell') {
     activity.amount = onvista.findAmount(textArr);
     activity.price = onvista.findPrice(textArr);
     activity.tax = findTax(textArr, fxRate);
-
+    activity.fee = onvista.findFee(textArr);
     date = onvista.findDateBuySell(textArr);
     time = findOrderTime(textArr);
-  } else if (onvista.isDividend(textArr)) {
-    activity.type = 'Dividend';
+  } else if (activity.type === 'Dividend') {
     activity.tax = findTax(textArr, fxRate);
     activity.price =
       fxRate === undefined
@@ -168,7 +184,6 @@ const parseBuySellDividend = pdfPages => {
 
     date = onvista.findDateDividend(textArr);
   }
-
   [activity.date, activity.datetime] = createActivityDateTime(date, time);
 
   if (fxRate !== undefined) {
@@ -181,22 +196,89 @@ const parseBuySellDividend = pdfPages => {
   return [validateActivity(activity)];
 };
 
-export const parsePages = pdfPages => {
-  if (detectedButIgnoredDocument(pdfPages[0])) {
-    return {
-      activities: undefined,
-      status: 7,
-    };
-  }
-  const activities = parseBuySellDividend(pdfPages);
-  if (activities !== undefined) {
-    return {
-      activities,
-      status: 0,
-    };
-  }
-  return {
-    activities: undefined,
-    status: 5,
+const parseTurboKO = pdfPages => {
+  const companyStartIdx = pdfPages.indexOf('Gattungsbezeichnung') + 1;
+  const companyEndIdx = pdfPages.indexOf('Fälligkeit');
+  let activity = {
+    broker: 'smartbroker',
+    type: 'Sell',
+    shares: onvista.findShares(pdfPages),
+    isin: onvista.findISIN(pdfPages),
+    company: pdfPages.slice(companyStartIdx, companyEndIdx).join(' '),
+    amount: onvista.findAmount(pdfPages),
+    tax: findTax(pdfPages),
+    fee: 0,
   };
+  activity.price = parseGermanNum(
+    pdfPages[pdfPages.indexOf('Einlösung zu:') + 1].split(/\s+/)[1]
+  );
+  [activity.date, activity.datetime] = createActivityDateTime(
+    pdfPages[pdfPages.indexOf('Wert') + 1]
+  );
+  return [validateActivity(activity)];
+};
+
+const parseTransferIn = pdfPages => {
+  const isRevision = pdfPages.includes('Anpassung Anschaffungsdaten');
+  let activity = {
+    broker: 'smartbroker',
+    type: 'TransferIn',
+    shares: onvista.findShares(pdfPages),
+    isin: onvista.findISIN(pdfPages),
+    company: pdfPages[pdfPages.indexOf('Gattungsbezeichnung') + 1],
+    amount: onvista.findAmount(pdfPages),
+    price: onvista.findPrice(pdfPages),
+    tax: 0,
+    fee: onvista.findFee(pdfPages),
+  };
+
+  if (isRevision) {
+    activity.amount = parseGermanNum(
+      pdfPages[pdfPages.indexOf('Anschaffungswert') + 4]
+    );
+    activity.fee = parseGermanNum(
+      pdfPages[pdfPages.indexOf('Anschaffungsnebenkosten') + 4]
+    );
+    activity.price = +Big(activity.amount).div(activity.shares);
+  }
+  const dateIdx = isRevision
+    ? pdfPages.indexOf('Anschaffungsdatum') + 3
+    : pdfPages.indexOf('Wert') + 1;
+  [activity.date, activity.datetime] = createActivityDateTime(
+    pdfPages[dateIdx]
+  );
+  return [validateActivity(activity)];
+};
+
+export const parsePages = pdfPages => {
+  const type = getDocumentType(pdfPages[0]);
+  switch (type) {
+    case 'Ignored':
+      return {
+        activities: undefined,
+        status: 7,
+      };
+    case 'Buy':
+    case 'Sell':
+    case 'Dividend':
+      return {
+        activities: parseBuySellDividend(pdfPages, type),
+        status: 0,
+      };
+    case 'TurboKO':
+      return {
+        activities: parseTurboKO(pdfPages.flat()),
+        status: 0,
+      };
+    case 'TransferIn':
+      return {
+        activities: parseTransferIn(pdfPages.flat()),
+        status: 0,
+      };
+    default:
+      return {
+        activities: undefined,
+        status: 5,
+      };
+  }
 };

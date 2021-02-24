@@ -4,6 +4,7 @@ export const buySamples = [
   require('./buy/limit_order_financial_transaction_tax.json'),
   require('./buy/market_order_without_explicit_ISIN.json'),
   require('./buy/saving_plan.json'),
+  require('./buy/2021_tui_preferred_buy.json'),
 ];
 
 export const sellSamples = [
@@ -26,11 +27,17 @@ export const dividendSamples = [
   require('./dividend/2021_reinvest_main_street_capital.json'),
 ];
 
-export const quarterSamples = [
-  require('./quarter_statement/without_stocks.json'),
-  require('./quarter_statement/with_stocks.json'),
-  require('./quarter_statement/two_pages.json'),
-  require('./quarter_statement/2020_year_end_statement.json'),
+export const depotStatement = [
+  require('./depotStatement/without_stocks.json'),
+  require('./depotStatement/with_stocks.json'),
+  require('./depotStatement/two_pages.json'),
+  require('./depotStatement/2020_year_end_statement.json'),
+  require('./depotStatement/2020_depotStatement_single_etf.json'),
+];
+
+export const options = [
+  require('./options/2021_call_apple_tilgung.json'),
+  require('./options/2021_turbo_varta_knockout_repayment.json'),
 ];
 
 export const ignoredSamples = [
@@ -46,6 +53,7 @@ export const ignoredSamples = [
 export const allSamples = buySamples.concat(
   sellSamples,
   dividendSamples,
-  quarterSamples,
+  depotStatement,
+  options,
   ignoredSamples
 );

@@ -3,6 +3,8 @@ import {
   parseGermanNum,
   validateActivity,
   createActivityDateTime,
+  findFirstRegexIndexInArray,
+  findFirstIsinIndexInArray,
 } from '@/helper';
 
 const findISIN = text => {
@@ -20,16 +22,25 @@ const findISIN = text => {
 const findCompany = text => {
   let companyIdx = text.indexOf('Reinvestierung');
   if (companyIdx < 0) {
+    companyIdx = text.indexOf('Umtausch/Bezug');
+  }
+  if (companyIdx < 0) {
     companyIdx = text.indexOf('BETRAG');
   }
   return text[companyIdx + 1];
 };
 
-const findDateSingleBuy = textArr => {
+const findDateSingleBuy = content => {
   // Extract the date from a string like this: "Market-Order Kauf am 04.02.2020, um 14:02 Uhr an der Lang & Schwarz Exchange."
   const searchTerm = 'Kauf am ';
-  const dateLine = textArr[textArr.findIndex(t => t.includes(searchTerm))];
-  return dateLine.split(searchTerm)[1].trim().substr(0, 10);
+  const dateIdx = content.findIndex(t => t.includes(searchTerm));
+  if (dateIdx >= 0) {
+    const dateLine = content[dateIdx];
+    return dateLine.split(searchTerm)[1].trim().substr(0, 10);
+  }
+
+  // For some special buys as part of capital increases there is no dateline
+  return content[content.indexOf('VALUTA') + 3];
 };
 
 const findOrderTime = content => {
@@ -73,11 +84,16 @@ const findShares = textArr => {
 const findAmount = (textArr, fxRate) => {
   let amountIdx = textArr.indexOf('Bruttoertrag');
   if (amountIdx < 0) {
+    amountIdx = textArr.indexOf('Kurswert');
+  }
+  if (amountIdx < 0) {
     amountIdx = textArr.indexOf('GESAMT');
   }
   const totalAmountLine = textArr[amountIdx + 1];
   const amount = parseGermanNum(totalAmountLine.split(' ')[0].trim());
-  return fxRate !== undefined ? +Big(amount).div(fxRate) : amount;
+  return fxRate !== undefined
+    ? +Big(amount).div(fxRate).abs()
+    : Math.abs(amount);
 };
 
 const findForeignInformation = textArr => {
@@ -102,7 +118,11 @@ const findFee = (textArr, fxRate) => {
   if (textArr.indexOf('Fremdkostenzuschlag') > -1) {
     const feeLine = textArr[textArr.indexOf('Fremdkostenzuschlag') + 1];
     const feeNumberString = feeLine.split(/\s+/)[0];
-
+    totalFee = totalFee.minus(parseGermanNum(feeNumberString));
+  }
+  if (textArr.indexOf('Gebühr Kundenweisung') > -1) {
+    const feeLine = textArr[textArr.indexOf('Gebühr Kundenweisung') + 1];
+    const feeNumberString = feeLine.split(/\s+/)[0];
     totalFee = totalFee.minus(parseGermanNum(feeNumberString));
   }
 
@@ -188,82 +208,73 @@ const getDocumentType = content => {
     return 'Dividend';
   } else if (
     content.some(
-      line => line.includes('Sparplanausführung am') || line.includes('Kauf am')
+      line =>
+        line.includes('Sparplanausführung am') ||
+        line.includes('Kauf am') ||
+        line === 'UMTAUSCH/BEZUG'
     )
   ) {
     return 'Buy';
   } else if (content.some(line => line.includes('Verkauf am'))) {
     return 'Sell';
+  } else if (content.includes('TILGUNG')) {
+    return 'callRepayment';
   }
   return undefined;
 };
 
 // Functions to parse an overview Statement
-const parsePositionAsActivity = (content, startLineNumber) => {
-  // Find the line with ISIN and the next line with the date
-  let lineNumberOfISIN;
-  let lineOfDate;
-  for (
-    let lineNumber = startLineNumber;
-    lineNumber < content.length;
-    lineNumber++
-  ) {
-    const line = content[lineNumber];
-    if (line.startsWith('ISIN:') && lineNumberOfISIN === undefined) {
-      lineNumberOfISIN = lineNumber;
-    }
-
-    if (lineNumberOfISIN !== undefined && /^\d{2}\.\d{2}\.\d{4}$/.test(line)) {
-      lineOfDate = lineNumber;
-      break;
-    }
-  }
-
-  let numberOfSharesLine;
+const parseDepotStatementEntry = (content, startLineNumber) => {
+  const isinIdx = findFirstRegexIndexInArray(
+    content,
+    /ISIN: .+/,
+    startLineNumber
+  );
+  const dateIdx = findFirstRegexIndexInArray(
+    content,
+    /^\d{2}\.\d{2}\.\d{4}$/,
+    isinIdx
+  );
+  // Edge-case: On a pages change, the total amount are located under the company name.
+  const amountIdx =
+    isinIdx - startLineNumber > 5 ? startLineNumber + 3 : dateIdx + 1;
+  let sharesLine;
   if (content[startLineNumber].includes(' ')) {
     // Normaly the number of shares are listed in a line with Stk.:
     // 1000 Stk.
-    numberOfSharesLine = content[startLineNumber].split(' ')[0];
+    sharesLine = content[startLineNumber].split(' ')[0];
   } else {
     // But sometimes before:
     // 61.1149
     // Stk.
-    numberOfSharesLine = content[startLineNumber - 1];
+    sharesLine = content[startLineNumber - 1];
   }
 
-  if (!numberOfSharesLine.includes(',') && numberOfSharesLine.includes('.')) {
+  if (!sharesLine.includes(',') && sharesLine.includes('.')) {
     // In the Q4 2020 document the number format has changed (once?) from the german one to the english one.
     // We simply replace the dot with a comma.
-    numberOfSharesLine = numberOfSharesLine.replace('.', ',');
+    sharesLine = sharesLine.replace('.', ',');
   }
 
-  const numberOfShares = parseGermanNum(numberOfSharesLine);
-  let toalAmount = parseGermanNum(content[lineOfDate + 1]);
+  let activity = {
+    broker: 'traderepublic',
+    type: 'TransferIn',
+    isin: content[isinIdx].split(' ')[1],
+    company: content[startLineNumber + 1],
+    shares: parseGermanNum(sharesLine),
+    amount: parseGermanNum(content[amountIdx]),
+    fee: 0,
+    tax: 0,
+  };
 
-  if (lineNumberOfISIN - startLineNumber > 5) {
-    // Edge-case: On a pages change, the total amount are located under the company name.
-    toalAmount = parseGermanNum(content[startLineNumber + 3]);
-  }
-
-  const [parsedDate, parsedDateTime] = createActivityDateTime(
-    content[lineOfDate],
+  [activity.date, activity.datetime] = createActivityDateTime(
+    content[dateIdx],
     undefined
   );
 
-  return validateActivity({
-    broker: 'traderepublic',
-    type: 'TransferIn',
-    date: parsedDate,
-    datetime: parsedDateTime,
-    isin: content[lineNumberOfISIN].split(' ')[1],
-    company: content[startLineNumber + 1],
-    shares: numberOfShares,
-    // We need to calculate the buy-price per share because in the overview is only the current price per share available.
-    price: +Big(toalAmount).div(Big(numberOfShares)),
-    amount: toalAmount,
-    fee: 0,
-    tax: 0,
-  });
+  // We need to calculate the buy-price per share because in the overview is only the current price per share available.
+  activity.price = +Big(activity.amount).div(Big(activity.shares));
+  return validateActivity(activity);
 };
 
 const parseOverviewStatement = content => {
@@ -274,7 +285,7 @@ const parseOverviewStatement = content => {
       continue;
     }
 
-    foundActivities.push(parsePositionAsActivity(content, lineNumber));
+    foundActivities.push(parseDepotStatementEntry(content, lineNumber));
   }
 
   return foundActivities;
@@ -328,6 +339,28 @@ const parseBuySellDividend = (textArr, docType) => {
   return validateActivity(activity);
 };
 
+const parseOption = content => {
+  const activityIdx = content.indexOf('Tilgung');
+  const isinIdx = findFirstIsinIndexInArray(content);
+  const amountIdx = content.indexOf('Kurswert') + 1;
+  let activity = {
+    broker: 'traderepublic',
+    type: 'Sell',
+    company: content.slice(activityIdx + 1, isinIdx).join(' '),
+    isin: content[isinIdx],
+    shares: parseGermanNum(content[isinIdx + 1].split(/\s+/)[0]),
+    amount: parseGermanNum(content[amountIdx]),
+    tax: findTax(content),
+    fee: 0,
+  };
+  activity.price = +Big(activity.amount).div(activity.shares);
+  [activity.date, activity.datetime] = createActivityDateTime(
+    content[content.indexOf('VALUTA') + 3],
+    undefined
+  );
+  return validateActivity(activity);
+};
+
 // FUnctions to be exported
 export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
@@ -354,12 +387,13 @@ export const parsePages = contents => {
     parseOverviewStatement(allPagesFlat).forEach(activity => {
       activities.push(activity);
     });
+  } else if (docType === 'callRepayment') {
+    activities.push(parseOption(allPagesFlat));
   } else {
     for (let content of contents) {
       activities.push(parseBuySellDividend(content, docType));
     }
   }
-
   return {
     activities,
     status: 0,

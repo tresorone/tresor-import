@@ -38,8 +38,11 @@ const findSharesDividend = textArr => {
   );
 };
 
-const findDateBuy = textArr =>
+const findDateBuySell = textArr =>
   textArr[textArr.findIndex(t => t.includes('Geschäftstag')) + 2];
+
+const findTimeSell = textArr =>
+  textArr[textArr.findIndex(t => t.includes('Handelszeit')) + 2];
 
 const findDateDividend = (textArr, foreignDividend = false) => {
   if (foreignDividend) {
@@ -109,6 +112,8 @@ const findCompanyDividend = (textArr, foreignDividend = false) => {
 
 const isBuy = textArr => textArr.some(t => t.includes('Wertpapierkauf'));
 
+const isSell = textArr => textArr.some(t => t.includes('Wertpapierverkauf'));
+
 const isDividend = textArr =>
   textArr.some(
     t => t === 'Investment-Ausschüttung' || t === 'Ertragsgutschrift'
@@ -128,9 +133,20 @@ const parseSingleTransaction = textArr => {
   let fee = 0;
   let tax = 0;
   let activity;
+  let time;
   if (isBuy(textArr)) {
     type = 'Buy';
-    date = findDateBuy(textArr);
+    date = findDateBuySell(textArr);
+    wkn = findWknBuy(textArr);
+    company = findCompanyBuy(textArr);
+    shares = +findSharesBuy(textArr);
+    amount = findAmountBuy(textArr);
+    price = findPriceBuy(textArr);
+    fee = findFeeBuy(textArr, amount);
+  } else if (isSell(textArr)) {
+    type = 'Sell';
+    date = findDateBuySell(textArr);
+    time = findTimeSell(textArr);
     wkn = findWknBuy(textArr);
     company = findCompanyBuy(textArr);
     shares = +findSharesBuy(textArr);
@@ -156,7 +172,7 @@ const parseSingleTransaction = textArr => {
   }
   // sadly, no exact times can be extracted as they are not given in any of the
   // files
-  const [parsedDate, parsedDateTime] = createActivityDateTime(date, undefined);
+  const [parsedDate, parsedDateTime] = createActivityDateTime(date, time);
   activity = {
     broker: 'commerzbank',
     type,
@@ -341,6 +357,11 @@ const parseTransactionReport = pdfPages => {
 // BLOCK 3
 // GENERAL PARSING FUNCTIONS
 //===========================
+
+const detectedButIgnoredDocument = content => {
+  return content.includes('Umsatzdetails');
+};
+
 export const canParseDocument = (pages, extension) => {
   // The first PDF Page does not always contain "Commerzbank", thus this ugly
   // workaround. e. G. dividend_IE00B3RBWM25_1.json
@@ -363,15 +384,25 @@ export const canParseDocument = (pages, extension) => {
           joinedContent.toLowerCase().includes('onvista')
         )
       ) &&
-      (isBuy(firstPageContent) || isDividend(firstPageContent))) ||
-      isTransactionReport(firstPageContent))
+      (isBuy(firstPageContent) ||
+        isDividend(firstPageContent) ||
+        isSell(firstPageContent))) ||
+      isTransactionReport(firstPageContent) ||
+      detectedButIgnoredDocument(firstPageContent))
   );
 };
 
 export const parsePages = contents => {
+  let activities = [];
+  if (detectedButIgnoredDocument(contents[0])) {
+    return {
+      activities,
+      status: 7,
+    };
+  }
+
   // Transaction Reports need to be handled completely different from individual
   // transaction documents
-  let activities;
   if (isTransactionReport(contents[0])) {
     activities = parseTransactionReport(contents);
   } else {
