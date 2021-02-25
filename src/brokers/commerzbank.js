@@ -175,25 +175,21 @@ const findCompanyDividend = (textArr, foreignDividend = false) => {
     const startCompanyName = textArr.findIndex(t => t.includes('WKN/ISIN')) + 4;
     const endCompanyName = textArr.findIndex(t => t.includes('STK')) - 1;
     return textArr.slice(startCompanyName, endCompanyName + 1).join(' ');
-  } else {
-    const lineNumberInvestmentDistribution = textArr.findIndex(t =>
-      t.includes('Investment-Ausschüttung')
-    );
-    const lineNumberBearerShares = textArr.findIndex(t =>
-      t.includes('Inhaber-Anteile')
-    );
-    const lineNumberBond = textArr.findIndex(t =>
-      t.includes('Wertpapier-Bezeichnung')
-    );
-    if (lineNumberInvestmentDistribution > 0) {
-      const startCompanyName = lineNumberInvestmentDistribution + 5;
-      return textArr.slice(startCompanyName, startCompanyName + 2).join(' ');
-    } else if (lineNumberBearerShares > 0) {
-      return textArr[lineNumberBearerShares + 1];
-    } else if (lineNumberBond > 0) {
-      const startCompanyName = lineNumberBond + 5;
-      return textArr.slice(startCompanyName, startCompanyName + 2).join(' ');
-    }
+  }
+  const lineNumberInvestmentDistribution = textArr.findIndex(t =>
+    t.includes('Investment-Ausschüttung')
+  );
+  const lineNumberBond = textArr.findIndex(t => t.includes('Wertpapier-Bezeichnung'));
+  const lineNumberPiece = textArr.findIndex(t => t.includes('STK'));
+  const lineNumberIssuingCountry = textArr.findIndex(t => t.includes('Emissionsland'));
+  if (lineNumberInvestmentDistribution > 0) {
+    const startCompanyName = lineNumberInvestmentDistribution + 5;
+    return textArr.slice(startCompanyName, startCompanyName + 2).join(' ');
+  } else if (lineNumberBond > 0 && lineNumberPiece > 0 && lineNumberIssuingCountry > 0) {
+    const startCompanyName = lineNumberBond + 5;
+    let companyName = textArr.slice(startCompanyName, lineNumberPiece).join(' ')
+    companyName += ' ' + textArr[lineNumberIssuingCountry - 1]
+    return companyName;
   }
 };
 
