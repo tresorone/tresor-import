@@ -203,7 +203,7 @@ describe('Broker: commerzbank', () => {
         broker: 'commerzbank',
         type: 'Sell',
         date: '2020-12-23',
-        datetime: '2020-12-23T' + result.activities[0].datetime.substring(11),
+        datetime: '2020-12-23T12:36:00.000Z',
         wkn: '938914',
         company: 'Airbus SE',
         shares: 12,
@@ -269,8 +269,8 @@ describe('Broker: commerzbank', () => {
         wkn: 'A1JX52',
         company: 'Vanguard FTSE All-World U.ETF',
         shares: 74.93,
-        price: 0.33618043507273454,
-        amount: 25.19,
+        price: 0.33620512072182956,
+        amount: 25.191849695686688,
         fee: 0,
         tax: 0,
         foreignCurrency: 'USD',
@@ -291,8 +291,8 @@ describe('Broker: commerzbank', () => {
         wkn: 'A1T8FV',
         company: 'Vang.FTSE A.-Wo.Hi.Di.Yi.U.ETF',
         shares: 60.986,
-        price: 0.3658216639884564,
-        amount: 22.31,
+        price: 0.36581969349586396,
+        amount: 22.309879827538758,
         fee: 0,
         tax: 0,
         foreignCurrency: 'USD',
@@ -313,10 +313,10 @@ describe('Broker: commerzbank', () => {
         wkn: '870747',
         company: 'Microsoft Corp.',
         shares: 40,
-        price: 0.39275,
-        amount: 15.71,
+        price: 0.462046204620462,
+        amount: 18.48184818481848,
         fee: 0,
-        tax: 0,
+        tax: 2.772277227722772,
         foreignCurrency: 'USD',
         fxRate: 1.212,
       });
@@ -475,7 +475,6 @@ describe('Broker: commerzbank', () => {
       }); */
     });
   });
-
 
   describe('Validate all ignored statements', () => {
     test('All ignored statements return status 7 and no activities', () => {
