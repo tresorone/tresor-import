@@ -51,3 +51,24 @@ To contribute:
 5. Write a parser in `src/brokers` to parse that content - see `src/brokers/comdirect.js` for inspiration
 6. Add and run all tests `npm t`
 7. Create a Pull Request
+
+# Licensing
+
+Usage of this codebase is permitted according to the GNU Affero General Public License v3 (AGPL-3.0).
+
+**HERE'S AN INCOMPLETE SUMMARY. READ THE [FULL LICENSE](LICENSE) BEFORE USING.**
+
+- You are permitted to:
+  - Use this codebase in any way you want including commercially
+  - Modify and distribute the codebase in any way you want
+- You MUST:
+  - Respect the copyright which is held by the maintainers of this project
+  - Disclose all changes you made to the code and also publish any code directly based on this code
+  - Give attribution to the orignal maintainers when using this project (especially when used commercially)
+- You can not
+  - Sublicense this codebase
+  - Expect any liability, warranty or similar by the original maintainers. However, we want to improve
+    this project as much as possible so feedback is heard!
+
+See also the following image, taken from [TL;DR Legal](https://www.tldrlegal.com/l/agpl3).
+![apgl3 Overview from TL;DR Legal](docs/images/tldr_legal_apgl30.PNG)

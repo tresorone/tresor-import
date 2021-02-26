@@ -13,7 +13,10 @@ import { findFirstRegexIndexInArray } from '../helper';
 // uniquely identifies onvista files so we have to construct a multistring
 // identifcation scheme.
 export const onvistaIdentificationString = 'BELEGDRUCK=J';
-export const smartbrokerIdentificationString = 'Landsberger Straße 300';
+export const smartbrokerIdentificationStrings = [
+  'Landsberger Straße 300',
+  'Landsberger Straˇe 300',
+];
 
 export const findISIN = text => {
   return text[text.indexOf('ISIN') + 1];
@@ -24,8 +27,7 @@ export const findCompany = text => {
   if (company === 'Gattungsbezeichnung') {
     company = text[text.findIndex(t => t.includes('ISIN')) - 2];
   }
-
-  return company;
+  if (company) return company;
 };
 
 export const findDateBuySell = text => {
@@ -81,30 +83,32 @@ export const findPrice = (text, fxRate = undefined) => {
 };
 
 export const findAmount = (text, fxRate = undefined) => {
-  let amount = parseGermanNum(
-    text[text.findIndex(t => t.includes('Kurswert')) + 2]
-  );
+  let amountIdx = text.findIndex(t => t.includes('Kurswert'));
+  if (amountIdx < 0) {
+    amountIdx = text.findIndex(t => t.includes('Bezugspreis'));
+  }
+  let amount = parseGermanNum(text[amountIdx + 2]);
   return fxRate === undefined ? amount : +Big(amount).div(fxRate);
 };
 
 export const findFee = (content, fxRate = undefined) => {
   let fee = Big(0);
-  const stockFeeIdx = content.indexOf('Börsengebühr') + 2;
-  if (stockFeeIdx > 1) {
-    fee = fee.plus(parseGermanNum(content[stockFeeIdx]));
-  }
-  const foreignFeeIdx = content.indexOf('Fremdspesen') + 2;
-  if (foreignFeeIdx > 1) {
-    fee = fee.plus(parseGermanNum(content[foreignFeeIdx]));
-  }
-  const exchangeFeeIdx = content.indexOf('Handelsplatzgebühr') + 2;
-  if (exchangeFeeIdx > 1) {
-    fee = fee.plus(parseGermanNum(content[exchangeFeeIdx]));
-  }
-  const orderProvisionIdx = content.indexOf('Orderprovision') + 2;
-  if (orderProvisionIdx > 1) {
-    fee = fee.plus(Big(parseGermanNum(content[orderProvisionIdx])));
-  }
+  const potentialFees = [
+    'Börsengebühr',
+    'Fremdspesen',
+    'Handelsplatzgebühr',
+    'Orderprovision',
+    'Provision',
+    'Maklercourtage',
+    'Fremde Spesen Xontro',
+    'Gebühr',
+  ];
+  potentialFees.forEach(feeString => {
+    const feeIdx = content.indexOf(feeString);
+    if (feeIdx >= 0) {
+      fee = fee.plus(Big(parseGermanNum(content[feeIdx + 2])));
+    }
+  });
   return fxRate === undefined ? +fee : +fee.div(fxRate);
 };
 
@@ -210,8 +214,10 @@ export const canParseDocument = (pages, extension) => {
     ((firstPageContent.some(line =>
       line.includes(onvistaIdentificationString)
     ) &&
-      !firstPageContent.some(line =>
-        line.includes(smartbrokerIdentificationString)
+      !firstPageContent.some(
+        line =>
+          line.includes(smartbrokerIdentificationStrings[0]) ||
+          line.includes(smartbrokerIdentificationStrings[1])
       )) ||
       (firstPageContent.some(line =>
         line.includes('Webtrading onvista bank')

@@ -17,11 +17,13 @@ export const buySamples = [
   require('./buy/2019_cloudflare.json'),
   require('./buy/2020_fraport.json'),
   require('./buy/2020_palantir.json'),
+  require('./buy/2021_tui_special_buy.json'),
 ];
 
 export const sellSamples = [
   require('./sell/sell1.json'),
   require('./sell/sell2.json'),
+  require('./sell/2021_tui_priority_sell.json'),
 ];
 
 export const dividendsSamples = [
@@ -47,6 +49,7 @@ export const ignoredSamples = [
   require('./ignored/2020_cost_information.json'),
   require('./ignored/2020_stock_split.json'),
   require('./ignored/2021_advance_flat_rate.json'),
+  require('./ignored/2021_depotStatment.json'),
 ];
 
 export const allSamples = buySamples
