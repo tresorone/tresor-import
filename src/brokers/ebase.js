@@ -150,25 +150,39 @@ const parseTransactionLog = pdfPages => {
   return actions;
 };
 
-export const canParseDocument = (pages, extension) => {
-  const firstPageContent = pages[0];
-  return (
-    extension === 'pdf' &&
-    firstPageContent.some(
-      line =>
-        line.startsWith('ebase Depot') ||
-        line.includes('finvesto Depot') ||
-        line.includes('VL-FondsDepot')
-    ) &&
-    firstPageContent.some(line => line.includes('Fondsertrag / Vorabpauschale'))
-  );
+const isTransactionLog = pdfPages => {
+  return pdfPages[0].some(
+    line =>
+      line.startsWith('ebase Depot') ||
+      line.includes('finvesto Depot') ||
+      line.includes('VL-FondsDepot')
+  ) &&
+  pdfPages[0].some(line => line.includes('Fondsertrag / Vorabpauschale'));
 };
 
-export const parsePages = contents => {
-  const activities = parseTransactionLog(contents);
-  const status = activities !== undefined ? 0 : 6;
-  return {
-    activities,
-    status,
-  };
+const isIgnoredDocument = pdfPages => {
+  return firstPageContent.includes('European Bank for Financial') && firstPageContent.includes('Umsatzabrechnung');
+}
+
+export const canParseDocument = (pages, extension) => {
+  return (
+    extension === 'pdf' && (
+    isTransactionLog(pdfPages) || isIgnoredDocument(pdfPages)));
+};
+
+export const parsePages = pdfPages => {
+  if (isTransactionLog(pdfPages)) {
+    const activities = parseTransactionLog(pdfPages);
+    const status = activities !== undefined ? 0 : 6;
+    return {
+      activities,
+      status,
+    };
+  } else if (isIgnoredDocument(pdfPages)) {
+    return {
+      activities: [],
+      status: 7
+    }
+  }
+  
 };
