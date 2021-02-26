@@ -266,7 +266,7 @@ export function findFirstIsinIndexInArray(array, offset = 0) {
 // was processed.
 export function createActivityDateTime(
   date,
-  time,
+  time = undefined,
   dateFormat = 'dd.MM.yyyy',
   dateTimeFormat = 'dd.MM.yyyy HH:mm',
   zone = 'Europe/Berlin'
