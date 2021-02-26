@@ -537,7 +537,6 @@ describe('Broker: ebase', () => {
   });
 
   describe('Validate that some documents are ignored', () => {
-
     test('Check whether 2021_account_statements are ignored', () => {
       const result = ebase.parsePages(ignoredSamples[0]);
       expect(result.activities.length).toEqual(0);

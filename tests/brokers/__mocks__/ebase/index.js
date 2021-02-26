@@ -22,11 +22,11 @@ export const transactionLogSamples = [
 ];
 
 export const ignoredSamples = [
-  require('./invalid/2021_account_statement.json')
-]
+  require('./ignored/2021_account_statement.json'),
+];
 
 export const allSamples = buySamples.concat(
   sellSamples,
-  transactionLogSamples, 
-  ignoredSamples, 
+  transactionLogSamples,
+  ignoredSamples
 );

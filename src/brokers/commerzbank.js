@@ -385,8 +385,7 @@ export const canParseDocument = (pages, extension) => {
         )
       ) &&
       (isBuy(firstPageContent) || isDividend(firstPageContent) || isSell(firstPageContent))) ||
-      isTransactionReport(firstPageContent) || 
-	  detectedButIgnoredDocument(firstPageContent))
+      isTransactionReport(firstPageContent) || detectedButIgnoredDocument(firstPageContent))
   );
 };
 
@@ -394,9 +393,9 @@ export const parsePages = contents => {
   let activities = [];
   if (detectedButIgnoredDocument(contents[0])) {
     return {
-	  activities,
-	  status: 7,
-	};
+      activities,
+      status: 7,
+    };
   }
 
   // Transaction Reports need to be handled completely different from individual

@@ -151,23 +151,28 @@ const parseTransactionLog = pdfPages => {
 };
 
 const isTransactionLog = pdfPages => {
-  return pdfPages[0].some(
-    line =>
-      line.startsWith('ebase Depot') ||
-      line.includes('finvesto Depot') ||
-      line.includes('VL-FondsDepot')
-  ) &&
-  pdfPages[0].some(line => line.includes('Fondsertrag / Vorabpauschale'));
+  return (
+    pdfPages[0].some(
+      line =>
+        line.startsWith('ebase Depot') ||
+        line.includes('finvesto Depot') ||
+        line.includes('VL-FondsDepot')
+    ) && pdfPages[0].some(line => line.includes('Fondsertrag / Vorabpauschale'))
+  );
 };
 
 const isIgnoredDocument = pdfPages => {
-  return firstPageContent.includes('European Bank for Financial') && firstPageContent.includes('Umsatzabrechnung');
-}
-
-export const canParseDocument = (pages, extension) => {
   return (
-    extension === 'pdf' && (
-    isTransactionLog(pdfPages) || isIgnoredDocument(pdfPages)));
+    pdfPages[0].includes('European Bank for Financial') &&
+    pdfPages[0].includes('Umsatzabrechnung')
+  );
+};
+
+export const canParseDocument = (pdfPages, extension) => {
+  return (
+    extension === 'pdf' &&
+    (isTransactionLog(pdfPages) || isIgnoredDocument(pdfPages))
+  );
 };
 
 export const parsePages = pdfPages => {
@@ -181,8 +186,7 @@ export const parsePages = pdfPages => {
   } else if (isIgnoredDocument(pdfPages)) {
     return {
       activities: [],
-      status: 7
-    }
+      status: 7,
+    };
   }
-  
 };
