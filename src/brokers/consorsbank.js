@@ -246,6 +246,7 @@ const findFee = content => {
   parsedFees.push(getNumberAfterTermWithOffset(content, 'börsenplatzgebühr'));
   parsedFees.push(getNumberAfterTermWithOffset(content, 'handelsentgelt'));
   parsedFees.push(getNumberAfterTermWithOffset(content, 'transaktionsentgelt'));
+  parsedFees.push(getNumberAfterTermWithOffset(content, 'eig. spesen'));
 
   if (!content.some(line => line.includes('Ausgabegebühr 0,00%'))) {
     parsedFees.push(getNumberAfterTermWithOffset(content, 'ausgabegebühr'));
@@ -332,13 +333,19 @@ const findForeignInformation = (content, isDividend) => {
   return [undefined, undefined, undefined];
 };
 
-const activityType = content => {
+const getDocumentType = content => {
   // Before 12/2015 the headline is 'Wertpapierabrechnung'
   const lineNumber = findBuySellLineNumber(content);
   if (lineNumber >= 0) {
-    if (content[lineNumber + 1].toLowerCase().startsWith('kauf')) {
+    if (
+      content[lineNumber + 1].toLowerCase().startsWith('kauf') ||
+      content[lineNumber + 1] === 'BEZUG'
+    ) {
       return 'Buy';
-    } else if (content[lineNumber + 1].toLowerCase() === 'verkauf') {
+    } else if (
+      content[lineNumber + 1].toLowerCase() === 'verkauf' ||
+      content[lineNumber + 1] === 'VERK. TEIL-/BEZUGSR.'
+    ) {
       return 'Sell';
     }
   } else if (
@@ -347,16 +354,17 @@ const activityType = content => {
     )
   ) {
     return 'Dividend';
+  } else if (
+    content.some(
+      line =>
+        line.includes('Kostenausweis') ||
+        line.includes('Aktiensplit') ||
+        line.includes('Vorabpauschale')
+    ) ||
+    content.includes('Kumulierter Gewinn/Verlust')
+  ) {
+    return 'ignoredDocument';
   }
-};
-
-const detectedButIgnoredDocument = content => {
-  return (
-    // When the document contains one of the following lines, we want to ignore these document.
-    content.some(line => line.includes('Kostenausweis')) ||
-    content.some(line => line.includes('Aktiensplit')) ||
-    content.some(line => line.includes('Vorabpauschale'))
-  );
 };
 
 export const canParseDocument = (pages, extension) => {
@@ -369,22 +377,22 @@ export const canParseDocument = (pages, extension) => {
   const isConsors =
     firstPageContent.some(
       line => line.toLowerCase && line.toLowerCase().includes('consorsbank')
-    ) || firstPageContent[1] === 'POSTFACH 17 43';
-
+    ) ||
+    firstPageContent[1] === 'POSTFACH 17 43' ||
+    // For depotStatements. The only file we have is quite heavily anonymized.
+    // Maybe better strings exist
+    (firstPageContent.includes('Kumulierter Gewinn/Verlust') &&
+      firstPageContent.includes('Entwicklung seit:'));
   if (!isConsors) {
     return false;
   }
-
-  return (
-    activityType(firstPageContent) !== undefined ||
-    detectedButIgnoredDocument(firstPageContent)
-  );
+  return getDocumentType(firstPageContent) !== undefined;
 };
 
-const parseData = textArr => {
+const parseData = (textArr, type) => {
   let activity = {
     broker: 'consorsbank',
-    type: activityType(textArr),
+    type,
     company: findCompany(textArr),
     fee: 0,
     tax: 0,
@@ -448,7 +456,6 @@ const parseData = textArr => {
       activity.tax = findDividendTax(textArr, activity.amount);
       break;
   }
-
   [activity.date, activity.datetime] = createActivityDateTime(
     date,
     time,
@@ -471,7 +478,8 @@ const parseData = textArr => {
 };
 
 export const parsePages = contents => {
-  if (detectedButIgnoredDocument(contents[0])) {
+  const documentType = getDocumentType(contents[0]);
+  if (documentType === 'ignoredDocument') {
     // We know this type and we don't want to support it.
     return {
       activities: [],
@@ -479,7 +487,7 @@ export const parsePages = contents => {
     };
   }
 
-  const activities = [parseData(contents[0])];
+  const activities = [parseData(contents[0], documentType)];
 
   return {
     activities,

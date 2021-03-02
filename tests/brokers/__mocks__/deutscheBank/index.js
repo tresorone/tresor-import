@@ -9,10 +9,12 @@ export const dividendSamples = [
 
 export const depotStatusSamples = [
   require('./depotStatus/2021_depot_status_standard.json'),
+  require('./depotStatus/2021_depot_status_with_prices.json'),
 ];
 
 export const transactionLogSamples = [
   require('./transactionLog/2020_buy_dividend_transaction_log.json'),
+  require('./transactionLog/2019_sell_transaction_log.json'),
 ];
 
 export const ignoredSamples = [

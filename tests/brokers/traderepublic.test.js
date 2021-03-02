@@ -5,7 +5,8 @@ import {
   buySamples,
   sellSamples,
   dividendSamples,
-  quarterSamples,
+  depotStatement,
+  options,
   ignoredSamples,
 } from './__mocks__/traderepublic';
 
@@ -121,6 +122,25 @@ describe('Broker: Trade Republic', () => {
         price: 26.111608475082065,
         amount: 35.0,
         fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Parse a prefered buy: 2021_tui_preferred_buy.json', () => {
+      const activities = traderepublic.parsePages(buySamples[5]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'traderepublic',
+        type: 'Buy',
+        date: '2021-01-26',
+        datetime: '2021-01-26T' + activities[0].datetime.substring(11),
+        isin: 'DE000TUAG000',
+        company: 'TUI AG',
+        shares: 75,
+        price: 1.07,
+        amount: 80.25,
+        fee: 5,
         tax: 0,
       });
     });
@@ -423,14 +443,14 @@ describe('Broker: Trade Republic', () => {
     });
   });
 
-  describe('Validate quarter statement', () => {
-    test('Map a empty quarter statement correctly', () => {
-      const activities = traderepublic.parsePages(quarterSamples[0]).activities;
+  describe('Validate depotStatements', () => {
+    test('Map a empty depot statement correctly', () => {
+      const activities = traderepublic.parsePages(depotStatement[0]).activities;
       expect(activities.length).toEqual(0);
     });
 
-    test('Map a quarter statement with two positions correctly', () => {
-      const activities = traderepublic.parsePages(quarterSamples[1]).activities;
+    test('Map a quarter depot statement with two positions correctly', () => {
+      const activities = traderepublic.parsePages(depotStatement[1]).activities;
 
       expect(activities.length).toEqual(2);
       expect(activities[0]).toEqual({
@@ -462,7 +482,7 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Should map the pdf data correctly for: two_pages', () => {
-      const activities = traderepublic.parsePages(quarterSamples[2]).activities;
+      const activities = traderepublic.parsePages(depotStatement[2]).activities;
       expect(activities.length).toEqual(16);
 
       expect(activities[10]).toEqual({
@@ -495,7 +515,7 @@ describe('Broker: Trade Republic', () => {
     });
 
     test('Should map the pdf data correctly for: 2020_year_end_statement', () => {
-      const activities = traderepublic.parsePages(quarterSamples[3]).activities;
+      const activities = traderepublic.parsePages(depotStatement[3]).activities;
       expect(activities.length).toEqual(56);
 
       expect(activities[2]).toEqual({
@@ -552,6 +572,65 @@ describe('Broker: Trade Republic', () => {
         shares: 58.1848,
         tax: 0,
         type: 'TransferIn',
+      });
+    });
+
+    test('Should parse depot statement: 2020_depotStatement_single_etf', () => {
+      const activities = traderepublic.parsePages(depotStatement[4]).activities;
+      expect(activities.length).toEqual(1);
+
+      expect(activities[0]).toEqual({
+        type: 'TransferIn',
+        broker: 'traderepublic',
+        company: 'iShsV-S&P 500 Inf.Te.',
+        date: '2020-06-30',
+        datetime: '2020-06-30T' + activities[0].datetime.substring(11),
+        isin: 'IE00B3WJKG14',
+        amount: 100,
+        price: 11.243408551736545,
+        shares: 8.8941,
+        tax: 0,
+        fee: 0,
+      });
+    });
+  });
+
+  describe('Validate options', () => {
+    test('Can parse a repayment of an unused call 2021_call_apple_tilgung', () => {
+      const activities = traderepublic.parsePages(options[0]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'traderepublic',
+        type: 'Sell',
+        isin: 'DE000TT3CJX8',
+        company: 'HSBC Trinkaus & Burkhardt AG Call 13.01.21 Apple 130',
+        date: '2021-01-20',
+        datetime: '2021-01-20T' + activities[0].datetime.substring(11),
+        shares: 5,
+        amount: 1.47,
+        price: 0.294,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Parse a prefered buy: 2021_turbo_varta_knockout_repayment.json', () => {
+      const activities = traderepublic.parsePages(options[1]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'traderepublic',
+        type: 'Sell',
+        date: '2021-02-05',
+        datetime: '2021-02-05T' + activities[0].datetime.substring(11),
+        isin: 'DE000TT5RSM5',
+        company: 'HSBC Trinkaus & Burkhardt AG TurboC O.End Varta',
+        shares: 500,
+        price: 0.001,
+        amount: 0.5,
+        fee: 0,
+        tax: -200.08,
       });
     });
   });

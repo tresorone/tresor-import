@@ -29,20 +29,22 @@ const findISINAndWKN = (pdfPage, spanISIN = 0, spanWKN = 0) => {
 const findCompany = (text, type, formatId) => {
   const companyLineIndex = text.findIndex(t => t.includes('/ISIN'));
   // span = 2 means its a dividend PDF - dividends dont have the WKN in the same line
-  if (type === 'Buy') {
-    return text[companyLineIndex + 1].split(/\s+/).slice(0, -1).join(' ');
-  } else if (type === 'Sell') {
-    const lineContent = text[companyLineIndex + 1].trim();
-
-    if (formatId === 0) {
-      // In this format, the name is one the same line as the WKN. We need only the first element before multiple spaces. Example:
-      // Arcimoto Inc.                                                            A2JN1H
-      return lineContent.split(/\s{2,}/)[0].trim();
+  switch (type) {
+    case 'Buy': {
+      return text[companyLineIndex + 1].split(/\s+/).slice(0, -1).join(' ');
     }
-
-    return lineContent;
-  } else if (type === 'Dividend') {
-    return text[companyLineIndex + 2].trim();
+    case 'Sell': {
+      const lineContent = text[companyLineIndex + 1].trim();
+      if (formatId === 0) {
+        // In this format, the name is one the same line as the WKN. We need only the first element before multiple spaces. Example:
+        // Arcimoto Inc.                                                            A2JN1H
+        return lineContent.split(/\s{2,}/)[0].trim();
+      }
+      return lineContent;
+    }
+    case 'Dividend': {
+      return text[companyLineIndex + 2].trim();
+    }
   }
 };
 
@@ -350,33 +352,31 @@ const getDocumentFormatId = content => {
   console.error('Unknown Document Type, can not parse');
 };
 
-const isBuy = textArr =>
-  textArr.some(
-    t => t.includes('Wertpapierkauf') || t.includes('Wertpapierbezug')
-  );
-
-const isSell = textArr => textArr.some(t => t.includes('Wertpapierverkauf'));
-
-const isDividend = textArr => {
-  return (
-    textArr.some(t => t.includes('Ertragsgutschrift')) ||
-    textArr.some(t => t.includes('Dividendengutschrift'))
-  );
-};
-
-const isTaxinfoDividend = textArr => {
-  return textArr.some(
-    t =>
-      t.includes('Steuerliche Behandlung:') &&
-      (t.includes('Dividende') || t.includes('Investment-Ausschüttung'))
-  );
-};
-
-const detectedButIgnoredDocument = content => {
-  return (
-    // When the document contains one of the following lines, we want to ignore these document.
-    content.some(line => line.includes('Kosteninformation'))
-  );
+const getDocumentType = content => {
+  if (
+    content.includes('Wertpapierkauf') ||
+    content.includes('Wertpapierbezug')
+  ) {
+    return 'Buy';
+  } else if (content.includes('Wertpapierverkauf')) {
+    return 'Sell';
+  } else if (
+    content.includes('Ertragsgutschrift') ||
+    content.includes('Dividendengutschrift')
+  ) {
+    return 'Dividend';
+  } else if (
+    content.some(
+      t =>
+        t.includes('Steuerliche Behandlung:') &&
+        (t.includes('Dividende') || t.includes('Investment-Ausschüttung'))
+    )
+  ) {
+    return 'TaxDividend';
+  } else if (content.some(line => line.includes('Kosteninformation'))) {
+    return 'Ignored';
+  }
+  return undefined;
 };
 
 export const canParseDocument = (pages, extension) => {
@@ -389,112 +389,97 @@ export const canParseDocument = (pages, extension) => {
     firstPageContent.every(
       line => !line.includes(onvistaIdentificationString)
     ) &&
-    (isBuy(firstPageContent) ||
-      isSell(firstPageContent) ||
-      isDividend(firstPageContent) ||
-      isTaxinfoDividend(firstPageContent) ||
-      detectedButIgnoredDocument(firstPageContent))
+    getDocumentType(firstPageContent) !== undefined
   );
 };
 
-const parseData = textArr => {
-  let type,
-    date,
-    time,
-    isin,
-    wkn,
-    company,
-    shares,
-    price,
-    amount,
-    fee = 0,
-    tax = 0,
-    fxRate,
-    foreignCurrency;
-
-  const formatId = getDocumentFormatId(textArr);
-
-  if (isBuy(textArr)) {
-    type = 'Buy';
-    date = findDateBuySell(textArr);
-    time = findOrderTime(textArr);
-    [fxRate, foreignCurrency] = findBuyFxRateForeignCurrency(textArr);
-    [isin, wkn] = findISINAndWKN(textArr, 2, 1);
-    company = findCompany(textArr, type, formatId);
-    amount = +findAmount(textArr, fxRate, foreignCurrency, formatId);
-    shares = findShares(textArr, formatId);
-    price = +Big(amount).div(shares);
-    fee = findFee(textArr, amount, false, formatId);
-  } else if (isSell(textArr)) {
-    type = 'Sell';
-    [isin, wkn] = findISINAndWKN(
-      textArr,
-      formatId === 1 ? 4 : 2,
-      formatId === 1 ? 2 : 1
-    );
-    company = findCompany(textArr, type, formatId);
-    date = findDateBuySell(textArr);
-    time = findOrderTime(textArr);
-    [fxRate, foreignCurrency] = findBuyFxRateForeignCurrency(textArr);
-    shares = findShares(textArr, formatId);
-    amount = +findAmount(textArr, fxRate, foreignCurrency, formatId);
-    price = +Big(amount).div(shares);
-    fee = findFee(textArr, amount, true, formatId);
-    tax = findTax(textArr, fxRate, formatId)[0];
-  } else if (isDividend(textArr)) {
-    [fxRate, foreignCurrency] = findPayoutFxrateForeignCurrency(textArr);
-    type = 'Dividend';
-    [isin, wkn] = findISINAndWKN(textArr, 3, 1);
-    company = findCompany(textArr, type, formatId);
-    date = findDateDividend(textArr);
-    shares = findDividendShares(textArr);
-    amount = findPayout(textArr, fxRate)[0];
-    price = +Big(amount).div(shares);
-    tax = findTax(textArr, fxRate, formatId)[0];
-  } else if (isTaxinfoDividend(textArr)) {
-    // Still needs handling of Foreign  Rates
-    let payout, withholdingTax, integratedWithholdingTax;
-    type = 'Dividend';
-    [isin, wkn, company, shares] = findISINAndWKN(textArr, 0, 0);
-    date = findDateDividend(textArr, formatId);
-    [tax, withholdingTax] = findTax(textArr, undefined, formatId);
-    [payout, integratedWithholdingTax] = findPayout(textArr);
-    if (integratedWithholdingTax > withholdingTax) {
-      withholdingTax = integratedWithholdingTax;
-      tax = +Big(tax).plus(integratedWithholdingTax);
-    }
-    amount = +Big(payout).plus(withholdingTax);
-    price = +Big(amount).div(shares);
-  }
-  const [parsedDate, parsedDateTime] = createActivityDateTime(date, time);
-
+const parseData = (textArr, type) => {
   let activity = {
     broker: 'comdirect',
     type,
-    date: parsedDate,
-    datetime: parsedDateTime,
-    isin,
-    wkn,
-    company,
-    shares,
-    price,
-    amount,
-    fee,
-    tax,
+    fee: 0,
+    tax: 0,
   };
+
+  let date, time, fxRate, foreignCurrency;
+
+  const formatId = getDocumentFormatId(textArr);
+
+  switch (activity.type) {
+    case 'Buy': {
+      date = findDateBuySell(textArr);
+      time = findOrderTime(textArr);
+      [fxRate, foreignCurrency] = findBuyFxRateForeignCurrency(textArr);
+      [activity.isin, activity.wkn] = findISINAndWKN(textArr, 2, 1);
+      activity.company = findCompany(textArr, type, formatId);
+      activity.amount = +findAmount(textArr, fxRate, foreignCurrency, formatId);
+      activity.shares = findShares(textArr, formatId);
+      activity.price = +Big(activity.amount).div(activity.shares);
+      activity.fee = findFee(textArr, activity.amount, false, formatId);
+      break;
+    }
+    case 'Sell': {
+      [activity.isin, activity.wkn] = findISINAndWKN(
+        textArr,
+        formatId === 1 ? 4 : 2,
+        formatId === 1 ? 2 : 1
+      );
+      activity.company = findCompany(textArr, activity.type, formatId);
+      date = findDateBuySell(textArr);
+      time = findOrderTime(textArr);
+      [fxRate, foreignCurrency] = findBuyFxRateForeignCurrency(textArr);
+      activity.shares = findShares(textArr, formatId);
+      activity.amount = +findAmount(textArr, fxRate, foreignCurrency, formatId);
+      activity.price = +Big(activity.amount).div(activity.shares);
+      activity.fee = findFee(textArr, activity.amount, true, formatId);
+      activity.tax = findTax(textArr, fxRate, formatId)[0];
+      break;
+    }
+    case 'Dividend': {
+      [fxRate, foreignCurrency] = findPayoutFxrateForeignCurrency(textArr);
+      [activity.isin, activity.wkn] = findISINAndWKN(textArr, 3, 1);
+      activity.company = findCompany(textArr, type, formatId);
+      date = findDateDividend(textArr);
+      activity.shares = findDividendShares(textArr);
+      activity.amount = findPayout(textArr, fxRate)[0];
+      activity.price = +Big(activity.amount).div(activity.shares);
+      activity.tax = findTax(textArr, fxRate, formatId)[0];
+      break;
+    }
+    case 'TaxDividend': {
+      // Still needs handling of Foreign  Rates
+      let payout, withholdingTax, integratedWithholdingTax;
+      activity.type = 'Dividend';
+      [
+        activity.isin,
+        activity.wkn,
+        activity.company,
+        activity.shares,
+      ] = findISINAndWKN(textArr, 0, 0);
+      date = findDateDividend(textArr, formatId);
+      [activity.tax, withholdingTax] = findTax(textArr, undefined, formatId);
+      [payout, integratedWithholdingTax] = findPayout(textArr);
+      if (integratedWithholdingTax > withholdingTax) {
+        withholdingTax = integratedWithholdingTax;
+        activity.tax = +Big(activity.tax).plus(integratedWithholdingTax);
+      }
+      activity.amount = +Big(payout).plus(withholdingTax);
+      activity.price = +Big(activity.amount).div(activity.shares);
+    }
+  }
+  [activity.date, activity.datetime] = createActivityDateTime(date, time);
 
   if (fxRate !== undefined) {
     activity.fxRate = fxRate;
-  }
-
-  if (foreignCurrency !== undefined) {
     activity.foreignCurrency = foreignCurrency;
   }
   return validateActivity(activity);
 };
 
 export const parsePages = contents => {
-  if (detectedButIgnoredDocument(contents[0])) {
+  const type = getDocumentType(contents[0]);
+
+  if (type === 'Ignored') {
     // We know this type and we don't want to support it.
     return {
       activities: [],
@@ -504,7 +489,7 @@ export const parsePages = contents => {
 
   // Sometimes information regarding the first transcation (i. e. tax in sell
   // documents) is spread across multiple pdf pages
-  const activities = [parseData(contents.flat())];
+  const activities = [parseData(contents.flat(), type)];
 
   return {
     activities,

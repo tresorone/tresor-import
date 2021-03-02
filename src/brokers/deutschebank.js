@@ -5,6 +5,8 @@ import {
   parseGermanNum,
   validateActivity,
   findNextLineIndexByRegex,
+  findFirstSearchtermIndexInArray,
+  findPreviousRegexMatchIdx
 } from '@/helper';
 
 const idStringLong =
@@ -13,58 +15,52 @@ const idStringLong =
 /////////////////////////////////////////////////
 // Transaction Log Functions
 /////////////////////////////////////////////////
-
-// Takes array of strings <transactionTypes> and returns the next occurrence of one of these strings in array <content>
-const findNextIdx = (content, transactionTypes, offset = 0) => {
-  Array.min = function (array) {
-    return Math.min.apply(Math, array);
-  };
-
-  let idxArray = [];
-  transactionTypes.forEach(type => {
-    idxArray.push(content.slice(offset).indexOf(type));
-  });
-  const nextIdx = Array.min(idxArray.filter(lineNumber => lineNumber >= 0));
-  return nextIdx !== Infinity ? nextIdx + offset : -1;
-};
-
 const parseTransactionLog = content => {
-  const transactionTypes = ['Kauf'];
-  let txIdx = 0;
+  const transactionTypes = ['Kauf', 'Verkauf'];
+  let txIdx = findFirstSearchtermIndexInArray(content, transactionTypes);
   let activities = [];
   while (txIdx >= 0) {
-    txIdx = findNextIdx(content, transactionTypes, txIdx + 1);
+    const firstCurrencyIdx = findNextLineIndexByRegex(
+      content,
+      /^[A-Z]{3}$/,
+      txIdx + 2
+    );
+    let activity = {
+      broker: 'deutschebank',
+      shares: Math.abs(parseGermanNum(content[txIdx + 1])),
+      company: content.slice(txIdx + 2, firstCurrencyIdx - 1).join(' '),
+      wkn: content[firstCurrencyIdx - 1],
+      price: parseGermanNum(content[firstCurrencyIdx + 1]),
+      amount: Math.abs(parseGermanNum(content[firstCurrencyIdx + 2])),
+      tax: 0,
+      fee: 0,
+    };
+    [activity.date, activity.datetime] = createActivityDateTime(
+      content[txIdx - 3]
+    );
     switch (content[txIdx]) {
       // Buy
       case transactionTypes[0]: {
-        const firstCurrencyIdx = findNextLineIndexByRegex(
-          content,
-          /^[A-Z]{3}$/,
-          txIdx + 2
-        );
-        let activity = {
-          broker: 'deutschebank',
-          type: 'Buy',
-          shares: parseGermanNum(content[txIdx + 1]),
-          company: content.slice(txIdx + 2, firstCurrencyIdx - 1).join(' '),
-          wkn: content[firstCurrencyIdx - 1],
-          price: parseGermanNum(content[firstCurrencyIdx + 1]),
-          amount: Math.abs(parseGermanNum(content[firstCurrencyIdx + 2])),
-          tax: 0,
-          fee: 0,
-        };
-        [activity.date, activity.datetime] = createActivityDateTime(
-          content[txIdx - 3]
-        );
-        activity = validateActivity(activity);
-        if (activity !== undefined) {
-          activities.push(activity);
-        } else {
-          return undefined;
-        }
+        activity.type = 'Buy';
+        break;
+      }
+      // Sell
+      case transactionTypes[1]: {
+        activity.type = 'Sell';
         break;
       }
     }
+    activity = validateActivity(activity);
+    if (activity !== undefined) {
+      activities.push(activity);
+    } else {
+      return undefined;
+    }
+    txIdx = findFirstSearchtermIndexInArray(
+      content,
+      transactionTypes,
+      txIdx + 1
+    );
   }
   return activities;
 };
@@ -76,13 +72,18 @@ const parseDepotStatus = content => {
   let activities = [];
   let idx = findNextLineIndexByRegex(content, /^[A-Z0-9]{6}$/);
   const dateTimeLine = content[
-    content.indexOf('Vermögensaufstellung Standard') + 4
+    content.findIndex(line => line.startsWith('Vermögensaufstellung ')) + 4
   ].split(/\s+/);
   const [date, datetime] = createActivityDateTime(
     dateTimeLine[2],
     dateTimeLine[4]
   );
+  // There are two kinds of depot statements with slightly different formatting
+  const offset = content.includes('Vermögensaufstellung mit Einstandskursen')
+    ? 1
+    : 0;
   while (idx >= 0) {
+    const sharesIdx = findPreviousRegexMatchIdx(content, idx, /^\d+(,\d+)?$/);
     if (/^[A-Z]{3}$/.test(content[idx + 1])) {
       let activity = {
         broker: 'deutschebank',
@@ -90,9 +91,9 @@ const parseDepotStatus = content => {
         date,
         datetime,
         wkn: content[idx],
-        company: content[idx - 1],
-        shares: parseGermanNum(content[idx - 2]),
-        amount: parseGermanNum(content[idx + 3]),
+        company: content[sharesIdx + 1],
+        shares: parseGermanNum(content[sharesIdx]),
+        amount: parseGermanNum(content[idx + 3 + 4 * offset]),
         price: parseGermanNum(content[idx + 2]),
         tax: 0,
         fee: 0,
@@ -199,7 +200,7 @@ const getDocumentType = content => {
     return 'Unsupported';
   } else if (content.includes('Umsatzliste')) {
     return 'TransactionLog';
-  } else if (content.includes('Vermögensaufstellung Standard')) {
+  } else if (content.some(line => line.startsWith('Vermögensaufstellung '))) {
     return 'DepotStatus';
   }
 };

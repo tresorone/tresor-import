@@ -236,6 +236,46 @@ describe('Broker: comdirect', () => {
         tax: 0,
       });
     });
+
+    test('Can parse the buy order: 2021_tui_rewrite', () => {
+      const result = comdirect.parsePages(buySamples[10]).activities;
+
+      expect(result.length).toEqual(1);
+      expect(result[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Buy',
+        date: '2021-01-26',
+        datetime: '2021-01-26T' + result[0].datetime.substring(11),
+        isin: 'DE000TUAG000',
+        wkn: 'TUAG00',
+        company: 'TUI AG',
+        shares: 8,
+        price: 1.07,
+        amount: 8.56,
+        fee: 0.95,
+        tax: 0,
+      });
+    });
+
+    test('Can parse the buy order: 2003_dws_vermoegens', () => {
+      const result = comdirect.parsePages(buySamples[11]).activities;
+
+      expect(result.length).toEqual(1);
+      expect(result[0]).toEqual({
+        broker: 'comdirect',
+        type: 'Buy',
+        date: '2003-03-07',
+        datetime: '2003-03-07T' + result[0].datetime.substring(11),
+        isin: 'DE0008476524',
+        wkn: '847652',
+        company: 'DWS VERMOEGENSBG. FONDS I',
+        shares: 1.769,
+        price: 57.20180893159977,
+        amount: 101.19,
+        fee: -1.2,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate Sells', () => {

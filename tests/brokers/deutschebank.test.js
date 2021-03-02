@@ -110,6 +110,40 @@ describe('Broker: Deutsche Bank', () => {
         tax: 0,
       });
     });
+
+    test('Can the TransferIns be parsed from: 2021_sepot_status_with_prices.json', () => {
+      const result = deutschebank.parsePages(depotStatusSamples[1]);
+
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(3);
+      expect(result.activities[0]).toEqual({
+        broker: 'deutschebank',
+        type: 'TransferIn',
+        date: '2021-02-06',
+        datetime: '2021-02-06T16:25:00.000Z',
+        wkn: 'A1XB5U',
+        company: 'X(IE)-MSCI WORLD 1C FUNDS',
+        shares: 15.902,
+        price: 60.62319,
+        amount: 1097.48,
+        fee: 0,
+        tax: 0,
+      });
+
+      expect(result.activities[1]).toEqual({
+        broker: 'deutschebank',
+        type: 'TransferIn',
+        date: '2021-02-06',
+        datetime: '2021-02-06T16:25:00.000Z',
+        wkn: 'A0F5UF',
+        company: 'ISHARE.NASDAQ-100 UCITS ETF DE',
+        shares: 1.3843,
+        price: 102.94734,
+        amount: 152.16,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate TransactionLog', () => {
@@ -128,6 +162,40 @@ describe('Broker: Deutsche Bank', () => {
         shares: 0.485,
         price: 101.76,
         amount: 50.02,
+        fee: 0,
+        tax: 0,
+      });
+    });
+
+    test('Can the Transaction Logs be parsed from: 2019_sell_transaction_log.json', () => {
+      const result = deutschebank.parsePages(transactionLogSamples[1]);
+
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(3);
+      expect(result.activities[0]).toEqual({
+        broker: 'deutschebank',
+        type: 'Sell',
+        date: '2019-04-08',
+        datetime: '2019-04-08T' + result.activities[0].datetime.substr(11),
+        wkn: 'DBX1MW',
+        company: 'XTRACKERS MSCI WORLD SWAP INH.ANT.1C O.N.',
+        shares: 14,
+        price: 54.31,
+        amount: 738.94,
+        fee: 0,
+        tax: 0,
+      });
+
+      expect(result.activities[1]).toEqual({
+        broker: 'deutschebank',
+        type: 'Sell',
+        date: '2019-04-08',
+        datetime: '2019-04-08T' + result.activities[1].datetime.substr(11),
+        wkn: 'DBX1ET',
+        company: 'XTRACKERS EURO STOXX 50 INH.ANT. 1C O.N.',
+        shares: 14,
+        price: 49.34,
+        amount: 669.36,
         fee: 0,
         tax: 0,
       });
