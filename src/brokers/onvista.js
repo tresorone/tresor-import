@@ -197,7 +197,6 @@ const findGrossPayout = (text, tax) => {
 const findForeignInformation = pdfPage => {
   const foreignCurrencyIdx = pdfPage.indexOf('Devisenkurs') + 1;
   if (foreignCurrencyIdx > 0) {
-    console.log(1)
     const fxRate = parseGermanNum(pdfPage[foreignCurrencyIdx].split(/\s+/)[1]);
     const foreignCurrency = pdfPage[foreignCurrencyIdx]
       .split(/\s+/)[0]
