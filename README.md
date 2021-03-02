@@ -64,7 +64,7 @@ Usage of this codebase is permitted according to the GNU Affero General Public L
 - You MUST:
   - Respect the copyright which is held by the maintainers of this project
   - Disclose all changes you made to the code and also publish any code directly based on this code
-  - Give attribution to the orignal maintainers when using this project (especially when used commercially)
+  - Give attribution to the original maintainers when using this project (especially when used commercially)
 - You can not
   - Sublicense this codebase
   - Expect any liability, warranty or similar by the original maintainers. However, we want to improve
