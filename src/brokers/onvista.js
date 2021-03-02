@@ -259,7 +259,12 @@ const isOverviewPage = content =>
 const detectedButIgnoredDocument = content => {
   return (
     // When the document contains one of the following lines, we want to ignore these document.
-    content.some(line => line.includes('Kostenausweis') || line === 'Storno - Erträgnisgutschrift' || line.startsWith('Stornierung und '))
+    content.some(
+      line =>
+        line.includes('Kostenausweis') ||
+        line === 'Storno - Erträgnisgutschrift' ||
+        line.startsWith('Stornierung und ')
+    )
   );
 };
 
