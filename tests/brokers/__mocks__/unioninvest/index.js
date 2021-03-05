@@ -18,6 +18,7 @@ export const dividendSamples = [
   require('./dividend/2017_single_reinvest_1.json'),
   require('./dividend/2018_single_reinvest_1.json'),
   require('./dividend/2019_multi_payout_reinvest_1.json'),
+  require('./dividend/2020_payout_reinvest_without_churchtax.json'),
 ];
 
 export const redistribution = [

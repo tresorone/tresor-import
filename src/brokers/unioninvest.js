@@ -52,7 +52,7 @@ const findCompany = (pdfPage, idx, dateIdx) => {
     return pdfPage[companyIdx] + pdfPage.slice(companyIdx + 1, idx).join(' ');
   }
   //  The company name is in the subdepot header:
-  else if (/(,[0-9]{2,})/.test(pdfPage[dateIdx - 1])) {
+  else if (/(,[0-9]{2,})/.test(pdfPage[dateIdx - 1]) || pdfPage[dateIdx - 1] === 'inklusive Solidaritätszuschlag') {
     const isinIdx = findPriorIdx(pdfPage, idx, ['ISIN:']);
     const companyStartIdx = findPriorIdx(pdfPage, isinIdx, ['Unterdepot-Nr.:']);
     const companyStartIdx2 = findPriorIdx(pdfPage, isinIdx, ['a.']);

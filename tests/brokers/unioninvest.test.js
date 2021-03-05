@@ -514,6 +514,38 @@ describe('Broker: Union Invest', () => {
         tax: 0,
       });
     });
+
+    test('Can parse a union invest dividend+reinvest without churchtax from 2020 ', () => {
+      const activities = unioninvest.parsePages(dividendSamples[6]).activities;
+
+      expect(activities.length).toEqual(2);
+      expect(activities[0]).toEqual({
+        broker: 'unioninvest',
+        type: 'Dividend',
+        date: '2020-12-11',
+        datetime: '2020-12-11T' + activities[0].datetime.substring(11),
+        isin: 'DE0009805515',
+        company: 'UniImmo: Europa',
+        shares: 65.432,
+        price: 0.9999694339161267,
+        amount: 65.43,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[1]).toEqual({
+        broker: 'unioninvest',
+        type: 'Buy',
+        date: '2020-12-11',
+        datetime: '2020-12-11T' + activities[1].datetime.substring(11),
+        isin: 'DE0009805515',
+        company: 'UniImmo: Europa',
+        shares: 1.214,
+        price: 53.91,
+        amount: 65.43,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate Redistributions', () => {
