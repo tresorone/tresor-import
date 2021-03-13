@@ -5,4 +5,5 @@ export const transactionLog = [
   require('./transactionLog/mixed_transaction_log_2.json'),
   require('./transactionLog/2021_transaction_log_1.json'),
   require('./transactionLog/2021_transaction_log_2.json'),
+  require('./transactionLog/place_of_execution_empty.json'),
 ];

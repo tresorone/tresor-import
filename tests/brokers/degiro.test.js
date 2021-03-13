@@ -228,6 +228,51 @@ describe('Broker: DEGIRO', () => {
         tax: 0,
       });
     });
+
+    test('Can parse all transactions of file: place_of_execution_empty.json', () => {
+      const activities = degiro.parsePages(transactionLog[6]).activities;
+      expect(activities.length).toEqual(35);
+      expect(
+        activities.filter(activity => activity !== undefined).length
+      ).toEqual(35);
+      expect(activities[0]).toEqual({
+        broker: 'degiro',
+        type: 'Buy',
+        company: 'CD PROJEKT RED SA',
+        date: '2020-12-11',
+        datetime: '2020-12-11T09:08:00.000Z',
+        fee: 8.46,
+        foreignCurrency: 'PLN',
+        fxRate: 4.4388,
+        isin: 'PLOPTTC00011',
+        price: 72.02,
+        shares: 30,
+        amount: 2160.6,
+        tax: 0,
+      });
+    });
+
+    test('Can parse a transactions that has no place of execution ', () => {
+      const activities = degiro.parsePages(transactionLog[6]).activities;
+      expect(activities.length).toEqual(35);
+      expect(
+        activities.filter(activity => activity.isin === 'AU000000APX3')[0]
+      ).toEqual({
+        broker: 'degiro',
+        type: 'Buy',
+        company: 'APPEN LTD',
+        date: '2020-12-03',
+        datetime: '2020-12-02T23:26:00.000Z',
+        foreignCurrency: 'AUD',
+        fxRate: 1.6319,
+        isin: 'AU000000APX3',
+        price: 18.745,
+        shares: 50,
+        amount: 937.25,
+        fee: 10.56,
+        tax: 0,
+      });
+    });
   });
 
   beforeEach(() => {
