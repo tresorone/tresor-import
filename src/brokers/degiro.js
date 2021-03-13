@@ -41,10 +41,15 @@ const parseTransaction = (content, index, numberParser, offset) => {
   // Is it possible that the transaction logs contains dividends?
 
   let totalOffset = offset;
-  const isinIdx =
+  let isinIdx =
     content.slice(index).findIndex(line => isinRegex.test(line)) + index;
   const company = content.slice(index + 2, isinIdx).join(' ');
   const isin = content[isinIdx];
+
+  // degiro tells you now the place of execution. Sometimes it is empty so we have to move the index by 1.
+  const hasEmptyLine = content[isinIdx + 2 + offset].indexOf(',') > -1; 
+  isinIdx = hasEmptyLine ? isinIdx -1 : isinIdx; 
+
   const shares = Big(numberParser(content[isinIdx + 2 + offset]));
   if (+shares === 0) {
     throw new zeroSharesTransaction(
