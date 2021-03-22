@@ -30,11 +30,18 @@ class zeroSharesTransaction extends Error {
 }
 
 const isTransactionOverview = pdfPage => {
-  return pdfPage.some(line => line.startsWith('Transaktionsübersicht von'));
+  return pdfPage.some(
+    line =>
+      line.startsWith('Transaktionsübersicht von') ||
+      line.startsWith('Operazioni da')
+  );
 };
 
 const isAccountStatement = pdfPage => {
-  return pdfPage[0].some(line => line.startsWith('Kontoauszug von'));
+  return pdfPage[0].some(
+    line =>
+      line.startsWith('Kontoauszug von') || line.startsWith('Estratto conto da')
+  );
 };
 
 const parseTransaction = (content, index, numberParser, offset) => {
@@ -47,8 +54,8 @@ const parseTransaction = (content, index, numberParser, offset) => {
   const isin = content[isinIdx];
 
   // degiro tells you now the place of execution. Sometimes it is empty so we have to move the index by 1.
-  const hasEmptyLine = content[isinIdx + 2 + offset].indexOf(',') > -1; 
-  isinIdx = hasEmptyLine ? isinIdx -1 : isinIdx; 
+  const hasEmptyLine = content[isinIdx + 2 + offset].indexOf(',') > -1;
+  isinIdx = hasEmptyLine ? isinIdx - 1 : isinIdx;
 
   const shares = Big(numberParser(content[isinIdx + 2 + offset]));
   if (+shares === 0) {
@@ -117,11 +124,17 @@ const parseTransactionLog = pdfPages => {
   const numberParser = parseGermanNum;
   // Sometimes a reference exchange is given which causes an offset of 1
   let offset = 0;
-  if (pdfPages.flat().includes('Ausführungso')) {
+  if (
+    pdfPages.flat().includes('Ausführungso') ||
+    pdfPages.flat().includes('Borsa di')
+  ) {
     offset += 1;
   }
   for (let content of pdfPages) {
-    let transactionIndex = content.indexOf('Gesamt') + 1;
+    let transactionIndex =
+      content.findIndex(
+        currentValue => currentValue === 'Gesamt' || currentValue === 'Totale'
+      ) + 1;
     while (transactionIndex > 0 && content.length - transactionIndex > 15) {
       // Entries might have a longer length (by 1) if there is a currency rate
       // this checks that the entry is a date in the expected format
