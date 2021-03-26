@@ -274,7 +274,26 @@ describe('Broker: DEGIRO', () => {
       });
     });
   });
+  
+  test('Can the transactions be parsed from: buy_only_transactions_it', () => {
+      const activities = degiro.parsePages(transactionLog[7]).activities;
 
+      expect(activities.length).toEqual(5);
+      expect(activities[0]).toEqual({
+        broker: 'degiro',
+        type: 'Buy',
+        date: '2021-03-18',
+        datetime: '2021-03-18T08:05:00.000Z',
+        isin: 'IE00B4X9L533',
+        company: 'HSBC MSCI WORLD',
+        shares: 1,
+        price: 23.73,
+        amount: 23.73,
+        fee: 23.73,
+        tax: 0,
+      });
+    });
+  
   beforeEach(() => {
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
   });
