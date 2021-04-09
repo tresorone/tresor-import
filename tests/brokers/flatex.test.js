@@ -262,6 +262,27 @@ describe('Broker: Flatex', () => {
         tax: 0,
       });
     });
+
+    test('Can parse statement: 2021_lockheed_martin', () => {
+      const result = flatex.parsePages(buySamples[11]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2021-04-08',
+        datetime: '2021-04-08T19:09:00.000Z',
+        isin: 'US5398301094',
+        company: 'LOCKHEED MARTIN DL 1',
+        shares: 1,
+        price: 324.9,
+        amount: 324.9,
+        fee: 6.75,
+        tax: 0,
+        // fxRate: 1.20477,
+        // foreignCurrency: 'USD',
+      });
+    });
   });
 
   describe('Sell', () => {
