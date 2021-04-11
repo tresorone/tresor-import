@@ -146,6 +146,14 @@ const findPayout = (content, baseCurrency) => {
     );
   }
 
+  if (payoutLineIndex < 0) {
+    // Some documents have the payout amount after:
+    // Steuerpflichtige Vorabpauschale
+    payoutLineIndex = content.findIndex(line =>
+      line.includes('Steuerpflichtige Vorabpauschale')
+    );
+  }
+
   const currencyLine = content[payoutLineIndex + 2];
   const payout =
     currencyLine === baseCurrency
@@ -222,9 +230,14 @@ const findForeignInformation = content => {
     }
   }
 
-  const baseCurrencyLineIndex = content.findIndex(
+  let baseCurrencyLineIndex = content.findIndex(
     line => line === 'Ausmachender Betrag'
   );
+  if (baseCurrencyLineIndex < 0) {
+    baseCurrencyLineIndex = content.findIndex(
+      line => line === 'Berechnungsgrundlage für die Kapitalertragsteuer'
+    );
+  }
   if (baseCurrencyLineIndex) {
     baseCurrency = content[baseCurrencyLineIndex + 2];
   }
@@ -294,7 +307,8 @@ const getDocumentType = content => {
     content.some(
       t =>
         t.includes('Dividendengutschrift') ||
-        t.includes('Ausschüttung Investmentfonds')
+        t.includes('Ausschüttung Investmentfonds') ||
+        t.includes('Vorabpauschale Investmentfonds')
     )
   ) {
     return 'Dividend';
@@ -318,7 +332,7 @@ export const canParseDocument = (pages, extension) => {
       // Some documents have the BIC inside
       (allPages.some(line => line.includes('BIC BYLADEM1001')) ||
         // And some in the first line the Zip-Code and City. For multipage documents the information are on line two.
-        allPages.slice(0, 2).some(line => line === '10919 Berlin')) &&
+        allPages.slice(0, 3).some(line => line === '10919 Berlin')) &&
       getDocumentType(allPages) !== undefined) ||
     // This is the case for savings plan summaries, they don't contain the strings above.
     allPages.includes('Im Abrechnungszeitraum angelegter Betrag')
