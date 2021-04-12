@@ -352,17 +352,20 @@ const findForeignInformation = (content, startLineNumber) => {
     return [undefined, undefined, undefined];
   }
 
+  const baseCurrency = getTableValueByKey(
+    content,
+    startLineNumber,
+    'Endbetrag',
+    2
+  );
+
   // Use groupIndex 2 for the currency.
   let foreignCurrency = grossValueByGroupIndex(content, startLineNumber, 2);
-  if (foreignCurrency === undefined) {
+  if (foreignCurrency === undefined || foreignCurrency === baseCurrency) {
     foreignCurrency = findPriceCurrency(content, startLineNumber);
   }
 
-  return [
-    Big(parseGermanNum(fxRate)),
-    foreignCurrency,
-    getTableValueByKey(content, startLineNumber, 'Endbetrag', 2),
-  ];
+  return [Big(parseGermanNum(fxRate)), foreignCurrency, baseCurrency];
 };
 
 const lineContains = (textArr, lineNumber, value) =>
