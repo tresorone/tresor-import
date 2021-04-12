@@ -279,8 +279,27 @@ describe('Broker: Flatex', () => {
         amount: 324.9,
         fee: 6.75,
         tax: 0,
-        // fxRate: 1.20477,
-        // foreignCurrency: 'USD',
+      });
+    });
+
+    test('Can parse statement: 2121_desktop', () => {
+      const result = flatex.parsePages(buySamples[12]);
+
+      expect(result.activities.length).toEqual(1);
+      expect(result.activities[0]).toEqual({
+        broker: 'flatex',
+        type: 'Buy',
+        date: '2021-04-08',
+        datetime: '2021-04-08T13:30:00.000Z',
+        isin: 'US25058X1054',
+        company: 'DESKTOP METAL INC.',
+        shares: 20,
+        price: 11.824723808236765,
+        amount: 236.49,
+        fee: 5.9,
+        tax: 0,
+        fxRate: 1.18396,
+        foreignCurrency: 'USD',
       });
     });
   });
