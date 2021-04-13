@@ -375,6 +375,7 @@ export const canParseDocument = (pages, extension) => {
     firstPageContent.some(
       line =>
         line.includes('flatex Bank AG') ||
+        line.includes('flatexDEGIRO Bank AG') ||
         line.includes('FinTech Group Bank AG') ||
         line.includes('biw AG')
     ) &&

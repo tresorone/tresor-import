@@ -32,30 +32,41 @@ class zeroSharesTransaction extends Error {
 
 const parseTransaction = (content, index, numberParser, offset) => {
   let foreignCurrencyIndex;
-  const numberRegex = /^-?\d+(,\d+)?$/;
-  const isinIdx = findFirstIsinIndexInArray(content, index);
+  const numberRegex = /^-?(\d+|\d.\d+)(,\d+)?$/;
+
+  let isinIdx = findFirstIsinIndexInArray(content, index);
+  const company = content.slice(index + 2, isinIdx).join(' ');
+  const isin = content[isinIdx];
+
+  // degiro tells you now the place of execution. Sometimes it is empty so we have to move the index by 1.
+  const hasEmptyLine = content[isinIdx + 2 + offset].indexOf(',') > -1;
+  isinIdx = hasEmptyLine ? isinIdx - 1 : isinIdx;
+
   const sharesIdx = findFirstRegexIndexInArray(content, numberRegex, isinIdx);
   const transactionEndIdx = findFirstRegexIndexInArray(
     content,
     /(DEGIRO B\.V\. ist als)|\d{2}-\d{2}-\d{4}/,
     sharesIdx
   );
+
   // Sometimes the currency comes first; sometimes the value comes first
   const amountOffset = numberRegex.test(content[sharesIdx + 1]) ? 5 : 6;
   let activity = {
     broker: 'degiro',
-    company: content.slice(index + 2, isinIdx).join(' '),
-    isin: content[isinIdx],
+    company,
+    isin,
     shares: numberParser(content[sharesIdx]),
     amount: Math.abs(numberParser(content[sharesIdx + amountOffset])),
     tax: 0,
     fee: 0,
   };
+
   if (activity.shares === 0) {
     throw new zeroSharesTransaction(
       'Transaction with ISIN ' + activity.isin + ' has no shares.'
     );
   }
+
   // There is the case where the amount is 0, might be a transfer out or a knockout certificate
   const currency = content[isinIdx + 3 + offset * 2];
   const baseCurrency = content[isinIdx + 7 + offset * 2];
@@ -92,6 +103,7 @@ const parseTransaction = (content, index, numberParser, offset) => {
     'dd-MM-yyyy',
     'dd-MM-yyyy HH:mm'
   );
+
   return validateActivity(activity);
 };
 
@@ -101,11 +113,17 @@ const parseTransactionLog = pdfPages => {
   const numberParser = parseGermanNum;
   // Sometimes a reference exchange is given which causes an offset of 1
   let offset = 0;
-  if (pdfPages.flat().includes('Ausführungso')) {
+  if (
+    pdfPages.flat().includes('Ausführungso') ||
+    pdfPages.flat().includes('Borsa di')
+  ) {
     offset += 1;
   }
   for (let content of pdfPages) {
-    let transactionIndex = content.indexOf('Gesamt') + 1;
+    let transactionIndex =
+      content.findIndex(
+        currentValue => currentValue === 'Gesamt' || currentValue === 'Totale'
+      ) + 1;
     while (transactionIndex > 0 && content.length - transactionIndex > 15) {
       // Entries might have a longer length (by 1) if there is a currency rate
       // this checks that the entry is a date in the expected format
@@ -142,7 +160,8 @@ const parseDepotStatement = pdfPages => {
   const dateline =
     flattendPages[
       flattendPages.findIndex(line =>
-        line.startsWith('Portfolioübersicht per ')
+        line.startsWith('Portfolioübersicht per ') ||
+        line.startsWith('Panoramica Portafoglio al ')
       )
     ];
   const [date, datetime] = createActivityDateTime(
@@ -181,10 +200,20 @@ const getDocumentType = pdfPages => {
   if (pdfPages[0].some(line => line.startsWith('Kontoauszug von'))) {
     return 'AccountStatement';
   } else if (
-    pdfPages[0].some(line => line.startsWith('Transaktionsübersicht von'))
+    pdfPages[0].some(
+      line =>
+        line.startsWith('Transaktionsübersicht von') ||
+        line.startsWith('Operazioni da')
+    )
   ) {
     return 'TransactionLog';
-  } else if (pdfPages[0].some(line => line.startsWith('Portfolioübersicht'))) {
+  } else if (
+    pdfPages[0].some(
+      line =>
+        line.startsWith('Portfolioübersicht') ||
+        line.startsWith('Panoramica Portafoglio')
+    )
+  ) {
     return 'DepotOverview';
   }
 };

@@ -150,25 +150,43 @@ const parseTransactionLog = pdfPages => {
   return actions;
 };
 
-export const canParseDocument = (pages, extension) => {
-  const firstPageContent = pages[0];
+const isTransactionLog = pdfPages => {
   return (
-    extension === 'pdf' &&
-    firstPageContent.some(
+    pdfPages[0].some(
       line =>
         line.startsWith('ebase Depot') ||
         line.includes('finvesto Depot') ||
         line.includes('VL-FondsDepot')
-    ) &&
-    firstPageContent.some(line => line.includes('Fondsertrag / Vorabpauschale'))
+    ) && pdfPages[0].some(line => line.includes('Fondsertrag / Vorabpauschale'))
   );
 };
 
-export const parsePages = contents => {
-  const activities = parseTransactionLog(contents);
-  const status = activities !== undefined ? 0 : 6;
-  return {
-    activities,
-    status,
-  };
+const isIgnoredDocument = pdfPages => {
+  return (
+    pdfPages[0].includes('European Bank for Financial') &&
+    pdfPages[0].includes('Umsatzabrechnung')
+  );
+};
+
+export const canParseDocument = (pdfPages, extension) => {
+  return (
+    extension === 'pdf' &&
+    (isTransactionLog(pdfPages) || isIgnoredDocument(pdfPages))
+  );
+};
+
+export const parsePages = pdfPages => {
+  if (isTransactionLog(pdfPages)) {
+    const activities = parseTransactionLog(pdfPages);
+    const status = activities !== undefined ? 0 : 6;
+    return {
+      activities,
+      status,
+    };
+  } else if (isIgnoredDocument(pdfPages)) {
+    return {
+      activities: [],
+      status: 7,
+    };
+  }
 };

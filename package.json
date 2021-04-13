@@ -1,6 +1,6 @@
 {
   "name": "@tresor.one/import",
-  "version": "2.10.0",
+  "version": "2.11.0",
   "description": "Creates Tresor One activities from PDF statements of brokers",
   "files": [
     "dist"
@@ -24,7 +24,7 @@
     "import"
   ],
   "author": "Sumit Kumar",
-  "license": "MIT",
+  "license": "AGPLv3",
   "dependencies": {
     "big.js": "^5.2.2",
     "lodash": "^4.17.19",

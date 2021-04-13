@@ -2,45 +2,24 @@ import { findImplementation } from '@/index';
 import * as ebase from '@/brokers/ebase';
 import {
   buySamples,
-  invalidSamples,
   transactionLogSamples,
   sellSamples,
+  allSamples,
+  ignoredSamples,
 } from './__mocks__/ebase';
-import { allValidSamples } from './__mocks__/ebase';
 
 describe('Broker: ebase', () => {
   let consoleErrorSpy;
 
-  test('should only accept revenue-summary reports', () => {
-    expect(
-      ebase.canParseDocument(
-        [['Fondsertrag / Vorabpauschale', 'ebase Depot flex standard']],
-        'pdf'
-      )
-    ).toEqual(true);
-  });
-
-  test('should reject unknown PDF files', () => {
-    expect(
-      ebase.canParseDocument([
-        ['This String should never occur in a legitimate document'],
-      ])
-    ).toEqual(false);
-  });
-
-  test('should validate the result', () => {
-    expect(ebase.parsePages(invalidSamples[0]).activities).toEqual(undefined);
-  });
-
   describe('Check all documents', () => {
     test('Can parse one page containing sell orders with ebase', () => {
-      allValidSamples.forEach(pages => {
+      allSamples.forEach(pages => {
         expect(ebase.canParseDocument(pages, 'pdf')).toEqual(true);
       });
     });
 
     test('Can identify a broker from one page as ebase', () => {
-      allValidSamples.forEach(pages => {
+      allSamples.forEach(pages => {
         const implementations = findImplementation(pages, 'pdf');
 
         expect(implementations.length).toEqual(1);
@@ -554,6 +533,14 @@ describe('Broker: ebase', () => {
         tax: 0.0,
         fee: 0.0,
       });
+    });
+  });
+
+  describe('Validate that some documents are ignored', () => {
+    test('Check whether 2021_account_statements are ignored', () => {
+      const result = ebase.parsePages(ignoredSamples[0]);
+      expect(result.activities.length).toEqual(0);
+      expect(result.status).toEqual(7);
     });
   });
 

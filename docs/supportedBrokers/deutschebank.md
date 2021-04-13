@@ -10,7 +10,7 @@ Explanation on the Column _Can be parsed_:
 - ❌ This file cannot and will not be parsed.
 - 🕥 File can not be parsed yet, support will be added in the future.
 
-If your file not listed in the table below, please report it at https://tresor.import.one!
+If your file not listed in the table below, please report it at https://import.tresor.one!
 
 | Type of file                        | Format | Can be parsed | Notes                                                                                                      |
 | ----------------------------------- | ------ | ------------- | ---------------------------------------------------------------------------------------------------------- |

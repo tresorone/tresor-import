@@ -21,15 +21,12 @@ export const transactionLogSamples = [
   require('./transactionLog/2021_transaction_log_1.json'),
 ];
 
-export const invalidSamples = [
-  require('./invalid/entgelt_verkauf_nan_single_pdfpage.json'),
+export const ignoredSamples = [
+  require('./ignored/2021_account_statement.json'),
 ];
 
-export const allValidSamples = buySamples.concat(
+export const allSamples = buySamples.concat(
   sellSamples,
-  transactionLogSamples
+  transactionLogSamples,
+  ignoredSamples
 );
-/*
-As of yet no dividend containing samples can be implemented due to a lack of
-pdfs containing them
-*/
