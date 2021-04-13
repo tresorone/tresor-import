@@ -45,7 +45,7 @@ const parseTransaction = (content, index, numberParser, offset) => {
   const sharesIdx = findFirstRegexIndexInArray(content, numberRegex, isinIdx);
   const transactionEndIdx = findFirstRegexIndexInArray(
     content,
-    /(DEGIRO B\.V\. ist als)|\d{2}-\d{2}-\d{4}/,
+    /(DEGIRO B\.V\. )|\d{2}-\d{2}-\d{4}/,
     sharesIdx
   );
 
@@ -159,13 +159,16 @@ const parseDepotStatement = pdfPages => {
   const flattendPages = pdfPages.flat();
   const dateline =
     flattendPages[
-      flattendPages.findIndex(line =>
-        line.startsWith('Portfolioübersicht per ') ||
-        line.startsWith('Panoramica Portafoglio al ')
+      flattendPages.findIndex(
+        line =>
+          line.startsWith('Portfolioübersicht per ') ||
+          line.startsWith('Panoramica Portafoglio al ')
       )
     ];
+
+  const dateLineSplitted = dateline.split(/\s+/);
   const [date, datetime] = createActivityDateTime(
-    dateline.split(/\s+/)[2],
+    dateLineSplitted[dateLineSplitted.length - 1],
     undefined,
     'dd-MM-yyyy'
   );

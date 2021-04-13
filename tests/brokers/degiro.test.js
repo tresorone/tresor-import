@@ -332,6 +332,7 @@ describe('Broker: DEGIRO', () => {
   describe('Validate Depot Overviews', () => {
     test('Can parse a Depot Overview from 2021', () => {
       const result = degiro.parsePages(depotOverview[0]);
+
       expect(result.status).toEqual(0);
       expect(result.activities.length).toEqual(6);
       expect(result.activities[0]).toEqual({
@@ -361,8 +362,28 @@ describe('Broker: DEGIRO', () => {
         tax: 0,
       });
     });
+
+    test('Can parse a Depot Overview from 2021', () => {
+      const result = degiro.parsePages(depotOverview[1]);
+
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(7);
+      expect(result.activities[6]).toEqual({
+        broker: 'degiro',
+        type: 'TransferIn',
+        date: '2021-03-22',
+        datetime: '2021-03-22T' + result.activities[0].datetime.substr(11),
+        isin: 'DE0007664039',
+        company: 'VOLKSWAGEN AG',
+        shares: 1,
+        price: 221.45,
+        amount: 221.45,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
-  
+
   beforeEach(() => {
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
   });
