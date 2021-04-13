@@ -8,6 +8,7 @@ export const transactionLog = [
   require('./transactionLog/place_of_execution_empty.json'),
   require('./transactionLog/2020_transaction_log_1.json'),
   require('./transactionLog/buy_only_transactions_it.json'),
+  require('./transactionLog/0000_transactions.json'),
 ];
 
 export const depotOverview = [

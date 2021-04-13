@@ -327,6 +327,25 @@ describe('Broker: DEGIRO', () => {
         tax: 0,
       });
     });
+
+    test('Can the transactions be parsed from: buy_only_transactions_it', () => {
+      const activities = degiro.parsePages(transactionLog[9]).activities;
+
+      expect(activities.length).toEqual(4);
+      expect(activities[0]).toEqual({
+        broker: 'degiro',
+        type: 'Buy',
+        date: '2021-03-29',
+        datetime: '2021-03-29T13:15:00.000Z',
+        isin: 'US5951121038',
+        company: 'MICRON TECHNOLOGY INC',
+        shares: 9,
+        price: 74.4,
+        amount: 669.6,
+        fee: 2.2,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate Depot Overviews', () => {
