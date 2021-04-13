@@ -14,6 +14,7 @@
     "prepare": "npm run build",
     "start": "concurrently --kill-others \"npm run demo\" \"npm run dev\"",
     "test": "jest --verbose",
+    "debug-test": "node --inspect-brk ./node_modules/.bin/jest --verbose",
     "lint": "eslint .",
     "precommit": "pretty-quick --staged --no-restage && npm run lint && npm t"
   },
