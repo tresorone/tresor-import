@@ -56,6 +56,7 @@ const parseTransaction = (content, index, numberParser, offset) => {
     company,
     isin,
     shares: numberParser(content[sharesIdx]),
+    // There is the case where the amount is 0, might be a transfer out or a knockout certificate
     amount: Math.abs(numberParser(content[sharesIdx + amountOffset])),
     tax: 0,
     fee: 0,
@@ -67,13 +68,18 @@ const parseTransaction = (content, index, numberParser, offset) => {
     );
   }
 
-  // There is the case where the amount is 0, might be a transfer out or a knockout certificate
-  const currency = content[isinIdx + 3 + offset * 2];
-  const baseCurrency = content[isinIdx + 7 + offset * 2];
+  // Some documents don't have the default columns but instead the venue column.
+  // For the currency fields we need to add an offset of 2.
+  const currencyOffset = content.some(line => line === 'Venue') ? 2 : 0;
+
+  const currency = content[isinIdx + 3 + offset * 2 + currencyOffset];
+  const baseCurrency = content[isinIdx + 7 + offset * 2 + currencyOffset];
 
   if (currency !== baseCurrency) {
     activity.foreignCurrency = currency;
-    activity.fxRate = numberParser(content[isinIdx + 9 + offset]);
+    activity.fxRate = numberParser(
+      content[isinIdx + 9 + offset + currencyOffset]
+    );
     // For foreign currency we need to go one line ahead for the following fields.
     foreignCurrencyIndex = 1;
   } else {
