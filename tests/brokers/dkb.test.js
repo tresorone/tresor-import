@@ -358,7 +358,8 @@ describe('DKB broker', () => {
         date: '2021-01-04',
         datetime: '2021-01-04T' + activities[0].datetime.substring(11),
         isin: 'IE00BF4RFH31',
-        company: 'ISHSIII-MSCI WLD SM.CA.UCI.ETF REGISTERED SHARES USD(ACC)O.N.',
+        company:
+          'ISHSIII-MSCI WLD SM.CA.UCI.ETF REGISTERED SHARES USD(ACC)O.N.',
         shares: 209.0743,
         price: 0.0012435770441417237,
         amount: 0.26,
