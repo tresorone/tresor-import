@@ -348,6 +348,24 @@ describe('DKB broker', () => {
         tax: 0,
       });
     });
+
+    test('Should map the document correctly: ertragsabrechnung_fond.json', () => {
+      const activities = dkb.parsePages(dividendsSamples[5]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'dkb',
+        type: 'Dividend',
+        date: '2021-01-04',
+        datetime: '2021-01-04T' + activities[0].datetime.substring(11),
+        isin: 'IE00BF4RFH31',
+        company: 'ISHSIII-MSCI WLD SM.CA.UCI.ETF REGISTERED SHARES USD(ACC)O.N.',
+        shares: 209.0743,
+        price: 0.0012435770441417237,
+        amount: 0.26,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   describe('Savings Plan Summary', () => {
