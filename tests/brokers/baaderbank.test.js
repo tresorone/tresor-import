@@ -180,6 +180,25 @@ describe('Broker: scalable.capital', () => {
         tax: 0.26,
       });
     });
+
+    test('Can parse 2021 adidas buy for scalable capital', () => {
+      const activities = baaderBank.parsePages(buySamples[8]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'scalablecapital',
+        type: 'Buy',
+        date: '2021-04-19',
+        datetime: '2021-04-19T07:17:55.000Z',
+        isin: 'DE000A1EWWW0',
+        company: 'adidas AG Namens-Aktien o.N.',
+        shares: 4,
+        price: 279.80,
+        amount: 1119.20,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate sells', () => {

@@ -8,45 +8,33 @@ import {
 } from '@/helper';
 // This broker also handles scalable capital
 
-const isPageTypeBuy = content =>
-  content.some(line => line.includes('Wertpapierabrechnung: Kauf'));
-
-const isPageTypeSell = content =>
-  content.some(line => line.includes('Wertpapierabrechnung: Verkauf'));
-
-const isPageTypeDividend = content =>
-  content.some(
-    line =>
-      line.includes('Fondsausschüttung') ||
-      line.includes('Dividendenabrechnung')
-  );
-
-const isPageTypeAccountStatement = content =>
-  content.indexOf('Perioden-Kontoauszug: EUR-Konto') > 0;
-
-const isBrokerGratisbroker = content =>
-  content.some(line => line.includes('GRATISBROKER GmbH'));
-
-const isBrokerScalableCapital = content =>
-  content.some(
-    line =>
-      line.includes('Scalable Capital Vermögensverwaltung GmbH') ||
-      content.some(line => line.includes('Scalable Capital Vermögensverw.GmbH'))
-  );
-
-const isBrokerOskar = content =>
-  content.some(line => line.includes('Oskar.de GmbH'));
+const getDocumentType = content => {
+  if (content.includes('Wertpapierabrechnung: Kauf')) {
+    return 'Buy'
+  }
+  else if (content.includes('Wertpapierabrechnung: Verkauf')) {
+    return 'Sell'
+  }
+  else if (content.includes('Fondsausschüttung') || content.includes('Dividendenabrechnung')) {
+    return 'Dividend'
+  }
+  else if (content.includes('Perioden-Kontoauszug: EUR-Konto')) {
+    return 'AccountStatement'
+  }
+}
 
 const getBroker = content => {
-  if (isBrokerGratisbroker(content)) {
+  if (content.some(line => line.includes('GRATISBROKER GmbH'))) {
     return 'gratisbroker';
   }
 
-  if (isBrokerOskar(content)) {
+  if (content.some(line => line.includes('Oskar.de GmbH'))) {
     return 'oskar';
   }
 
-  return 'scalablecapital';
+  if (content.some(line => line.includes('Scalable Capital Vermögensverw'))) {
+    return 'scalablecapital';
+  }
 };
 
 const findOrderDate = content => {
@@ -101,11 +89,6 @@ const findPayDate = content => {
   return content[findLineNumberByContent(content, term)].substring(term.length);
 };
 
-const findByStartingTerm = (content, term) =>
-  content[content.findIndex(line => line.startsWith(term))].substring(
-    term.length
-  );
-
 const findLineNumberByContent = (content, term, contains = true) =>
   content.findIndex(line => (contains ? line.includes(term) : line === term));
 
@@ -128,7 +111,16 @@ const findLineNumberByCurrentAndPreviousLineContent = (
   return undefined;
 };
 
-const findISIN = content => findByStartingTerm(content, 'ISIN: ');
+const findISIN = content => {
+  // There are two formats for the ISIN. One contains the ISIN in the same row
+  // as the string 'ISIN: ', the other one in the following row.
+  let isinIdx = content.findIndex(line => line.startsWith('ISIN: '));
+  if (isinIdx >= 0) {
+    return content[isinIdx].substring(6);
+  }
+  isinIdx = content.indexOf('ISIN:')
+  return content[isinIdx + 1]
+}
 
 const findCompany = (content, isDividend) => {
   let startLineNumber;
@@ -148,24 +140,27 @@ const findCompany = (content, isDividend) => {
   return content[startLineNumber];
 };
 
-const findShares = (content, isDividend) => {
-  const line = isDividend
-    ? content[findLineNumberByContent(content, 'Ausschüttung', false) - 1]
-    : content[
-        findLineNumberByCurrentAndPreviousLineContent(
-          content,
-          'Nominale',
-          'STK'
-        )
-      ];
+const findShares = (content, documentType) => {
+  let line;
+  if (documentType === 'Dividend') {
+    line = content[findLineNumberByContent(content, 'Ausschüttung', false) - 1]
+  }
+  else if (['Buy', 'Sell'].includes(documentType)) {
+    line = content[
+      findLineNumberByCurrentAndPreviousLineContent(
+        content,
+        'Nominale',
+        'STK'
+      )]
+  }
   return parseGermanNum(line.split(' ')[1]);
 };
 
-const findAmount = (content, type) => {
-  if (type === 'Dividend') {
+const findAmount = (content, documentType) => {
+  if (documentType === 'Dividend') {
     //First occurence of Bruttobetrag  can be in foreign currency; last Occurence is in €
     return parseGermanNum(content[content.lastIndexOf('Bruttobetrag') + 2]);
-  } else if (type === 'Buy' || type === 'Sell') {
+  } else if (documentType === 'Buy' || documentType === 'Sell') {
     return parseGermanNum(content[content.indexOf('Kurswert') + 1]);
   }
 };
@@ -267,82 +262,48 @@ const findTax = content => {
   return +totalTax;
 };
 
-const canParsePage = content =>
-  isPageTypeBuy(content) ||
-  isPageTypeSell(content) ||
-  isPageTypeDividend(content) ||
-  isPageTypeAccountStatement(content);
-
 export const canParseDocument = (pages, extension) => {
-  const firstPageContent = pages[0];
+  const content = pages.flat();
   return (
     extension === 'pdf' &&
-    canParsePage(firstPageContent) &&
-    (isBrokerGratisbroker(firstPageContent) ||
-      isBrokerScalableCapital(firstPageContent) ||
-      isBrokerOskar(firstPageContent))
+    getDocumentType(content) !== undefined &&
+    getBroker(content) !== undefined
   );
 };
 
-const parsePage = content => {
-  let type, date, time, isin, company, shares, price, amount, fee, tax;
-
-  if (isPageTypeBuy(content)) {
-    type = 'Buy';
-    isin = findISIN(content);
-    company = findCompany(content, false);
-    date = findOrderDate(content);
-    time = findOrderTime(content);
-    shares = findShares(content, false);
-    amount = findAmount(content, 'Buy');
-    price = findPricePerShare(content, false);
-    fee = 0;
-    tax = findTax(content);
-  } else if (isPageTypeSell(content)) {
-    type = 'Sell';
-    isin = findISIN(content);
-    company = findCompany(content, false);
-    date = findOrderDate(content);
-    time = findOrderTime(content);
-    shares = findShares(content, false);
-    amount = findAmount(content, 'Sell');
-    price = findPricePerShare(content, false);
-    fee = 0;
-    tax = findTax(content);
-  } else if (isPageTypeDividend(content)) {
-    type = 'Dividend';
-    isin = findISIN(content);
-    company = findCompany(content, true);
-    date = findPayDate(content);
-    shares = findShares(content, true);
-    amount = findAmount(content, 'Dividend');
-    price = findPricePerShare(content, true);
-    fee = 0;
-    tax = findTax(content);
-  } else {
-    console.error('Unknown page type for Baader Bank');
+const parsePage = (content, documentType) => {
+  let activity = {
+    broker: getBroker(content),
+    type: documentType,
+    isin: findISIN(content),
+    shares: findShares(content, documentType),
+    amount: findAmount(content, documentType),
+    fee: 0,
+    tax: findTax(content),
+  }
+  let date, time
+  switch (documentType) {
+    case 'Buy':
+    case 'Sell':
+      activity.company = findCompany(content, false);
+      date = findOrderDate(content);
+      time = findOrderTime(content);
+      activity.price = findPricePerShare(content, false);
+      break;
+    case 'Dividend':
+      activity.company = findCompany(content, true);
+      date = findPayDate(content);
+      activity.price = findPricePerShare(content, true);
+      break;
   }
 
-  const [parsedDate, parsedDateTime] = createActivityDateTime(
+  [activity.date, activity.datetime] = createActivityDateTime(
     date,
     time,
     'dd.MM.yyyy',
     'dd.MM.yyyy HH:mm:ss'
   );
-
-  return validateActivity({
-    broker: getBroker(content),
-    type,
-    date: parsedDate,
-    datetime: parsedDateTime,
-    isin,
-    company,
-    shares,
-    price,
-    amount,
-    fee,
-    tax,
-  });
+  return validateActivity(activity);
 };
 
 const parseAccountStatement = content => {
@@ -404,11 +365,12 @@ const parseAccountStatement = content => {
 export const parsePages = contents => {
   let activities = [];
   const content = contents.flat();
+  const documentType = getDocumentType(content);
 
-  if (isPageTypeAccountStatement(contents[0])) {
+  if (documentType === 'AccountStatement') {
     activities.push(...parseAccountStatement(content));
-  } else if (canParsePage(content)) {
-    activities.push(parsePage(content));
+  } else if (['Buy', 'Sell', 'Dividend'].includes(documentType)) {
+    activities.push(parsePage(content, documentType));
   }
 
   return {

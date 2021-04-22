@@ -7,6 +7,7 @@ export const buySamples = [
   require('./buy/saving_plan_vanguard_from_Oskar.json'),
   require('./buy/market_order_from_Oskar.json'),
   require('./buy/2021_azioni_nom_italian_tax.json'),
+  require('./buy/2021_scalable_adidas_ag.json'),
 ];
 
 export const sellSamples = [require('./sell/market_order.json')];
