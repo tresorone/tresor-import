@@ -10,18 +10,18 @@ import {
 
 const getDocumentType = content => {
   if (content.includes('Wertpapierabrechnung: Kauf')) {
-    return 'Buy'
+    return 'Buy';
+  } else if (content.includes('Wertpapierabrechnung: Verkauf')) {
+    return 'Sell';
+  } else if (
+    content.includes('Fondsausschüttung') ||
+    content.includes('Dividendenabrechnung')
+  ) {
+    return 'Dividend';
+  } else if (content.includes('Perioden-Kontoauszug: EUR-Konto')) {
+    return 'AccountStatement';
   }
-  else if (content.includes('Wertpapierabrechnung: Verkauf')) {
-    return 'Sell'
-  }
-  else if (content.includes('Fondsausschüttung') || content.includes('Dividendenabrechnung')) {
-    return 'Dividend'
-  }
-  else if (content.includes('Perioden-Kontoauszug: EUR-Konto')) {
-    return 'AccountStatement'
-  }
-}
+};
 
 const getBroker = content => {
   if (content.some(line => line.includes('GRATISBROKER GmbH'))) {
@@ -118,9 +118,9 @@ const findISIN = content => {
   if (isinIdx >= 0) {
     return content[isinIdx].substring(6);
   }
-  isinIdx = content.indexOf('ISIN:')
-  return content[isinIdx + 1]
-}
+  isinIdx = content.indexOf('ISIN:');
+  return content[isinIdx + 1];
+};
 
 const findCompany = (content, isDividend) => {
   let startLineNumber;
@@ -143,15 +143,16 @@ const findCompany = (content, isDividend) => {
 const findShares = (content, documentType) => {
   let line;
   if (documentType === 'Dividend') {
-    line = content[findLineNumberByContent(content, 'Ausschüttung', false) - 1]
-  }
-  else if (['Buy', 'Sell'].includes(documentType)) {
-    line = content[
-      findLineNumberByCurrentAndPreviousLineContent(
-        content,
-        'Nominale',
-        'STK'
-      )]
+    line = content[findLineNumberByContent(content, 'Ausschüttung', false) - 1];
+  } else if (['Buy', 'Sell'].includes(documentType)) {
+    line =
+      content[
+        findLineNumberByCurrentAndPreviousLineContent(
+          content,
+          'Nominale',
+          'STK'
+        )
+      ];
   }
   return parseGermanNum(line.split(' ')[1]);
 };
@@ -280,8 +281,8 @@ const parsePage = (content, documentType) => {
     amount: findAmount(content, documentType),
     fee: 0,
     tax: findTax(content),
-  }
-  let date, time
+  };
+  let date, time;
   switch (documentType) {
     case 'Buy':
     case 'Sell':

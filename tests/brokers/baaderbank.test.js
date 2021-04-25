@@ -193,8 +193,8 @@ describe('Broker: scalable.capital', () => {
         isin: 'DE000A1EWWW0',
         company: 'adidas AG Namens-Aktien o.N.',
         shares: 4,
-        price: 279.80,
-        amount: 1119.20,
+        price: 279.8,
+        amount: 1119.2,
         fee: 0,
         tax: 0,
       });
