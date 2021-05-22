@@ -30,10 +30,10 @@ const activityType = content => {
     case 'Rückzahlung':
       return 'Payback';
   }
-  if (content.includes('Depotbewertung')) {
+  if (content.includes('Depotbewertung') && !content[0].startsWith('Jahresdepotauszug')) {
     return 'DepotStatement';
   }
-  if (content[0].startsWith('Depotauszug')) {
+  if (content[0].startsWith('Depotauszug') || content[0].startsWith('Jahresdepotauszug')) {
     return 'PostboxDepotStatement';
   }
 };
@@ -376,14 +376,21 @@ const parseDepotStatement = content => {
 const parsePostboxDepotStatement = content => {
   let idx = content.indexOf('Stück');
   let activities = [];
-  if (content[0].split(' ')[2] == undefined) {
-    return undefined;
+  let tmpdate;
+
+  if(!content[0].startsWith('Jahresdepotauszug')){
+    if (content[0].split(' ')[2] == undefined) {
+      return undefined;
+    }
+    tmpdate = content[0].split(' ')[2];
+  } else {
+    tmpdate = content[11];
   }
   const [date, datetime] = createActivityDateTime(
-    content[0].split(' ')[2],
-    '00:00'
+    tmpdate,
+    '23:59'
   );
-  
+
   while (idx >= 0) {
     let isinaddidx = 6;
     if (content[idx + 6].startsWith('ISIN')) {
@@ -428,7 +435,7 @@ export const parsePages = contents => {
   if (type === 'DepotStatement') {
     activities = parseDepotStatement(contentsFlat);
   } else if (type === 'PostboxDepotStatement') {
-      activities = parsePostboxDepotStatement(contentsFlat);
+    activities = parsePostboxDepotStatement(contentsFlat);
   } else {
     // Information regarding dividends can be split across multiple pdf pages
     activities = [parseBuySellDividend(contentsFlat, type)];

@@ -40,4 +40,5 @@ export const invalidSamples = [require('./invalid/invalid_buy.json')];
 
 export const postboxDepotStatement = [
   require('./postboxDepotStatement/statement1.json'),
+  require('./postboxDepotStatement/statement2.json'),
 ];
