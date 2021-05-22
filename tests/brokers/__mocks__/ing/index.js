@@ -37,3 +37,7 @@ export const paybackSamples = [
 ];
 
 export const invalidSamples = [require('./invalid/invalid_buy.json')];
+
+export const postboxDepotStatement = [
+  require('./postboxDepotStatement/statement1.json'),
+];

@@ -7,6 +7,7 @@ import {
   invalidSamples,
   paybackSamples,
   depotStatement,
+  postboxDepotStatement
 } from './__mocks__/ing';
 
 describe('Broker: ING', () => {
@@ -529,6 +530,41 @@ describe('Broker: ING', () => {
         shares: 15,
         price: 42.385333333333335,
         amount: 635.78,
+        fee: 0,
+        tax: 0,
+      });
+    });
+  });
+
+  describe('Postbox Depot Statement', () => {
+    test('Can parse postboxDepotStatement 1', () => {
+      const result = ing.parsePages(postboxDepotStatement[0]);
+      expect(result.status).toEqual(0);
+      expect(result.activities.length).toEqual(17);
+      expect(result.activities[0]).toEqual({
+        broker: 'ing',
+        type: 'TransferIn',
+        date: '2021-03-31',
+        datetime: '2021-03-30T22:00:00.000Z',
+        isin: 'US64110L1061',
+        company: 'Netflix Inc.',
+        shares: 2,
+        price: 443.95,
+        amount: 887.9,
+        fee: 0,
+        tax: 0,
+      });
+
+      expect(result.activities[13]).toEqual({
+        broker: 'ing',
+        type: 'TransferIn',
+        date: '2021-03-31',
+        datetime: '2021-03-30T22:00:00.000Z',
+        isin: 'US74767V1098',
+        company: 'QuantumScape Corp.',
+        shares: 25,
+        price: 38.1664,
+        amount: 954.16,
         fee: 0,
         tax: 0,
       });

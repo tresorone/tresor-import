@@ -19,18 +19,22 @@ const activityType = content => {
     case 'Wertpapierabrechnung':
       if (content[1].startsWith('Kauf')) {
         return 'Buy';
-      } else if (content[1] === 'Verkauf') {
+      } else if (content[1].startsWith('Verkauf')) {
         return 'Sell';
       }
       break;
     case 'Dividendengutschrift':
     case 'Ertragsgutschrift':
+    case 'Zinsgutschrift':
       return 'Dividend';
     case 'Rückzahlung':
       return 'Payback';
   }
   if (content.includes('Depotbewertung')) {
     return 'DepotStatement';
+  }
+  if (content[0].startsWith('Depotauszug')) {
+    return 'PostboxDepotStatement';
   }
 };
 
@@ -369,6 +373,45 @@ const parseDepotStatement = content => {
   return activities;
 };
 
+const parsePostboxDepotStatement = content => {
+  let idx = content.indexOf('Stück');
+  let activities = [];
+  if (content[0].split(' ')[2] == undefined) {
+    return undefined;
+  }
+  const [date, datetime] = createActivityDateTime(
+    content[0].split(' ')[2],
+    '00:00'
+  );
+  
+  while (idx >= 0) {
+    let isinaddidx = 6;
+    if (content[idx + 6].startsWith('ISIN')) {
+      isinaddidx = 7; //necessary if currency is not euro
+    }
+    let activity = {
+      broker: 'ing',
+      type: 'TransferIn',
+      isin: content[idx + isinaddidx].split(' ')[0],
+      company: content[idx + 1],
+      date,
+      datetime,
+      shares: parseGermanNum(content[idx - 1]),
+      amount: parseGermanNum(content[idx + 3]),
+      tax: 0,
+      fee: 0,
+    };
+    activity.price = +Big(activity.amount).div(activity.shares);
+    activity = validateActivity(activity);
+    if (activity === undefined) {
+      return undefined;
+    }
+    activities.push(activity);
+    idx = content.indexOf('Stück', idx + 1);
+  }
+  return activities;
+};
+
 export const canParseDocument = (pages, extension) => {
   return (
     extension === 'pdf' &&
@@ -384,6 +427,8 @@ export const parsePages = contents => {
 
   if (type === 'DepotStatement') {
     activities = parseDepotStatement(contentsFlat);
+  } else if (type === 'PostboxDepotStatement') {
+      activities = parsePostboxDepotStatement(contentsFlat);
   } else {
     // Information regarding dividends can be split across multiple pdf pages
     activities = [parseBuySellDividend(contentsFlat, type)];
