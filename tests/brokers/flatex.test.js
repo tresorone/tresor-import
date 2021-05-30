@@ -49,6 +49,19 @@ describe('Broker: Flatex', () => {
       ).toEqual(true);
     });
 
+    test('should accept csv file', () => {
+      expect(
+        flatex.canParseDocument(
+          [
+            [
+              'Nummer;Buchtag;Valuta;ISIN;Bezeichnung;Nominal;;Buchungsinformationen;TA-Nr.;Kurs;\r',
+            ],
+          ],
+          'csv'
+        )
+      ).toEqual(true);
+    });
+
     test('should not accept any PDFs', () => {
       expect(flatex.canParseDocument([['42']], 'pdf')).toEqual(false);
       expect(
@@ -77,6 +90,11 @@ describe('Broker: Flatex', () => {
       });
     });
 
+    test('should map csv data of sample 14 corretly', () => {
+      const result = flatex.parsePages(buySamples[13]);
+
+      expect(result.activities.length).toEqual(32);
+    });
     test('should map pdf data of sample 2 correctly', () => {
       const result = flatex.parsePages(buySamples[1]);
 

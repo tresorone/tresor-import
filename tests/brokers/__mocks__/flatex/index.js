@@ -12,6 +12,7 @@ export const buySamples = [
   require('./buy/2017_lion_e_mobility.json'),
   require('./buy/2021_lockheed_martin.json'),
   require('./buy/2021_desktop.json'),
+  require('./buy/2021_depotumsaetze_csv.json'),
 ];
 
 export const sellSamples = [

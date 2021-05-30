@@ -4,6 +4,7 @@ import {
   validateActivity,
   createActivityDateTime,
   timeRegex,
+  csvLinesToJSON,
 } from '@/helper';
 
 const getTableValueByKey = (textArr, startLineNumber, key, groupIndex = 1) => {
@@ -373,6 +374,39 @@ const lineContains = (textArr, lineNumber, value) =>
 
 export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
+  switch (extension) {
+    case 'csv':
+      return firstPageContent.some(
+        line =>
+          line.includes('Nummer') ||
+          line.includes('Buchtag') ||
+          line.includes('Valuta') ||
+          line.includes('ISIN') ||
+          line.includes('Bezeichnung') ||
+          line.includes('Nominal') ||
+          line.includes('Buchungsinformationen') ||
+          line.includes('TA-Nr.') ||
+          line.includes('Kurs')
+      );
+    case 'pdf': {
+      return (
+        firstPageContent.some(
+          line =>
+            line.includes('flatex Bank AG') ||
+            line.includes('flatexDEGIRO Bank AG') ||
+            line.includes('FinTech Group Bank AG') ||
+            line.includes('biw AG')
+        ) &&
+        (firstPageContent.some(line => line.includes('Kauf')) ||
+          firstPageContent.some(line => line.includes('Verkauf')) ||
+          firstPageContent.some(line =>
+            line.includes('Dividendengutschrift')
+          ) ||
+          firstPageContent.some(line => line.includes('Ertragsmitteilung')) ||
+          detectedButIgnoredDocument(firstPageContent))
+      );
+    }
+  }
   return (
     extension === 'pdf' &&
     firstPageContent.some(
@@ -396,6 +430,54 @@ const detectedButIgnoredDocument = content => {
     content.some(line => line.toLowerCase().includes('auftragsbestätigung')) ||
     content.some(line => line.toLowerCase().includes('einrichtung sparplan nr'))
   );
+};
+
+const detectCSVDocument = content => {
+  //Currently i do not know how to detect a csv other than looking for its header row
+  return content.some(line =>
+    line.includes(
+      'Nummer;Buchtag;Valuta;ISIN;Bezeichnung;Nominal;;Buchungsinformationen;TA-Nr.;Kurs;'
+    )
+  );
+};
+
+const parseCSV = content => {
+  let transactions = JSON.parse(csvLinesToJSON(content.flat()));
+
+  return transactions
+    .filter(
+      row =>
+        row['Buchungsinformationen'].includes('Kauf') ||
+        row['Buchungsinformationen'].includes('Eingang')
+    )
+    .map(row => {
+      let type = row['Buchungsinformationen'].includes('Kauf')
+          ? 'Buy'
+          : 'UNKOWN',
+        date = row['Buchtag'],
+        datetime = row['Valuta'],
+        isin = row['ISIN'],
+        company = row['Bezeichung'],
+        shares = row['Nominal'],
+        price = row['Kurs'] * row['Nominal'],
+        amount = row['Kurs'],
+        fee = 0,
+        tax = 0;
+
+      return {
+        broker: 'flatex',
+        type,
+        date,
+        datetime,
+        isin,
+        company,
+        shares,
+        price: +price,
+        amount,
+        fee,
+        tax,
+      };
+    });
 };
 
 const parsePage = (textArr, startLineNumber) => {
@@ -496,6 +578,16 @@ const parsePage = (textArr, startLineNumber) => {
 
 export const parsePages = contents => {
   let activities = [];
+
+  let text = contents.flat();
+  //CSV
+  if (detectCSVDocument(text)) {
+    activities = parseCSV(contents);
+    return {
+      activities,
+      status: 0,
+    };
+  }
 
   if (detectedButIgnoredDocument(contents.flat())) {
     // We know this type and we don't want to support it.
