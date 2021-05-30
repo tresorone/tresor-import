@@ -372,24 +372,24 @@ const findForeignInformation = (content, startLineNumber) => {
 const lineContains = (textArr, lineNumber, value) =>
   textArr[lineNumber].includes(value);
 
+
+  const detectCSVDocument = content => {
+    //Currently i do not know how to detect a csv other than looking for its header row
+    return content.some(line =>
+      line.includes(
+        'Nummer;Buchtag;Valuta;ISIN;Bezeichnung;Nominal;;Buchungsinformationen;TA-Nr.;Kurs;'
+      )
+    );
+  };
+
 export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
   switch (extension) {
     case 'csv':
-      return firstPageContent.some(
-        line =>
-          line.includes('Nummer') ||
-          line.includes('Buchtag') ||
-          line.includes('Valuta') ||
-          line.includes('ISIN') ||
-          line.includes('Bezeichnung') ||
-          line.includes('Nominal') ||
-          line.includes('Buchungsinformationen') ||
-          line.includes('TA-Nr.') ||
-          line.includes('Kurs')
-      );
+      return detectCSVDocument(firstPageContent);
     case 'pdf': {
       return (
+        detectCSVDocument(firstPageContent) == false &&
         firstPageContent.some(
           line =>
             line.includes('flatex Bank AG') ||
@@ -432,14 +432,7 @@ const detectedButIgnoredDocument = content => {
   );
 };
 
-const detectCSVDocument = content => {
-  //Currently i do not know how to detect a csv other than looking for its header row
-  return content.some(line =>
-    line.includes(
-      'Nummer;Buchtag;Valuta;ISIN;Bezeichnung;Nominal;;Buchungsinformationen;TA-Nr.;Kurs;'
-    )
-  );
-};
+
 
 const parseCSV = content => {
   let transactions = JSON.parse(csvLinesToJSON(content.flat()));

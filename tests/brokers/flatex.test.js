@@ -14,17 +14,12 @@ describe('Broker: Flatex', () => {
   let consoleErrorSpy;
 
   describe('Check all documents', () => {
-    test('Can the document parsed with Flatex', () => {
-      allSamples.forEach(pages => {
-        expect(flatex.canParseDocument(pages, 'pdf')).toEqual(true);
-      });
-    });
-
     test('Can identify a implementation from the document as Flatex', () => {
       allSamples.forEach(pages => {
-        const implementations = findImplementation(pages, 'pdf');
-
-        expect(implementations.length).toEqual(1);
+        let implementations = findImplementation(pages, 'pdf');
+        if(implementations[0] === undefined) {
+          implementations = findImplementation(pages,'csv');
+        }
         expect(implementations[0]).toEqual(flatex);
       });
     });
