@@ -17,8 +17,8 @@ describe('Broker: Flatex', () => {
     test('Can identify a implementation from the document as Flatex', () => {
       allSamples.forEach(pages => {
         let implementations = findImplementation(pages, 'pdf');
-        if(implementations[0] === undefined) {
-          implementations = findImplementation(pages,'csv');
+        if (implementations[0] === undefined) {
+          implementations = findImplementation(pages, 'csv');
         }
         expect(implementations[0]).toEqual(flatex);
       });

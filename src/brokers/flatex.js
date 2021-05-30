@@ -372,15 +372,14 @@ const findForeignInformation = (content, startLineNumber) => {
 const lineContains = (textArr, lineNumber, value) =>
   textArr[lineNumber].includes(value);
 
-
-  const detectCSVDocument = content => {
-    //Currently i do not know how to detect a csv other than looking for its header row
-    return content.some(line =>
-      line.includes(
-        'Nummer;Buchtag;Valuta;ISIN;Bezeichnung;Nominal;;Buchungsinformationen;TA-Nr.;Kurs;'
-      )
-    );
-  };
+const detectCSVDocument = content => {
+  //Currently i do not know how to detect a csv other than looking for its header row
+  return content.some(line =>
+    line.includes(
+      'Nummer;Buchtag;Valuta;ISIN;Bezeichnung;Nominal;;Buchungsinformationen;TA-Nr.;Kurs;'
+    )
+  );
+};
 
 export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
@@ -407,21 +406,7 @@ export const canParseDocument = (pages, extension) => {
       );
     }
   }
-  return (
-    extension === 'pdf' &&
-    firstPageContent.some(
-      line =>
-        line.includes('flatex Bank AG') ||
-        line.includes('flatexDEGIRO Bank AG') ||
-        line.includes('FinTech Group Bank AG') ||
-        line.includes('biw AG')
-    ) &&
-    (firstPageContent.some(line => line.includes('Kauf')) ||
-      firstPageContent.some(line => line.includes('Verkauf')) ||
-      firstPageContent.some(line => line.includes('Dividendengutschrift')) ||
-      firstPageContent.some(line => line.includes('Ertragsmitteilung')) ||
-      detectedButIgnoredDocument(firstPageContent))
-  );
+  
 };
 
 const detectedButIgnoredDocument = content => {
@@ -431,8 +416,6 @@ const detectedButIgnoredDocument = content => {
     content.some(line => line.toLowerCase().includes('einrichtung sparplan nr'))
   );
 };
-
-
 
 const parseCSV = content => {
   let transactions = JSON.parse(csvLinesToJSON(content.flat()));
