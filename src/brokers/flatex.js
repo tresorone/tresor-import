@@ -3,8 +3,7 @@ import {
   parseGermanNum,
   validateActivity,
   createActivityDateTime,
-  timeRegex,
-  csvLinesToJSON,
+  timeRegex
 } from '@/helper';
 
 const getTableValueByKey = (textArr, startLineNumber, key, groupIndex = 1) => {
@@ -373,6 +372,11 @@ const lineContains = (textArr, lineNumber, value) =>
   textArr[lineNumber].includes(value);
 
 const detectCSVDocument = content => {
+  if (content.some(obj => typeof obj == 'object')) {
+    return content.some(
+      obj => 'Bezeichnung' in obj && 'Buchtag' in obj && 'ISIN' in obj
+    );
+  }
   //Currently i do not know how to detect a csv other than looking for its header row
   return content.some(line =>
     line.includes(
@@ -406,7 +410,6 @@ export const canParseDocument = (pages, extension) => {
       );
     }
   }
-  
 };
 
 const detectedButIgnoredDocument = content => {
@@ -418,24 +421,19 @@ const detectedButIgnoredDocument = content => {
 };
 
 const parseCSV = content => {
-  let transactions = JSON.parse(csvLinesToJSON(content.flat()));
-
-  return transactions
-    .filter(
-      row =>
-        row['Buchungsinformationen'].includes('Kauf') ||
-        row['Buchungsinformationen'].includes('Eingang')
-    )
-    .map(row => {
+  let data = content.splice(1);
+  return data.map(row => {
       let type = row['Buchungsinformationen'].includes('Kauf')
           ? 'Buy'
           : 'UNKOWN',
         date = row['Buchtag'],
         datetime = row['Valuta'],
         isin = row['ISIN'],
-        company = row['Bezeichung'],
+        company = row['Bezeichnung'],
         shares = row['Nominal'],
-        price = row['Kurs'] * row['Nominal'],
+        price =
+          parseFloat(row['Kurs'].replace(',', '.')) *
+          parseFloat(row['Nominal'].replace(',', '.')),
         amount = row['Kurs'],
         fee = 0,
         tax = 0;
@@ -448,7 +446,7 @@ const parseCSV = content => {
         isin,
         company,
         shares,
-        price: +price,
+        price,
         amount,
         fee,
         tax,

@@ -26,7 +26,7 @@
   ],
   "author": "Sumit Kumar",
   "license": "AGPLv3",
-  "dependencies": { 
+  "dependencies": {
     "big.js": "^5.2.2",
     "lodash": "^4.17.19",
     "luxon": "^1.25.0",
