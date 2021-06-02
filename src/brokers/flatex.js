@@ -4,7 +4,7 @@ import {
   validateActivity,
   createActivityDateTime,
   timeRegex,
-} from '@/helper';
+} from '@/helper'; 
 
 const getTableValueByKey = (textArr, startLineNumber, key, groupIndex = 1) => {
   const finding = textArr.find(
@@ -385,33 +385,6 @@ const detectCSVDocument = content => {
   );
 };
 
-export const canParseDocument = (pages, extension) => {
-  const firstPageContent = pages[0];
-  switch (extension) {
-    case 'csv':
-      return detectCSVDocument(firstPageContent);
-    case 'pdf': {
-      return (
-        detectCSVDocument(firstPageContent) == false &&
-        firstPageContent.some(
-          line =>
-            line.includes('flatex Bank AG') ||
-            line.includes('flatexDEGIRO Bank AG') ||
-            line.includes('FinTech Group Bank AG') ||
-            line.includes('biw AG')
-        ) &&
-        (firstPageContent.some(line => line.includes('Kauf')) ||
-          firstPageContent.some(line => line.includes('Verkauf')) ||
-          firstPageContent.some(line =>
-            line.includes('Dividendengutschrift')
-          ) ||
-          firstPageContent.some(line => line.includes('Ertragsmitteilung')) ||
-          detectedButIgnoredDocument(firstPageContent))
-      );
-    }
-  }
-};
-
 const detectedButIgnoredDocument = content => {
   return (
     // When the document contains one of the following lines, we want to ignore these document.
@@ -420,10 +393,18 @@ const detectedButIgnoredDocument = content => {
   );
 };
 
+const parseAction = type => {
+  if (type.includes('Kauf')) return 'BUY';
+  if (type.includes('Verkaufen')) return 'SELL';
+  if (type.includes('WP-Eingang')) return 'TransfertIn';
+
+  return 'UNKOWN';
+};
+
 const parseCSV = content => {
   let data = content.splice(1);
   return data.map(row => {
-    let type = row['Buchungsinformationen'].includes('Kauf') ? 'Buy' : 'UNKOWN',
+    let type = parseAction(row['Buchungsinformationen']),
       date = row['Buchtag'],
       datetime = row['Valuta'],
       isin = row['ISIN'],
@@ -544,6 +525,33 @@ const parsePage = (textArr, startLineNumber) => {
   }
 
   return validateActivity(activity);
+};
+
+export const canParseDocument = (pages, extension) => {
+  const firstPageContent = pages[0];
+  switch (extension) {
+    case 'csv':
+      return detectCSVDocument(firstPageContent);
+    case 'pdf': {
+      return (
+        detectCSVDocument(firstPageContent) == false &&
+        firstPageContent.some(
+          line =>
+            line.includes('flatex Bank AG') ||
+            line.includes('flatexDEGIRO Bank AG') ||
+            line.includes('FinTech Group Bank AG') ||
+            line.includes('biw AG')
+        ) &&
+        (firstPageContent.some(line => line.includes('Kauf')) ||
+          firstPageContent.some(line => line.includes('Verkauf')) ||
+          firstPageContent.some(line =>
+            line.includes('Dividendengutschrift')
+          ) ||
+          firstPageContent.some(line => line.includes('Ertragsmitteilung')) ||
+          detectedButIgnoredDocument(firstPageContent))
+      );
+    }
+  }
 };
 
 export const parsePages = contents => {
