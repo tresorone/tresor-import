@@ -3,7 +3,7 @@ import {
   parseGermanNum,
   validateActivity,
   createActivityDateTime,
-  timeRegex
+  timeRegex,
 } from '@/helper';
 
 const getTableValueByKey = (textArr, startLineNumber, key, groupIndex = 1) => {
@@ -423,35 +423,31 @@ const detectedButIgnoredDocument = content => {
 const parseCSV = content => {
   let data = content.splice(1);
   return data.map(row => {
-      let type = row['Buchungsinformationen'].includes('Kauf')
-          ? 'Buy'
-          : 'UNKOWN',
-        date = row['Buchtag'],
-        datetime = row['Valuta'],
-        isin = row['ISIN'],
-        company = row['Bezeichnung'],
-        shares = row['Nominal'],
-        price =
-          parseFloat(row['Kurs'].replace(',', '.')) *
-          parseFloat(row['Nominal'].replace(',', '.')),
-        amount = row['Kurs'],
-        fee = 0,
-        tax = 0;
+    let type = row['Buchungsinformationen'].includes('Kauf') ? 'Buy' : 'UNKOWN',
+      date = row['Buchtag'],
+      datetime = row['Valuta'],
+      isin = row['ISIN'],
+      company = row['Bezeichnung'],
+      shares = row['Nominal'],
+      price = parseGermanNum(row['Kurs']) * parseGermanNum(row['Nominal']),
+      amount = row['Kurs'],
+      fee = 0,
+      tax = 0;
 
-      return {
-        broker: 'flatex',
-        type,
-        date,
-        datetime,
-        isin,
-        company,
-        shares,
-        price,
-        amount,
-        fee,
-        tax,
-      };
-    });
+    return {
+      broker: 'flatex',
+      type,
+      date,
+      datetime,
+      isin,
+      company,
+      shares,
+      price,
+      amount,
+      fee,
+      tax,
+    };
+  });
 };
 
 const parsePage = (textArr, startLineNumber) => {

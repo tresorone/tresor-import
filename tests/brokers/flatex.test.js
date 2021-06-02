@@ -9,7 +9,7 @@ import {
   allSamples,
 } from './__mocks__/flatex';
 
-import {csvLinesToJSON} from '../../src/helper'
+import { csvLinesToJSON } from '../../src/helper';
 import Big from 'big.js';
 
 describe('Broker: Flatex', () => {
@@ -90,7 +90,7 @@ describe('Broker: Flatex', () => {
     test('should map csv data of sample 14 corretly', () => {
       const result = flatex.parsePages(
         JSON.parse(csvLinesToJSON(buySamples[13][0]))
-        );
+      );
 
       expect(result.activities.length).toEqual(32);
     });
