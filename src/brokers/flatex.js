@@ -371,69 +371,12 @@ const findForeignInformation = (content, startLineNumber) => {
 const lineContains = (textArr, lineNumber, value) =>
   textArr[lineNumber].includes(value);
 
-const detectCSVDocumentFromObject = content => {
-  try {
-    return (
-      'Bezeichnung' in content && 'Buchtag' in content && 'ISIN' in content
-    );
-  } catch (e) {
-    return false;
-  }
-};
-
-const detectCSVDocumentFromText = content => {
-  //Currently i do not know how to detect a csv other than looking for its header row
-  let result = content.includes(
-    'Nummer;Buchtag;Valuta;ISIN;Bezeichnung;Nominal;;Buchungsinformationen;TA-Nr.;Kurs;'
-  );
-
-  return result;
-};
-
 const detectedButIgnoredDocument = content => {
   return (
     // When the document contains one of the following lines, we want to ignore these document.
     content.some(line => line.toLowerCase().includes('auftragsbestätigung')) ||
     content.some(line => line.toLowerCase().includes('einrichtung sparplan nr'))
   );
-};
-
-const parseAction = type => {
-  if (type.includes('Kauf')) return 'BUY';
-  if (type.includes('Verkauf')) return 'SELL';
-  if (type.includes('WP-Eingang')) return 'TransfertIn';
-
-  return 'UNKOWN';
-};
-
-const parseCSV = content => {
-  let data = content.splice(1);
-  return data.map(row => {
-    let type = parseAction(row['Buchungsinformationen']),
-      date = row['Buchtag'],
-      datetime = row['Valuta'],
-      isin = row['ISIN'],
-      company = row['Bezeichnung'],
-      shares = row['Nominal'],
-      price = parseGermanNum(row['Kurs']) * parseGermanNum(row['Nominal']),
-      amount = row['Kurs'],
-      fee = 0,
-      tax = 0;
-
-    return {
-      broker: 'flatex',
-      type,
-      date,
-      datetime,
-      isin,
-      company,
-      shares,
-      price,
-      amount,
-      fee,
-      tax,
-    };
-  });
 };
 
 const parsePage = (textArr, startLineNumber) => {
@@ -532,29 +475,109 @@ const parsePage = (textArr, startLineNumber) => {
   return validateActivity(activity);
 };
 
+/**
+ *
+ */
+class FlatexCSV {
+  /**
+   * Maps the parsed CSV file to an activity and transforms items to the expected type/format
+   * @param {object[]} content -> parsed CSV file
+   * @returns {activities[]} mapped content of an array of objects to an array of activities
+   */
+  parseCSV(content) {
+    let data = content.splice(1);
+    return data.map(row => {
+      let type = this.parseAction(row['Buchungsinformationen']),
+        date = row['Buchtag'],
+        datetime = row['Valuta'],
+        isin = row['ISIN'],
+        company = row['Bezeichnung'],
+        shares = row['Nominal'],
+        price = parseGermanNum(row['Kurs']) * parseGermanNum(row['Nominal']),
+        amount = row['Kurs'],
+        fee = 0,
+        tax = 0;
+
+      return {
+        broker: 'flatex',
+        type,
+        date,
+        datetime,
+        isin,
+        company,
+        shares,
+        price,
+        amount,
+        fee,
+        tax,
+      };
+    });
+  }
+
+  /**
+   * Checks for certain key words (Kauf,Verkauf,WP-Eingang) which maps to actions
+   * @param {string} type
+   * @returns {'BUY'|'SELL|'TransfertIn'|'UNKOWN'}
+   */
+  parseAction(type) {
+    if (type.includes('Kauf')) return 'BUY';
+    if (type.includes('Verkauf')) return 'SELL';
+    if (type.includes('WP-Eingang')) return 'TransfertIn';
+
+    return 'UNKOWN';
+  }
+
+  /**
+   * Check if the header row of the csv file maps to the expected header row.
+   * @param {string} content
+   * @returns {boolean}
+   */
+  static detectCSVDocumentFromText(content) {
+    //Currently i do not know how to detect a csv other than looking for its header row
+    let result = content.includes(
+      'Nummer;Buchtag;Valuta;ISIN;Bezeichnung;Nominal;;Buchungsinformationen;TA-Nr.;Kurs;'
+    );
+
+    return result;
+  }
+
+  /**
+   * Checks if a object contains certain fields which the expected CSV File contains as well.
+   * @param {object} content
+   * @returns {boolean}
+   */
+  static detectCSVDocumentFromObject(content) {
+    try {
+      return (
+        'Bezeichnung' in content && 'Buchtag' in content && 'ISIN' in content
+      );
+    } catch (e) {
+      return false;
+    }
+  }
+}
+
+const detectPDFDocument = firstPageContent => {
+  return firstPageContent.some(
+    line =>
+      line.includes('flatex Bank AG') ||
+      line.includes('flatexDEGIRO Bank AG') ||
+      line.includes('FinTech Group Bank AG') ||
+      line.includes('biw AG')
+  ) &&
+    (firstPageContent.some(line => line.includes('Kauf')) ||
+      firstPageContent.some(line => line.includes('Verkauf')) ||
+      firstPageContent.some(line => line.includes('Dividendengutschrift')) ||
+      firstPageContent.some(line => line.includes('Ertragsmitteilung')) ||
+      detectedButIgnoredDocument(firstPageContent));
+};
 export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
   switch (extension) {
     case 'csv':
-      return detectCSVDocumentFromText(firstPageContent[0]);
+      return FlatexCSV.detectCSVDocumentFromText(firstPageContent[0]);
     case 'pdf': {
-      return (
-        //detectCSVDocumentFromText(firstPageContent) == false &&
-        firstPageContent.some(
-          line =>
-            line.includes('flatex Bank AG') ||
-            line.includes('flatexDEGIRO Bank AG') ||
-            line.includes('FinTech Group Bank AG') ||
-            line.includes('biw AG')
-        ) &&
-        (firstPageContent.some(line => line.includes('Kauf')) ||
-          firstPageContent.some(line => line.includes('Verkauf')) ||
-          firstPageContent.some(line =>
-            line.includes('Dividendengutschrift')
-          ) ||
-          firstPageContent.some(line => line.includes('Ertragsmitteilung')) ||
-          detectedButIgnoredDocument(firstPageContent))
-      );
+      return detectPDFDocument(firstPageContent);
     }
   }
 };
@@ -564,8 +587,9 @@ export const parsePages = contents => {
 
   let text = contents.flat()[0];
   //CSV
-  if (detectCSVDocumentFromObject(text)) {
-    activities = parseCSV(contents);
+  if (FlatexCSV.detectCSVDocumentFromObject(text)) {
+    let parser = new FlatexCSV();
+    activities = parser.parseCSV(contents);
     return {
       activities,
       status: 0,
