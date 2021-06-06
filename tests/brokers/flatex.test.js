@@ -7,6 +7,7 @@ import {
   mixedPageSamples,
   ignoredSamples,
   allSamples,
+  csvSamples,
 } from './__mocks__/flatex';
 
 import { csvLinesToJSON } from '../../src/helper';
@@ -19,9 +20,24 @@ describe('Broker: Flatex', () => {
     test('Can identify a implementation from the document as Flatex', () => {
       allSamples.forEach(pages => {
         let implementations = findImplementation(pages, 'pdf');
-        if (implementations[0] === undefined) {
-          implementations = findImplementation(pages, 'csv');
-        }
+        expect(implementations[0]).toEqual(flatex);
+      });
+    });
+
+    test('Can identify a pdf implementation from the document as Flatex', () => {
+      allSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'pdf');
+
+        expect(implementations.length).toEqual(1);
+        expect(implementations[0]).toEqual(flatex);
+      });
+    });
+
+    test('Can identify a csv implementation from the document as Flatex', () => {
+      csvSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'csv');
+
+        expect(implementations.length).toEqual(1);
         expect(implementations[0]).toEqual(flatex);
       });
     });
@@ -87,9 +103,9 @@ describe('Broker: Flatex', () => {
       });
     });
 
-    test('should map csv data of sample 14 corretly', () => {
+    test('should map csv data of csv sample corretly', () => {
       const result = flatex.parsePages(
-        JSON.parse(csvLinesToJSON(buySamples[13][0]))
+        JSON.parse(csvLinesToJSON(csvSamples[0][0]))
       );
 
       expect(result.activities.length).toEqual(32);

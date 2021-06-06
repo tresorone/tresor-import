@@ -4,7 +4,7 @@ import {
   validateActivity,
   createActivityDateTime,
   timeRegex,
-} from '@/helper'; 
+} from '@/helper';
 
 const getTableValueByKey = (textArr, startLineNumber, key, groupIndex = 1) => {
   const finding = textArr.find(
@@ -371,18 +371,23 @@ const findForeignInformation = (content, startLineNumber) => {
 const lineContains = (textArr, lineNumber, value) =>
   textArr[lineNumber].includes(value);
 
-const detectCSVDocument = content => {
-  if (content.some(obj => typeof obj == 'object')) {
-    return content.some(
-      obj => 'Bezeichnung' in obj && 'Buchtag' in obj && 'ISIN' in obj
+const detectCSVDocumentFromObject = content => {
+  try {
+    return (
+      'Bezeichnung' in content && 'Buchtag' in content && 'ISIN' in content
     );
+  } catch( e ) {
+    return false;
   }
+};
+
+const detectCSVDocumentFromText = content => {
   //Currently i do not know how to detect a csv other than looking for its header row
-  return content.some(line =>
-    line.includes(
-      'Nummer;Buchtag;Valuta;ISIN;Bezeichnung;Nominal;;Buchungsinformationen;TA-Nr.;Kurs;'
-    )
+  let result = content.includes(
+    'Nummer;Buchtag;Valuta;ISIN;Bezeichnung;Nominal;;Buchungsinformationen;TA-Nr.;Kurs;'
   );
+
+  return result;
 };
 
 const detectedButIgnoredDocument = content => {
@@ -531,10 +536,10 @@ export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
   switch (extension) {
     case 'csv':
-      return detectCSVDocument(firstPageContent);
+      return detectCSVDocumentFromText(firstPageContent[0]);
     case 'pdf': {
       return (
-        detectCSVDocument(firstPageContent) == false &&
+        //detectCSVDocumentFromText(firstPageContent) == false &&
         firstPageContent.some(
           line =>
             line.includes('flatex Bank AG') ||
@@ -557,9 +562,9 @@ export const canParseDocument = (pages, extension) => {
 export const parsePages = contents => {
   let activities = [];
 
-  let text = contents.flat();
+  let text = contents.flat()[0];
   //CSV
-  if (detectCSVDocument(text)) {
+  if (detectCSVDocumentFromObject(text)) {
     activities = parseCSV(contents);
     return {
       activities,

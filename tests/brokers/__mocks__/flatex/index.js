@@ -12,7 +12,6 @@ export const buySamples = [
   require('./buy/2017_lion_e_mobility.json'),
   require('./buy/2021_lockheed_martin.json'),
   require('./buy/2021_desktop.json'),
-  require('./buy/2021_depotumsaetze_csv.json'),
 ];
 
 export const sellSamples = [
@@ -37,6 +36,8 @@ export const ignoredSamples = [
   require('./ignored/2020_order_confirmation.json'),
   require('./ignored/2020_saving_plan_confirmation.json'),
 ];
+
+export const csvSamples = [require('./buy/2021_depotumsaetze_csv.json')];
 
 export const allSamples = buySamples.concat(
   sellSamples,
