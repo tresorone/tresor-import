@@ -628,11 +628,11 @@ class FlatexCSV {
         datetime = row['Valuta'],
         isin = row['ISIN'],
         company = row['Bezeichnung'],
-        shares = row['Nominal'],
-        price = parseGermanNum(row['Kurs']) * parseGermanNum(row['Nominal']),
-        amount = row['Kurs'],
-        fee = 0,
-        tax = 0;
+        shares = new Big(parseGermanNum(row['Nominal'])),
+        price = new Big(parseGermanNum(row['Kurs']) * parseGermanNum(row['Nominal'])),
+        amount = new Big(parseGermanNum(row['Kurs'])),
+        fee = new Big(0),
+        tax = new Big(0);
 
       return {
         broker: 'flatex',
