@@ -7,11 +7,11 @@ import {
 } from '@/helper';
 
 /**
- * 
- * @param {string[]} textArr 
- * @param {number} startLineNumber 
- * @param {any} key 
- * @param {number} groupIndex 
+ *
+ * @param {string[]} textArr
+ * @param {number} startLineNumber
+ * @param {any} key
+ * @param {number} groupIndex
  * @returns {any}
  */
 const getTableValueByKey = (textArr, startLineNumber, key, groupIndex = 1) => {
@@ -29,10 +29,10 @@ const getTableValueByKey = (textArr, startLineNumber, key, groupIndex = 1) => {
 };
 
 /**
- * 
- * @param {string[]} textArr 
- * @param {number} startLineNumber 
- * @param {any} key 
+ *
+ * @param {string[]} textArr
+ * @param {number} startLineNumber
+ * @param {any} key
  * @returns {any}
  */
 const getHeaderValueByKey = (textArr, startLineNumber, key) => {
@@ -43,8 +43,8 @@ const getHeaderValueByKey = (textArr, startLineNumber, key) => {
 };
 
 /**
- * 
- * @param {string[]} textArr 
+ *
+ * @param {string[]} textArr
  * @returns {number}
  */
 const findTableIndexes = textArr => {
@@ -60,9 +60,9 @@ const findTableIndexes = textArr => {
 };
 
 /**
- * 
- * @param {string[]} textArr 
- * @param {number} tableIndex 
+ *
+ * @param {string[]} textArr
+ * @param {number} tableIndex
  * @returns {string|null}
  */
 const findISIN = (textArr, tableIndex) => {
@@ -72,9 +72,9 @@ const findISIN = (textArr, tableIndex) => {
 };
 
 /**
- * 
- * @param {string[]} textArr 
- * @param {number} tableIndex 
+ *
+ * @param {string[]} textArr
+ * @param {number} tableIndex
  * @returns {string|undefined}
  */
 const findCompany = (textArr, tableIndex) => {
@@ -88,9 +88,9 @@ const findCompany = (textArr, tableIndex) => {
 };
 
 /**
- * 
- * @param {string[]} textArr 
- * @param {number} startLineNumber 
+ *
+ * @param {string[]} textArr
+ * @param {number} startLineNumber
  * @returns {Date|undefined}
  */
 const findDateBuySell = (textArr, startLineNumber) => {
@@ -120,9 +120,9 @@ const findDateBuySell = (textArr, startLineNumber) => {
 };
 
 /**
- * 
- * @param {string[]} textArr 
- * @param {number} startLineNumber 
+ *
+ * @param {string[]} textArr
+ * @param {number} startLineNumber
  * @returns {string}
  */
 const findOrderTime = (textArr, startLineNumber) => {
@@ -154,9 +154,9 @@ const findOrderTime = (textArr, startLineNumber) => {
 };
 
 /**
- * 
- * @param {string[]} textArr 
- * @param {number} startLineNumber 
+ *
+ * @param {string[]} textArr
+ * @param {number} startLineNumber
  * @returns {Big}
  */
 const findShares = (textArr, startLineNumber) => {
@@ -197,9 +197,9 @@ const findShares = (textArr, startLineNumber) => {
 };
 
 /**
- * 
- * @param {string[]} content 
- * @param {number} startLineNumber 
+ *
+ * @param {string[]} content
+ * @param {number} startLineNumber
  * @returns {Big}
  */
 const findPrice = (content, startLineNumber) => {
@@ -212,9 +212,9 @@ const findPrice = (content, startLineNumber) => {
 };
 
 /**
- * 
- * @param {string[]} content 
- * @param {number} startLineNumber 
+ *
+ * @param {string[]} content
+ * @param {number} startLineNumber
  * @returns {string|undefined}
  */
 const findPriceCurrency = (content, startLineNumber) => {
@@ -233,23 +233,23 @@ const findPriceCurrency = (content, startLineNumber) => {
 };
 
 /**
- * 
- * @param {string[]} textArr 
- * @param {number} startLineNumber 
- * @returns 
+ *
+ * @param {string[]} textArr
+ * @param {number} startLineNumber
+ * @returns
  */
 const findAmount = (textArr, startLineNumber) =>
   parseGermanNum(
     findTableValueByKeyWithDocumentFormat(textArr, startLineNumber, 'Kurswert')
   );
 
-  /**
-   * 
-   * @param {string[]} content 
-   * @param {number} startLineNumber 
-   * @param {any} term 
-   * @returns {string}
-   */
+/**
+ *
+ * @param {string[]} content
+ * @param {number} startLineNumber
+ * @param {any} term
+ * @returns {string}
+ */
 const findTableValueByKeyWithDocumentFormat = (
   content,
   startLineNumber,
@@ -267,9 +267,9 @@ const findTableValueByKeyWithDocumentFormat = (
 };
 
 /**
- * 
- * @param {string[]} textArr 
- * @param {number} startLineNumber 
+ *
+ * @param {string[]} textArr
+ * @param {number} startLineNumber
  * @returns {Big}
  */
 const findFee = (textArr, startLineNumber) => {
@@ -317,9 +317,9 @@ const findFee = (textArr, startLineNumber) => {
 };
 
 /**
- * 
- * @param {string[]} textArr 
- * @param {number} startLineNumber 
+ *
+ * @param {string[]} textArr
+ * @param {number} startLineNumber
  * @returns {Big}
  */
 const findTax = (textArr, startLineNumber) => {
@@ -347,18 +347,18 @@ const findTax = (textArr, startLineNumber) => {
 };
 
 /**
- * 
- * @param {string[]} content 
- * @param {number} startLineNumber 
+ *
+ * @param {string[]} content
+ * @param {number} startLineNumber
  * @returns {number}
  */
 const findNetPayout = (content, startLineNumber) =>
   parseGermanNum(getTableValueByKey(content, startLineNumber, 'Endbetrag', 1));
 
 /**
- * 
- * @param {string[]} textArr 
- * @param {number} startLineNumber 
+ *
+ * @param {string[]} textArr
+ * @param {number} startLineNumber
  * @returns {Date}
  */
 const findDateDividend = (textArr, startLineNumber) => {
@@ -372,10 +372,10 @@ const findDateDividend = (textArr, startLineNumber) => {
 
 /**
  * Find the correct amout of Payout. if a foreignCurrency is defined payout is converted with fxRate
- * @param {string[]} textArr 
- * @param {number} startLineNumber 
- * @param {string} fxRate 
- * @param {string|undefined} foreignCurrency 
+ * @param {string[]} textArr
+ * @param {number} startLineNumber
+ * @param {string} fxRate
+ * @param {string|undefined} foreignCurrency
  * @returns {Big}
  */
 const findPayout = (textArr, startLineNumber, fxRate, foreignCurrency) => {
@@ -406,9 +406,9 @@ const findPayout = (textArr, startLineNumber, fxRate, foreignCurrency) => {
 
 /**
  * GroupIndex = 1: amount, GroupIndex = 2: currency
- * @param {string[]} content 
- * @param {number} startLineNumber 
- * @param {number} groupIndex 
+ * @param {string[]} content
+ * @param {number} startLineNumber
+ * @param {number} groupIndex
  * @returns {number|undefined}
  */
 const grossValueByGroupIndex = (content, startLineNumber, groupIndex) => {
@@ -447,8 +447,8 @@ const grossValueByGroupIndex = (content, startLineNumber, groupIndex) => {
 
 /**
  * This function returns an array with: fxRate, foreignCurrency, baseCurrency (or undefined).
- * @param {*} content 
- * @param {*} startLineNumber 
+ * @param {*} content
+ * @param {*} startLineNumber
  * @returns {object[]} [fxRate, foreignCurrency, baseCurrency ]
  */
 const findForeignInformation = (content, startLineNumber) => {
@@ -487,20 +487,20 @@ const findForeignInformation = (content, startLineNumber) => {
 };
 
 /**
- * 
- * @param {string[]} textArr 
- * @param {number} lineNumber 
- * @param {any} value 
- * @returns 
+ *
+ * @param {string[]} textArr
+ * @param {number} lineNumber
+ * @param {any} value
+ * @returns
  */
 const lineContains = (textArr, lineNumber, value) =>
   textArr[lineNumber].includes(value);
 
-  /**
-   * 
-   * @param {string[]} content 
-   * @returns 
-   */
+/**
+ *
+ * @param {string[]} content
+ * @returns
+ */
 const detectedButIgnoredDocument = content => {
   return (
     // When the document contains one of the following lines, we want to ignore these document.
@@ -510,10 +510,10 @@ const detectedButIgnoredDocument = content => {
 };
 
 /**
- * 
- * @param {string[]} textArr 
- * @param {number} startLineNumber 
- * @returns 
+ *
+ * @param {string[]} textArr
+ * @param {number} startLineNumber
+ * @returns
  */
 const parsePage = (textArr, startLineNumber) => {
   let type,
@@ -695,7 +695,7 @@ class FlatexCSV {
 
 /**
  * Checks PDF content
- * @param {string[]} firstPageContent 
+ * @param {string[]} firstPageContent
  * @returns {boolean}
  */
 const detectPDFDocument = firstPageContent => {
@@ -714,7 +714,6 @@ const detectPDFDocument = firstPageContent => {
       detectedButIgnoredDocument(firstPageContent))
   );
 };
-
 
 export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
