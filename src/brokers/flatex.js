@@ -6,6 +6,14 @@ import {
   timeRegex,
 } from '@/helper';
 
+/**
+ * 
+ * @param {string[]} textArr 
+ * @param {number} startLineNumber 
+ * @param {any} key 
+ * @param {number} groupIndex 
+ * @returns {any}
+ */
 const getTableValueByKey = (textArr, startLineNumber, key, groupIndex = 1) => {
   const finding = textArr.find(
     t =>
@@ -20,6 +28,13 @@ const getTableValueByKey = (textArr, startLineNumber, key, groupIndex = 1) => {
   return result ? result[groupIndex] : null;
 };
 
+/**
+ * 
+ * @param {string[]} textArr 
+ * @param {number} startLineNumber 
+ * @param {any} key 
+ * @returns {any}
+ */
 const getHeaderValueByKey = (textArr, startLineNumber, key) => {
   const result = textArr.find(
     t => textArr.indexOf(t) >= startLineNumber && t.includes(key + ' ')
@@ -27,6 +42,11 @@ const getHeaderValueByKey = (textArr, startLineNumber, key) => {
   return result ? result.match(new RegExp(key + '\\s\\s+(.+)'))[1] : null;
 };
 
+/**
+ * 
+ * @param {string[]} textArr 
+ * @returns {number}
+ */
 const findTableIndexes = textArr => {
   let lineNumbers = [];
   textArr.forEach((line, lineNumber) => {
@@ -39,12 +59,24 @@ const findTableIndexes = textArr => {
   return lineNumbers;
 };
 
+/**
+ * 
+ * @param {string[]} textArr 
+ * @param {number} tableIndex 
+ * @returns {string|null}
+ */
 const findISIN = (textArr, tableIndex) => {
   const isinStr = textArr[tableIndex].trim();
   const isinMatch = isinStr.match(/([A-Z]{2})((?![A-Z]{10})[A-Z0-9]{10})/);
   return isinMatch ? isinMatch[0] : null;
 };
 
+/**
+ * 
+ * @param {string[]} textArr 
+ * @param {number} tableIndex 
+ * @returns {string|undefined}
+ */
 const findCompany = (textArr, tableIndex) => {
   const companyStr = textArr[tableIndex].trim();
   const companyMatch = companyStr.match(
@@ -55,6 +87,12 @@ const findCompany = (textArr, tableIndex) => {
     : undefined;
 };
 
+/**
+ * 
+ * @param {string[]} textArr 
+ * @param {number} startLineNumber 
+ * @returns {Date|undefined}
+ */
 const findDateBuySell = (textArr, startLineNumber) => {
   if (getTableValueByKey(textArr, startLineNumber, 'Schlusstag')) {
     // Standard stock
@@ -81,6 +119,12 @@ const findDateBuySell = (textArr, startLineNumber) => {
   return textArr[lineNumber].split(/\s+/)[1];
 };
 
+/**
+ * 
+ * @param {string[]} textArr 
+ * @param {number} startLineNumber 
+ * @returns {string}
+ */
 const findOrderTime = (textArr, startLineNumber) => {
   const lineWithOrderTime = getTableValueByKey(
     textArr,
@@ -109,6 +153,12 @@ const findOrderTime = (textArr, startLineNumber) => {
   return lineWithExecutionTime.split(' ')[0];
 };
 
+/**
+ * 
+ * @param {string[]} textArr 
+ * @param {number} startLineNumber 
+ * @returns {Big}
+ */
 const findShares = (textArr, startLineNumber) => {
   const partialExecution = getTableValueByKey(
     textArr,
@@ -146,6 +196,12 @@ const findShares = (textArr, startLineNumber) => {
   }
 };
 
+/**
+ * 
+ * @param {string[]} content 
+ * @param {number} startLineNumber 
+ * @returns {Big}
+ */
 const findPrice = (content, startLineNumber) => {
   const lineValue = getTableValueByKey(content, startLineNumber, 'Kurs');
   if (!lineValue) {
@@ -155,6 +211,12 @@ const findPrice = (content, startLineNumber) => {
   return Big(parseGermanNum(lineValue));
 };
 
+/**
+ * 
+ * @param {string[]} content 
+ * @param {number} startLineNumber 
+ * @returns {string|undefined}
+ */
 const findPriceCurrency = (content, startLineNumber) => {
   const lineValue = getTableValueByKey(content, startLineNumber, 'Kurs', 2);
   if (!lineValue) {
@@ -170,11 +232,24 @@ const findPriceCurrency = (content, startLineNumber) => {
   return currency;
 };
 
+/**
+ * 
+ * @param {string[]} textArr 
+ * @param {number} startLineNumber 
+ * @returns 
+ */
 const findAmount = (textArr, startLineNumber) =>
   parseGermanNum(
     findTableValueByKeyWithDocumentFormat(textArr, startLineNumber, 'Kurswert')
   );
 
+  /**
+   * 
+   * @param {string[]} content 
+   * @param {number} startLineNumber 
+   * @param {any} term 
+   * @returns {string}
+   */
 const findTableValueByKeyWithDocumentFormat = (
   content,
   startLineNumber,
@@ -191,6 +266,12 @@ const findTableValueByKeyWithDocumentFormat = (
   return value;
 };
 
+/**
+ * 
+ * @param {string[]} textArr 
+ * @param {number} startLineNumber 
+ * @returns {Big}
+ */
 const findFee = (textArr, startLineNumber) => {
   const provision = findTableValueByKeyWithDocumentFormat(
     textArr,
@@ -235,6 +316,12 @@ const findFee = (textArr, startLineNumber) => {
   return +Big(provision).plus(Big(ownExpenses)).plus(Big(foreignExpenses));
 };
 
+/**
+ * 
+ * @param {string[]} textArr 
+ * @param {number} startLineNumber 
+ * @returns {Big}
+ */
 const findTax = (textArr, startLineNumber) => {
   let totalTax = Big(0);
 
@@ -259,9 +346,21 @@ const findTax = (textArr, startLineNumber) => {
   return +totalTax;
 };
 
+/**
+ * 
+ * @param {string[]} content 
+ * @param {number} startLineNumber 
+ * @returns {number}
+ */
 const findNetPayout = (content, startLineNumber) =>
   parseGermanNum(getTableValueByKey(content, startLineNumber, 'Endbetrag', 1));
 
+/**
+ * 
+ * @param {string[]} textArr 
+ * @param {number} startLineNumber 
+ * @returns {Date}
+ */
 const findDateDividend = (textArr, startLineNumber) => {
   const date = getTableValueByKey(textArr, startLineNumber, 'Valuta', 1);
   if (/\d{2}.\d{2}.\d{4}/.test(date)) {
@@ -271,6 +370,14 @@ const findDateDividend = (textArr, startLineNumber) => {
   return getTableValueByKey(textArr, startLineNumber, 'Valuta', 2);
 };
 
+/**
+ * Find the correct amout of Payout. if a foreignCurrency is defined payout is converted with fxRate
+ * @param {string[]} textArr 
+ * @param {number} startLineNumber 
+ * @param {string} fxRate 
+ * @param {string|undefined} foreignCurrency 
+ * @returns {Big}
+ */
 const findPayout = (textArr, startLineNumber, fxRate, foreignCurrency) => {
   const payoutAmount = Big(
     // Use groupIndex 1 for the amount.
@@ -297,7 +404,13 @@ const findPayout = (textArr, startLineNumber, fxRate, foreignCurrency) => {
   return payoutAmount.div(fxRate);
 };
 
-// GroupIndex = 1: amount, GroupIndex = 2: currency
+/**
+ * GroupIndex = 1: amount, GroupIndex = 2: currency
+ * @param {string[]} content 
+ * @param {number} startLineNumber 
+ * @param {number} groupIndex 
+ * @returns {number|undefined}
+ */
 const grossValueByGroupIndex = (content, startLineNumber, groupIndex) => {
   let amount = getTableValueByKey(
     content,
@@ -332,7 +445,12 @@ const grossValueByGroupIndex = (content, startLineNumber, groupIndex) => {
   return undefined;
 };
 
-// This function returns an array with: fxRate, foreignCurrency, baseCurrency (or undefined).
+/**
+ * This function returns an array with: fxRate, foreignCurrency, baseCurrency (or undefined).
+ * @param {*} content 
+ * @param {*} startLineNumber 
+ * @returns {object[]} [fxRate, foreignCurrency, baseCurrency ]
+ */
 const findForeignInformation = (content, startLineNumber) => {
   let fxRate = getTableValueByKey(content, startLineNumber, 'Devisenkurs', 1);
 
@@ -368,9 +486,21 @@ const findForeignInformation = (content, startLineNumber) => {
   return [Big(parseGermanNum(fxRate)), foreignCurrency, baseCurrency];
 };
 
+/**
+ * 
+ * @param {string[]} textArr 
+ * @param {number} lineNumber 
+ * @param {any} value 
+ * @returns 
+ */
 const lineContains = (textArr, lineNumber, value) =>
   textArr[lineNumber].includes(value);
 
+  /**
+   * 
+   * @param {string[]} content 
+   * @returns 
+   */
 const detectedButIgnoredDocument = content => {
   return (
     // When the document contains one of the following lines, we want to ignore these document.
@@ -379,6 +509,12 @@ const detectedButIgnoredDocument = content => {
   );
 };
 
+/**
+ * 
+ * @param {string[]} textArr 
+ * @param {number} startLineNumber 
+ * @returns 
+ */
 const parsePage = (textArr, startLineNumber) => {
   let type,
     date,
@@ -476,7 +612,7 @@ const parsePage = (textArr, startLineNumber) => {
 };
 
 /**
- *
+ * Implementation to detect and parse CSV content
  */
 class FlatexCSV {
   /**
@@ -557,20 +693,29 @@ class FlatexCSV {
   }
 }
 
+/**
+ * Checks PDF content
+ * @param {string[]} firstPageContent 
+ * @returns {boolean}
+ */
 const detectPDFDocument = firstPageContent => {
-  return firstPageContent.some(
-    line =>
-      line.includes('flatex Bank AG') ||
-      line.includes('flatexDEGIRO Bank AG') ||
-      line.includes('FinTech Group Bank AG') ||
-      line.includes('biw AG')
-  ) &&
+  return (
+    firstPageContent.some(
+      line =>
+        line.includes('flatex Bank AG') ||
+        line.includes('flatexDEGIRO Bank AG') ||
+        line.includes('FinTech Group Bank AG') ||
+        line.includes('biw AG')
+    ) &&
     (firstPageContent.some(line => line.includes('Kauf')) ||
       firstPageContent.some(line => line.includes('Verkauf')) ||
       firstPageContent.some(line => line.includes('Dividendengutschrift')) ||
       firstPageContent.some(line => line.includes('Ertragsmitteilung')) ||
-      detectedButIgnoredDocument(firstPageContent));
+      detectedButIgnoredDocument(firstPageContent))
+  );
 };
+
+
 export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
   switch (extension) {
