@@ -108,7 +108,14 @@ describe('Broker: Flatex', () => {
         JSON.parse(csvLinesToJSON(csvSamples[0][0]))
       );
 
-      expect(result.activities.length).toEqual(32);
+        expect(result.activities[0]['broker']).toEqual('flatex');
+        expect(result.activities[0]['type']).toEqual('BUY')
+        expect(result.activities[0]['isin']).toEqual('LU2023678878')
+
+        expect(result.activities[4]['broker']).toEqual('flatex');
+        expect(result.activities[4]['type']).toEqual('SELL')
+        expect(result.activities[4]['isin']).toEqual('NO0010081235')
+        expect(result.activities.length).toEqual(32);
     });
     test('should map pdf data of sample 2 correctly', () => {
       const result = flatex.parsePages(buySamples[1]);

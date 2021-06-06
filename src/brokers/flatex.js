@@ -376,7 +376,7 @@ const detectCSVDocumentFromObject = content => {
     return (
       'Bezeichnung' in content && 'Buchtag' in content && 'ISIN' in content
     );
-  } catch( e ) {
+  } catch (e) {
     return false;
   }
 };
@@ -400,7 +400,7 @@ const detectedButIgnoredDocument = content => {
 
 const parseAction = type => {
   if (type.includes('Kauf')) return 'BUY';
-  if (type.includes('Verkaufen')) return 'SELL';
+  if (type.includes('Verkauf')) return 'SELL';
   if (type.includes('WP-Eingang')) return 'TransfertIn';
 
   return 'UNKOWN';
