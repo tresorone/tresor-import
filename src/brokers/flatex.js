@@ -7,7 +7,7 @@ import {
 } from '@/helper';
 
 /**
- *
+ * Access a cell of a table by its header and group Index.
  * @param {string[]} textArr
  * @param {number} startLineNumber
  * @param {any} key
@@ -43,9 +43,9 @@ const getHeaderValueByKey = (textArr, startLineNumber, key) => {
 };
 
 /**
- *
+ * finds a list of numbers representing the indicies of a table, starting from a certain line
  * @param {string[]} textArr
- * @returns {number}
+ * @returns {number[]}
  */
 const findTableIndexes = textArr => {
   let lineNumbers = [];
@@ -60,7 +60,7 @@ const findTableIndexes = textArr => {
 };
 
 /**
- *
+ * finds a string for the ISIN starting from a certain line
  * @param {string[]} textArr
  * @param {number} tableIndex
  * @returns {string|null}
@@ -72,7 +72,7 @@ const findISIN = (textArr, tableIndex) => {
 };
 
 /**
- *
+ * finds a date for dividends starting from a certain line
  * @param {string[]} textArr
  * @param {number} tableIndex
  * @returns {string|undefined}
@@ -88,7 +88,7 @@ const findCompany = (textArr, tableIndex) => {
 };
 
 /**
- *
+ * finds a date for Buy/Sell event starting from a certain line
  * @param {string[]} textArr
  * @param {number} startLineNumber
  * @returns {Date|undefined}
@@ -120,7 +120,7 @@ const findDateBuySell = (textArr, startLineNumber) => {
 };
 
 /**
- *
+ * finds a string for the Order Time starting from a certain line
  * @param {string[]} textArr
  * @param {number} startLineNumber
  * @returns {string}
@@ -154,7 +154,7 @@ const findOrderTime = (textArr, startLineNumber) => {
 };
 
 /**
- *
+ * finds a (Big) number for shares starting from a certain line
  * @param {string[]} textArr
  * @param {number} startLineNumber
  * @returns {Big}
@@ -197,7 +197,7 @@ const findShares = (textArr, startLineNumber) => {
 };
 
 /**
- *
+ * finds a (Big) number for Price starting from a certain line
  * @param {string[]} content
  * @param {number} startLineNumber
  * @returns {Big}
@@ -212,7 +212,7 @@ const findPrice = (content, startLineNumber) => {
 };
 
 /**
- *
+ * finds a string for PriceCurrency starting from a certain line
  * @param {string[]} content
  * @param {number} startLineNumber
  * @returns {string|undefined}
@@ -233,10 +233,10 @@ const findPriceCurrency = (content, startLineNumber) => {
 };
 
 /**
- *
+ * finds a number for the Amount(Kurswert) starting from a certain line
  * @param {string[]} textArr
  * @param {number} startLineNumber
- * @returns
+ * @returns {number} 
  */
 const findAmount = (textArr, startLineNumber) =>
   parseGermanNum(
@@ -267,7 +267,7 @@ const findTableValueByKeyWithDocumentFormat = (
 };
 
 /**
- *
+ * finds a (Big) number for Fees starting from a certain line
  * @param {string[]} textArr
  * @param {number} startLineNumber
  * @returns {Big}
@@ -317,7 +317,7 @@ const findFee = (textArr, startLineNumber) => {
 };
 
 /**
- *
+ * finds a (Big) number for Tax starting from a certain line
  * @param {string[]} textArr
  * @param {number} startLineNumber
  * @returns {Big}
@@ -347,7 +347,7 @@ const findTax = (textArr, startLineNumber) => {
 };
 
 /**
- *
+ * finds a number for the NetPayout starting from a certain line
  * @param {string[]} content
  * @param {number} startLineNumber
  * @returns {number}
@@ -356,7 +356,7 @@ const findNetPayout = (content, startLineNumber) =>
   parseGermanNum(getTableValueByKey(content, startLineNumber, 'Endbetrag', 1));
 
 /**
- *
+ * finds a date for dividends starting from a certain line 
  * @param {string[]} textArr
  * @param {number} startLineNumber
  * @returns {Date}
@@ -487,19 +487,19 @@ const findForeignInformation = (content, startLineNumber) => {
 };
 
 /**
- *
+ * Checks if a row contains a certain value
  * @param {string[]} textArr
  * @param {number} lineNumber
  * @param {any} value
- * @returns
+ * @returns {boolean}
  */
 const lineContains = (textArr, lineNumber, value) =>
   textArr[lineNumber].includes(value);
 
 /**
- *
+ * detects documents from a pdf we like to ignore
  * @param {string[]} content
- * @returns
+ * @returns {boolean}
  */
 const detectedButIgnoredDocument = content => {
   return (
@@ -509,8 +509,8 @@ const detectedButIgnoredDocument = content => {
   );
 };
 
-/**
- *
+/** 
+ * Parse a string array containing the content of a PDF
  * @param {string[]} textArr
  * @param {number} startLineNumber
  * @returns
@@ -629,7 +629,9 @@ class FlatexCSV {
         isin = row['ISIN'],
         company = row['Bezeichnung'],
         shares = new Big(parseGermanNum(row['Nominal'])),
-        price = new Big(parseGermanNum(row['Kurs']) * parseGermanNum(row['Nominal'])),
+        price = new Big(
+          parseGermanNum(row['Kurs']) * parseGermanNum(row['Nominal'])
+        ),
         amount = new Big(parseGermanNum(row['Kurs'])),
         fee = new Big(0),
         tax = new Big(0);
@@ -715,6 +717,13 @@ const detectPDFDocument = firstPageContent => {
   );
 };
 
+
+/**
+ * Check if a given document can supposedly be parse
+ * @param {string[][]} pages contains 2D array. The first index addresses the page. The second index address the ideally the row of the page.
+ * @param {string} extension 'csv'|'pdf' | file extension of the document
+ * @returns 
+ */
 export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
   switch (extension) {
@@ -726,6 +735,11 @@ export const canParseDocument = (pages, extension) => {
   }
 };
 
+/**
+ * Parses a document and transforms its contents into activities
+ * @param {string[][] | object[]} contents PDF files a treaty as string[][]. CSV files a treated as object[]
+ * @returns {activities : object[], status : number} activies combined with a status code of value 0 on success or 7 on not supported
+ */
 export const parsePages = contents => {
   let activities = [];
 
