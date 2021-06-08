@@ -236,7 +236,7 @@ const findPriceCurrency = (content, startLineNumber) => {
  * finds a number for the Amount(Kurswert) starting from a certain line
  * @param {string[]} textArr
  * @param {number} startLineNumber
- * @returns {number} 
+ * @returns {number}
  */
 const findAmount = (textArr, startLineNumber) =>
   parseGermanNum(
@@ -356,7 +356,7 @@ const findNetPayout = (content, startLineNumber) =>
   parseGermanNum(getTableValueByKey(content, startLineNumber, 'Endbetrag', 1));
 
 /**
- * finds a date for dividends starting from a certain line 
+ * finds a date for dividends starting from a certain line
  * @param {string[]} textArr
  * @param {number} startLineNumber
  * @returns {Date}
@@ -509,7 +509,7 @@ const detectedButIgnoredDocument = content => {
   );
 };
 
-/** 
+/**
  * Parse a string array containing the content of a PDF
  * @param {string[]} textArr
  * @param {number} startLineNumber
@@ -660,7 +660,7 @@ class FlatexCSV {
   parseAction(type) {
     if (type.includes('Kauf')) return 'BUY';
     if (type.includes('Verkauf')) return 'SELL';
-    if (type.includes('WP-Eingang')) return 'TransfertIn';
+    if (type.includes('WP-Eingang')) return 'TransferIn';
 
     return 'UNKOWN';
   }
@@ -717,12 +717,11 @@ const detectPDFDocument = firstPageContent => {
   );
 };
 
-
 /**
  * Check if a given document can supposedly be parse
  * @param {string[][]} pages contains 2D array. The first index addresses the page. The second index address the ideally the row of the page.
  * @param {string} extension 'csv'|'pdf' | file extension of the document
- * @returns 
+ * @returns
  */
 export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
