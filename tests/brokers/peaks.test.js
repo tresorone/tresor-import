@@ -46,6 +46,19 @@ describe('Broker: peaks', () => {
         fee: 0,
         tax: 0,
       });
+      expect(activities[113]).toEqual({
+        broker: 'peaks',
+        type: 'Buy',
+        date: '2020-07-08',
+        datetime: '2020-07-08T' + activities[113].datetime.substring(11),
+        isin: 'IE00B4WXJJ64',
+        company: 'iShares Core Govt Bond UCITS ETF EUR (Dist)',
+        shares: 0.01056400,
+        price: 132.53,
+        amount: 1.4,
+        fee: 0,
+        tax: 0,
+      });
     });
 
     test('Can a monthly purchase be parsed from buy_monthly', () => {
