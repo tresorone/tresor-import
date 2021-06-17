@@ -9,3 +9,5 @@ export const buySamples = [
 export const dividendSamples = [require('./dividend/dividends_buy.json')];
 
 export const feesSamples = [require('./fees/fees_sell.json')];
+
+export const unknownSamples = [require('./unknown/unknown.json')];

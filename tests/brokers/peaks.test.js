@@ -6,6 +6,7 @@ import {
   buySamples,
   dividendSamples,
   feesSamples,
+  unknownSamples,
 } from './__mocks__/peaks';
 
 describe('Broker: peaks', () => {
@@ -53,7 +54,7 @@ describe('Broker: peaks', () => {
         datetime: '2020-07-08T' + activities[113].datetime.substring(11),
         isin: 'IE00B4WXJJ64',
         company: 'iShares Core Govt Bond UCITS ETF EUR (Dist)',
-        shares: 0.01056400,
+        shares: 0.010564,
         price: 132.53,
         amount: 1.4,
         fee: 0,
@@ -158,6 +159,93 @@ describe('Broker: peaks', () => {
         price: 123.2,
         amount: 0.5,
         fee: 0.5,
+        tax: 0,
+      });
+    });
+  });
+
+  describe('Validate unknown', () => {
+    test('Can "unknown" entries be parsed as buy and sell', () => {
+      // unknown entries are a switch of portfolios
+      const activities = peaks.parsePages(unknownSamples[0]).activities;
+
+      expect(activities.length).toEqual(12);
+      expect(activities[6]).toEqual({
+        broker: 'peaks',
+        type: 'Buy',
+        date: '2020-08-26',
+        datetime: '2020-08-26T' + activities[6].datetime.substring(11),
+        isin: 'IE00B52VJ196',
+        company: 'iShares MSCI Europe SRI UCITS ETF EUR (Acc)',
+        shares: 0.48347549,
+        price: 47.5,
+        amount: 22.97,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[7]).toEqual({
+        broker: 'peaks',
+        type: 'Buy',
+        date: '2020-08-26',
+        datetime: '2020-08-26T' + activities[7].datetime.substring(11),
+        isin: 'LU0629460089',
+        company: 'UBS ETF-MSCI USA Socially Responsible',
+        shares: 0.44857923,
+        price: 122.26,
+        amount: 54.84,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[8]).toEqual({
+        broker: 'peaks',
+        type: 'Buy',
+        date: '2020-08-26',
+        datetime: '2020-08-26T' + activities[8].datetime.substring(11),
+        isin: 'LU0629460832',
+        company: 'UBS ETF-MSCI Pac Socially Responsible',
+        shares: 0.21945726,
+        price: 61.22,
+        amount: 13.44,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[9]).toEqual({
+        broker: 'peaks',
+        type: 'Buy',
+        date: '2020-08-26',
+        datetime: '2020-08-26T' + activities[9].datetime.substring(11),
+        isin: 'IE00BYVJRP78',
+        company: 'iShares Sustainable MSCI Em Mkt',
+        shares: 1.57696059,
+        price: 5.91,
+        amount: 9.32,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[10]).toEqual({
+        broker: 'peaks',
+        type: 'Sell',
+        date: '2020-08-26',
+        datetime: '2020-08-26T' + activities[10].datetime.substring(11),
+        isin: 'IE00B4WXJJ64',
+        company: 'iShares Core Govt Bond UCITS ETF EUR (Dist)',
+        shares: 0.52972954,
+        price: 132.51,
+        amount: 70.2,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[11]).toEqual({
+        broker: 'peaks',
+        type: 'Sell',
+        date: '2020-08-26',
+        datetime: '2020-08-26T' + activities[11].datetime.substring(11),
+        isin: 'LU0484968812',
+        company: 'Xtrackers II ESG EUR Corp Bond UCITS ETF',
+        shares: 0.19276853,
+        price: 157.51,
+        amount: 30.36,
+        fee: 0,
         tax: 0,
       });
     });
