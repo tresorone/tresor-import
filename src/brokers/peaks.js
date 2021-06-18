@@ -42,6 +42,22 @@ const findTransaction = element => {
   return /([0-9]{2}-){2}[0-9]{4}/.test(element);
 };
 
+const parseNum = n => {
+  if (n.charAt(n.length - 3) === '.') {
+    return parseFloat(n.replace(',', ''));
+  }
+
+  return parseGermanNum(n);
+};
+
+const parseShares = s => {
+  if (s.includes('.')) {
+    return parseFloat(s);
+  }
+
+  return parseGermanNum(s);
+};
+
 const parseTransaction = (transaction, typeCategory) => {
   let activity = {
     broker: 'peaks',
@@ -59,9 +75,9 @@ const parseTransaction = (transaction, typeCategory) => {
   );
   activity.isin = transaction[4];
   activity.company = transaction[3];
-  activity.shares = parseGermanNum(transaction[7]);
-  activity.price = parseGermanNum(transaction[8]);
-  activity.amount = Math.abs(parseGermanNum(transaction[9]));
+  activity.shares = parseShares(transaction[7]);
+  activity.price = parseNum(transaction[8]);
+  activity.amount = Math.abs(parseNum(transaction[9]));
   if (typeCategory === 'Kosten für Peaks') {
     // fees for the Peaks app are paid through the sale of shares
     activity.fee = activity.amount;
