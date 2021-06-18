@@ -1,4 +1,3 @@
-//import Big from 'big.js';
 import { findImplementation } from '@/index';
 import * as peaks from '../../src/brokers/peaks';
 import {
@@ -7,6 +6,7 @@ import {
   dividendSamples,
   feesSamples,
   unknownSamples,
+  numberFormatSamples,
 } from './__mocks__/peaks';
 
 describe('Broker: peaks', () => {
@@ -245,6 +245,71 @@ describe('Broker: peaks', () => {
         shares: 0.19276853,
         price: 157.51,
         amount: 30.36,
+        fee: 0,
+        tax: 0,
+      });
+    });
+  });
+
+  describe('Validate number format', () => {
+    test('Can English formatted numbers be parsed correctly', () => {
+      const activities = peaks.parsePages(numberFormatSamples[0]).activities;
+
+      expect(activities.length).toEqual(12);
+      expect(activities[0]).toEqual({
+        broker: 'peaks',
+        type: 'Buy',
+        date: '2020-07-02',
+        datetime: '2020-07-02T' + activities[0].datetime.substring(11),
+        isin: 'IE00B4WXJJ64',
+        company: 'iShares Core Govt Bond UCITS ETF EUR (Dist)',
+        shares: 0.0796132,
+        price: 131.89,
+        amount: 10.5,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[11]).toEqual({
+        broker: 'peaks',
+        type: 'Buy',
+        date: '2020-07-01',
+        datetime: '2020-07-01T' + activities[11].datetime.substring(11),
+        isin: 'LU0484968812',
+        company: 'Xtrackers II ESG EUR Corp Bond UCITS ETF',
+        shares: 0.01191687,
+        price: 155.58,
+        amount: 1.85,
+        fee: 0,
+        tax: 0,
+      });
+    });
+    test('Can German formatted numbers be parsed correctly', () => {
+      const activities = peaks.parsePages(numberFormatSamples[1]).activities;
+
+      expect(activities.length).toEqual(12);
+      expect(activities[0]).toEqual({
+        broker: 'peaks',
+        type: 'Buy',
+        date: '2020-08-04',
+        datetime: '2020-08-04T' + activities[0].datetime.substring(11),
+        isin: 'LU0484968812',
+        company: 'Xtrackers II ESG EUR Corp Bond UCITS ETF',
+        shares: 0.00560401,
+        price: 157.92,
+        amount: 0.88,
+        fee: 0,
+        tax: 0,
+      });
+      expect(activities[11]).toEqual({
+        broker: 'peaks',
+        type: 'Buy',
+        date: '2020-08-04',
+        datetime: '2020-08-04T' + activities[11].datetime.substring(11),
+        isin: 'IE00B4WXJJ64',
+        company: 'iShares Core Govt Bond UCITS ETF EUR (Dist)',
+        shares: 0.0785399,
+        price: 133.69,
+        amount: 10.5,
         fee: 0,
         tax: 0,
       });
