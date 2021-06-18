@@ -622,19 +622,25 @@ class FlatexCSV {
    */
   parseCSV(content) {
     let data = content.splice(1);
+    
+
     return data.map(row => {
+
+      const priceValue = new Big(parseGermanNum(row['Kurs']));
+      const numberOfShares = new Big(parseGermanNum(row['Nominal']));
+      const buchtag = row['Buchtag'];
+      const valuta = row['Valuta'];
+
       let type = this.parseAction(row['Buchungsinformationen']),
-        date = row['Buchtag'],
-        datetime = row['Valuta'],
+        date = createActivityDateTime(buchtag),
+        datetime = createActivityDateTime(valuta),
         isin = row['ISIN'],
         company = row['Bezeichnung'],
-        shares = new Big(parseGermanNum(row['Nominal'])),
-        price = new Big(
-          parseGermanNum(row['Kurs']) * parseGermanNum(row['Nominal'])
-        ),
-        amount = new Big(parseGermanNum(row['Kurs'])),
-        fee = new Big(0),
-        tax = new Big(0);
+        shares = +numberOfShares,
+        price = +priceValue.times(numberOfShares),
+        amount = +priceValue,
+        fee = 0,
+        tax = 0;
 
       return {
         broker: 'flatex',
