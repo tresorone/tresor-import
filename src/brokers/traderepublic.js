@@ -153,8 +153,10 @@ const findTax = (textArr, fxRate) => {
       totalTax = totalTax.minus(foreignTax);
     }
   }
-  const capitalTaxIdx = textArr.findIndex(line =>
-    line.includes('Kapitalertragssteuer')
+  const capitalTaxIdx = textArr.findIndex(
+    line =>
+      line.includes('Kapitalertragssteuer') ||
+      line.includes('Kapitalertragsteuer')
   );
   if (capitalTaxIdx >= 0) {
     totalTax = totalTax.minus(
