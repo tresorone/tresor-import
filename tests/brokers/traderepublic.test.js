@@ -203,6 +203,25 @@ describe('Broker: Trade Republic', () => {
         type: 'Sell',
       });
     });
+
+    test('Parse the tax amount right with the changed label for gain tax: 2021_IE00B53SZB19', () => {
+      const activities = traderepublic.parsePages(sellSamples[3]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        amount: 523.69,
+        broker: 'traderepublic',
+        company: 'iShsVII-NASDAQ 100 UCITS ETF',
+        date: '2021-06-01',
+        datetime: '2021-06-01T14:18:00.000Z',
+        fee: 0,
+        isin: 'IE00B53SZB19',
+        price: 628.6040091225543,
+        shares: 0.8331,
+        tax: 2.57,
+        type: 'Sell',
+      });
+    });
   });
 
   describe('Validate dividends', () => {
