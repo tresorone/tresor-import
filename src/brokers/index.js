@@ -11,6 +11,7 @@ import * as ebase from './ebase';
 import * as ersteBank from './ersteBank';
 import * as flatex from './flatex';
 import * as ing from './ing';
+import * as lynx from './lynx';
 import * as onvista from './onvista';
 import * as pb from './postbank';
 import * as smartbroker from './smartbroker';
@@ -31,6 +32,7 @@ export {
   ersteBank,
   flatex,
   ing,
+  lynx,
   onvista,
   pb,
   smartbroker,
