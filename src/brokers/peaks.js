@@ -68,7 +68,7 @@ const parseTransaction = (transaction, typeCategory) => {
   let date = formatDate(transaction[0]);
   let activities = [];
 
-  activity.type = getType(transaction[2], parseGermanNum(transaction[9]));
+  activity.type = getType(transaction[2], parseNum(transaction[9]));
   [activity.date, activity.datetime] = createActivityDateTime(
     date,
     transaction[1]
