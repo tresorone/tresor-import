@@ -20,6 +20,7 @@ export const dividendSamples = [
 
 export const accountSamples = [
   require('./accountStatement/2020_scalable_buy_dividend.json'),
+  require('./accountStatement/2021_scalable_sell_buy.json'),
 ];
 
 export const allSamples = buySamples.concat(

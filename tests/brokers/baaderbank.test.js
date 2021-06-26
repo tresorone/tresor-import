@@ -316,6 +316,28 @@ describe('Broker: scalable.capital', () => {
         tax: 0,
       });
     });
+
+    test('Can parse statement: 2021_scalable_sell_buy', () => {
+      const result = baaderBank.parsePages(accountSamples[1]);
+      expect(result.status).toEqual(0);
+
+      const activities = result.activities;
+      expect(activities.length).toEqual(6);
+
+      expect(activities[0]).toEqual({
+        broker: 'scalablecapital',
+        type: 'Sell',
+        date: '2021-04-07',
+        datetime: '2021-04-07T' + activities[0].datetime.substring(11),
+        isin: 'US86738R1086',
+        company: 'SUNHYDROGEN INC. DL -,001',
+        shares: 5000,
+        price: 0.1104,
+        amount: 552,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   beforeEach(() => {
