@@ -4,7 +4,7 @@ a more detailed explanation is given behind brokername.
 | Broker / App                                           | Type of documents                                           | Remark                                                                             |
 | ------------------------------------------------------ | ----------------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | 1822direkt                                             | Buy, Sell, Dividend                                         |                                                                                    |
-| Baader Bank                                            | Buy, Sell, Dividend                                         |                                                                                    |
+| Baader Bank                                            | Buy, Sell, Dividend, Monthly statement                      |                                                                                    |
 | comdirect                                              | Buy, Sell, Dividend                                         |                                                                                    |
 | Commerzbank                                            | Buy, Dividend, Transaction Log                              |                                                                                    |
 | Consorsbank                                            | Buy, Sell, Dividend                                         |                                                                                    |
@@ -14,13 +14,13 @@ a more detailed explanation is given behind brokername.
 | ebase                                                  | Transaction Log                                             | Currently only the `.pdf` documents                                                |
 | Erste Bank (AT)                                        | Buy, Dividend                                               |                                                                                    |
 | flatex / FinTech Group                                 | Buy, Sell, Dividend                                         |                                                                                    |
-| Gratisbroker                                           | See Baderbank                                               |                                                                                    |
+| Gratisbroker                                           | See Baader Bank                                             |                                                                                    |
 | ING (DE)                                               | Buy, Sell, Dividend, Depot Statement                        |                                                                                    |
 | onvista                                                | Buy, Sell, Dividend                                         |                                                                                    |
-| Oskar                                                  | See Baderbank                                               |                                                                                    |
+| Oskar                                                  | See Baader Bank                                             |                                                                                    |
 | Portfolio Performance                                  | .csv file Containing Buys, Sells, Dividends                 | Must be cleared of splits, only `.csv` files generated via menu `File` -> `export` |
 | Postbank                                               | Buy, Sell, Dividend                                         |                                                                                    |
-| Scalable Capital                                       | See Baderbank                                               |                                                                                    |
+| Scalable Capital                                       | See Baader Bank                                             |                                                                                    |
 | Smartbroker                                            | Buy, Sell, Dividend, Knockouts                              | (Portfolio Overview and Cost Information can't be parsed                           |
 | Trade Republic                                         | Buy, Sell, Dividend, Quarter/Year report                    |                                                                                    |
 | Union Investment                                       | Buy, Sell, Dividend                                         |                                                                                    |
