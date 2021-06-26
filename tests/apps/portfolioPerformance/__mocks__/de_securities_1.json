@@ -70,7 +70,7 @@
   {
     "isin": "LU0302296495",
     "wkn": "A0MWAN",
-    "type": "Buy",
+    "type": "TransferIn",
     "company": "DNB Technology",
     "symbol": "CFPM.F",
     "date": "2018-10-16",
@@ -86,7 +86,7 @@
   },
   {
     "wkn": "710000",
-    "type": "Buy",
+    "type": "TransferIn",
     "company": "DAIMLER",
     "symbol": "DAI.DE",
     "date": "2018-10-15",
@@ -102,7 +102,7 @@
   },
   {
     "wkn": "710000",
-    "type": "Buy",
+    "type": "TransferIn",
     "company": "DAIMLER",
     "symbol": "DAI.DE",
     "date": "2018-10-15",
@@ -118,7 +118,7 @@
   },
   {
     "wkn": "864009",
-    "type": "Buy",
+    "type": "TransferIn",
     "company": "NINTENDO",
     "symbol": "NTO.BE",
     "date": "2018-10-15",
@@ -134,7 +134,7 @@
   },
   {
     "wkn": "A1CX3T",
-    "type": "Buy",
+    "type": "TransferIn",
     "company": "TESLA",
     "symbol": "TL0.DE",
     "date": "2018-10-12",
@@ -150,7 +150,7 @@
   },
   {
     "wkn": "A1EWWW",
-    "type": "Buy",
+    "type": "TransferIn",
     "company": "ADIDAS",
     "symbol": "ADS.DE",
     "date": "2018-10-12",
@@ -166,7 +166,7 @@
   },
   {
     "wkn": "A1JWVX",
-    "type": "Buy",
+    "type": "TransferIn",
     "company": "FACEBOOK",
     "symbol": "FB2A.DE",
     "date": "2018-10-12",
@@ -182,7 +182,7 @@
   },
   {
     "wkn": "A14R7U",
-    "type": "Buy",
+    "type": "TransferIn",
     "company": "PAYPAL",
     "symbol": "2PP.SG",
     "date": "2018-10-12",
@@ -198,7 +198,7 @@
   },
   {
     "wkn": "541523",
-    "type": "Buy",
+    "type": "TransferIn",
     "company": "LYX.NASDAQ-100",
     "symbol": "LYMS.DE",
     "date": "2018-10-12",
@@ -215,7 +215,7 @@
   {
     "isin": "US64110L1061",
     "wkn": "552484",
-    "type": "Buy",
+    "type": "TransferIn",
     "company": "NETFLIX",
     "symbol": "NFC.DE",
     "date": "2018-10-12",
@@ -231,7 +231,7 @@
   },
   {
     "wkn": "710000",
-    "type": "Buy",
+    "type": "TransferIn",
     "company": "DAIMLER",
     "symbol": "DAI.DE",
     "date": "2018-10-12",
@@ -248,7 +248,7 @@
   {
     "isin": "DE0008490962",
     "wkn": "849096",
-    "type": "Buy",
+    "type": "TransferIn",
     "company": "DWS DEUTSCHLAND",
     "symbol": "HJUE.BE",
     "date": "2018-10-12",
@@ -264,7 +264,7 @@
   },
   {
     "wkn": "855686",
-    "type": "Buy",
+    "type": "TransferIn",
     "company": "DISNEY",
     "symbol": "WDP.DE",
     "date": "2018-10-12",
@@ -280,7 +280,7 @@
   },
   {
     "wkn": "865985",
-    "type": "Buy",
+    "type": "TransferIn",
     "company": "APPLE",
     "symbol": "APC.DE",
     "date": "2018-10-12",
@@ -296,7 +296,7 @@
   },
   {
     "wkn": "870747",
-    "type": "Buy",
+    "type": "TransferIn",
     "company": "MICROSOFT",
     "symbol": "MSF.DE",
     "date": "2018-10-12",
@@ -312,7 +312,7 @@
   },
   {
     "wkn": "906866",
-    "type": "Buy",
+    "type": "TransferIn",
     "company": "AMAZON",
     "symbol": "AMZ.DE",
     "date": "2018-10-12",
@@ -833,7 +833,7 @@
   {
     "isin": "LU1239760025",
     "wkn": "DWS030",
-    "type": "Sell",
+    "type": "TransferOut",
     "company": "DB Platinum IV",
     "symbol": "XYPP.F",
     "date": "2018-12-07",
@@ -850,7 +850,7 @@
   {
     "isin": "LU1865032954",
     "wkn": "DWSK62",
-    "type": "Buy",
+    "type": "TransferIn",
     "company": "DWS Concept Platow - LC EUR ACC",
     "symbol": "D5BA.HM",
     "date": "2018-12-07",
@@ -2095,7 +2095,7 @@
   {
     "isin": "LU1829221024",
     "wkn": "LYX00F",
-    "type": "Buy",
+    "type": "TransferIn",
     "company": "Lyxor Nasdaq 100",
     "symbol": "LYMS.DE",
     "date": "2019-08-17",
@@ -2111,7 +2111,7 @@
   },
   {
     "wkn": "541523",
-    "type": "Sell",
+    "type": "TransferOut",
     "company": "LYX.NASDAQ-100",
     "symbol": "LYMS.DE",
     "date": "2019-08-17",
