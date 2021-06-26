@@ -324,6 +324,10 @@ const parseAccountStatement = content => {
       type = 'Buy';
       amount = parseGermanNum(content[startIndex + 3]);
       companyLineNumber = startIndex + 5;
+    } else if (content[startIndex + 3] === 'Verkauf') {
+      type = 'Sell';
+      amount = parseGermanNum(content[startIndex + 2]);
+      companyLineNumber = startIndex + 4;
     } else if (content[startIndex + 3] === 'Coupons/Dividende') {
       type = 'Dividend';
       amount = parseGermanNum(content[startIndex + 2]);
