@@ -18,6 +18,7 @@ a more detailed explanation is given behind brokername.
 | ING (DE)                                               | Buy, Sell, Dividend, Depot Statement                        |                                                                                    |
 | onvista                                                | Buy, Sell, Dividend                                         |                                                                                    |
 | Oskar                                                  | See Baderbank                                               |                                                                                    |
+| Peaks                                                  | The quarter overview file                                   |                                                                                    |
 | Portfolio Performance                                  | .csv file Containing Buys, Sells, Dividends                 | Must be cleared of splits, only `.csv` files generated via menu `File` -> `export` |
 | Postbank                                               | Buy, Sell, Dividend                                         |                                                                                    |
 | Scalable Capital                                       | See Baderbank                                               |                                                                                    |
