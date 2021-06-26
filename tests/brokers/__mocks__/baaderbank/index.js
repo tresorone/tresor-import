@@ -16,6 +16,7 @@ export const dividendSamples = [
   require('./dividend/etf110_without_taxes.json'),
   require('./dividend/dividend_USD_with_withholding_taxes.json'),
   require('./dividend/volkswagen_with_taxes_gratisbroker.json'),
+  require('./dividend/2021_scalable.json'),
 ];
 
 export const accountSamples = [

@@ -279,6 +279,25 @@ describe('Broker: scalable.capital', () => {
         tax: 15.38,
       });
     });
+
+    test('Can the document can be parsed: 2021_scalable', () => {
+      const activities = baaderBank.parsePages(dividendSamples[3]).activities;
+
+      expect(activities.length).toEqual(1);
+      expect(activities[0]).toEqual({
+        broker: 'scalablecapital',
+        type: 'Dividend',
+        date: '2021-04-01',
+        datetime: '2021-04-01T' + activities[0].datetime.substring(11),
+        isin: 'IE00B3VVMM84',
+        company: 'Vanguard FTSE Em.Markets U.ETF Registered Shares USD Dis.oN',
+        shares: 9.222,
+        price: 0.09577568667344863,
+        amount: 0.88,
+        fee: 0,
+        tax: 0,
+      });
+    });
   });
 
   describe('Validate account statements', () => {
