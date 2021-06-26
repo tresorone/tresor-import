@@ -70,17 +70,21 @@ const validate = activity => {
   }
 
   // transform transferOut to Sell
-  if (activity.type === 'transferOut') {
-    activity.type = 'Sell';
+  if (activity.type === 'transferOut' || activity.type === 'bookOut') {
+    activity.type = 'TransferOut';
   }
 
   // transform transferIn to Buy
-  if (activity.type === 'transferIn') {
-    activity.type = 'Buy';
+  if (activity.type === 'transferIn' || activity.type === 'bookIn') {
+    activity.type = 'TransferIn';
   }
 
   // filter cash movements and other non-supported types
-  if (!['Buy', 'Sell', 'Dividend'].includes(activity.type)) {
+  if (
+    !['Buy', 'Sell', 'Dividend', 'TransferOut', 'TransferIn'].includes(
+      activity.type
+    )
+  ) {
     return [];
   }
 
