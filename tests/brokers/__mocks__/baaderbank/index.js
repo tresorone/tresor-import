@@ -22,8 +22,13 @@ export const accountSamples = [
   require('./accountStatement/2020_scalable_buy_dividend.json'),
 ];
 
+export const ignoredSamples = [
+  require('./ignored/scalable_account_clearing.json'),
+];
+
 export const allSamples = buySamples.concat(
   sellSamples,
   dividendSamples,
-  accountSamples
+  accountSamples,
+  ignoredSamples
 );
