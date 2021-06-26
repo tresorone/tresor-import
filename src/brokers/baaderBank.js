@@ -32,7 +32,10 @@ const getBroker = content => {
     return 'oskar';
   }
 
-  if (content.some(line => line.includes('Scalable Capital Vermögensverw'))) {
+  if (
+    content.some(line => line.includes('Scalable Capital Vermögensverw')) ||
+    content.some(line => line.includes('www.scalable.capital'))
+  ) {
     return 'scalablecapital';
   }
 };
