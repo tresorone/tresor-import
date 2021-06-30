@@ -24,7 +24,7 @@ export const findISIN = text => {
 
 const findISINFullText = fullText => {
   const startPosition = fullText.indexOf('ISIN') + 4;
-  return fullText.substring(startPosition, startPosition + 11);
+  return fullText.substring(startPosition, startPosition + 12);
 };
 
 export const findCompany = text => {
