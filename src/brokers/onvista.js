@@ -305,67 +305,25 @@ const findTax = text => {
 const findTaxFullText = fullText => {
   let totalTax = Big(0);
 
-  // let lastTaxIndex = undefined;
-  // let taxLineNumber = text.findIndex(t => t.startsWith('einbehaltene '));
-  // if (taxLineNumber > 0) {
-  //   lastTaxIndex = taxLineNumber;
-  // } else {
-  //   let taxLineNumber = text.findIndex(t => t.startsWith('einbehaltener '));
-  //   if (taxLineNumber > 0) {
-  //     lastTaxIndex = taxLineNumber;
-  //   }
-  // }
+  const taxText = findValueBetweenElements(
+    fullText,
+    'HinweisezursteuerlichenVerrechnung',
+    'imlaufendenJahr'
+  );
+  let lastPosition = 0;
 
-  // const dayOfTradeLineNumber = text.findIndex(t => t.includes('Handelstag'));
-  // if (lastTaxIndex === undefined && dayOfTradeLineNumber > 0) {
-  //   // This document hasn't any taxes or is an old document.
-  //   // Search the taxes between Kurswert und Handelstag.
-
-  //   let nameOfPositionLineNumber =
-  //     text.findIndex(t => t.includes('Kurswert')) + 3;
-  //   while (nameOfPositionLineNumber < dayOfTradeLineNumber) {
-  //     let nameOfPosition = text[nameOfPositionLineNumber];
-
-  //     if (
-  //       nameOfPosition.toLowerCase().includes('steuer') ||
-  //       nameOfPosition.toLowerCase().includes('zuschlag')
-  //     ) {
-  //       totalTax = totalTax.plus(
-  //         Big(parseGermanNum(text[nameOfPositionLineNumber + 2]))
-  //       );
-  //     }
-
-  //     nameOfPositionLineNumber += 4;
-  //   }
-
-  //   return +totalTax;
-  // }
-
-  // while (lastTaxIndex !== undefined) {
-  //   const lineParsedAmount = Math.abs(parseGermanNum(text[lastTaxIndex + 2]));
-  //   totalTax = totalTax.plus(Big(lineParsedAmount));
-  //   lastTaxIndex += 3;
-
-  //   if (
-  //     !text[lastTaxIndex].startsWith('einbehaltene ') &&
-  //     !text[lastTaxIndex].startsWith('einbehaltener ')
-  //   ) {
-  //     break;
-  //   }
-  // }
-  // const sourceTaxIndex = text.findIndex(t => t.includes('davon anrechenbare'));
-  // if (sourceTaxIndex > -1) {
-  //   totalTax = totalTax.plus(parseGermanNum(text[sourceTaxIndex + 2]));
-  // }
-
-  // const witholdingTaxFondInputIdx = text.indexOf(
-  //   'anrechenbare Quellensteuer Fondseingangsseite'
-  // );
-  // if (witholdingTaxFondInputIdx >= 0) {
-  //   totalTax = totalTax.plus(
-  //     parseGermanNum(text[witholdingTaxFondInputIdx + 2])
-  //   );
-  // }
+  do {
+    lastPosition = taxText.indexOf('einbehaltene', lastPosition + 1);
+    if (lastPosition > 0) {
+      totalTax = totalTax.plus(
+        findNumberByOneStartingElements(
+          taxText.substring(lastPosition),
+          'EUR',
+          0
+        )
+      );
+    }
+  } while (lastPosition > 0);
 
   return +totalTax;
 };
