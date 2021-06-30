@@ -3,6 +3,7 @@ import pdfjs from 'pdfjs-dist/build/pdf';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 import * as brokers from './brokers';
 import * as apps from './apps';
+import { isBrowser, isNode } from 'browser-or-node';
 
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -19,12 +20,20 @@ export const findImplementation = (pages, extension) => {
 };
 
 export const parseActivitiesFromPages = (pages, extension) => {
+  if (pages.length === 0) {
+    // Without pages we don't have any activity
+    return {
+      activities: undefined,
+      status: 1,
+    };
+  }
+
   let status;
   const implementations = findImplementation(pages, extension);
 
   try {
-    // Status 1, no broker could be found
     if (implementations === undefined || implementations.length < 1) {
+      // Status 1, no broker could be found
       status = 1;
     } else if (implementations.length === 1) {
       if (extension === 'pdf') {
@@ -61,6 +70,13 @@ export const parseFile = file => {
     const reader = new FileReader();
 
     reader.onload = async e => {
+      if (!isBrowser || isNode) {
+        resolve({
+          pages: [],
+          extension,
+        });
+      }
+
       let fileContent, pdfDocument;
       let pages = [];
 

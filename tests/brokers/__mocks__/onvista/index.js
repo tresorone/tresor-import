@@ -3,6 +3,7 @@ export const buySamples = [
   require('./buy/2020_Vanguard_FTSE_All_World.json'),
   require('./buy/2018_ComSta._MSCI_World.json'),
   require('./buy/2010_Muenchener_Rueckvers.json'),
+  require('./buy/2021_iShsIII-CoreMSCI.json'),
 ];
 
 export const sellSamples = [
@@ -21,6 +22,7 @@ export const dividendsSamples = [
   require('./dividend/2019_ComSta._MSCI_Em.Mkts.json'),
   require('./dividend/2019_iSh.EO_ST.Sel.Div.30.json'),
   require('./dividend/2019_MetLife.json'),
+  require('./dividend/2021_iShare-NASDAQ.json'),
 ];
 
 export const accountStatementSamples = [

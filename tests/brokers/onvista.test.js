@@ -137,6 +137,24 @@ describe('Broker: onvista', () => {
         tax: 0,
       });
     });
+
+    test('Can parse document: 2021_iShsIII-CoreMSCI', () => {
+      const activities = onvista.parsePages(buySamples[4]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'onvista',
+        type: 'Buy',
+        date: '2021-06-15',
+        datetime: '2021-06-15T07:04:00.000Z',
+        isin: 'IE00B4L5Y983',
+        company: 'iShsIII-CoreMSCI WorldU.ETFRegistered ShsUSD(Acc)o.N.',
+        shares: 2.9014,
+        price: 68.586,
+        amount: 199,
+        fee: 1,
+        tax: 0,
+      });
+    });
   });
 
   describe('Sell', () => {
@@ -436,6 +454,26 @@ describe('Broker: onvista', () => {
           fxRate: 1.1373,
         },
       ]);
+    });
+
+    test('Can parse document: 2021_iShare-NASDAQ-CoreMSCI', () => {
+      const activities = onvista.parsePages(dividendsSamples[5]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'onvista',
+        type: 'Dividend',
+        date: '2021-06-15',
+        datetime: '2021-06-15T' + activities[0].datetime.substring(11),
+        isin: 'DE000A0F5UF5',
+        company: 'iShare.NASDAQ-100UCITS ETFDE Inhaber-Anteile',
+        shares: 5,
+        price: 0.124,
+        amount: 0.62,
+        fee: 0,
+        tax: 0.12,
+        foreignCurrency: 'USD',
+        fxRate: 1.2175,
+      });
     });
   });
 
