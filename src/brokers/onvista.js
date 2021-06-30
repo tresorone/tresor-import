@@ -311,6 +311,9 @@ const findTaxFullText = fullText => {
     'imlaufendenJahr'
   );
   let lastPosition = 0;
+  if (taxText === undefined) {
+    return +totalTax;
+  }
 
   do {
     lastPosition = taxText.indexOf('einbehaltene', lastPosition + 1);
