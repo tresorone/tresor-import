@@ -580,8 +580,6 @@ const parseAccountStatement = pdfPages => {
 };
 
 const parseSingleTransactionFullText = fullText => {
-  console.log(fullText);
-
   let activity = {
     broker: 'onvista',
     isin: findISINFullText(fullText),
