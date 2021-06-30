@@ -20,6 +20,8 @@ const getDocumentType = content => {
     return 'Dividend';
   } else if (content.includes('Perioden-Kontoauszug: EUR-Konto')) {
     return 'AccountStatement';
+  } else if (content.includes('Rechnungsabschluss: EUR')) {
+    return 'AccountClearing';
   }
 };
 
@@ -375,10 +377,22 @@ export const parsePages = contents => {
   const content = contents.flat();
   const documentType = getDocumentType(content);
 
-  if (documentType === 'AccountStatement') {
-    activities.push(...parseAccountStatement(content));
-  } else if (['Buy', 'Sell', 'Dividend'].includes(documentType)) {
-    activities.push(parsePage(content, documentType));
+  switch (documentType) {
+    case 'AccountClearing':
+      return {
+        activities,
+        status: 7,
+      };
+
+    case 'AccountStatement':
+      activities.push(...parseAccountStatement(content));
+      break;
+
+    case 'Buy':
+    case 'Dividend':
+    case 'Sell':
+      activities.push(parsePage(content, documentType));
+      break;
   }
 
   return {

@@ -24,8 +24,13 @@ export const accountSamples = [
   require('./accountStatement/2021_scalable_sell_buy.json'),
 ];
 
+export const ignoredSamples = [
+  require('./ignored/scalable_account_clearing.json'),
+];
+
 export const allSamples = buySamples.concat(
   sellSamples,
   dividendSamples,
-  accountSamples
+  accountSamples,
+  ignoredSamples
 );
