@@ -22,6 +22,11 @@ export const findISIN = text => {
   return text[text.indexOf('ISIN') + 1];
 };
 
+const findISINFullText = fullText => {
+  const startPosition = fullText.indexOf('ISIN') + 4;
+  return fullText.substring(startPosition, startPosition + 11);
+};
+
 export const findCompany = text => {
   let company = text[text.findIndex(t => t.includes('ISIN')) - 1];
   if (company === 'Gattungsbezeichnung') {
@@ -29,6 +34,8 @@ export const findCompany = text => {
   }
   if (company) return company;
 };
+
+const findCompanyFullText = fullText => findValueBetweenElements(fullText, 'Gattungsbezeichnung', 'ISIN');
 
 export const findDateBuySell = text => {
   const lineNumber = text.findIndex(t => t.includes('Handelstag'));
@@ -44,9 +51,13 @@ export const findDateBuySell = text => {
   return date;
 };
 
+const findDateBuySellFullText = fullText => findValueBetweenElements(fullText, 'Handelstag', 'Handelszeit');
+
 export const findDateDividend = text => {
   return text[text.findIndex(t => t.includes('Zahltag')) + 1];
 };
+
+const findDateDividendFullText = fullText => fullText.substring(fullText.indexOf('Zahltag') + 7, fullText.indexOf('Zahltag') + 17);
 
 const findOrderTime = content => {
   // Extract the time after the line with Handelszeit which contains "17:33"
@@ -70,16 +81,25 @@ const findOrderTime = content => {
   return undefined;
 };
 
+const findOrderTimeFullText = fullText => findValueBetweenElements(fullText, 'Handelszeit', 'Handelsplatz');
+
 export const findShares = textArr => {
   const sharesLine = textArr[textArr.findIndex(t => t.includes('STK'))];
   return parseGermanNum(sharesLine.split(' ')[1]);
 };
+
+const findSharesFullText = fullText => findNumberByOneStartingElements(fullText, 'STK', 0);
 
 export const findPrice = (text, fxRate = undefined) => {
   const priceLine = text[text.findIndex(t => t.includes('Kurs')) + 1];
   const price = parseGermanNum(priceLine.split(' ')[1]);
 
   return fxRate === undefined ? price : +Big(price).div(fxRate);
+};
+
+const findPriceFullText = (fullText, fxRate) => {
+  const amount = findNumberByOneStartingElements(fullText, 'Kurs');
+  return fxRate === undefined ? amount : +Big(amount).div(fxRate); 
 };
 
 export const findAmount = (text, fxRate = undefined) => {
@@ -89,6 +109,62 @@ export const findAmount = (text, fxRate = undefined) => {
   }
   let amount = parseGermanNum(text[amountIdx + 2]);
   return fxRate === undefined ? amount : +Big(amount).div(fxRate);
+};
+
+const findAmountFullText = (fullText, fxRate) => {
+  const amount = findNumberByOneStartingElements(fullText, ['Kurswert', 'Bezugspreis']);
+  return fxRate === undefined ? amount : +Big(amount).div(fxRate);  
+};
+
+const findNumberByOneStartingElements = (fullText, elements, offset = 3) => {
+  const position = findFirstPositionOfElements(fullText, elements);
+  if (position < 0) {
+    return undefined;
+  }
+
+  let value = '';
+  const pattern = /[0-9-,.]/;
+  for (let index = position + offset; index < fullText.length; index++) {
+    const element = fullText[index];
+    if (!pattern.test(element)) {
+      break;
+    }
+
+    value += element;
+  }
+
+  return parseGermanNum(value);
+};
+
+const findFirstPositionOfElements = (fullText, elements, minimumIndex = 0, appendLength = true) => {
+  if (typeof elements === 'string') {
+    elements = [elements];
+  }
+
+  for (let index = 0; index < elements.length; index++) {
+    const element = elements[index];
+    const position = fullText.indexOf(element, minimumIndex);
+
+    if (position >= minimumIndex) {
+      return  appendLength ? position + element.length : position;
+    }
+  }
+  
+  return -1;
+};
+
+const findValueBetweenElements = (fullText, startElements, endElements) => {
+  let startPosition = findFirstPositionOfElements(fullText, startElements);
+  if (startPosition < 0) {
+    return undefined;
+  }
+
+  let endPosition = findFirstPositionOfElements(fullText, endElements, startPosition, false);
+  if (endPosition < 0) {
+    return undefined;
+  }
+  
+  return fullText.substring(startPosition, endPosition);
 };
 
 export const findFee = (content, fxRate = undefined) => {
@@ -109,6 +185,31 @@ export const findFee = (content, fxRate = undefined) => {
       fee = fee.plus(Big(parseGermanNum(content[feeIdx + 2])));
     }
   });
+  return fxRate === undefined ? +fee : +fee.div(fxRate);
+};
+
+const findFeeFullText = (fullText, fxRate) => {
+  let fee = Big(0);
+  const potentialFees = [
+    'Börsengebühr',
+    'Fremdspesen',
+    'Handelsplatzgebühr',
+    'Orderprovision',
+    'Provision',
+    'Maklercourtage',
+    'FremdeSpesenXontro',
+    'Gebühr',
+  ];
+
+  potentialFees.forEach(feeString => {
+    const value = findNumberByOneStartingElements(fullText, feeString);
+    if (value === undefined) {
+      return;
+    }
+
+    fee = fee.plus(Big(value));
+  });
+
   return fxRate === undefined ? +fee : +fee.div(fxRate);
 };
 
@@ -180,6 +281,74 @@ const findTax = text => {
   return +totalTax;
 };
 
+const findTaxFullText = fullText => {
+  let totalTax = Big(0);
+
+  // let lastTaxIndex = undefined;
+  // let taxLineNumber = text.findIndex(t => t.startsWith('einbehaltene '));
+  // if (taxLineNumber > 0) {
+  //   lastTaxIndex = taxLineNumber;
+  // } else {
+  //   let taxLineNumber = text.findIndex(t => t.startsWith('einbehaltener '));
+  //   if (taxLineNumber > 0) {
+  //     lastTaxIndex = taxLineNumber;
+  //   }
+  // }
+
+  // const dayOfTradeLineNumber = text.findIndex(t => t.includes('Handelstag'));
+  // if (lastTaxIndex === undefined && dayOfTradeLineNumber > 0) {
+  //   // This document hasn't any taxes or is an old document.
+  //   // Search the taxes between Kurswert und Handelstag.
+
+  //   let nameOfPositionLineNumber =
+  //     text.findIndex(t => t.includes('Kurswert')) + 3;
+  //   while (nameOfPositionLineNumber < dayOfTradeLineNumber) {
+  //     let nameOfPosition = text[nameOfPositionLineNumber];
+
+  //     if (
+  //       nameOfPosition.toLowerCase().includes('steuer') ||
+  //       nameOfPosition.toLowerCase().includes('zuschlag')
+  //     ) {
+  //       totalTax = totalTax.plus(
+  //         Big(parseGermanNum(text[nameOfPositionLineNumber + 2]))
+  //       );
+  //     }
+
+  //     nameOfPositionLineNumber += 4;
+  //   }
+
+  //   return +totalTax;
+  // }
+
+  // while (lastTaxIndex !== undefined) {
+  //   const lineParsedAmount = Math.abs(parseGermanNum(text[lastTaxIndex + 2]));
+  //   totalTax = totalTax.plus(Big(lineParsedAmount));
+  //   lastTaxIndex += 3;
+
+  //   if (
+  //     !text[lastTaxIndex].startsWith('einbehaltene ') &&
+  //     !text[lastTaxIndex].startsWith('einbehaltener ')
+  //   ) {
+  //     break;
+  //   }
+  // }
+  // const sourceTaxIndex = text.findIndex(t => t.includes('davon anrechenbare'));
+  // if (sourceTaxIndex > -1) {
+  //   totalTax = totalTax.plus(parseGermanNum(text[sourceTaxIndex + 2]));
+  // }
+
+  // const witholdingTaxFondInputIdx = text.indexOf(
+  //   'anrechenbare Quellensteuer Fondseingangsseite'
+  // );
+  // if (witholdingTaxFondInputIdx >= 0) {
+  //   totalTax = totalTax.plus(
+  //     parseGermanNum(text[witholdingTaxFondInputIdx + 2])
+  //   );
+  // }
+
+  return +totalTax;
+};
+
 const findGrossPayout = (text, tax) => {
   const netPayoutIdx = text.findIndex(t =>
     t.includes('Betrag zu Ihren Gunsten')
@@ -197,6 +366,18 @@ const findGrossPayout = (text, tax) => {
   }
 };
 
+const findGrossPayoutFullText = (fullText, tax) => {
+  const netAmountValue = findNumberByOneStartingElements(fullText, 'BetragzuIhrenGunsten');
+  if (netAmountValue !== undefined) {
+    return +Big(netAmountValue).plus(tax);
+  }
+
+  const grossAmountValue = findNumberByOneStartingElements(fullText, ['Thesaurierungbrutto', 'ausländischeDividende']);
+  if (grossAmountValue !== undefined) {
+    return grossAmountValue;
+  }
+};
+
 const findForeignInformation = pdfPage => {
   const foreignCurrencyIdx = pdfPage.indexOf('Devisenkurs') + 1;
   if (foreignCurrencyIdx > 0) {
@@ -209,62 +390,88 @@ const findForeignInformation = pdfPage => {
   return [undefined, undefined];
 };
 
+const findForeignInformationFullText = fullText => {
+  const value = findValueBetweenElements(fullText, 'Devisenkurs', 'Betrag');
+  if (value === undefined) {
+    return [undefined, undefined];
+  }
+
+  return [value.substring(4, 7), parseGermanNum(value.substring(7))];
+};
+
 export const canParseDocument = (pages, extension) => {
   const firstPageContent = pages[0];
   const allPagesFlat = pages.flat();
+  const firstPageText = pages[0].join('');
 
   return (
     extension === 'pdf' &&
-    ((firstPageContent.some(line =>
-      line.includes(onvistaIdentificationString)
-    ) &&
+    (
+      (
+      (firstPageContent.some(line => line.includes(onvistaIdentificationString)) || firstPageText.includes(onvistaIdentificationString)) &&
       !firstPageContent.some(
         line =>
           line.includes(smartbrokerIdentificationStrings[0]) ||
           line.includes(smartbrokerIdentificationStrings[1])
       )) ||
-      (firstPageContent.some(line =>
-        line.includes('Webtrading onvista bank')
-      ) &&
-        detectedButIgnoredDocument(firstPageContent)) ||
+      (firstPageContent.some(line => line.includes('Webtrading onvista bank')) && detectedButIgnoredDocument(firstPageContent)) ||
       // Account Statements
       (firstPageContent.some(line => line.includes('www.onvista-bank.de')) &&
         isAccountStatement(allPagesFlat)) ||
       // Depotübersicht
       (allPagesFlat[allPagesFlat.length - 1] ===
         'Powered by TCPDF (www.tcpdf.org)' &&
-        isOverviewPage(allPagesFlat)))
-  );
+        isOverviewPage(allPagesFlat))
+    )
+
+  );;;
 };
 
 export const isBuy = content =>
   content.some(line => line.includes('Wir haben für Sie gekauft'));
 
+export const isBuyFullText = fullText =>
+fullText.includes('WirhabenfürSiegekauft');
+
 export const isSell = content =>
   content.some(line => line.includes('Wir haben für Sie verkauft'));
 
+export const isSellFullText = fullText =>
+fullText.includes('WirhabenfürSieverkauft');
+
 export const isDividend = content =>
-  content.some(line => line.includes('Erträgnisgutschrift')) ||
-  content.some(line => line.includes('Dividendengutschrift'));
+content.some(line => line.includes('Erträgnisgutschrift')) ||
+content.some(line => line.includes('Dividendengutschrift'));
+
+export const isDividendFullText = fullText =>
+fullText.includes('Erträgnisgutschrift') ||
+fullText.includes('Dividendengutschrift');
 
 const isAccountStatement = content =>
-  content.some(line => line.toLowerCase().startsWith('kontoauszug nr. '));
+  content.some(line => line.toLowerCase().startsWith('kontoauszug nr. ') ||
+  line.toLowerCase().startsWith('kontoauszugnr.'));
 
-const canParsePage = content =>
-  isBuy(content) || isSell(content) || isDividend(content);
+const canParsePage = content => {
+      return isBuy(content) || isSell(content) || isDividend(content);
+}
+
+const canParsePageFullText = fullText => isBuyFullText(fullText) || isSellFullText(fullText) || isDividendFullText(fullText);
 
 const isOverviewPage = content =>
   content.some(line => line.includes('Depotübersicht Wertpapiere'));
 
-const detectedButIgnoredDocument = content => {
+const detectedButIgnoredDocument = (content, fullText) => {
   return (
     // When the document contains one of the following lines, we want to ignore these document.
     content.some(
       line =>
         line.includes('Kostenausweis') ||
         line === 'Storno - Erträgnisgutschrift' ||
-        line.startsWith('Stornierung und ')
-    )
+        line.startsWith('Stornierung und')
+    ) ||
+    fullText.includes('Kostenausweis') ||
+        fullText.includes('Storno-Erträgnisgutschrift') ||
+        fullText.startsWith('Stornierungund')
   );
 };
 
@@ -379,6 +586,54 @@ const parseAccountStatement = pdfPages => {
   return activities;
 };
 
+const parseSingleTransactionFullText = fullText => {
+  console.log(fullText);
+
+  let activity = {
+    broker: 'onvista',
+    isin: findISINFullText(fullText),
+    company: findCompanyFullText(fullText),
+    shares: findSharesFullText(fullText),
+  };
+
+  const [foreignCurrency, fxRate] = findForeignInformationFullText(fullText);
+  if (foreignCurrency !== undefined && fxRate !== undefined) {
+    activity.foreignCurrency = foreignCurrency;
+    activity.fxRate = fxRate;
+  }
+
+  activity.fee = findFeeFullText(fullText, activity.fxRate);
+  activity.tax = findTaxFullText(fullText);
+
+  if (isBuyFullText(fullText)) {
+    activity.type = 'Buy';
+    [activity.date, activity.datetime] = createActivityDateTime(
+      findDateBuySellFullText(fullText),
+      findOrderTimeFullText(fullText)
+    );
+    activity.amount = findAmountFullText(fullText, activity.fxRate);
+    activity.price = findPriceFullText(fullText, activity.fxRate);
+  } else if (isSellFullText(fullText)) {
+    activity.type = 'Sell';
+    [activity.date, activity.datetime] = createActivityDateTime(
+      findDateBuySellFullText(fullText),
+      findOrderTimeFullText(fullText)
+    );
+    activity.amount = findAmountFullText(fullText, activity.fxRate);
+    activity.price = findPriceFullText(fullText, activity.fxRate);
+  } else if (isDividendFullText(fullText)) {
+    activity.type = 'Dividend';
+    [activity.date, activity.datetime] = createActivityDateTime(
+      findDateDividendFullText(fullText),
+      undefined
+    );
+    activity.amount = findGrossPayoutFullText(fullText, activity.tax);
+    activity.price = +Big(activity.amount).div(activity.shares);
+  }
+
+  return validateActivity(activity);
+};
+
 const parseSingleTransaction = pdfPage => {
   let activity = {
     broker: 'onvista',
@@ -428,7 +683,7 @@ const parseSingleTransaction = pdfPage => {
 
 export const parsePages = pdfPages => {
   let activities = [];
-  if (detectedButIgnoredDocument(pdfPages[0])) {
+  if (detectedButIgnoredDocument(pdfPages[0], pdfPages[0].join(''))) {
     // We know this type and we don't want to support it.
     return {
       activities,
@@ -446,6 +701,15 @@ export const parsePages = pdfPages => {
       if (canParsePage(content)) {
         activities.push(parseSingleTransaction(content));
       }
+    }
+
+    if (activities.length === 0) {
+      pdfPages.forEach(content => {
+        const fullText = content.join('');
+        if (canParsePageFullText(fullText)) {
+          activities.push(parseSingleTransactionFullText(fullText));
+        }
+      });
     }
   }
 
