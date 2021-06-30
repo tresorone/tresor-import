@@ -11,6 +11,7 @@ export const sellSamples = [
   require('./sell/limit_order_tesla.json'),
   require('./sell/limit_order_stryker.json'),
   require('./sell/limit_order_workhorse_group_tax_refund.json'),
+  require('./sell/2021_IE00B53SZB19.json'),
 ];
 
 export const dividendSamples = [
