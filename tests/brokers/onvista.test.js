@@ -475,6 +475,26 @@ describe('Broker: onvista', () => {
         fxRate: 1.2175,
       });
     });
+
+    test('Can parse document: 2021_Nintendo', () => {
+      const activities = onvista.parsePages(dividendsSamples[6]).activities;
+
+      expect(activities[0]).toEqual({
+        broker: 'onvista',
+        type: 'Dividend',
+        date: '2021-06-30',
+        datetime: '2021-06-30T' + activities[0].datetime.substring(11),
+        isin: 'JP3756600007',
+        company: 'NintendoCo. Ltd.Registered Shareso.N.',
+        shares: 7,
+        price: 10.602857142857143,
+        amount: 74.22,
+        fee: 0,
+        tax: 11.17,
+        foreignCurrency: 'JPY',
+        fxRate: 132.58,
+      });
+    });
   });
 
   describe('Account Statement', () => {

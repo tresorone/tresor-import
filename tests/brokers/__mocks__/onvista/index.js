@@ -23,6 +23,7 @@ export const dividendsSamples = [
   require('./dividend/2019_iSh.EO_ST.Sel.Div.30.json'),
   require('./dividend/2019_MetLife.json'),
   require('./dividend/2021_iShare-NASDAQ.json'),
+  require('./dividend/2021_Nintendo.json'),
 ];
 
 export const accountStatementSamples = [

@@ -328,6 +328,17 @@ const findTaxFullText = fullText => {
     }
   } while (lastPosition > 0);
 
+  const withholdingTaxPosition = taxText.indexOf('anrechenbare');
+  if (withholdingTaxPosition > 0) {
+    totalTax = totalTax.plus(
+      findNumberByOneStartingElements(
+        taxText.substring(withholdingTaxPosition),
+        'EUR',
+        0
+      )
+    );
+  }
+
   return +totalTax;
 };
 
