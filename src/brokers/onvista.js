@@ -35,7 +35,8 @@ export const findCompany = text => {
   if (company) return company;
 };
 
-const findCompanyFullText = fullText => findValueBetweenElements(fullText, 'Gattungsbezeichnung', 'ISIN');
+const findCompanyFullText = fullText =>
+  findValueBetweenElements(fullText, 'Gattungsbezeichnung', 'ISIN');
 
 export const findDateBuySell = text => {
   const lineNumber = text.findIndex(t => t.includes('Handelstag'));
@@ -51,13 +52,18 @@ export const findDateBuySell = text => {
   return date;
 };
 
-const findDateBuySellFullText = fullText => findValueBetweenElements(fullText, 'Handelstag', 'Handelszeit');
+const findDateBuySellFullText = fullText =>
+  findValueBetweenElements(fullText, 'Handelstag', 'Handelszeit');
 
 export const findDateDividend = text => {
   return text[text.findIndex(t => t.includes('Zahltag')) + 1];
 };
 
-const findDateDividendFullText = fullText => fullText.substring(fullText.indexOf('Zahltag') + 7, fullText.indexOf('Zahltag') + 17);
+const findDateDividendFullText = fullText =>
+  fullText.substring(
+    fullText.indexOf('Zahltag') + 7,
+    fullText.indexOf('Zahltag') + 17 // The date with german format has a length of 10 charaters
+  );
 
 const findOrderTime = content => {
   // Extract the time after the line with Handelszeit which contains "17:33"
@@ -81,14 +87,16 @@ const findOrderTime = content => {
   return undefined;
 };
 
-const findOrderTimeFullText = fullText => findValueBetweenElements(fullText, 'Handelszeit', 'Handelsplatz');
+const findOrderTimeFullText = fullText =>
+  findValueBetweenElements(fullText, 'Handelszeit', 'Handelsplatz');
 
 export const findShares = textArr => {
   const sharesLine = textArr[textArr.findIndex(t => t.includes('STK'))];
   return parseGermanNum(sharesLine.split(' ')[1]);
 };
 
-const findSharesFullText = fullText => findNumberByOneStartingElements(fullText, 'STK', 0);
+const findSharesFullText = fullText =>
+  findNumberByOneStartingElements(fullText, 'STK', 0);
 
 export const findPrice = (text, fxRate = undefined) => {
   const priceLine = text[text.findIndex(t => t.includes('Kurs')) + 1];
@@ -99,7 +107,7 @@ export const findPrice = (text, fxRate = undefined) => {
 
 const findPriceFullText = (fullText, fxRate) => {
   const amount = findNumberByOneStartingElements(fullText, 'Kurs');
-  return fxRate === undefined ? amount : +Big(amount).div(fxRate); 
+  return fxRate === undefined ? amount : +Big(amount).div(fxRate);
 };
 
 export const findAmount = (text, fxRate = undefined) => {
@@ -112,8 +120,11 @@ export const findAmount = (text, fxRate = undefined) => {
 };
 
 const findAmountFullText = (fullText, fxRate) => {
-  const amount = findNumberByOneStartingElements(fullText, ['Kurswert', 'Bezugspreis']);
-  return fxRate === undefined ? amount : +Big(amount).div(fxRate);  
+  const amount = findNumberByOneStartingElements(fullText, [
+    'Kurswert',
+    'Bezugspreis',
+  ]);
+  return fxRate === undefined ? amount : +Big(amount).div(fxRate);
 };
 
 const findNumberByOneStartingElements = (fullText, elements, offset = 3) => {
@@ -136,7 +147,12 @@ const findNumberByOneStartingElements = (fullText, elements, offset = 3) => {
   return parseGermanNum(value);
 };
 
-const findFirstPositionOfElements = (fullText, elements, minimumIndex = 0, appendLength = true) => {
+const findFirstPositionOfElements = (
+  fullText,
+  elements,
+  minimumIndex = 0,
+  appendLength = true
+) => {
   if (typeof elements === 'string') {
     elements = [elements];
   }
@@ -146,10 +162,10 @@ const findFirstPositionOfElements = (fullText, elements, minimumIndex = 0, appen
     const position = fullText.indexOf(element, minimumIndex);
 
     if (position >= minimumIndex) {
-      return  appendLength ? position + element.length : position;
+      return appendLength ? position + element.length : position;
     }
   }
-  
+
   return -1;
 };
 
@@ -159,11 +175,16 @@ const findValueBetweenElements = (fullText, startElements, endElements) => {
     return undefined;
   }
 
-  let endPosition = findFirstPositionOfElements(fullText, endElements, startPosition, false);
+  let endPosition = findFirstPositionOfElements(
+    fullText,
+    endElements,
+    startPosition,
+    false
+  );
   if (endPosition < 0) {
     return undefined;
   }
-  
+
   return fullText.substring(startPosition, endPosition);
 };
 
@@ -367,12 +388,18 @@ const findGrossPayout = (text, tax) => {
 };
 
 const findGrossPayoutFullText = (fullText, tax) => {
-  const netAmountValue = findNumberByOneStartingElements(fullText, 'BetragzuIhrenGunsten');
+  const netAmountValue = findNumberByOneStartingElements(
+    fullText,
+    'BetragzuIhrenGunsten'
+  );
   if (netAmountValue !== undefined) {
     return +Big(netAmountValue).plus(tax);
   }
 
-  const grossAmountValue = findNumberByOneStartingElements(fullText, ['Thesaurierungbrutto', 'ausländischeDividende']);
+  const grossAmountValue = findNumberByOneStartingElements(fullText, [
+    'Thesaurierungbrutto',
+    'ausländischeDividende',
+  ]);
   if (grossAmountValue !== undefined) {
     return grossAmountValue;
   }
@@ -406,56 +433,64 @@ export const canParseDocument = (pages, extension) => {
 
   return (
     extension === 'pdf' &&
-    (
-      (
-      (firstPageContent.some(line => line.includes(onvistaIdentificationString)) || firstPageText.includes(onvistaIdentificationString)) &&
+    (((firstPageContent.some(line =>
+      line.includes(onvistaIdentificationString)
+    ) ||
+      firstPageText.includes(onvistaIdentificationString)) &&
       !firstPageContent.some(
         line =>
           line.includes(smartbrokerIdentificationStrings[0]) ||
           line.includes(smartbrokerIdentificationStrings[1])
       )) ||
-      (firstPageContent.some(line => line.includes('Webtrading onvista bank')) && detectedButIgnoredDocument(firstPageContent)) ||
+      (firstPageContent.some(line =>
+        line.includes('Webtrading onvista bank')
+      ) &&
+        detectedButIgnoredDocument(firstPageContent)) ||
       // Account Statements
       (firstPageContent.some(line => line.includes('www.onvista-bank.de')) &&
         isAccountStatement(allPagesFlat)) ||
       // Depotübersicht
       (allPagesFlat[allPagesFlat.length - 1] ===
         'Powered by TCPDF (www.tcpdf.org)' &&
-        isOverviewPage(allPagesFlat))
-    )
-
-  );;;
+        isOverviewPage(allPagesFlat)))
+  );
 };
 
 export const isBuy = content =>
   content.some(line => line.includes('Wir haben für Sie gekauft'));
 
 export const isBuyFullText = fullText =>
-fullText.includes('WirhabenfürSiegekauft');
+  fullText.includes('WirhabenfürSiegekauft');
 
 export const isSell = content =>
   content.some(line => line.includes('Wir haben für Sie verkauft'));
 
 export const isSellFullText = fullText =>
-fullText.includes('WirhabenfürSieverkauft');
+  fullText.includes('WirhabenfürSieverkauft');
 
 export const isDividend = content =>
-content.some(line => line.includes('Erträgnisgutschrift')) ||
-content.some(line => line.includes('Dividendengutschrift'));
+  content.some(line => line.includes('Erträgnisgutschrift')) ||
+  content.some(line => line.includes('Dividendengutschrift'));
 
 export const isDividendFullText = fullText =>
-fullText.includes('Erträgnisgutschrift') ||
-fullText.includes('Dividendengutschrift');
+  fullText.includes('Erträgnisgutschrift') ||
+  fullText.includes('Dividendengutschrift');
 
 const isAccountStatement = content =>
-  content.some(line => line.toLowerCase().startsWith('kontoauszug nr. ') ||
-  line.toLowerCase().startsWith('kontoauszugnr.'));
+  content.some(
+    line =>
+      line.toLowerCase().startsWith('kontoauszug nr. ') ||
+      line.toLowerCase().startsWith('kontoauszugnr.')
+  );
 
 const canParsePage = content => {
-      return isBuy(content) || isSell(content) || isDividend(content);
-}
+  return isBuy(content) || isSell(content) || isDividend(content);
+};
 
-const canParsePageFullText = fullText => isBuyFullText(fullText) || isSellFullText(fullText) || isDividendFullText(fullText);
+const canParsePageFullText = fullText =>
+  isBuyFullText(fullText) ||
+  isSellFullText(fullText) ||
+  isDividendFullText(fullText);
 
 const isOverviewPage = content =>
   content.some(line => line.includes('Depotübersicht Wertpapiere'));
@@ -470,8 +505,8 @@ const detectedButIgnoredDocument = (content, fullText) => {
         line.startsWith('Stornierung und')
     ) ||
     fullText.includes('Kostenausweis') ||
-        fullText.includes('Storno-Erträgnisgutschrift') ||
-        fullText.startsWith('Stornierungund')
+    fullText.includes('Storno-Erträgnisgutschrift') ||
+    fullText.startsWith('Stornierungund')
   );
 };
 
