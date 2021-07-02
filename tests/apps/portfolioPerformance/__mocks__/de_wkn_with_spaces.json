@@ -17,6 +17,23 @@
     "price": 37.425
   },
   {
+    "isin": "DE0005659700",
+    "wkn": "565970",
+    "type": "TransferOut",
+    "company": "ECKERT+ZIEGLER AG O.N.",
+    "symbol": "EUZ",
+    "date": "2020-09-01",
+    "shares": 24,
+    "amount": 1003.2,
+    "grossAmount": 0,
+    "tax": 0,
+    "fee": 0,
+    "currency": "EUR",
+    "exchangeRate": 0,
+    "datetime": "2020-08-31T22:00:00.000Z",
+    "price": 41.8
+  },
+  {
     "isin": "US8552441094",
     "wkn": "884437",
     "type": "Buy",
