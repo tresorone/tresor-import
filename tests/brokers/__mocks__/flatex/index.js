@@ -37,6 +37,8 @@ export const ignoredSamples = [
   require('./ignored/2020_saving_plan_confirmation.json'),
 ];
 
+export const csvSamples = [require('./buy/2021_depotumsaetze_csv.json')];
+
 export const allSamples = buySamples.concat(
   sellSamples,
   dividendSamples,

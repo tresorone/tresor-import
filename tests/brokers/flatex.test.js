@@ -7,22 +7,35 @@ import {
   mixedPageSamples,
   ignoredSamples,
   allSamples,
+  csvSamples,
 } from './__mocks__/flatex';
+
+import { csvLinesToJSON } from '../../src/helper';
 import Big from 'big.js';
 
 describe('Broker: Flatex', () => {
   let consoleErrorSpy;
 
   describe('Check all documents', () => {
-    test('Can the document parsed with Flatex', () => {
+    test('Can identify a implementation from the document as Flatex', () => {
       allSamples.forEach(pages => {
-        expect(flatex.canParseDocument(pages, 'pdf')).toEqual(true);
+        let implementations = findImplementation(pages, 'pdf');
+        expect(implementations[0]).toEqual(flatex);
       });
     });
 
-    test('Can identify a implementation from the document as Flatex', () => {
+    test('Can identify a pdf implementation from the document as Flatex', () => {
       allSamples.forEach(pages => {
         const implementations = findImplementation(pages, 'pdf');
+
+        expect(implementations.length).toEqual(1);
+        expect(implementations[0]).toEqual(flatex);
+      });
+    });
+
+    test('Can identify a csv implementation from the document as Flatex', () => {
+      csvSamples.forEach(pages => {
+        const implementations = findImplementation(pages, 'csv');
 
         expect(implementations.length).toEqual(1);
         expect(implementations[0]).toEqual(flatex);
@@ -45,6 +58,19 @@ describe('Broker: Flatex', () => {
         flatex.canParseDocument(
           [['flatex Bank AG', 'Dividendengutschrift']],
           'pdf'
+        )
+      ).toEqual(true);
+    });
+
+    test('should accept csv file', () => {
+      expect(
+        flatex.canParseDocument(
+          [
+            [
+              'Nummer;Buchtag;Valuta;ISIN;Bezeichnung;Nominal;;Buchungsinformationen;TA-Nr.;Kurs;\r',
+            ],
+          ],
+          'csv'
         )
       ).toEqual(true);
     });
@@ -77,6 +103,23 @@ describe('Broker: Flatex', () => {
       });
     });
 
+    test('should map csv data of csv sample corretly', () => {
+      const result = flatex.parsePages(
+        JSON.parse(csvLinesToJSON(csvSamples[0][0]))
+      );
+
+      expect(result.activities[0]['broker']).toEqual('flatex');
+      expect(result.activities[0]['type']).toEqual('BUY');
+      expect(result.activities[0]['isin']).toEqual('LU2023678878');
+
+      expect(result.activities[4]['broker']).toEqual('flatex');
+      expect(result.activities[4]['type']).toEqual('SELL');
+      expect(result.activities[4]['isin']).toEqual('NO0010081235');
+      expect(result.activities.length).toEqual(32);
+      expect(
+        result.activities.filter(activity => activity !== undefined).length
+      ).toEqual(32);
+    });
     test('should map pdf data of sample 2 correctly', () => {
       const result = flatex.parsePages(buySamples[1]);
 
