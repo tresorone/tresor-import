@@ -1,4 +1,3 @@
-import { csvLinesToJSON } from '@/helper';
 import pdfjs from 'pdfjs-dist/build/pdf';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 import * as brokers from './brokers';
@@ -36,12 +35,8 @@ export const parseActivitiesFromPages = (pages, extension) => {
       // Status 1, no broker could be found
       status = 1;
     } else if (implementations.length === 1) {
-      if (extension === 'pdf') {
+      if (extension === 'pdf' || extension === 'csv') {
         return filterResultActivities(implementations[0].parsePages(pages));
-      } else if (extension === 'csv') {
-        return filterResultActivities(
-          implementations[0].parsePages(JSON.parse(csvLinesToJSON(pages[0])))
-        );
       }
       // Invalid Filetype
       else {
