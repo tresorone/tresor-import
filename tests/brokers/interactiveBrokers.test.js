@@ -1,8 +1,6 @@
 import { findImplementation } from '@/index';
 import * as interactiveBrokers from '../../src/brokers/interactiveBrokers';
-import {
-  allSamples
-} from './__mocks__/interactiveBrokers';
+import { allSamples } from './__mocks__/interactiveBrokers';
 
 describe('Broker: interactive Brokers', () => {
   let consoleErrorSpy;
@@ -10,7 +8,9 @@ describe('Broker: interactive Brokers', () => {
   describe('Check all documents', () => {
     test('Can one page parsed with interactive Brokers', () => {
       allSamples.forEach(pages => {
-        expect(interactiveBrokers.canParseDocument(pages[0], 'csv')).toEqual(true);
+        expect(interactiveBrokers.canParseDocument(pages[0], 'csv')).toEqual(
+          true
+        );
       });
     });
 
@@ -26,7 +26,8 @@ describe('Broker: interactive Brokers', () => {
 
   describe('Validate activity', () => {
     test('Can the first order parsed from activity', () => {
-      const activities = interactiveBrokers.parsePages(allSamples[0]).activities;
+      const activities = interactiveBrokers.parsePages(allSamples[0])
+        .activities;
 
       expect(activities.length).toEqual(3);
       expect(activities[0]).toEqual({
@@ -54,4 +55,3 @@ describe('Broker: interactive Brokers', () => {
     consoleErrorSpy.mockRestore();
   });
 });
-

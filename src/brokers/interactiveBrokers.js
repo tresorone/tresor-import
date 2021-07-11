@@ -1,22 +1,21 @@
 export const canParseDocument = (pages, extension) =>
-	extension === 'csv' &&
-	pages
-	.flat()
-	.some(
-		line =>
-		(line.includes('Transaktionen,Data,Order,Aktien,')) ||
-		(line.includes('Transactions,Data,Order,Stock,'))
-);
+  extension === 'csv' &&
+  pages
+    .flat()
+    .some(
+      line =>
+        line.includes('Transaktionen,Data,Order,Aktien,') ||
+        line.includes('Transactions,Data,Order,Stock,')
+    );
 
-
-const findType = fields =>  {
-	if (fields[16].includes('O')) return 'Buy';
-	if (fields[16].includes('C')) return 'Sell';
-	return 'Unknown';
+const findType = fields => {
+  if (fields[16].includes('O')) return 'Buy';
+  if (fields[16].includes('C')) return 'Sell';
+  return 'Unknown';
 };
 
 const findAmount = fields => {
-	return parseFloat(fields[13]);
+  return parseFloat(fields[13]);
 };
 
 const findShares = fields => {
@@ -33,7 +32,12 @@ const findDate = fields => {
   return fields[6].replace(/^"|"$/g, '');
 };
 const findDatetime = fields => {
-  return fields[6].replace(/^"|"$/g, '') +  'T' + fields[7].replace(/^"|"$/g, '').trimStart() + '.000Z';
+  return (
+    fields[6].replace(/^"|"$/g, '') +
+    'T' +
+    fields[7].replace(/^"|"$/g, '').trimStart() +
+    '.000Z'
+  );
 };
 const findCurrency = fields => {
   return fields[4];
@@ -63,27 +67,26 @@ const findActivity = line => {
   return activity;
 };
 
-
 export const parsePages = contentOriginal => {
-	const content = contentOriginal[0];
-	if (content.length === 0) {
-		return {
-			activities: [],
-			status: 5,
-		};
-	}
+  const content = contentOriginal[0];
+  if (content.length === 0) {
+    return {
+      activities: [],
+      status: 5,
+    };
+  }
 
-	const filteredContent = content.filter(line => line.includes('Transaktionen,Data,Order,Aktien,'));
-	let activities = [];
-	filteredContent.forEach(line => {
-		let activity = findActivity(line);
-		activities.push(activity);
-	});
+  const filteredContent = content.filter(line =>
+    line.includes('Transaktionen,Data,Order,Aktien,')
+  );
+  let activities = [];
+  filteredContent.forEach(line => {
+    let activity = findActivity(line);
+    activities.push(activity);
+  });
 
-	
-
-	return {
-		activities,
-		status: 0,
-	};
+  return {
+    activities,
+    status: 0,
+  };
 };
