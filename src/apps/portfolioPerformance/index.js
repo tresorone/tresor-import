@@ -1,5 +1,6 @@
 import Big from 'big.js';
 import {
+  csvLinesToJSON,
   parseGermanNum,
   validateActivity,
   createActivityDateTime,
@@ -149,7 +150,8 @@ export const canParseDocument = (pages, extension) =>
           line.includes('Security Name'))
     );
 
-export const parsePages = content => {
+export const parsePages = contentOriginal => {
+  const content = JSON.parse(csvLinesToJSON(contentOriginal[0]));
   if (content.length === 0) {
     return {
       activities: [],
