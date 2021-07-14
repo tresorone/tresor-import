@@ -21,7 +21,11 @@ const isPageTypeSell = content =>
   );
 
 const isPageTypeDividend = content =>
-  content.some(line => line.includes('Ausschüttung Investmentfonds'));
+  content.some(
+    line => 
+      line.includes('Ausschüttung Investmentfonds') ||
+      line.includes('Dividendengutschrift')
+  );
 
 const findISIN = content =>
   content[findLineNumberByContent(content, 'ISIN') + 5];
@@ -78,7 +82,9 @@ const findAmount = (content, findTotalAmount) => {
 
 const findPayoutAmount = content => {
   let currentLineNumber = findLineNumberByContent(content, 'Ausschüttung');
-
+  if (currentLineNumber < 0) {
+    currentLineNumber = findLineNumberByContent(content, 'Dividendengutschrift');
+  }
   while (!content[currentLineNumber + 2].includes('EUR')) {
     currentLineNumber += 2;
   }
